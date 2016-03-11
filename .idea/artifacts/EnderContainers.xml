@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="EnderContainers">
+    <output-path>M:/Jeux/minecraft/serveurs/perso/1.8/plugins</output-path>
+    <root id="archive" name="EnderContainers.jar">
+      <element id="module-output" name="EnderContainers" />
+    </root>
+  </artifact>
+</component>
