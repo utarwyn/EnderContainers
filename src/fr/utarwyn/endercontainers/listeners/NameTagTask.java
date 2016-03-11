@@ -22,7 +22,7 @@ public class NameTagTask implements Runnable{
             if(b.getType().equals(Material.ENDER_CHEST)){
                 if(playerActives.containsKey(p)) continue;
 
-                int maxEcs =  Config.maxEnderchests;
+                int maxEcs = Config.maxEnderchests;
                 int copEcs = 0;
 
                 for(int i = 0; i < maxEcs; i++){
