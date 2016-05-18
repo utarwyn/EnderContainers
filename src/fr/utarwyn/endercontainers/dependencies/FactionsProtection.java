@@ -20,7 +20,7 @@ public class FactionsProtection {
         Faction playerFac = mplayer.getFaction();
         Faction currentFac = BoardColl.get().getFactionAt(PS.valueOf(b.getLocation()));
 
-        if (mplayer.isUsingAdminMode()) r = true;
+        if (mplayer.isOverriding()) r = true;
 
         if ((!r) && (currentFac != null)) {
             if ((playerFac != null) && (currentFac.getName().equalsIgnoreCase(playerFac.getName()))) r = true;

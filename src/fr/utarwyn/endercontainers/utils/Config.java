@@ -6,9 +6,11 @@ public class Config {
      * ----- General configuration
      * This is the general configuration
      */
-    public static boolean enabled = false;
-    public static boolean debug = true;
+    public static boolean enabled = true;
+    public static boolean debug = false;
     public static String prefix = "§8[§6EnderContainers§8] §7";
+    public static String pluginPrefix = prefix + "";
+    public static String updateBase = "http://utarwyn.xyz/plugins/endercontainers/";
 
 
     /**
@@ -22,8 +24,9 @@ public class Config {
      * ----- Enderchests configuration
      * This is the Enderchests configuration
      */
-    public static String mainEnderchestTitle = "Enderchest of %player%";
+    public static String mainEnderchestTitle       = "Enderchest of %player%";
     public static Integer defaultEnderchestsNumber = 1;
+    public static Boolean allowDoubleChest         = true;
 
     public static String enderchestTitle = "Enderchest %num% of %player%";
     public static String enderchestOpenPerm = "endercontainers.slot.";
@@ -36,11 +39,12 @@ public class Config {
      */
     public static boolean mysql = false;
 
-    public static String DB_HOST = "localhost";
-    public static Integer DB_PORT = 3306;
-    public static String DB_USER = "root";
-    public static String DB_PASS = "";
-    public static String DB_BDD = "default";
+    public static String DB_HOST   = "localhost";
+    public static Integer DB_PORT  = 3306;
+    public static String DB_USER   = "root";
+    public static String DB_PASS   = "";
+    public static String DB_BDD    = "default";
+    public static String DB_PREFIX = "ec_";
 
     /**
      * ----- Dependencies configuration
@@ -52,5 +56,7 @@ public class Config {
      * ----- Fun & others configuration
      * This is the funnies & others configuration
      */
-    public static boolean blockNametag = false;
+    public static boolean blockNametag     = false;
+    public static String openingChestSound = "CHEST_OPEN";
+    public static String closingChestSound = "CHEST_CLOSE";
 }

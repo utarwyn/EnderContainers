@@ -1,18 +1,30 @@
 package fr.utarwyn.endercontainers;
 
+import fr.utarwyn.endercontainers.containers.MenuContainer;
+import fr.utarwyn.endercontainers.database.DatabaseSet;
 import fr.utarwyn.endercontainers.utils.Config;
 import fr.utarwyn.endercontainers.utils.CoreUtils;
 import fr.utarwyn.endercontainers.utils.EnderChestUtils;
+import fr.utarwyn.endercontainers.utils.ItemSerializer;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 public class EnderChest {
 
     private Integer num = -1;
     private Player owner;
+
+    public String ownerName;
+    public UUID ownerUUID;
+
+    public MenuContainer lastMenuContainer;
 
     private HashMap<Integer, ItemStack> items = new HashMap<Integer, ItemStack>();
 
@@ -20,6 +32,13 @@ public class EnderChest {
     public EnderChest(Integer num, Player owner) {
         this.num = num;
         this.owner = owner;
+
+        load();
+    }
+    public EnderChest(Integer num, String ownerName, UUID ownerUUID) {
+        this.num = num;
+        this.ownerName = ownerName;
+        this.ownerUUID = ownerUUID;
 
         load();
     }
@@ -68,13 +87,32 @@ public class EnderChest {
         return items.containsValue(n);
     }
 
+    public int getRealSize(){
+        int n = 0;
+
+        for(Integer index : getItems().keySet()){
+            ItemStack item = getItems().get(index);
+            if(item != null) n++;
+        }
+
+        return n;
+    }
+
     public void clearItems() {
         this.items.clear();
     }
 
     public void load() {
-        if (owner == null || num == -1) return;
-        String file = Config.saveDir + owner.getUniqueId().toString() + ".yml";
+        if ((owner == null && ownerName == null) && num == -1) return;
+
+        if(EnderContainers.hasMysql()){
+            this.loadFromMysql();
+            return;
+        }
+
+        UUID uuid = (owner != null) ? owner.getUniqueId() : ownerUUID;
+
+        String file = Config.saveDir + uuid.toString() + ".yml";
         String path = "enderchests.enderchest" + num;
 
         EnderContainers.getConfigClass().loadConfigFile(file);
@@ -89,16 +127,24 @@ public class EnderChest {
             addItem(index, i);
         }
     }
-
     public void save() {
-        if (owner == null || num == -1) return;
-        String file = Config.saveDir + owner.getUniqueId().toString() + ".yml";
+        if ((owner == null && ownerName == null) && num == -1) return;
+
+        if(EnderContainers.hasMysql()){
+            this.saveToMysql();
+            return;
+        }
+
+        UUID uuid         = (owner != null) ? owner.getUniqueId() : ownerUUID;
+        String playername = (owner != null) ? owner.getName() : ownerName;
+
+        String file = Config.saveDir + uuid.toString() + ".yml";
         String path = "enderchests.enderchest" + num;
         EnderContainers.getConfigClass().loadConfigFile(file);
         int count = 0;
 
         if (!EnderContainers.getConfigClass().isConfigurationSection(file, "enderchests"))
-            EnderChestUtils.initatePlayerFile(file, owner);
+            EnderChestUtils.initatePlayerFile(file, playername);
 
         EnderContainers.getConfigClass().removePath(file, path);
 
@@ -113,13 +159,39 @@ public class EnderChest {
                 count++;
         }
 
-        // Save current timestamp
+        // Save current timestamp & current chest size
         EnderContainers.getConfigClass().set(file, "lastsaved", System.currentTimeMillis() + "");
+        EnderContainers.getConfigClass().set(file, "enderchestsSize." + num, count);
 
         EnderContainers.getConfigClass().setAutoSaving = true;
         EnderContainers.getConfigClass().saveConfig(file);
 
 
-        CoreUtils.log(owner.getName() + "'s enderchest saved ! (" + count + " items)");
+        CoreUtils.log(playername + "'s enderchest saved ! (" + count + " items)");
+    }
+
+    public void loadFromMysql(){
+        UUID uuid       = (owner != null) ? owner.getUniqueId() : ownerUUID;
+        DatabaseSet set = EnderContainers.getMysqlManager().getPlayerEnderchest(uuid, num);
+
+        if(set != null){
+            String rawItems = set.getString("items");
+            HashMap<Integer, ItemStack> items = ItemSerializer.stringToItems(rawItems);
+
+            this.items = items;
+        }
+    }
+    public void saveToMysql(){
+        UUID uuid          = (owner != null) ? owner.getUniqueId() : ownerUUID;
+        Integer slotsUsed  = 0;
+
+        for(Integer slot : items.keySet()){
+            ItemStack item = items.get(slot);
+            if(item == null) continue;
+
+            slotsUsed++;
+        }
+
+        EnderContainers.getMysqlManager().savePlayerEnderchest(uuid, num, slotsUsed, ItemSerializer.itemsToString(items));
     }
 }

@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.database;
 
+import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.utils.Config;
 import fr.utarwyn.endercontainers.utils.CoreUtils;
 
@@ -19,6 +20,8 @@ public class Database {
     private static Connection conn;
     private static String lastRequest;
 
+    private boolean debugMessage = false;
+
 
     public void setBDD(String BDD) {
         Database.DB = BDD;
@@ -27,14 +30,25 @@ public class Database {
     public static Connection getConnection() {
         return Database.conn;
     }
+    public static Boolean isConnected(){ return getConnection() != null; }
 
     public void connect() {
         try {
             if (Database.conn == null || Database.conn.isClosed()) {
                 Database.conn = DriverManager.getConnection("jdbc:mysql://" + Database.host + ":" + Database.port + "/" + Database.DB, user, pass);
+                if(!debugMessage){
+                    CoreUtils.log(Config.pluginPrefix + "§aMysql: connected to the database '" + Database.DB + "'.");
+                    Config.enabled = true;
+                    debugMessage = true;
+                }
             }
         } catch (SQLException e) {
-            CoreUtils.error("Mysql error: " + e.getMessage());
+            Database.conn = null;
+            CoreUtils.error("Mysql error: unable to connect to the database. Please retry.");
+            CoreUtils.log(Config.pluginPrefix + "§4Module §6Mysql §4disabled.", true);
+
+            EnderContainers.getInstance().loadBackupsConfig();
+            Config.mysql = false;Config.enabled = true;
         }
     }
 
@@ -55,8 +69,39 @@ public class Database {
             Connection conn = DriverManager.getConnection("jdbc:mysql://" + Database.host + ":" + Database.port + "/?user=" + Database.user + "&password=" + Database.pass);
             s = conn.createStatement();
             s.executeUpdate("CREATE DATABASE " + dbName);
+
+            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+    public void emptyTable(String tableName) {
+        Statement s;
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://" + Database.host + ":" + Database.port + "/?user=" + Database.user + "&password=" + Database.pass);
+            s = conn.createStatement();
+
+            s.executeUpdate("USE " + Database.DB);
+            s.executeUpdate("SET SQL_SAFE_UPDATES=0;");
+            s.executeUpdate("truncate " + tableName);
+            s.executeUpdate("SET SQL_SAFE_UPDATES=1;");
+
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public Boolean tableExists(String table){
+        if(!isConnected()) return false;
+
+        try{
+            DatabaseMetaData dbm = conn.getMetaData();
+            ResultSet tables     = dbm.getTables(null, null, table, null);
+
+            if(tables.next()) return true;
+            else return false;
+        } catch(Exception e){
+            return false;
         }
     }
 
@@ -73,15 +118,29 @@ public class Database {
         return this.find(table, conditions, orderby, null);
     }
 
-    public List<DatabaseSet> find(String table, Map<String, String> conditions, List<String> orderby, List<Integer> limit) {
+    public List<DatabaseSet> find(String table, Map<String, String> conditions, List<String> orderby, List<String> fields) {
+        return find(table, conditions, orderby, fields, null);
+    }
+
+    public List<DatabaseSet> find(String table, Map<String, String> conditions, List<String> orderby, List<String> fields, List<Integer> limit) {
         connect();
 
         List<DatabaseSet> result = null;
         PreparedStatement sql = null;
         if (getConnection() == null) return null;
 
+        String strFields = "*";
+        if(fields != null){
+            strFields = "";
+
+            for(String field : fields)
+                strFields += field + ",";
+
+            strFields = strFields.substring(0, strFields.length() - 1);
+        }
+
         // Format fields & elements
-        String req = "SELECT * FROM " + table + "";
+        String req = "SELECT " + strFields + " FROM " + table + "";
         ArrayList<String> stringsToExec = new ArrayList<>();
         if (conditions != null) {
             int count = conditions.size();
@@ -92,7 +151,7 @@ public class Database {
                 String v = conditions.get(k);
 
                 if (index != count)
-                    req += k + " = ? AND";
+                    req += k + " = ? AND ";
                 else
                     req += k + " = ?";
 
@@ -148,8 +207,15 @@ public class Database {
         else return r.get(0);
     }
 
-    public DatabaseSet findFirst(String table, Map<String, String> conditions, List<String> orderby, List<Integer> limit) {
-        List<DatabaseSet> r = this.find(table, conditions, orderby, limit);
+    public DatabaseSet findFirst(String table, Map<String, String> conditions, List<String> orderby, List<String> fields) {
+        List<DatabaseSet> r = this.find(table, conditions, orderby, fields);
+        if (r == null) return null;
+        else return r.get(0);
+    }
+
+
+    public DatabaseSet findFirst(String table, Map<String, String> conditions, List<String> orderby, List<String> fields, List<Integer> limit) {
+        List<DatabaseSet> r = this.find(table, conditions, orderby, fields, limit);
         if (r == null) return null;
         else return r.get(0);
     }
@@ -222,7 +288,7 @@ public class Database {
                 String v = conditions.get(k);
 
                 if (CondsIndex != CondsCount)
-                    req += k + " = ? AND";
+                    req += k + " = ? AND ";
                 else
                     req += k + " = ?";
 
@@ -242,12 +308,17 @@ public class Database {
                     sql.setString(i, (String) o);
                 else if (o instanceof Integer)
                     sql.setInt(i, (Integer) o);
+                else if (o instanceof Long)
+                    sql.setLong(i, (Long) o);
                 else if (o instanceof Float)
                     sql.setFloat(i, (Float) o);
                 else if (o instanceof Double)
                     sql.setDouble(i, (Double) o);
-                else if (o instanceof Timestamp)
+                else if (o instanceof Timestamp) {
                     sql.setTimestamp(i, (Timestamp) o);
+                }else{
+                    sql.setNull(i, Types.TIMESTAMP);
+                }
 
                 i++;
             }
@@ -267,6 +338,17 @@ public class Database {
         }
     }
 
+    public void request(String request){
+        if(!isConnected()) return;
+
+        Statement s;
+        try {
+            s = conn.createStatement();
+            s.executeUpdate(request);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public boolean delete(String table, Map<String, String> conditions) {
         connect();

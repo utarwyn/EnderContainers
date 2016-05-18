@@ -10,45 +10,48 @@ import java.net.URLConnection;
 public class Updater {
     private static EnderContainers plugin;
 
-    public String address = "http://185.13.38.245/plugins/EnderContainers/" + EnderContainers.getInstance().getDescription().getName() + "-lastest.jar";
+    public String address = Config.updateBase + EnderContainers.getInstance().getDescription().getName() + "-lastest.jar";
     public String updatepath = "plugins" + File.separator + EnderContainers.getInstance().getDescription().getName() + ".jar";
+
 
     public Updater(EnderContainers instance) {
         plugin = instance;
     }
 
-    public Boolean updateCheck() {
-        URLConnection conn = null;
+    public String getNewVersion(){
+        String newVersion = null;
+        String version    = EnderContainers.getInstance().getDescription().getVersion();
+
         try {
-            URL url = new URL(this.address);
-            conn = url.openConnection();
-            File localfile = new File(this.updatepath);
-            long lastmodifiedurl = conn.getLastModified();
-            long lastmodifiedfile = localfile.lastModified();
-            if (lastmodifiedurl > lastmodifiedfile) {
-                plugin.getLogger().info("Mise a jour en cours...");
-                download();
-                return true;
-            } else {
-                plugin.getLogger().info("Aucun mise a jour trouvee !");
-                return false;
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+            URL url = new URL(Config.updateBase + "version");
+            InputStream is = url.openStream();
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            byte[] buf = new byte[4096];
+            int n;
+            while ((n = is.read(buf)) >= 0)
+                os.write(buf, 0, n);
+            os.close();
+            is.close();
+            byte[] data = os.toByteArray();
+
+            newVersion = new String(data);
+
+            if (newVersion.equalsIgnoreCase(version)) newVersion = null;
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-        plugin.getServer().notify();
-        return false;
+
+        return newVersion;
     }
 
     public void update() {
-        plugin.getLogger().info("Mise a jour en cours...");
+        plugin.getLogger().info("Updating...");
         download();
     }
 
     public void update(String adress, String file) {
-        plugin.getLogger().info("Mise a jour en cours...");
+        plugin.getLogger().info("Updating...");
         download(adress, file);
     }
 

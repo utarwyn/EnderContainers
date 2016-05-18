@@ -6,12 +6,18 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 public class MenuContainer implements InventoryHolder {
 
     int rows = 29;
     String title = "";
     private HashMap<Integer, ItemStack> items = new HashMap<Integer, ItemStack>();
+    private Inventory inventory;
+
+    // Offline player
+    public String offlineOwnerName = "";
+    public UUID offlineOwnerUUID  = null;
 
     public MenuContainer(int rows, String title) {
         this.rows = rows;
@@ -40,6 +46,7 @@ public class MenuContainer implements InventoryHolder {
 
     @Override
     public Inventory getInventory() {
+        if(this.inventory != null) return this.inventory;
         Inventory inv = Bukkit.createInventory(this, rows, title);
 
         for (Integer index : items.keySet()) {
@@ -48,6 +55,7 @@ public class MenuContainer implements InventoryHolder {
             inv.setItem(index, i);
         }
 
+        this.inventory = inv;
         return inv;
     }
 

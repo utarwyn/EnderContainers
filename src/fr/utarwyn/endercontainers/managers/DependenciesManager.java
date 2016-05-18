@@ -19,13 +19,13 @@ public class DependenciesManager {
     }
 
     public void loadDependencies() {
-        CoreUtils.log("-----------§8[§bDependencies§8]§7-----------");
+        CoreUtils.log("§8[§6EnderContainers§8] -----------§8[§bDependencies§8]§7-----------", true);
         if (Config.factionsSupport) {
             loadDependency("Factions");
         } else {
             this.dependencies.put("Factions", Boolean.valueOf(false));
         }
-        CoreUtils.log("------------------------------------");
+        CoreUtils.log("§8[§6EnderContainers§8] ------------------------------------", true);
     }
 
     public HashMap<String, Boolean> getDependencies() {
@@ -47,9 +47,9 @@ public class DependenciesManager {
         }
         this.dependencies.put(dependency, Boolean.valueOf(isEnabled));
         if (isEnabled) {
-            CoreUtils.log("§e   - " + dependency + "§r: " + ChatColor.GREEN + "[Enabled]");
+            CoreUtils.log("§8[§6EnderContainers§8] §e   - " + dependency + "§r: " + ChatColor.GREEN + "[Enabled]", true);
         } else {
-            CoreUtils.log("§e   - " + dependency + "§r: " + ChatColor.RED + "[Disabled]");
+            CoreUtils.log("§8[§6EnderContainers§8] §e   - " + dependency + "§r: " + ChatColor.RED + "[Disabled]", true);
         }
     }
 }
