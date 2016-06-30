@@ -71,7 +71,7 @@ public class EnderchestsManager {
         }
 
         EnderChest ec = getPlayerEnderchest(owner, num);
-        Integer slots = (Config.allowDoubleChest && CoreUtils.playerHasPerm(owner, "doublechest." + num)) ? 54 : 27;
+        Integer slots = (Config.allowDoubleChest && (CoreUtils.playerHasPerm(owner, "doublechest." + num) || CoreUtils.playerHasPerm(owner, "doublechest.*"))) ? 54 : 27;
 
         if(ec != null && ec.lastMenuContainer != null){
             if (enderchestsOpens.containsKey(player)) enderchestsOpens.remove(player);
