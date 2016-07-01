@@ -43,8 +43,8 @@ public class PluginListener implements Listener {
         Player p = e.getPlayer();
 
         if(p.isOp() && EnderContainers.getInstance().newVersion != null){
-            p.sendMessage(Config.pluginPrefix + "§aThere is a newer version available: §2§l" + EnderContainers.getInstance().newVersion + "§a.");
-            p.sendMessage(Config.pluginPrefix + "§7Type §e/ec update §7in the chat to start the update.");
+            p.sendMessage(Config.pluginPrefix + "§a" + EnderContainers.__("other_new_update") + ": §2§l" + EnderContainers.getInstance().newVersion + "§a.");
+            p.sendMessage(Config.pluginPrefix + EnderContainers.__("other_new_update_line2").replace("%command%", "/ec update"));
         }
 
         if(EnderContainers.hasMysql())

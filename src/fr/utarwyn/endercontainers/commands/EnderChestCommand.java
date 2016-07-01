@@ -23,7 +23,7 @@ public class EnderChestCommand implements CommandExecutor {
         Player p = (Player) sender;
 
         if (!Config.enabled) {
-            CoreUtils.errorMessage(p, "Plugin is disabled.");
+            PluginMsg.pluginDisabled(p);
             return true;
         }
 

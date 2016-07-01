@@ -110,25 +110,25 @@ public class EnderChestUtils {
 
             if (!player.hasPermission(Config.enderchestOpenPerm + i) && i != 0 && i >= Config.defaultEnderchestsNumber) {
                 meta.setDisplayName("§cEnderchest " + (i + 1) + " " + suffix);
-                meta.setLore(Arrays.asList(" ", "This enderchest is locked."));
+                meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_locked")));
             }else{
                 meta.setDisplayName("§aEnderchest " + (i + 1) + " " + suffix);
 
-                if (size == slots) meta.setLore(Arrays.asList(" ", "§4Inventory full !"));
+                if (size == slots) meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_inventoryfull")));
             }
 
             if(playerToSpec != null && size == 0) {
                 if (!playerToSpec.getName().equalsIgnoreCase(mainPlayer.getName())) {
                     if (!player.hasPermission(Config.enderchestOpenPerm + i) && i >= Config.defaultEnderchestsNumber)
-                        meta.setLore(Arrays.asList(" ", "§2This enderchest is empty.", "§cThe player don't have access to this chest."));
+                        meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_empty"), EnderContainers.__("enderchest_player_denied")));
                     else
-                        meta.setLore(Arrays.asList(" ", "§2This enderchest is empty.", "§aClick to show this enderchest."));
+                        meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_empty"), EnderContainers.__("enderchest_show_contents")));
                 }
             }else if(playerToSpec != null && !playerToSpec.getName().equalsIgnoreCase(mainPlayer.getName())){
                 if (!player.hasPermission(Config.enderchestOpenPerm + i) && i >= Config.defaultEnderchestsNumber)
-                    meta.setLore(Arrays.asList(" ", "§cThe player don't have access to this chest."));
+                    meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_player_denied")));
                 else
-                    meta.setLore(Arrays.asList(" ", "§bClick to show the content", "§bof this enderchest."));
+                    meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_show_contents")));
             }
 
             item.setItemMeta(meta);
@@ -150,7 +150,7 @@ public class EnderChestUtils {
         String file = "";
 
         if(!Bukkit.getOfflinePlayer(playername).hasPlayedBefore() || (!EnderContainers.hasMysql() && !EnderContainers.getConfigClass().isConfigurationSection("players.yml", playername))){
-            CoreUtils.errorMessage(player, "This player has never played on the server ! Please retry.");
+            CoreUtils.errorMessage(player, EnderContainers.__("enderchest_player_never_connected"));
             return;
         }
 
@@ -218,23 +218,23 @@ public class EnderChestUtils {
 
             if (!accesses.containsKey(i) && i != 0 && i >= Config.defaultEnderchestsNumber) {
                 meta.setDisplayName("§cEnderchest " + (i + 1) + " " + suffix);
-                meta.setLore(Arrays.asList(" ", "§cThis enderchest is locked."));
+                meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_locked")));
             }else{
                 meta.setDisplayName("§aEnderchest " + (i + 1) + " " + suffix);
 
-                if (size == slots) meta.setLore(Arrays.asList(" ", "§4Inventory full !"));
+                if (size == slots) meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_inventoryfull")));
             }
 
             if(size == 0) {
                 if (!accesses.containsKey(i) && i >= Config.defaultEnderchestsNumber)
-                    meta.setLore(Arrays.asList(" ", "§2This enderchest is empty.", "§cThe player don't have access to this chest."));
+                    meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_empty"), EnderContainers.__("enderchest_player_denied")));
                 else
-                    meta.setLore(Arrays.asList(" ", "§2This enderchest is empty.", "§aClick to show this enderchest."));
+                    meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_empty"), EnderContainers.__("enderchest_show_contents")));
             }else{
                 if (!accesses.containsKey(i) && i >= Config.defaultEnderchestsNumber)
-                    meta.setLore(Arrays.asList(" ", "§cThe player don't have access to this chest."));
+                    meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_player_denied")));
                 else
-                    meta.setLore(Arrays.asList(" ", "§bClick to show the content", "§bof this enderchest."));
+                    meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_show_contents")));
             }
 
             item.setItemMeta(meta);
@@ -337,14 +337,14 @@ public class EnderChestUtils {
                 public void run() {
 
                     if (!EnderContainers.getConfigClass().isConfigurationSection("backups.yml", pre)) {
-                        CoreUtils.errorMessage(p, "Backup §6" + name + "§c is undefined.");
+                        CoreUtils.errorMessage(p, EnderContainers.__("cmd_backup_unknown").replace("%backup_name%", name));
                         Config.enabled = true;
                         return;
                     }
 
                     File backupDir = new File("plugins/EnderContainers/" + EnderContainers.getConfigClass().getString("backups.yml", pre + ".path"));
                     if (!backupDir.exists()) {
-                        CoreUtils.errorMessage(p, "Backup folder of §6" + name + "§c not exist.");
+                        CoreUtils.errorMessage(p, EnderContainers.__("cmd_backup_folder_unknown").replace("%backup_name%", name));
                         Config.enabled = true;
                         return;
                     }
@@ -364,15 +364,14 @@ public class EnderChestUtils {
                     EnderContainers.getInstance().reloadConfiguration();
 
                     Config.enabled = true;
-                    p.sendMessage(Config.prefix + "§aBackup §b" + name + "§a loaded indefinitly.");
-                    p.sendMessage(Config.prefix + "§aPlugin enabled !");
+                    p.sendMessage(Config.prefix + EnderContainers.__("cmd_backup_loaded").replace("%backup_name%", name));
                 }
             });
         }else{
             final DatabaseSet backup = EnderContainers.getMysqlManager().getBackup(name);
 
             if(backup == null){
-                CoreUtils.errorMessage(p, "Backup §6" + name + "§c is undefined.");
+                CoreUtils.errorMessage(p, EnderContainers.__("cmd_backup_unknown").replace("%backup_name%", name));
                 Config.enabled = true;
                 return;
             }
@@ -403,7 +402,7 @@ public class EnderChestUtils {
                         EnderContainers.getMysqlManager().saveEnderChestFromABackup(id, items, slotsUsed, lastOpeningTime, lastSaveTime, playerUUID, enderchestId);
                     }
 
-                    CoreUtils.errorMessage(p, "§aBackup §6" + name + " §aloaded ! §2Plugin enabled.");
+                    CoreUtils.errorMessage(p, EnderContainers.__("cmd_backup_loaded").replace("%backup_name%", name));
                     Config.enabled = true;
                 }
             });
@@ -421,13 +420,13 @@ public class EnderChestUtils {
             public void run() {
                 if(!mysql) {
                     if (!EnderContainers.getConfigClass().isConfigurationSection("backups.yml", pre)) {
-                        CoreUtils.errorMessage(p, "Backup §6" + name + "§c is undefined.");
+                        CoreUtils.errorMessage(p, EnderContainers.__("cmd_backup_unknown").replace("%backup_name%", name));
                         return;
                     }
 
                     File backupDir = new File("plugins/EnderContainers/" + EnderContainers.getConfigClass().getString("backups.yml", pre + ".path"));
                     if (!backupDir.exists()) {
-                        CoreUtils.errorMessage(p, "Backup folder of §6" + name + "§c not exist.");
+                        CoreUtils.errorMessage(p, EnderContainers.__("cmd_backup_folder_unknown").replace("%backup_name%", name));
                         return;
                     }
 
@@ -444,14 +443,14 @@ public class EnderChestUtils {
                 }else{
                     DatabaseSet backup = EnderContainers.getMysqlManager().getBackup(name);
                     if(backup == null){
-                        CoreUtils.errorMessage(p, "Backup §6" + name + "§c is undefined.");
+                        CoreUtils.errorMessage(p, EnderContainers.__("cmd_backup_unknown").replace("%backup_name%", name));
                         return;
                     }
 
                     EnderContainers.getMysqlManager().removeBackup(name);
                 }
 
-                p.sendMessage(Config.prefix + "§aBackup §b" + name + "§a removed.");
+                p.sendMessage(Config.prefix + EnderContainers.__("cmd_backup_removed"));
             }
         });
 
@@ -544,6 +543,8 @@ public class EnderChestUtils {
     }
     public static HashMap<Integer, Boolean> getPlayerAccesses(String playername){
         HashMap<Integer, Boolean> accesses = new HashMap<>();
+
+        if(!EnderContainers.hasMysql()) EnderContainers.getConfigClass().loadConfigFile("players.yml");
 
         if(!Bukkit.getOfflinePlayer(playername).hasPlayedBefore())
             return accesses;

@@ -8,6 +8,7 @@ import fr.utarwyn.endercontainers.listeners.NameTagTask;
 import fr.utarwyn.endercontainers.listeners.PluginListener;
 import fr.utarwyn.endercontainers.managers.DependenciesManager;
 import fr.utarwyn.endercontainers.managers.EnderchestsManager;
+import fr.utarwyn.endercontainers.managers.LocalesManager;
 import fr.utarwyn.endercontainers.managers.MysqlManager;
 import fr.utarwyn.endercontainers.utils.*;
 import org.bukkit.Bukkit;
@@ -25,6 +26,7 @@ public class EnderContainers extends JavaPlugin {
     public EnderchestsManager enderchestsManager;
     public DependenciesManager dependenciesManager;
     public MysqlManager mysqlManager;
+    public LocalesManager localesManager;
 
     public NameTagTask nameTagTask = new NameTagTask();
     public String newVersion = null;
@@ -58,6 +60,8 @@ public class EnderContainers extends JavaPlugin {
             getConfigClass().set("main", "debug", Config.debug);
         if (!getConfigClass().contains("main", "prefix"))
             getConfigClass().set("main", "prefix", "&8[&6EnderContainers&8] &7");
+        if (!getConfigClass().contains("main", "locale"))
+            getConfigClass().set("main", "locale", Config.pluginLocale);
         if (!getConfigClass().contains("main", "enderchests.max"))
             getConfigClass().set("main", "enderchests.max", Config.maxEnderchests);
         if (!getConfigClass().contains("main", "enderchests.default"))
@@ -94,6 +98,7 @@ public class EnderContainers extends JavaPlugin {
         Config.enabled = getConfigClass().getBoolean("main", "enabled");
         Config.debug = getConfigClass().getBoolean("main", "debug");
         Config.prefix = ChatColor.translateAlternateColorCodes('&', getConfigClass().getString("main", "prefix"));
+        Config.pluginLocale = getConfigClass().getString("main", "locale");
 
         if (getConfigClass().getInt("main", "enderchests.max") <= 54 && getConfigClass().getInt("main", "enderchests.max") > 0)
             Config.maxEnderchests = getConfigClass().getInt("main", "enderchests.max");
@@ -135,6 +140,7 @@ public class EnderContainers extends JavaPlugin {
         this.dependenciesManager = new DependenciesManager();
         this.enderchestsManager  = new EnderchestsManager();
         this.mysqlManager        = new MysqlManager();
+        this.localesManager      = new LocalesManager();
     }
 
     public void loadListeners() {
@@ -207,6 +213,9 @@ public class EnderContainers extends JavaPlugin {
     }
     public static MysqlManager getMysqlManager(){
         return EnderContainers.instance.mysqlManager;
+    }
+    public static String __(String key){
+        return EnderContainers.getInstance().localesManager.get(key);
     }
 
     public static ConfigClass getConfigClass() {

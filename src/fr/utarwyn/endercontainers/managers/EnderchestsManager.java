@@ -103,6 +103,11 @@ public class EnderchestsManager {
         ec.lastMenuContainer = menu;
     }
     public void openOfflinePlayerEnderChest(Integer num, Player player, UUID uuid, String playername){
+        if(player.getName().equals(playername)){
+            CoreUtils.errorMessage(player, "You can't open one of your own enderchests ! Please retry.");
+            return;
+        }
+
         if(Bukkit.getPlayer(playername) != null){
             openPlayerEnderChest(num, player, Bukkit.getPlayer(playername));
             return;

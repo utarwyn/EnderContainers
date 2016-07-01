@@ -36,7 +36,7 @@ public class EnderChestListener implements Listener {
         if (b == null) return;
         if (!Config.enabled){
             e.setCancelled(true);
-            CoreUtils.errorMessage(p, "The plugin is actually disabled. Please wait.");
+            PluginMsg.pluginDisabled(p);
             return;
         }
 
@@ -157,6 +157,7 @@ public class EnderChestListener implements Listener {
 
         ecm.enderchestsOpens.remove(p);
 
+        assert ec != null;
         ec.clearItems();
 
         int index = 0;

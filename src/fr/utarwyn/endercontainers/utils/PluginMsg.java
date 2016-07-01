@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.utils;
 
+import fr.utarwyn.endercontainers.EnderContainers;
 import org.bukkit.entity.Player;
 
 public class PluginMsg {
@@ -9,14 +10,18 @@ public class PluginMsg {
     }
 
     public static void cantUseHereFaction(Player p) {
-        CoreUtils.errorMessage(p, "You can't use this EnderChest here.");
+        CoreUtils.errorMessage(p, EnderContainers.__("error_access_denied_factions"));
     }
 
     public static void cannotOpenEnderchest(Player p) {
-        CoreUtils.errorMessage(p, "You can't open this EnderChest !");
+        CoreUtils.errorMessage(p, EnderContainers.__("error_cannot_open_enderchest"));
     }
 
     public static void enderchestUnknown(Player p, Integer index) {
-        CoreUtils.errorMessage(p, "Enderchest " + index + " doesn't exist.");
+        CoreUtils.errorMessage(p, EnderContainers.__("error_unknown_enderchest").replace("%enderchest%", Integer.toString(index)));
+    }
+
+    public static void pluginDisabled(Player p){
+        CoreUtils.errorMessage(p, EnderContainers.__("error_plugin_disabled"));
     }
 }

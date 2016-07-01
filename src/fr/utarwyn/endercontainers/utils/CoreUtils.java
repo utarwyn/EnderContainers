@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.utils;
 
+import fr.utarwyn.endercontainers.EnderContainers;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -25,10 +26,10 @@ public class CoreUtils {
     }
 
     public static void accessDenied(CommandSender sender) {
-        sender.sendMessage(Config.prefix + "§c" + "You don't have access to this command.");
+        sender.sendMessage(Config.prefix + "§c" + EnderContainers.__("error_player_denied"));
     }
     public static void consoleDenied(CommandSender sender){
-        errorMessage(sender, "You must be a player to do this.");
+        errorMessage(sender, EnderContainers.__("error_console_denied"));
     }
 
     public static boolean playerHasPerm(Player player, String perm) {

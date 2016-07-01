@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.listeners;
 
+import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.utils.Config;
 import fr.utarwyn.endercontainers.utils.CoreUtils;
 import fr.utarwyn.endercontainers.utils.EnderChestUtils;
@@ -27,7 +28,7 @@ public class NameTagTask implements Runnable{
 
                 int copEcs = EnderChestUtils.getPlayerAvailableEnderchests(p);
 
-                String nameTag = "§6§l" + copEcs + "§r§e enderchest" + ((copEcs > 1) ? "s" : "") + " available";
+                String nameTag = EnderContainers.__("enderchest_nametag").replace("%enderchests%", Integer.toString(copEcs)).replace("%plurial%", ((copEcs > 1) ? "s" : ""));
                 FloatingTextUtils.FloatingText ft = FloatingTextUtils.displayFloatingTextAtFor(nameTag, b.getLocation().clone().add(0.5, 1, 0.5), p);
 
                 playerActives.put(p, ft);

@@ -12,6 +12,8 @@ public class Config {
     public static String pluginPrefix = prefix + "";
     public static String updateBase = "http://utarwyn.xyz/plugins/endercontainers/";
 
+    public static String pluginLocale = "en";
+
 
     /**
      * ----- Save configuration
