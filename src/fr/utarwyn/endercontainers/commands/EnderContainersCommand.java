@@ -184,22 +184,22 @@ public class EnderContainersCommand implements CommandExecutor {
 
         if (page == 1) {
             sendFormattedHelpLine(p, EnderContainers.__("help_enderchest_cmd"), "§e/enderchest [number]", "*");
-            sendFormattedHelpLine(p, EnderContainers.__("help_open_enderchest_cmd"), "§b/ec open <player>", "backups.openchests");
+            sendFormattedHelpLine(p, EnderContainers.__("help_open_enderchest_cmd"), "§b/endc open <player>", "backups.openchests");
 
             p.sendMessage(" ");
 
-            sendFormattedHelpLine(p, EnderContainers.__("help_backups_cmd"), "§b/ec backups", "backups.view");
-            sendFormattedHelpLine(p, EnderContainers.__("help_create_backup_cmd"), "§b/ec createbackup <name>", "backups.create");
-            sendFormattedHelpLine(p, EnderContainers.__("help_backup_info_cmd"), "§b/ec backup <name>", "backups.info");
+            sendFormattedHelpLine(p, EnderContainers.__("help_backups_cmd"), "§b/endc backups", "backups.view");
+            sendFormattedHelpLine(p, EnderContainers.__("help_create_backup_cmd"), "§b/endc createbackup <name>", "backups.create");
+            sendFormattedHelpLine(p, EnderContainers.__("help_backup_info_cmd"), "§b/endc backup <name>", "backups.info");
         } else if (page == 2) {
-            sendFormattedHelpLine(p, EnderContainers.__("help_backup_load_cmd"), "§b/ec loadbackup <name>", "backups.load");
-            sendFormattedHelpLine(p, EnderContainers.__("help_remove_backup_cmd"), "§b/ec rmbackup <name>", "backups.remove");
+            sendFormattedHelpLine(p, EnderContainers.__("help_backup_load_cmd"), "§b/endc loadbackup <name>", "backups.load");
+            sendFormattedHelpLine(p, EnderContainers.__("help_remove_backup_cmd"), "§b/endc rmbackup <name>", "backups.remove");
 
             p.sendMessage(" ");
 
-            sendFormattedHelpLine(p, EnderContainers.__("help_view_config_cmd"), "§b/ec config", null, true);
-            sendFormattedHelpLine(p, EnderContainers.__("help_updates_check_cmd"), "§e/ec update", "update");
-            sendFormattedHelpLine(p, EnderContainers.__("help_reload_plugin_cmd"), "§e/ec reload", null, true);
+            sendFormattedHelpLine(p, EnderContainers.__("help_view_config_cmd"), "§b/endc config", null, true);
+            sendFormattedHelpLine(p, EnderContainers.__("help_updates_check_cmd"), "§e/endc update", "update");
+            sendFormattedHelpLine(p, EnderContainers.__("help_reload_plugin_cmd"), "§e/endc reload", null, true);
         }
 
         p.sendMessage(" ");

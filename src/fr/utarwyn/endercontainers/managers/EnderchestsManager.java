@@ -77,7 +77,8 @@ public class EnderchestsManager {
             if (enderchestsOpens.containsKey(player)) enderchestsOpens.remove(player);
             enderchestsOpens.put(player, ec);
 
-            player.playSound(player.getLocation(), Sound.CHEST_OPEN, 1, 1);
+            playSoundTo(Config.openingChestSound, player);
+
             player.openInventory(ec.lastMenuContainer.getInventory());
             return;
         }
@@ -97,7 +98,7 @@ public class EnderchestsManager {
         if (enderchestsOpens.containsKey(player)) enderchestsOpens.remove(player);
         enderchestsOpens.put(player, ec);
 
-        player.playSound(player.getLocation(), Sound.CHEST_OPEN, 1, 1);
+        playSoundTo(Config.openingChestSound, player);
         player.openInventory(menu.getInventory());
 
         ec.lastMenuContainer = menu;
@@ -145,7 +146,8 @@ public class EnderchestsManager {
             if (enderchestsOpens.containsKey(player)) enderchestsOpens.remove(player);
             enderchestsOpens.put(player, ec);
 
-            player.playSound(player.getLocation(), Sound.CHEST_OPEN, 1, 1);
+            playSoundTo(Config.openingChestSound, player);
+
             player.openInventory(ec.lastMenuContainer.getInventory());
             return;
         }
@@ -169,7 +171,7 @@ public class EnderchestsManager {
         if (enderchestsOpens.containsKey(player)) enderchestsOpens.remove(player);
         enderchestsOpens.put(player, ec);
 
-        player.playSound(player.getLocation(), Sound.CHEST_OPEN, 1, 1);
+        playSoundTo(Config.openingChestSound, player);
         player.openInventory(menu.getInventory());
 
         menu.offlineOwnerUUID = uuid;menu.offlineOwnerName = playername;
@@ -215,5 +217,12 @@ public class EnderchestsManager {
             cc.set("players.yml", p.getName() + ".uuid", p.getUniqueId().toString());
             cc.set("players.yml", p.getName() + ".accesses", EnderChestUtils.playerAvailableEnderchestsToString(p));
         }
+    }
+
+    private void playSoundTo(String soundName, Player player){
+        if(CoreUtils.soundExists(soundName))
+            player.playSound(player.getLocation(), Sound.valueOf(soundName), 1F, 1F);
+        else
+            CoreUtils.log("§cThe sound §6" + soundName + "§c doesn't exists. Please change it in the config.", true);
     }
 }

@@ -4,6 +4,7 @@ import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.utils.Config;
 import org.bukkit.ChatColor;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -93,7 +94,7 @@ public class LocalesManager {
         messages.put("help_updates_check_cmd", "Check for update");
         messages.put("help_reload_plugin_cmd", "Reload plugin configuration");
 
-        messages.put("other_new_update", "There is a newer version of the plugin");
+        messages.put("other_new_update", "There is a newer version available");
         messages.put("other_new_update_line2", "&7Type &e%command% &7in the chat to start the update.");
 
         EnderContainers.getConfigClass().setAutoSaving = false;
@@ -109,7 +110,7 @@ public class LocalesManager {
 
 
     public String get(String key){
-        if(messages.containsKey(key)) return ChatColor.translateAlternateColorCodes('&', messages.get(key));
+        if(messages.containsKey(key)) return ChatColor.translateAlternateColorCodes('&', new String(messages.get(key).getBytes(), Charset.forName("UTF-8")));
         else return "%undefined%";
     }
 

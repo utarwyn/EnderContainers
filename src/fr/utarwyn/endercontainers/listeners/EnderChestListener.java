@@ -49,9 +49,9 @@ public class EnderChestListener implements Listener {
                 }
             }
 
-            p.playSound(p.getLocation(), Sound.valueOf(Config.openingChestSound), 1F, 1F);
+            playSoundTo(Config.openingChestSound, p);
+
             EnderChestUtils.openPlayerMainMenu(p, null);
-            e.setCancelled(true);
         }
     }
 
@@ -63,6 +63,7 @@ public class EnderChestListener implements Listener {
         if (!(e.getInventory().getHolder() instanceof MenuContainer)) return;
 
         Player playerOwner = EnderContainers.getEnderchestsManager().getLastEnderchestOpened(p);
+        Sound clickSound   = CoreUtils.soundExists("CLICK") ? Sound.valueOf("CLICK") : Sound.valueOf("UI_BUTTON_CLICK");
 
         if (invname.equalsIgnoreCase(CoreUtils.replacePlayerName(Config.mainEnderchestTitle, p))) { // Own main enderchest
             Integer index = e.getRawSlot();
@@ -81,16 +82,18 @@ public class EnderChestListener implements Listener {
             EnderChestUtils.recalculateItems(p, index);
 
             if (index == 0) {
-                p.playSound(p.getLocation(), Sound.valueOf(Config.openingChestSound), 1, 1);
+                playSoundTo(Config.openingChestSound, p);
                 p.openInventory(p.getEnderChest());
                 return;
             }
 
             if (p.hasPermission(Config.enderchestOpenPerm + index) || index < Config.defaultEnderchestsNumber) {
-                p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                p.playSound(p.getLocation(), clickSound, 1, 1);
                 EnderContainers.getInstance().enderchestsManager.openPlayerEnderChest(index, p, null);
             }else{
-                p.playSound(p.getLocation(), Sound.GLASS, 1, 1);
+                Sound glassSound = CoreUtils.soundExists("GLASS") ? Sound.valueOf("GLASS") : Sound.valueOf("BLOCK_GLASS_HIT");
+
+                p.playSound(p.getLocation(), glassSound, 1, 1);
             }
         }else if(playerOwner != null && invname.equalsIgnoreCase(CoreUtils.replacePlayerName(Config.mainEnderchestTitle, playerOwner))){ // Player who open another enderchest
             Integer index = e.getRawSlot();
@@ -101,7 +104,7 @@ public class EnderChestListener implements Listener {
             if (index < 0) return;
             if (index >= Config.maxEnderchests) return;
 
-            p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+            p.playSound(p.getLocation(), clickSound, 1, 1);
 
             EnderChest ec = EnderContainers.getEnderchestsManager().getPlayerEnderchest(playerOwner, index);
             if(ec == null || index > (EnderChestUtils.getPlayerAvailableEnderchests(playerOwner) - 1)) return;
@@ -142,7 +145,7 @@ public class EnderChestListener implements Listener {
         Player playerOwner = ecm.getLastEnderchestOpened(p);
 
         if(inv.getName().equalsIgnoreCase("container.enderchest")){
-            p.playSound(p.getLocation(), Sound.valueOf(Config.closingChestSound), 1F, 1F);
+            playSoundTo(Config.closingChestSound, p);
             return;
         }
 
@@ -171,6 +174,13 @@ public class EnderChestListener implements Listener {
         if(ec.lastMenuContainer == null || ec.lastMenuContainer.getInventory() == null)
             EnderContainers.getEnderchestsManager().removeEnderChest(ec);
 
-        p.playSound(p.getLocation(), Sound.valueOf(Config.closingChestSound), 1F, 1F);
+        playSoundTo(Config.closingChestSound, p);
+    }
+
+    private void playSoundTo(String soundName, Player player){
+        if(CoreUtils.soundExists(soundName))
+            player.playSound(player.getLocation(), Sound.valueOf(soundName), 1F, 1F);
+        else
+            CoreUtils.log("§cThe sound §6" + soundName + "§c doesn't exists. Please change it in the config.", true);
     }
 }

@@ -28,7 +28,7 @@ public class NameTagTask implements Runnable{
 
                 int copEcs = EnderChestUtils.getPlayerAvailableEnderchests(p);
 
-                String nameTag = EnderContainers.__("enderchest_nametag").replace("%enderchests%", Integer.toString(copEcs)).replace("%plurial%", ((copEcs > 1) ? "s" : ""));
+                String nameTag = EnderContainers.__("enderchest_nametag").replace("%enderchests%", Integer.toString(copEcs)).replaceAll("%plurial%", ((copEcs > 1) ? "s" : ""));
                 FloatingTextUtils.FloatingText ft = FloatingTextUtils.displayFloatingTextAtFor(nameTag, b.getLocation().clone().add(0.5, 1, 0.5), p);
 
                 playerActives.put(p, ft);

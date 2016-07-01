@@ -221,7 +221,6 @@ public class EnderContainers extends JavaPlugin {
     public static ConfigClass getConfigClass() {
         return EnderContainers.configClass;
     }
-
     public static Database getDB() {
         return database;
     }
@@ -238,6 +237,10 @@ public class EnderContainers extends JavaPlugin {
         loadBackupsConfig();
 
         loadMysql();
+    }
+    public static String getServerVersion(){
+        String packageName = EnderContainers.getInstance().getServer().getClass().getPackage().getName();
+        return packageName.substring(packageName.lastIndexOf('.') + 1);
     }
 
     public void checkDatabase() {

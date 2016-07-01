@@ -48,7 +48,7 @@ public class EnderChestCommand implements CommandExecutor {
             }
         }else{
             if(CoreUtils.playerHasPerm(p, "cmd.enderchests") || p.isOp()){
-                p.playSound(p.getLocation(), Sound.valueOf(Config.openingChestSound), 1, 1);
+                playSoundTo(Config.openingChestSound, p);
                 EnderChestUtils.openPlayerMainMenu(p, null);
             }else{
                 PluginMsg.doesNotHavePerm(p);
@@ -58,5 +58,10 @@ public class EnderChestCommand implements CommandExecutor {
         return true;
     }
 
-
+    private void playSoundTo(String soundName, Player player){
+        if(CoreUtils.soundExists(soundName))
+            player.playSound(player.getLocation(), Sound.valueOf(soundName), 1F, 1F);
+        else
+            CoreUtils.log("§cThe sound §6" + soundName + "§c doesn't exists. Please change it in the config.", true);
+    }
 }

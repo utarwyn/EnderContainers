@@ -1,19 +1,11 @@
 package fr.utarwyn.endercontainers.utils;
 
-import net.minecraft.server.v1_8_R3.EntityArmorStand;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.PacketPlayOutEntityDestroy;
-import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntityLiving;
-import org.bukkit.Bukkit;
+import fr.utarwyn.endercontainers.EnderContainers;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
 
 public class FloatingTextUtils {
 
@@ -25,8 +17,32 @@ public class FloatingTextUtils {
     }
 
 
+    public static FloatingText getFloatingTextFromHandler(Location location, String text){
+        return getFloatingTextFromHandler(location, text, null);
+    }
+    public static FloatingText getFloatingTextFromHandler(Location location, String text, Player p){
+        String version = EnderContainers.getServerVersion();
+        FloatingText floatingText = null;
+
+        try {
+            final Class<?> clazz = Class.forName("fr.utarwyn.endercontainers.handlers." + version + ".FloatingText");
+
+            if (FloatingText.class.isAssignableFrom(clazz)) { // Make sure it actually implements NMS
+                floatingText = (FloatingText) clazz.getConstructor(Location.class, String.class, Player.class).newInstance(location, text, p); // Set our handler
+            }
+        } catch (final Exception e) {
+            e.printStackTrace();
+            EnderContainers.getInstance().getLogger().severe("Could not find support for this CraftBukkit version.");
+            EnderContainers.getInstance().getServer().getPluginManager().disablePlugin(EnderContainers.getInstance());
+            return null;
+        }
+
+        return floatingText;
+    }
+
+
     public static FloatingText displayFloatingTextAt(String text, Location loc) {
-        FloatingText floatingText = new FloatingText(loc, text);
+        FloatingText floatingText = getFloatingTextFromHandler(loc, text);
 
         floatingTexts.add(floatingText);
         return floatingText;
@@ -37,7 +53,7 @@ public class FloatingTextUtils {
     }
 
     public static FloatingText displayFloatingTextAtFor(String text, Location loc, Player player) {
-        FloatingText floatingText = new FloatingText(loc, text, player);
+        FloatingText floatingText = getFloatingTextFromHandler(loc, text, player);
 
         floatingTexts.add(floatingText);
         return floatingText;
@@ -82,76 +98,12 @@ public class FloatingTextUtils {
     }
 
 
-    public static class FloatingText {
+    public interface FloatingText{
+        String getText();
 
-        private Location location;
-        private String text;
-        private Player player;
-
-        private EntityArmorStand armorStand;
-        private HashMap<UUID, Integer> armorStands = new HashMap<>();
-
-        public FloatingText(Location location, String text) {
-            new FloatingText(location, text, null);
-        }
-
-        public FloatingText(Location location, String text, Player p) {
-            this.location = location;
-            this.text = text;
-            this.player = p;
-
-            this.spawn();
-        }
-
-
-        public String getText() {
-            return this.text;
-        }
-
-
-        public void spawn() {
-            armorStand = new EntityArmorStand(((CraftWorld) location.getWorld()).getHandle());
-            armorStand.setLocation(location.getX(), location.getY() - 1, location.getZ(), location.getYaw(), location.getPitch());
-
-            armorStand.setCustomName(this.text);
-            armorStand.setCustomNameVisible(true);
-
-            armorStand.setGravity(false);
-            armorStand.setInvisible(true);
-            armorStand.setSmall(true);
-
-            if (this.player == null) {
-                PacketPlayOutSpawnEntityLiving packet = new PacketPlayOutSpawnEntityLiving(this.armorStand);
-
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    EntityPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
-                    nmsPlayer.playerConnection.sendPacket(packet);
-
-                    armorStands.put(p.getUniqueId(), armorStand.getId());
-                }
-            } else spawnFor(this.player);
-        }
-
-        public void spawnFor(Player p) {
-            if (this.armorStand == null) return;
-
-            PacketPlayOutSpawnEntityLiving packet = new PacketPlayOutSpawnEntityLiving(this.armorStand);
-
-            EntityPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
-            nmsPlayer.playerConnection.sendPacket(packet);
-
-            armorStands.put(p.getUniqueId(), armorStand.getId());
-        }
-
-        public void remove() {
-            for (UUID uuid : armorStands.keySet()) {
-                PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(armorStands.get(uuid));
-                EntityPlayer nmsPlayer = ((CraftPlayer) Bukkit.getPlayer(uuid)).getHandle();
-                nmsPlayer.playerConnection.sendPacket(packet);
-            }
-        }
-
+        void spawn();
+        void spawnFor(Player player);
+        void remove();
     }
-
 
 }

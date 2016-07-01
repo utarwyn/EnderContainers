@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.utils;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -68,5 +69,15 @@ public class CoreUtils {
         int r = 0;
         for (ItemStack i : inv.getContents()) if (i != null) r++;
         return r;
+    }
+    public static boolean soundExists(String soundName) {
+
+        for (Sound sound : Sound.values()) {
+            if (sound.name().equals(soundName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

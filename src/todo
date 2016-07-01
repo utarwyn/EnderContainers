@@ -1,15 +1,4 @@
-Version 1.0.5:
-- Update to Bukkit/Spigot 1.8.8 & Factions 2.8.13 -> Good
-- Support for Mysql (Backups, enderchests & players) -> Good
-- Add sounds configurations -> Good
-- Add doubleEnderchest configuration -> Good
-- Fix nametags on reload -> Good
-- Support offline players (not connected on the server) -> Good
-- Improve main menu -> Good
-- Re-organize all permissions with new names & paths
-- No file is created except the config.yml file when mysql mode is set to 'true' -> Good
-- [FIX] If player has got 1 enderchest > open this enderchest directly and bypass the main menu -> Good
-- [FIX] Commands in the console -> Good
-- [FIX] Open another player's enderchest in realtime (spectator shows in realtime what the spectated player do in his enderchest) -> Good
-- [FIX] Update system not working -> Good
-- [FIX] '/enderchest' command -> Good
+Version 1.0.6:
+- Support both versions 1.8.8 & 1.9.4
+- Support for locales (with UTF8 messages support)
+- Fix offline enderchests interface
