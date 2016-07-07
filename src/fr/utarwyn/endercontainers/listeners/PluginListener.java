@@ -44,7 +44,7 @@ public class PluginListener implements Listener {
 
         if(p.isOp() && EnderContainers.getInstance().newVersion != null){
             p.sendMessage(Config.pluginPrefix + "§a" + EnderContainers.__("other_new_update") + ": §2§l" + EnderContainers.getInstance().newVersion + "§a.");
-            p.sendMessage(Config.pluginPrefix + EnderContainers.__("other_new_update_line2").replace("%command%", "/ec update"));
+            p.sendMessage(Config.pluginPrefix + EnderContainers.__("other_new_update_line2").replace("%command%", "/endc update"));
         }
 
         if(EnderContainers.hasMysql())

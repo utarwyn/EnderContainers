@@ -4,12 +4,14 @@ import fr.utarwyn.endercontainers.EnderChest;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.containers.MenuContainer;
 import fr.utarwyn.endercontainers.dependencies.FactionsProtection;
+import fr.utarwyn.endercontainers.dependencies.PlotSquaredProtection;
 import fr.utarwyn.endercontainers.managers.EnderchestsManager;
 import fr.utarwyn.endercontainers.utils.Config;
 import fr.utarwyn.endercontainers.utils.CoreUtils;
 import fr.utarwyn.endercontainers.utils.EnderChestUtils;
 import fr.utarwyn.endercontainers.utils.PluginMsg;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -48,10 +50,18 @@ public class EnderChestListener implements Listener {
                     return;
                 }
             }
+            if (EnderContainers.getInstance().getDependenciesManager().isDependencyLoaded("PlotSquared")) {
+                if (!PlotSquaredProtection.canOpenEnderChestInPlot(b, p)) {
+                    e.setCancelled(true);
+                    PluginMsg.cantUseHereFaction(p);
+                    return;
+                }
+            }
 
-            playSoundTo(Config.openingChestSound, p);
+            playSoundInWorld(Config.openingChestSound, p, b.getLocation());
 
             EnderChestUtils.openPlayerMainMenu(p, null);
+            e.setCancelled(true);
         }
     }
 
@@ -178,9 +188,15 @@ public class EnderChestListener implements Listener {
     }
 
     private void playSoundTo(String soundName, Player player){
-        if(CoreUtils.soundExists(soundName))
+        if(CoreUtils.soundExists(soundName)) {
             player.playSound(player.getLocation(), Sound.valueOf(soundName), 1F, 1F);
-        else
+        }else
+            CoreUtils.log("§cThe sound §6" + soundName + "§c doesn't exists. Please change it in the config.", true);
+    }
+    private void playSoundInWorld(String soundName, Player player, Location location){
+        if(CoreUtils.soundExists(soundName)) {
+            player.getWorld().playSound(location, Sound.valueOf(soundName), 1F, 1F);
+        }else
             CoreUtils.log("§cThe sound §6" + soundName + "§c doesn't exists. Please change it in the config.", true);
     }
 }

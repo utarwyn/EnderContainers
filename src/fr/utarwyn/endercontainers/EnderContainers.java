@@ -16,6 +16,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
+
 public class EnderContainers extends JavaPlugin {
 
     private static EnderContainers instance;
@@ -29,6 +31,7 @@ public class EnderContainers extends JavaPlugin {
     public LocalesManager localesManager;
 
     public NameTagTask nameTagTask = new NameTagTask();
+
     public String newVersion = null;
 
     public void onEnable() {
@@ -42,6 +45,7 @@ public class EnderContainers extends JavaPlugin {
         loadTasks();
 
         loadMysql();
+        loadMetrics();
 
         checkForUpdates();
     }
@@ -190,6 +194,15 @@ public class EnderContainers extends JavaPlugin {
                 }
             }
         });
+    }
+
+    public void loadMetrics(){
+        try {
+            Metrics metrics = new Metrics(this);
+            metrics.start();
+        } catch (IOException e) {
+            CoreUtils.errorMessage(getServer().getConsoleSender(), "Plugin Metrics error : failed to submit stats.");
+        }
     }
 
 

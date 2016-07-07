@@ -50,7 +50,7 @@ public class EnderContainersCommand implements CommandExecutor {
                 Player p = (Player) sender;
 
                 if (args.length <= 1) {
-                    CoreUtils.errorMessage(p, EnderContainers.__("error_command_usage") + ": /ec open <player>");
+                    CoreUtils.errorMessage(p, EnderContainers.__("error_command_usage") + ": /endc open <player>");
                     return true;
                 }
                 if (!CoreUtils.playerHasPerm(p, "openchests") && !p.isOp()) {
@@ -83,7 +83,7 @@ public class EnderContainersCommand implements CommandExecutor {
                     return true;
                 }
                 if (args.length < 2) {
-                    CoreUtils.errorMessage(sender, EnderContainers.__("error_command_usage") + ": /ec createbackup <name>");
+                    CoreUtils.errorMessage(sender, EnderContainers.__("error_command_usage") + ": /endc createbackup <name>");
                     return true;
                 } else {
                     String name = args[1];
@@ -100,7 +100,7 @@ public class EnderContainersCommand implements CommandExecutor {
                     return true;
                 }
                 if (args.length < 2) {
-                    CoreUtils.errorMessage(sender, EnderContainers.__("error_command_usage") + ": /ec loadbackup <name>");
+                    CoreUtils.errorMessage(sender, EnderContainers.__("error_command_usage") + ": /endc loadbackup <name>");
                     return true;
                 } else {
                     String name = args[1];
@@ -115,7 +115,7 @@ public class EnderContainersCommand implements CommandExecutor {
                     return true;
                 }
                 if (args.length < 2) {
-                    CoreUtils.errorMessage(sender, EnderContainers.__("error_command_usage") + ": /ec backup <name>");
+                    CoreUtils.errorMessage(sender, EnderContainers.__("error_command_usage") + ": /endc backup <name>");
                     return true;
                 } else {
                     String name = args[1];
@@ -127,7 +127,7 @@ public class EnderContainersCommand implements CommandExecutor {
                     return true;
                 }
                 if (args.length < 2) {
-                    CoreUtils.errorMessage(sender, EnderContainers.__("error_command_usage") + ": /ec rmbackup <name>");
+                    CoreUtils.errorMessage(sender, EnderContainers.__("error_command_usage") + ": /endc rmbackup <name>");
                     return true;
                 } else {
                     String name = args[1];
@@ -143,13 +143,13 @@ public class EnderContainersCommand implements CommandExecutor {
                 if (args.length >= 2) {
                     if (args[1].equalsIgnoreCase("install")) {
                         if (!updateChecked) {
-                            CoreUtils.errorMessage(sender, EnderContainers.__("cmd_update_install_error").replace("%command%", "/ec update"));
+                            CoreUtils.errorMessage(sender, EnderContainers.__("cmd_update_install_error").replace("%command%", "/endc update"));
                             return true;
                         } else {
                             doUpdate(sender);
                         }
                     } else {
-                        CoreUtils.errorMessage(sender, EnderContainers.__("error_command_usage") + ": /ec update [install]");
+                        CoreUtils.errorMessage(sender, EnderContainers.__("error_command_usage") + ": /endc update [install]");
                         return true;
                     }
                 } else {
@@ -279,7 +279,7 @@ public class EnderContainersCommand implements CommandExecutor {
                     newVersion = new String(data);
 
                     if (!newVersion.equalsIgnoreCase(version)) { // Do an update
-                        p.sendMessage(Config.prefix + EnderContainers.__("cmd_update_found").replace("%version%", newVersion).replace("%command%", "/ec update install"));
+                        p.sendMessage(Config.prefix + EnderContainers.__("cmd_update_found").replace("%version%", newVersion).replace("%command%", "/endc update install"));
                         updateChecked = true;
                     } else { // Nothing to do
                         p.sendMessage(Config.prefix + "§a" + EnderContainers.__("cmd_update_notfound"));
@@ -339,13 +339,13 @@ public class EnderContainersCommand implements CommandExecutor {
         List<DatabaseSet> backups = null;
 
         if (!mysql && !EnderContainers.getConfigClass().isConfigurationSection("backups.yml", "backups")) {
-            CoreUtils.errorMessage(sender, EnderContainers.__("cmd_nobackup").replace("%command%", "/ec createbackup <name>"));
+            CoreUtils.errorMessage(sender, EnderContainers.__("cmd_nobackup").replace("%command%", "/endc createbackup <name>"));
             return;
         }else if(mysql){
             backups = EnderContainers.getMysqlManager().getBackups();
 
             if(backups == null || backups.size() == 0){
-                CoreUtils.errorMessage(sender, EnderContainers.__("cmd_nobackup").replace("%command%", "/ec createbackup <name>"));
+                CoreUtils.errorMessage(sender, EnderContainers.__("cmd_nobackup").replace("%command%", "/endc createbackup <name>"));
                 return;
             }
         }
@@ -366,7 +366,7 @@ public class EnderContainersCommand implements CommandExecutor {
         }
 
         sender.sendMessage(" ");
-        sender.sendMessage(EnderContainers.__("cmd_backup_info").replace("%command%", "/ec backup <name>"));
+        sender.sendMessage(EnderContainers.__("cmd_backup_info").replace("%command%", "/endc backup <name>"));
     }
 
     public void getBackupInformation(CommandSender p, String name) {

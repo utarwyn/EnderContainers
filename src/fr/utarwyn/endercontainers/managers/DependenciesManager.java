@@ -23,7 +23,12 @@ public class DependenciesManager {
         if (Config.factionsSupport) {
             loadDependency("Factions");
         } else {
-            this.dependencies.put("Factions", Boolean.valueOf(false));
+            this.dependencies.put("Factions", false);
+        }
+        if (Config.plotSquaredSupport) {
+            loadDependency("PlotSquared");
+        } else {
+            this.dependencies.put("PlotSquared", false);
         }
         CoreUtils.log("§8[§6EnderContainers§8] ------------------------------------", true);
     }

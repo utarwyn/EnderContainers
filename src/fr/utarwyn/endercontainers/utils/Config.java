@@ -53,6 +53,8 @@ public class Config {
      * This is the dependencies configuration
      */
     public static boolean factionsSupport = true;
+    public static boolean plotSquaredSupport = true;
+    public static boolean townySupport = true;
 
     /**
      * ----- Fun & others configuration
