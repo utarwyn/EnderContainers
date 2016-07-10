@@ -26,11 +26,8 @@ public class Config {
      * ----- Enderchests configuration
      * This is the Enderchests configuration
      */
-    public static String mainEnderchestTitle       = "Enderchest of %player%";
     public static Integer defaultEnderchestsNumber = 1;
-    public static Boolean allowDoubleChest         = true;
 
-    public static String enderchestTitle = "Enderchest %num% of %player%";
     public static String enderchestOpenPerm = "endercontainers.slot.";
     public static Integer maxEnderchests = 27;
 
@@ -63,4 +60,5 @@ public class Config {
     public static boolean blockNametag     = false;
     public static String openingChestSound = "CHEST_OPEN";
     public static String closingChestSound = "CHEST_CLOSE";
+    public static boolean updateChecker    = true;
 }

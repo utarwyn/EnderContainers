@@ -4,6 +4,7 @@ import fr.utarwyn.endercontainers.database.Database;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
 import fr.utarwyn.endercontainers.utils.Config;
 import fr.utarwyn.endercontainers.utils.EnderChestUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -28,15 +29,20 @@ public class MysqlManager {
 
         if(playerInfo.size() == 0) database.save(Config.DB_PREFIX + "players", DatabaseSet.makeFields("player_name", player.getName(), "player_uuid", player.getUniqueId().toString(), "accesses", EnderChestUtils.playerAvailableEnderchestsToString(player)));
     }
-    public HashMap<Integer, Boolean> getPlayerAccesses(String playername){
+    public HashMap<Integer, Integer> getPlayerAccesses(String playername){
         String table = Config.DB_PREFIX + "players";
-        HashMap<Integer, Boolean> r = new HashMap<>();
+        HashMap<Integer, Integer> r = new HashMap<>();
 
         List<DatabaseSet> accesses = database.find(table, DatabaseSet.makeConditions("player_name", playername), null, Collections.singletonList("accesses"));
 
         for(DatabaseSet set : accesses){
             for(String accessStr : set.getString("accesses").split(";")) {
-                r.put(Integer.valueOf(accessStr.split(":")[0]), Boolean.valueOf(accessStr.split(":")[1]));
+                String val   = accessStr.split(":")[1];
+                Integer rows = val.equals("true") ? 6 : 3;
+
+                if(StringUtils.isNumeric(val)) rows = Integer.parseInt(val);
+
+                r.put(Integer.valueOf(accessStr.split(":")[0]), rows);
             }
         }
 

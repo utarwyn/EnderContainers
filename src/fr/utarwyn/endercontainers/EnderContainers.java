@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 public class EnderContainers extends JavaPlugin {
 
@@ -33,9 +34,12 @@ public class EnderContainers extends JavaPlugin {
     public NameTagTask nameTagTask = new NameTagTask();
 
     public String newVersion = null;
+    public HashMap<String, String> newLocaleKeys = new HashMap<>();
 
     public void onEnable() {
         EnderContainers.instance = this;
+
+        this.localesManager = new LocalesManager();
 
         loadMainConfig();
         loadBackupsConfig();
@@ -70,12 +74,29 @@ public class EnderContainers extends JavaPlugin {
             getConfigClass().set("main", "enderchests.max", Config.maxEnderchests);
         if (!getConfigClass().contains("main", "enderchests.default"))
             getConfigClass().set("main", "enderchests.default", Config.defaultEnderchestsNumber);
-        if (!getConfigClass().contains("main", "enderchests.mainTitle"))
-            getConfigClass().set("main", "enderchests.mainTitle", Config.mainEnderchestTitle);
-        if (!getConfigClass().contains("main", "enderchests.enderchestTitle"))
-            getConfigClass().set("main", "enderchests.enderchestTitle", Config.enderchestTitle);
-        if (!getConfigClass().contains("main", "enderchests.allowDoubleChest"))
-            getConfigClass().set("main", "enderchests.allowDoubleChest", Config.allowDoubleChest);
+
+        // From config.yml to locale/*.yml (from 1.0.6c version)
+        if (getConfigClass().contains("main", "enderchests.mainTitle")) {
+            newLocaleKeys.put("enderchest_main_gui_title", getConfigClass().getString("main", "enderchests.mainTitle"));
+            getConfigClass().removePath("main", "enderchests.mainTitle");
+        }else{
+            newLocaleKeys.put("enderchest_main_gui_title", localesManager.getDefaultMessages().get("enderchest_main_gui_title"));
+        }
+        if (getConfigClass().contains("main", "enderchests.enderchestTitle")) {
+            newLocaleKeys.put("enderchest_gui_title", getConfigClass().getString("main", "enderchests.enderchestTitle"));
+            getConfigClass().removePath("main", "enderchests.enderchestTitle");
+        }else{
+            newLocaleKeys.put("enderchest_gui_title", localesManager.getDefaultMessages().get("enderchest_gui_title"));
+        }
+
+        newLocaleKeys.put("enderchest_glasspane_title", localesManager.getDefaultMessages().get("enderchest_glasspane_title"));
+
+
+        // Removing from 1.0.6c version
+        if (getConfigClass().contains("main", "enderchests.allowDoubleChest"))
+            getConfigClass().removePath("main", "enderchests.allowDoubleChest");
+
+
 
         if (!getConfigClass().contains("main", "mysql.enabled"))
             getConfigClass().set("main", "mysql.enabled", Config.mysql);
@@ -98,6 +119,8 @@ public class EnderContainers extends JavaPlugin {
             getConfigClass().set("main", "others.openingChestSound", Config.openingChestSound);
         if (!getConfigClass().contains("main", "others.closingChestSound"))
             getConfigClass().set("main", "others.closingChestSound", Config.closingChestSound);
+        if (!getConfigClass().contains("main", "others.updateChecker"))
+            getConfigClass().set("main", "others.updateChecker", Config.updateChecker);
 
         Config.enabled = getConfigClass().getBoolean("main", "enabled");
         Config.debug = getConfigClass().getBoolean("main", "debug");
@@ -111,10 +134,6 @@ public class EnderContainers extends JavaPlugin {
             Config.defaultEnderchestsNumber = getConfigClass().getInt("main", "enderchests.default");
         else Config.defaultEnderchestsNumber = 1;
 
-        Config.mainEnderchestTitle = ChatColor.translateAlternateColorCodes('&', getConfigClass().getString("main", "enderchests.mainTitle"));
-        Config.enderchestTitle     = ChatColor.translateAlternateColorCodes('&', getConfigClass().getString("main", "enderchests.enderchestTitle"));
-        Config.allowDoubleChest    = getConfigClass().getBoolean("main", "enderchests.allowDoubleChest");
-
         Config.mysql     = getConfigClass().getBoolean("main", "mysql.enabled");
         Config.DB_HOST   = getConfigClass().getString("main", "mysql.host");
         Config.DB_PORT   = getConfigClass().getInt("main", "mysql.port");
@@ -126,6 +145,7 @@ public class EnderContainers extends JavaPlugin {
         Config.blockNametag      = getConfigClass().getBoolean("main", "others.blocknametag");
         Config.openingChestSound = getConfigClass().getString("main", "others.openingChestSound");
         Config.closingChestSound = getConfigClass().getString("main", "others.closingChestSound");
+        Config.updateChecker     = getConfigClass().getBoolean("main", "others.updateChecker");
     }
 
     public void loadBackupsConfig() {
@@ -144,7 +164,8 @@ public class EnderContainers extends JavaPlugin {
         this.dependenciesManager = new DependenciesManager();
         this.enderchestsManager  = new EnderchestsManager();
         this.mysqlManager        = new MysqlManager();
-        this.localesManager      = new LocalesManager();
+
+        this.localesManager.loadMessages();
     }
 
     public void loadListeners() {
@@ -207,6 +228,8 @@ public class EnderContainers extends JavaPlugin {
 
 
     public void checkForUpdates(){
+        if(!Config.updateChecker) return;
+
         String newVersion = new Updater(this).getNewVersion();
 
         if(newVersion != null){

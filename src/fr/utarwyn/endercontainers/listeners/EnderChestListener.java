@@ -60,7 +60,7 @@ public class EnderChestListener implements Listener {
 
             playSoundInWorld(Config.openingChestSound, p, b.getLocation());
 
-            EnderChestUtils.openPlayerMainMenu(p, null);
+            EnderContainers.getEnderchestsManager().openPlayerMainMenu(p, null);
             e.setCancelled(true);
         }
     }
@@ -75,7 +75,7 @@ public class EnderChestListener implements Listener {
         Player playerOwner = EnderContainers.getEnderchestsManager().getLastEnderchestOpened(p);
         Sound clickSound   = CoreUtils.soundExists("CLICK") ? Sound.valueOf("CLICK") : Sound.valueOf("UI_BUTTON_CLICK");
 
-        if (invname.equalsIgnoreCase(CoreUtils.replacePlayerName(Config.mainEnderchestTitle, p))) { // Own main enderchest
+        if (invname.equalsIgnoreCase(CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), p))) { // Own main enderchest
             Integer index = e.getRawSlot();
 
             if(e.getCurrentItem() == null || e.getCurrentItem().getType().equals(Material.AIR)){
@@ -105,7 +105,7 @@ public class EnderChestListener implements Listener {
 
                 p.playSound(p.getLocation(), glassSound, 1, 1);
             }
-        }else if(playerOwner != null && invname.equalsIgnoreCase(CoreUtils.replacePlayerName(Config.mainEnderchestTitle, playerOwner))){ // Player who open another enderchest
+        }else if(playerOwner != null && invname.equalsIgnoreCase(CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), playerOwner))){ // Player who open another enderchest
             Integer index = e.getRawSlot();
 
             if (index >= e.getInventory().getSize()) return;
@@ -138,7 +138,7 @@ public class EnderChestListener implements Listener {
             if(index >= e.getInventory().getSize()) return;
             if(index < 0) return;
 
-            if(invname.equalsIgnoreCase(CoreUtils.replacePlayerName(Config.mainEnderchestTitle, playername))){
+            if(invname.equalsIgnoreCase(CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), playername))){
                 e.setCancelled(true);
                 EnderContainers.getEnderchestsManager().openOfflinePlayerEnderChest(index, p, uuid, playername);
             }
@@ -159,13 +159,13 @@ public class EnderChestListener implements Listener {
             return;
         }
 
-        if (inv.getName().equalsIgnoreCase(CoreUtils.replacePlayerName(Config.mainEnderchestTitle, p))) return;
-        if (playerOwner != null && inv.getName().equalsIgnoreCase(CoreUtils.replacePlayerName(Config.mainEnderchestTitle, playerOwner))) return;
+        if (inv.getName().equalsIgnoreCase(CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), p))) return;
+        if (playerOwner != null && inv.getName().equalsIgnoreCase(CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), playerOwner))) return;
         if (!ecm.enderchestsOpens.containsKey(p)) return;
         ec = ecm.enderchestsOpens.get(p);
 
         if(ec != null && ec.getOwner() == null){ // Close offline player's chest (or main menu)
-            if(inv.getName().equalsIgnoreCase(CoreUtils.replacePlayerName(Config.mainEnderchestTitle, ec.ownerName))) return;
+            if(inv.getName().equalsIgnoreCase(CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), ec.ownerName))) return;
         }
 
         ecm.enderchestsOpens.remove(p);

@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ public class ConfigClass {
     Plugin plugin;
 
     FileConfiguration mainConfig;
-    HashMap<String, YamlConfiguration> configs = new HashMap<String, YamlConfiguration>();
+    HashMap<String, YamlConfiguration> configs = new HashMap<>();
 
     public Boolean setAutoSaving = true;
 
@@ -32,7 +32,7 @@ public class ConfigClass {
     public void loadConfigFile(String file) {
         if (this.configs.containsKey(file)) return;
 
-        YamlConfiguration yaml = new YamlConfiguration();
+        YamlConfiguration yaml = null;
         File f = new File(this.plugin.getDataFolder(), file);
         try {
             if (!this.plugin.getDataFolder().exists() && !this.plugin.getDataFolder().isDirectory())
@@ -53,12 +53,8 @@ public class ConfigClass {
             if (!f.isFile())
                 f.createNewFile();
 
-            yaml.load(f);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            yaml = YamlConfiguration.loadConfiguration(f);
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InvalidConfigurationException e) {
             e.printStackTrace();
         }
 

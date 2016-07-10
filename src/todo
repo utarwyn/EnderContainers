@@ -1,6 +1,7 @@
-Version 1.0.6:
-- Support both versions 1.8.8 & 1.9.4
-- Support for locales (with UTF8 messages support)
-- Fix offline enderchests interface
-- Support for PlotSquared
-- Add Plugin Metrics
+Version 1.0.7:
+- Support for 1.10.X
+- Enderchest message customizable.
+- Enderchest glass panes customizable.
+- Enderchest rows customizable (1 to 6)
+- Auto-detect system from 1.0.5 & 1.0.6
+- Fix UTF-8 messages for versions 1.7 to 1.10

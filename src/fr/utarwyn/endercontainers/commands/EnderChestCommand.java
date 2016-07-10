@@ -49,7 +49,7 @@ public class EnderChestCommand implements CommandExecutor {
         }else{
             if(CoreUtils.playerHasPerm(p, "cmd.enderchests") || p.isOp()){
                 playSoundTo(Config.openingChestSound, p);
-                EnderChestUtils.openPlayerMainMenu(p, null);
+                EnderContainers.getEnderchestsManager().openPlayerMainMenu(p, null);
             }else{
                 PluginMsg.doesNotHavePerm(p);
             }

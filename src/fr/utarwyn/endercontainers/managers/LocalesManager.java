@@ -10,21 +10,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static fr.utarwyn.endercontainers.EnderContainers.getConfigClass;
+import static fr.utarwyn.endercontainers.EnderContainers.getInstance;
+
 public class LocalesManager {
 
     private Map<String, String> messages = new HashMap<>();
-
-    public LocalesManager(){
-        this.loadMessages();
-    }
-
 
     public void loadMessages(){
         String locale = Config.pluginLocale;
         String file   = "locales/" + locale + ".yml";
 
-        EnderContainers.getConfigClass().loadConfigFile(file);
-        Set<String> keys = EnderContainers.getConfigClass().getKeys(file, false);
+        getConfigClass().loadConfigFile(file);
+        Set<String> keys = getConfigClass().getKeys(file, false);
 
         if(keys.size() == 0 && locale.equals("en")){
             keys = this.generateDefaultMessages();
@@ -34,13 +32,46 @@ public class LocalesManager {
             return;
         }
 
+        for(String newKey : getInstance().newLocaleKeys.keySet()){
+            if(!getConfigClass().contains(file, newKey)){
+                getConfigClass().set(file, newKey, getInstance().newLocaleKeys.get(newKey));
+                keys = getConfigClass().getKeys(file, false);
+            }
+        }
+
         for(String key : keys){
-            messages.put(key, EnderContainers.getConfigClass().getString(file, key));
+            messages.put(key, getConfigClass().getString(file, key));
         }
     }
     public Set<String> generateDefaultMessages(){
         String locale = Config.pluginLocale;
         String file   = "locales/" + locale + ".yml";
+
+        Map<String, String> messages = this.getDefaultMessages();
+
+        getConfigClass().setAutoSaving = false;
+        for(String key : messages.keySet()) {
+            getConfigClass().set(file, key, messages.get(key));
+        }
+
+        getConfigClass().saveConfig(file);
+        getConfigClass().setAutoSaving = true;
+
+        return messages.keySet();
+    }
+
+
+    public String get(String key){
+        String bukkitVersion = EnderContainers.getServerVersion();
+        String message       = messages.get(key);
+
+        if(bukkitVersion.contains("v1_7") || bukkitVersion.contains("v1_8"))
+            message = new String(messages.get(key).getBytes(), Charset.forName("UTF-8"));
+
+        if(messages.containsKey(key)) return ChatColor.translateAlternateColorCodes('&', message);
+        else return "%undefined%";
+    }
+    public Map<String, String> getDefaultMessages(){
         Map<String, String> messages = new TreeMap<>();
 
         messages.put("cmd_backup_creation_starting", "Starting backup creation...");
@@ -73,6 +104,9 @@ public class LocalesManager {
         messages.put("enderchest_player_denied", "&cThe player don't have access to this chest.");
         messages.put("enderchest_player_never_connected", "This player has never played on the server ! Please retry.");
         messages.put("enderchest_nametag", "&6&l%enderchests%&r&e enderchest%plurial% available");
+        messages.put("enderchest_main_gui_title", "Enderchest of %player%");
+        messages.put("enderchest_gui_title", "Enderchest %num% of %player%");
+        messages.put("enderchest_glasspane_title", "Enderchest %num% %suffix%");
 
         messages.put("error_command_usage", "Usage");
         messages.put("error_player_noperm", "You don't have the permission to do this.");
@@ -97,21 +131,7 @@ public class LocalesManager {
         messages.put("other_new_update", "There is a newer version available");
         messages.put("other_new_update_line2", "&7Type &e%command% &7in the chat to start the update.");
 
-        EnderContainers.getConfigClass().setAutoSaving = false;
-        for(String key : messages.keySet()) {
-            EnderContainers.getConfigClass().set(file, key, messages.get(key));
-        }
-
-        EnderContainers.getConfigClass().saveConfig(file);
-        EnderContainers.getConfigClass().setAutoSaving = true;
-
-        return messages.keySet();
-    }
-
-
-    public String get(String key){
-        if(messages.containsKey(key)) return ChatColor.translateAlternateColorCodes('&', new String(messages.get(key).getBytes(), Charset.forName("UTF-8")));
-        else return "%undefined%";
+        return messages;
     }
 
 }

@@ -2,16 +2,15 @@ package fr.utarwyn.endercontainers.utils;
 
 import fr.utarwyn.endercontainers.EnderChest;
 import fr.utarwyn.endercontainers.EnderContainers;
-import fr.utarwyn.endercontainers.containers.MenuContainer;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
 import fr.utarwyn.endercontainers.managers.EnderchestsManager;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import java.io.File;
@@ -19,236 +18,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class EnderChestUtils {
-
-    @SuppressWarnings("deprecation")
-    public static void openPlayerMainMenu(Player player, Player playerToSpec) {
-        Player mainPlayer = player;
-        if (playerToSpec != null) player = playerToSpec;
-
-        if(playerToSpec != null){
-            if(playerToSpec.getName().equalsIgnoreCase(mainPlayer.getName())){
-                if (!CoreUtils.playerHasPerm(mainPlayer, "command.global")) {
-                    PluginMsg.doesNotHavePerm(mainPlayer);
-                    return;
-                }
-            }else{
-                if (!CoreUtils.playerHasPerm(mainPlayer, "command.openchests")) {
-                    PluginMsg.doesNotHavePerm(mainPlayer);
-                    return;
-                }
-            }
-        }
-
-        int availableEnderchests = getPlayerAvailableEnderchests(player);
-
-        // Update player slots (in BDD or on disk)
-        EnderContainers.getEnderchestsManager().savePlayerInfo(player);
-
-        if(availableEnderchests == 1){
-            mainPlayer.openInventory(player.getEnderChest());
-            return;
-        }
-
-        int cells = (int) (Math.ceil(EnderContainers.getConfigClass().getDouble("main", "enderchests.max") / 9.0) * 9);
-        if (cells > 6 * 9) cells = 6 * 9;
-        MenuContainer menu = new MenuContainer(cells, CoreUtils.replacePlayerName(Config.mainEnderchestTitle, player));
-
-        HashMap<Integer, ItemStack> items = new HashMap<>();
-        HashMap<Integer, Integer> sqlSlotsChests  = new HashMap<>();
-
-        if(EnderContainers.hasMysql()){
-            List<DatabaseSet> sqlResults = EnderContainers.getMysqlManager().getPlayerEnderchests(player.getUniqueId());
-            for(DatabaseSet result : sqlResults){
-                sqlSlotsChests.put(result.getInteger("enderchest_id"), result.getInteger("slots_used"));
-            }
-        }
-
-        for (int i = 0; i < Config.maxEnderchests; i++) {
-            ItemStack item = null;
-            int size       = 0;
-
-            if(EnderContainers.hasMysql()){
-                if(sqlSlotsChests.containsKey(i)) size = sqlSlotsChests.get(i);
-            }else {
-                EnderChest ec = EnderContainers.getEnderchestsManager().getPlayerEnderchest(player, i);
-                if (ec != null) size = ec.getRealSize();
-            }
-
-            if(i == 0) size = CoreUtils.getInventorySize(player.getEnderChest());
-
-            Integer slots = (Config.allowDoubleChest && CoreUtils.playerHasPerm(player, "doublechest." + i)) ? 54 : 27;
-            if(size > slots) size = slots;
-
-            if (!player.hasPermission(Config.enderchestOpenPerm + i) && i >= Config.defaultEnderchestsNumber) {
-                item = new ItemStack(160, 1, (short) 0, (byte) 15);
-            } else {
-                item = new ItemStack(160, 1);
-
-                if (size > 0)
-                    item = new ItemStack(160, 1, (short) 0, (byte) 5);
-                if (size >= (slots / 2))
-                    item = new ItemStack(160, 1, (short) 0, (byte) 1);
-                if (size == slots)
-                    item = new ItemStack(160, 1, (short) 0, (byte) 14);
-            }
-
-            ItemMeta meta    = item.getItemMeta();
-            String suffixDef = "(" + size + "/" + slots + ")";
-            String suffix    = suffixDef;
-
-            if (size > 0)
-                suffix = "§a" + suffixDef;
-            if (size >= (slots / 2))
-                suffix = "§6" + suffixDef;
-            if (size == slots)
-                suffix = "§4" + suffixDef;
-            if (size == 0)
-                suffix = "§r" + suffixDef;
-
-            if (!player.hasPermission(Config.enderchestOpenPerm + i) && i != 0 && i >= Config.defaultEnderchestsNumber) {
-                meta.setDisplayName("§cEnderchest " + (i + 1) + " " + suffix);
-                meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_locked")));
-            }else{
-                meta.setDisplayName("§aEnderchest " + (i + 1) + " " + suffix);
-
-                if (size == slots) meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_inventoryfull")));
-            }
-
-            if(playerToSpec != null && size == 0) {
-                if (!playerToSpec.getName().equalsIgnoreCase(mainPlayer.getName())) {
-                    if (!player.hasPermission(Config.enderchestOpenPerm + i) && i >= Config.defaultEnderchestsNumber)
-                        meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_empty"), EnderContainers.__("enderchest_player_denied")));
-                    else
-                        meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_empty"), EnderContainers.__("enderchest_show_contents")));
-                }
-            }else if(playerToSpec != null && !playerToSpec.getName().equalsIgnoreCase(mainPlayer.getName())){
-                if (!player.hasPermission(Config.enderchestOpenPerm + i) && i >= Config.defaultEnderchestsNumber)
-                    meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_player_denied")));
-                else
-                    meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_show_contents")));
-            }
-
-            item.setItemMeta(meta);
-
-            items.put(i, item);
-        }
-
-        menu.setItems(items);
-        mainPlayer.openInventory(menu.getInventory());
-    }
-    public static void openOfflinePlayerMainMenu(Player player, String playername){
-        if(Bukkit.getPlayer(playername) != null){
-            openPlayerMainMenu(player, Bukkit.getPlayer(playername));
-            return;
-        }
-
-        HashMap<Integer, Boolean> accesses = getPlayerAccesses(playername);
-        UUID uuid   = null;
-        String file = "";
-
-        if(!Bukkit.getOfflinePlayer(playername).hasPlayedBefore() || (!EnderContainers.hasMysql() && !EnderContainers.getConfigClass().isConfigurationSection("players.yml", playername))){
-            CoreUtils.errorMessage(player, EnderContainers.__("enderchest_player_never_connected"));
-            return;
-        }
-
-        if(!EnderContainers.hasMysql()) {
-            uuid = UUID.fromString(EnderContainers.getConfigClass().getString("players.yml", playername + ".uuid"));
-            file = Config.saveDir + uuid.toString() + ".yml";
-        }else
-            uuid = EnderContainers.getMysqlManager().getPlayerUUIDFromPlayername(playername);
-
-        int cells = (int) (Math.ceil(EnderContainers.getConfigClass().getDouble("main", "enderchests.max") / 9.0) * 9);
-        if (cells > 6 * 9) cells = 6 * 9;
-        MenuContainer menu = new MenuContainer(cells, CoreUtils.replacePlayerName(Config.mainEnderchestTitle, playername));
-
-        HashMap<Integer, ItemStack> items = new HashMap<>();
-        HashMap<Integer, Integer> sqlSlotsChests  = new HashMap<>();
-
-        if(EnderContainers.hasMysql()){
-            List<DatabaseSet> sqlResults = EnderContainers.getMysqlManager().getPlayerEnderchests(uuid);
-            for(DatabaseSet result : sqlResults){
-                sqlSlotsChests.put(result.getInteger("enderchest_id"), result.getInteger("slots_used"));
-            }
-        }
-
-        for (int i = 0; i < Config.maxEnderchests; i++) {
-            ItemStack item = null;
-            int size       = 0;
-
-            if(EnderContainers.hasMysql()){
-                if(sqlSlotsChests.containsKey(i)) size = sqlSlotsChests.get(i);
-            }else{
-                EnderContainers.getConfigClass().loadConfigFile(file);
-                size = EnderContainers.getConfigClass().getInt(file, "enderchestsSize." + i);
-            }
-
-            if(i == 0) size = CoreUtils.getInventorySize(EnderContainers.getEnderchestsManager().getEnderChestOf(uuid, playername));
-
-            Integer slots = (Config.allowDoubleChest && accesses.containsKey(i) && accesses.get(i)) ? 54 : 27;
-            if(size > slots) size = slots;
-
-            if (!accesses.containsKey(i) && i >= Config.defaultEnderchestsNumber) {
-                item = new ItemStack(160, 1, (short) 0, (byte) 15);
-            } else {
-                item = new ItemStack(160, 1);
-
-                if (size > 0)
-                    item = new ItemStack(160, 1, (short) 0, (byte) 5);
-                if (size >= (slots / 2))
-                    item = new ItemStack(160, 1, (short) 0, (byte) 1);
-                if (size == slots)
-                    item = new ItemStack(160, 1, (short) 0, (byte) 14);
-            }
-
-            ItemMeta meta    = item.getItemMeta();
-            String suffixDef = "(" + size + "/" + slots + ")";
-            String suffix    = suffixDef;
-
-            if (size > 0)
-                suffix = "§a" + suffixDef;
-            if (size >= (slots / 2))
-                suffix = "§6" + suffixDef;
-            if (size == slots)
-                suffix = "§4" + suffixDef;
-            if (size == 0)
-                suffix = "§r" + suffixDef;
-
-            if (!accesses.containsKey(i) && i != 0 && i >= Config.defaultEnderchestsNumber) {
-                meta.setDisplayName("§cEnderchest " + (i + 1) + " " + suffix);
-                meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_locked")));
-            }else{
-                meta.setDisplayName("§aEnderchest " + (i + 1) + " " + suffix);
-
-                if (size == slots) meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_inventoryfull")));
-            }
-
-            if(size == 0) {
-                if (!accesses.containsKey(i) && i >= Config.defaultEnderchestsNumber)
-                    meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_empty"), EnderContainers.__("enderchest_player_denied")));
-                else
-                    meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_empty"), EnderContainers.__("enderchest_show_contents")));
-            }else{
-                if (!accesses.containsKey(i) && i >= Config.defaultEnderchestsNumber)
-                    meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_player_denied")));
-                else
-                    meta.setLore(Arrays.asList(" ", EnderContainers.__("enderchest_show_contents")));
-            }
-
-            item.setItemMeta(meta);
-
-            items.put(i, item);
-        }
-
-        menu.setItems(items);
-
-        menu.offlineOwnerName = playername;
-        menu.offlineOwnerUUID = uuid;
-        player.openInventory(menu.getInventory());
-    }
-
 
     public static void initatePlayerFile(String file, String playername) {
         EnderContainers.getConfigClass().set(file, "playername", playername);
@@ -450,7 +224,7 @@ public class EnderChestUtils {
                     EnderContainers.getMysqlManager().removeBackup(name);
                 }
 
-                p.sendMessage(Config.prefix + EnderContainers.__("cmd_backup_removed"));
+                p.sendMessage(Config.prefix + EnderContainers.__("cmd_backup_removed").replace("%backup_name%", name));
             }
         });
 
@@ -531,18 +305,18 @@ public class EnderChestUtils {
         return n;
     }
     public static String playerAvailableEnderchestsToString(Player p){
-        String r = "0:false;";
+        String r = "0:3;";
 
         for(int i = 1; i < Config.maxEnderchests; i++){
             if(p.hasPermission(Config.enderchestOpenPerm + i) || p.isOp() || i < Config.defaultEnderchestsNumber)
-                r += i + ":" + (CoreUtils.playerHasPerm(p, "doublechest." + i) || p.isOp()) + ";";
+                r += i + ":" + EnderChestUtils.getEnderChestAllowedRows(p, i) + ";";
         }
 
         r = r.substring(0, r.length() - 1);
         return r;
     }
-    public static HashMap<Integer, Boolean> getPlayerAccesses(String playername){
-        HashMap<Integer, Boolean> accesses = new HashMap<>();
+    public static HashMap<Integer, Integer> getPlayerAccesses(String playername){
+        HashMap<Integer, Integer> accesses = new HashMap<>();
 
         if(!EnderContainers.hasMysql()) EnderContainers.getConfigClass().loadConfigFile("players.yml");
 
@@ -554,12 +328,26 @@ public class EnderChestUtils {
         if(!EnderContainers.hasMysql()){
             String[] accessesStr = EnderContainers.getConfigClass().getString("players.yml", playername + ".accesses").split(";");
             for(String accessStr : accessesStr) {
-                accesses.put(Integer.valueOf(accessStr.split(":")[0]), Boolean.valueOf(accessStr.split(":")[1]));
+                String val   = accessStr.split(":")[1];
+                Integer rows = val.equals("true") ? 6 : 3;
+
+                if(StringUtils.isNumeric(val)) rows = Integer.parseInt(val);
+
+                accesses.put(Integer.valueOf(accessStr.split(":")[0]), rows);
             }
         }else{
             accesses = EnderContainers.getMysqlManager().getPlayerAccesses(playername);
         }
 
         return accesses;
+    }
+
+    public static Integer getEnderChestAllowedRows(Player player, Integer enderchestNumber){
+        if(CoreUtils.playerHasPerm(player, "doublechest." + enderchestNumber) || CoreUtils.playerHasPerm(player, "doublechest.*")) return 6;
+
+        for(int row = 1; row <= 6; row++)
+            if(CoreUtils.playerHasPerm(player, "slot" + enderchestNumber + ".row" + row)) return row;
+
+        return 3;
     }
 }

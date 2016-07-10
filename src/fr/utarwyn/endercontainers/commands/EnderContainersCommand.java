@@ -63,14 +63,14 @@ public class EnderContainersCommand implements CommandExecutor {
 
                 // Check if player spectated is online or not
                 if (playerToSpec == null || !playerToSpec.isOnline()) {
-                    EnderChestUtils.openOfflinePlayerMainMenu(p, playername);
+                    EnderContainers.getEnderchestsManager().openOfflinePlayerMainMenu(p, playername);
                     return true;
                 }
 
                 if(!p.getName().equalsIgnoreCase(playername))
                     EnderContainers.getEnderchestsManager().setLastEnderchestOpened(p, playerToSpec);
 
-                EnderChestUtils.openPlayerMainMenu(p, playerToSpec);
+                EnderContainers.getEnderchestsManager().openPlayerMainMenu(p, playerToSpec);
             } else if (args[0].equalsIgnoreCase("backups")) {
                 if (!CoreUtils.senderHasPerm(sender, "backups.view")) {
                     CoreUtils.accessDenied(sender);
@@ -235,8 +235,6 @@ public class EnderContainersCommand implements CommandExecutor {
         if (Config.enabled) rEna = "§atrue";
         String rDeb = "§cfalse";
         if (Config.debug) rDeb = "§atrue";
-        String rAdc = "§cfalse";
-        if (Config.allowDoubleChest) rAdc = "§atrue";
 
         p.sendMessage("§7 - Enabled = " + rEna);
         p.sendMessage("§7 - Debug = " + rDeb);
@@ -247,13 +245,12 @@ public class EnderContainersCommand implements CommandExecutor {
         p.sendMessage("§7 - SaveDir = §r" + Config.saveDir);
         p.sendMessage("§7 - MaxEnderchests = §r" + Config.maxEnderchests);
         p.sendMessage("§7 - DefaultEnderchestsNumber = §r" + Config.defaultEnderchestsNumber);
-        p.sendMessage("§7 - AllowDoubleChest = " + rAdc);
 
         p.sendMessage(" ");
 
         p.sendMessage("§7 - EnderchestOpenPerm = §r" + Config.enderchestOpenPerm);
-        p.sendMessage("§7 - MainEnderchestTitle = §r" + Config.mainEnderchestTitle);
-        p.sendMessage("§7 - EnderchestTitle = §r" + Config.enderchestTitle);
+        p.sendMessage("§7 - MainEnderchestTitle = §r" + EnderContainers.__("enderchest_main_gui_title"));
+        p.sendMessage("§7 - EnderchestTitle = §r" + EnderContainers.__("enderchest_gui_title"));
     }
 
     public void checkForUpdate(final CommandSender p) {
