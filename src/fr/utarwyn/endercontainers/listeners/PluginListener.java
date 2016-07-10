@@ -22,19 +22,19 @@ public class PluginListener implements Listener {
         if (disabling) return;
         disabling = true;
 
-        // Clear nametags
-        HashMap<Player, FloatingTextUtils.FloatingText> nametags = EnderContainers.getInstance().nameTagTask.getActiveNametags();
-        for(Player p : nametags.keySet()){
-            FloatingTextUtils.FloatingText ft = nametags.get(p);
-            ft.remove();
-        }
-
         try {
+            // Clear nametags
+            HashMap<Player, FloatingTextUtils.FloatingText> nametags = EnderContainers.getInstance().nameTagTask.getActiveNametags();
+            for(Player p : nametags.keySet()){
+                FloatingTextUtils.FloatingText ft = nametags.get(p);
+                ft.remove();
+            }
+
             CoreUtils.log(Config.pluginPrefix + "§7Save all opened enderchests...");
             EnderChestUtils.saveOpenedEnderchests();
             CoreUtils.log(Config.pluginPrefix + "§aAll enderchests are now saved in the config ! See you soon :P");
         } catch(Exception ex){
-            CoreUtils.log(Config.pluginPrefix + "§cError during the save. Plugin disabled before all enderchests saved.", true);
+            CoreUtils.log(Config.pluginPrefix + "§cAn error occured during the disabling of the plugin. Please report this error to the plugin's owner.", true);
         }
     }
 
