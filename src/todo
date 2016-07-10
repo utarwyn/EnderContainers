@@ -3,5 +3,4 @@ Version 1.0.6:
 - Support for locales (with UTF8 messages support)
 - Fix offline enderchests interface
 - Support for PlotSquared
-- Support for Towny
 - Add Plugin Metrics
