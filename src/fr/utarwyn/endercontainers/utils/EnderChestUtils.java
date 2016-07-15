@@ -345,8 +345,10 @@ public class EnderChestUtils {
     public static Integer getEnderChestAllowedRows(Player player, Integer enderchestNumber){
         if(CoreUtils.playerHasPerm(player, "doublechest." + enderchestNumber) || CoreUtils.playerHasPerm(player, "doublechest.*")) return 6;
 
-        for(int row = 1; row <= 6; row++)
-            if(CoreUtils.playerHasPerm(player, "slot" + enderchestNumber + ".row" + row)) return row;
+        for(int row = 1; row <= 6; row++) {
+            if (CoreUtils.playerHasPerm(player, "slot" + enderchestNumber + ".row" + row)) return row;
+            else if (CoreUtils.playerHasPerm(player, "slots.row" + row)) return row;
+        }
 
         return 3;
     }

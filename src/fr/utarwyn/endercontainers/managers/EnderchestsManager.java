@@ -295,6 +295,12 @@ public class EnderchestsManager {
             return;
         }
 
+        if (num == 0) {
+            playSoundTo(Config.openingChestSound, player);
+            player.openInventory(owner.getEnderChest());
+            return;
+        }
+
         if (!player.hasPermission(Config.enderchestOpenPerm + num) && num >= Config.defaultEnderchestsNumber) {
             PluginMsg.doesNotHavePerm(player);
             return;

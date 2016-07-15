@@ -30,6 +30,11 @@ public class DependenciesManager {
         } else {
             this.dependencies.put("PlotSquared", false);
         }
+        if (Config.citizensSupport) {
+            loadDependency("Citizens");
+        } else {
+            this.dependencies.put("Citizens", false);
+        }
         CoreUtils.log("§8[§6EnderContainers§8] ------------------------------------", true);
     }
 

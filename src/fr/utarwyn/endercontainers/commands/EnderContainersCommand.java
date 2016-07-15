@@ -2,10 +2,8 @@ package fr.utarwyn.endercontainers.commands;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
-import fr.utarwyn.endercontainers.utils.Config;
-import fr.utarwyn.endercontainers.utils.CoreUtils;
-import fr.utarwyn.endercontainers.utils.EnderChestUtils;
-import fr.utarwyn.endercontainers.utils.Updater;
+import fr.utarwyn.endercontainers.dependencies.CitizensIntegration;
+import fr.utarwyn.endercontainers.utils.*;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,6 +19,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 
 public class EnderContainersCommand implements CommandExecutor {
@@ -162,6 +161,20 @@ public class EnderContainersCommand implements CommandExecutor {
                 }
                 EnderContainers.getInstance().reloadConfiguration();
                 sender.sendMessage(Config.prefix + "§a" + EnderContainers.__("cmd_config_reloaded"));
+            } else if (args[0].equalsIgnoreCase("npc") && EnderContainers.getInstance().getDependenciesManager().isDependencyLoaded("Citizens")) {
+                if(!(sender instanceof Player)){CoreUtils.consoleDenied(sender);return true;}
+
+                if (!sender.isOp()) {
+                    CoreUtils.accessDenied(sender);
+                    return true;
+                }
+
+                if(args.length <= 1){
+                    CoreUtils.errorMessage(sender, EnderContainers.__("error_command_usage") + ": /endc npc <link|info|unlink>");
+                    return true;
+                }
+
+                EnderContainers.getCitizensIntegration().onCommand((Player) sender, args[1], Arrays.copyOfRange(args, 2, args.length));
             } else {
                 sender.sendMessage(Config.prefix + "§c" + EnderContainers.__("cmd_unknown_error") + ": §6/endercontainers help§c.");
             }

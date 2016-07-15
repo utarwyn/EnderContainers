@@ -52,6 +52,7 @@ public class Config {
     public static boolean factionsSupport = true;
     public static boolean plotSquaredSupport = true;
     public static boolean townySupport = true;
+    public static boolean citizensSupport = true;
 
     /**
      * ----- Fun & others configuration

@@ -2,7 +2,7 @@ name: EnderContainers
 author: Utarwyn
 version: 1.0.7
 main: fr.utarwyn.endercontainers.EnderContainers
-softdepend: [Factions, mcore, PlotSquared]
+softdepend: [Factions, mcore, PlotSquared, Citizens]
 commands:
   endercontainers:
     aliases: [enderc, endc, enc, ecp]

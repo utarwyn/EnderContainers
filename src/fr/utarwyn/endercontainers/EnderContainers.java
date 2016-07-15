@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers;
 import fr.utarwyn.endercontainers.commands.EnderChestCommand;
 import fr.utarwyn.endercontainers.commands.EnderContainersCommand;
 import fr.utarwyn.endercontainers.database.Database;
+import fr.utarwyn.endercontainers.dependencies.CitizensIntegration;
 import fr.utarwyn.endercontainers.listeners.EnderChestListener;
 import fr.utarwyn.endercontainers.listeners.NameTagTask;
 import fr.utarwyn.endercontainers.listeners.PluginListener;
@@ -31,6 +32,9 @@ public class EnderContainers extends JavaPlugin {
     public MysqlManager mysqlManager;
     public LocalesManager localesManager;
 
+    // Dependencies
+    public CitizensIntegration citizensIntegration = new CitizensIntegration();
+
     public NameTagTask nameTagTask = new NameTagTask();
 
     public String newVersion = null;
@@ -47,6 +51,8 @@ public class EnderContainers extends JavaPlugin {
         loadManagers();
         loadListeners();
         loadTasks();
+
+        loadDependencies();
 
         loadMysql();
         loadMetrics();
@@ -173,6 +179,13 @@ public class EnderContainers extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PluginListener(), this);
     }
 
+    public void loadDependencies(){
+        if(getDependenciesManager().isDependencyLoaded("Citizens")) {
+            citizensIntegration.load();
+            getServer().getPluginManager().registerEvents(citizensIntegration, this);
+        }
+    }
+
     public void loadTasks(){
         if(!Config.blockNametag) return;
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, nameTagTask, 10L, 0);
@@ -255,7 +268,7 @@ public class EnderContainers extends JavaPlugin {
     }
 
     public static ConfigClass getConfigClass() {
-        return EnderContainers.configClass;
+        return configClass;
     }
     public static Database getDB() {
         return database;
@@ -265,6 +278,9 @@ public class EnderContainers extends JavaPlugin {
         return this.dependenciesManager;
     }
 
+    public static CitizensIntegration getCitizensIntegration(){
+        return EnderContainers.getInstance().citizensIntegration;
+    }
 
     public void reloadConfiguration() {
         EnderContainers.getConfigClass().reloadConfigs();

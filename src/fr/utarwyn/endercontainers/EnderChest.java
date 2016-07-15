@@ -46,17 +46,8 @@ public class EnderChest {
     public Integer getNum() {
         return this.num;
     }
-
-    public void setNum(Integer num) {
-        this.num = num;
-    }
-
     public Player getOwner() {
         return this.owner;
-    }
-
-    public void setOwner(Player owner) {
-        this.owner = owner;
     }
 
     public HashMap<Integer, ItemStack> getItems() {
@@ -170,7 +161,7 @@ public class EnderChest {
         CoreUtils.log(playername + "'s enderchest saved ! (" + count + " items)");
     }
 
-    public void loadFromMysql(){
+    private void loadFromMysql(){
         UUID uuid       = (owner != null) ? owner.getUniqueId() : ownerUUID;
         DatabaseSet set = EnderContainers.getMysqlManager().getPlayerEnderchest(uuid, num);
 
@@ -181,7 +172,7 @@ public class EnderChest {
             this.items = items;
         }
     }
-    public void saveToMysql(){
+    private void saveToMysql(){
         UUID uuid          = (owner != null) ? owner.getUniqueId() : ownerUUID;
         Integer slotsUsed  = 0;
 
