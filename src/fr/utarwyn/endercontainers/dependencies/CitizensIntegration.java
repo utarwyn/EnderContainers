@@ -6,6 +6,7 @@ import fr.utarwyn.endercontainers.utils.ConfigClass;
 import fr.utarwyn.endercontainers.utils.CoreUtils;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.NPCLeftClickEvent;
+import net.citizensnpcs.api.event.NPCRemoveEvent;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.npc.NPC;
 import org.apache.commons.lang.StringUtils;
@@ -328,7 +329,13 @@ public class CitizensIntegration implements Listener{
         onNPCClicked(e.getClicker(), e.getNPC());
         e.setCancelled(true);
     }
+    @EventHandler
+    public void onNPCRemoved(NPCRemoveEvent e){
+        NPC npc = e.getNPC();
 
+        if(getNPCLinkById(npc.getId()) != null)
+            removeNPCLink(npc.getId());
+    }
 
 
     private class PlayerChatEditMode{

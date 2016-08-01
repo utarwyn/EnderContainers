@@ -75,7 +75,10 @@ public class ItemSerializer {
                 } else if (itemAttribute[0].equals("a") && createdItemStack) {
                     is.setAmount(Integer.valueOf(itemAttribute[1]));
                 } else if (itemAttribute[0].equals("e") && createdItemStack) {
-                    is.addEnchantment(Enchantment.getById(Integer.valueOf(itemAttribute[1])), Integer.valueOf(itemAttribute[2]));
+                    Enchantment enchantment = Enchantment.getById(Integer.valueOf(itemAttribute[1]));
+                    Integer level = Integer.valueOf(itemAttribute[2]);
+
+                    is.addUnsafeEnchantment(enchantment, level);
                 } else if (itemAttribute[0].equals("n") && createdItemStack) {
                     ItemMeta meta = is.getItemMeta();
                     String[] displayName = itemAttribute[1].split("=");

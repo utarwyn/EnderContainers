@@ -1,7 +1,4 @@
-Version 1.0.7:
-- Support for 1.10.X
-- Enderchest message customizable.
-- Enderchest glass panes customizable.
-- Enderchest rows customizable (1 to 6)
-- Auto-detect system from 1.0.5 & 1.0.6
-- Fix UTF-8 messages for versions 1.7 to 1.10
+Version 1.0.8:
+- Support for "Citizens 2"
+- Support for unsafe enchantments (thanks to Kledioz)
+- New API (basics)
