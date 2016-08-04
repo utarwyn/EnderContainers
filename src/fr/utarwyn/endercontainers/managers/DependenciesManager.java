@@ -9,8 +9,8 @@ import org.bukkit.plugin.PluginManager;
 import java.util.HashMap;
 
 public class DependenciesManager {
-    EnderContainers instance;
-    HashMap<String, Boolean> dependencies = new HashMap<String, Boolean>();
+    private EnderContainers instance;
+    private HashMap<String, Boolean> dependencies = new HashMap<String, Boolean>();
 
     public DependenciesManager() {
         this.instance = EnderContainers.getInstance();
@@ -18,7 +18,7 @@ public class DependenciesManager {
         loadDependencies();
     }
 
-    public void loadDependencies() {
+    private void loadDependencies() {
         CoreUtils.log("§8[§6EnderContainers§8] -----------§8[§bDependencies§8]§7-----------", true);
         if (Config.factionsSupport) {
             loadDependency("Factions");
@@ -38,7 +38,7 @@ public class DependenciesManager {
         CoreUtils.log("§8[§6EnderContainers§8] ------------------------------------", true);
     }
 
-    public HashMap<String, Boolean> getDependencies() {
+    private HashMap<String, Boolean> getDependencies() {
         return this.dependencies;
     }
 
@@ -49,13 +49,15 @@ public class DependenciesManager {
         return false;
     }
 
-    public void loadDependency(String dependency) {
+    private void loadDependency(String dependency) {
         PluginManager pm = this.instance.getServer().getPluginManager();
         boolean isEnabled = false;
         if ((pm.getPlugin(dependency) != null) && (pm.getPlugin(dependency).isEnabled())) {
             isEnabled = true;
         }
-        this.dependencies.put(dependency, Boolean.valueOf(isEnabled));
+
+        this.dependencies.put(dependency, isEnabled);
+
         if (isEnabled) {
             CoreUtils.log("§8[§6EnderContainers§8] §e   - " + dependency + "§r: " + ChatColor.GREEN + "[Enabled]", true);
         } else {

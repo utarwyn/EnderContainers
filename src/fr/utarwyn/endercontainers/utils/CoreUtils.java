@@ -4,7 +4,6 @@ import fr.utarwyn.endercontainers.EnderContainers;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -80,5 +79,16 @@ public class CoreUtils {
         }
 
         return false;
+    }
+    public static void playSoundTo(String soundName, Player player){
+        if(soundExists(soundName))
+            player.playSound(player.getLocation(), Sound.valueOf(soundName), 1F, 1F);
+        else
+            CoreUtils.log("§cThe sound §6" + soundName + "§c doesn't exists. Please change it in the config.", true);
+    }
+
+    public static String getServerVersion(){
+        String packageName = EnderContainers.getInstance().getServer().getClass().getPackage().getName();
+        return packageName.substring(packageName.lastIndexOf('.') + 1);
     }
 }

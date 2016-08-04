@@ -27,13 +27,13 @@ public class EnderContainers extends JavaPlugin {
     private static Database database;
 
     // Managers
-    public EnderchestsManager enderchestsManager;
-    public DependenciesManager dependenciesManager;
-    public MysqlManager mysqlManager;
-    public LocalesManager localesManager;
+    private EnderchestsManager enderchestsManager;
+    private DependenciesManager dependenciesManager;
+    private MysqlManager mysqlManager;
+    private LocalesManager localesManager;
 
     // Dependencies
-    public CitizensIntegration citizensIntegration = new CitizensIntegration();
+    private CitizensIntegration citizensIntegration = new CitizensIntegration();
 
     public NameTagTask nameTagTask = new NameTagTask();
 
@@ -65,7 +65,7 @@ public class EnderContainers extends JavaPlugin {
     }
 
 
-    public void loadMainConfig() {
+    private void loadMainConfig() {
         EnderContainers.configClass = new ConfigClass(EnderContainers.getInstance());
 
         if (!getConfigClass().contains("main", "enabled"))
@@ -154,19 +154,19 @@ public class EnderContainers extends JavaPlugin {
         Config.updateChecker     = getConfigClass().getBoolean("main", "others.updateChecker");
     }
 
-    public void loadBackupsConfig() {
+    private void loadBackupsConfig() {
         if(!Config.mysql){
             getConfigClass().loadConfigFile("backups.yml");
             getConfigClass().loadConfigFile("players.yml");
         }
     }
 
-    public void loadCommands() {
+    private void loadCommands() {
         getCommand("endercontainers").setExecutor(new EnderContainersCommand());
         getCommand("enderchest").setExecutor(new EnderChestCommand());
     }
 
-    public void loadManagers() {
+    private void loadManagers() {
         this.dependenciesManager = new DependenciesManager();
         this.enderchestsManager  = new EnderchestsManager();
         this.mysqlManager        = new MysqlManager();
@@ -174,24 +174,24 @@ public class EnderContainers extends JavaPlugin {
         this.localesManager.loadMessages();
     }
 
-    public void loadListeners() {
+    private void loadListeners() {
         getServer().getPluginManager().registerEvents(new EnderChestListener(), this);
         getServer().getPluginManager().registerEvents(new PluginListener(), this);
     }
 
-    public void loadDependencies(){
+    private void loadDependencies(){
         if(getDependenciesManager().isDependencyLoaded("Citizens")) {
             citizensIntegration.load();
             getServer().getPluginManager().registerEvents(citizensIntegration, this);
         }
     }
 
-    public void loadTasks(){
+    private void loadTasks(){
         if(!Config.blockNametag) return;
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, nameTagTask, 10L, 0);
     }
 
-    public void loadMysql(){
+    private void loadMysql(){
         this.getServer().getScheduler().runTaskAsynchronously(this, new Runnable() {
             @Override
             public void run() {
@@ -203,7 +203,7 @@ public class EnderContainers extends JavaPlugin {
                     mysqlManager.setDatabase(database);
                     checkDatabase();
 
-                    if(database.isConnected()){
+                    if(Database.isConnected()){
                         if(!database.tableExists(Config.DB_PREFIX + "enderchests")){
                             database.request("CREATE TABLE `" + Config.DB_PREFIX + "enderchests` (`id` INT(11) NOT NULL AUTO_INCREMENT, `items` MEDIUMTEXT NULL, `slots_used` INT(2) NOT NULL DEFAULT 0, `last_opening_time` TIMESTAMP NULL, `last_save_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, `player_uuid` VARCHAR(36) NULL, `enderchest_id` TINYINT(2) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)) COLLATE='latin1_swedish_ci' ENGINE=InnoDB;");
                             CoreUtils.log(Config.pluginPrefix + "§aMysql: table `" + Config.DB_PREFIX + "enderchests` created.");
@@ -230,7 +230,7 @@ public class EnderContainers extends JavaPlugin {
         });
     }
 
-    public void loadMetrics(){
+    private void loadMetrics(){
         try {
             Metrics metrics = new Metrics(this);
             metrics.start();
@@ -240,7 +240,7 @@ public class EnderContainers extends JavaPlugin {
     }
 
 
-    public void checkForUpdates(){
+    private void checkForUpdates(){
         if(!Config.updateChecker) return;
 
         String newVersion = new Updater(this).getNewVersion();
@@ -290,12 +290,8 @@ public class EnderContainers extends JavaPlugin {
 
         loadMysql();
     }
-    public static String getServerVersion(){
-        String packageName = EnderContainers.getInstance().getServer().getClass().getPackage().getName();
-        return packageName.substring(packageName.lastIndexOf('.') + 1);
-    }
 
-    public void checkDatabase() {
+    private void checkDatabase() {
         EnderContainers.getDB().connect();
     }
     public static Boolean hasMysql(){

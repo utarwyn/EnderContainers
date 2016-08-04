@@ -2,14 +2,11 @@ package fr.utarwyn.endercontainers.managers;
 
 import fr.utarwyn.endercontainers.EnderChest;
 import fr.utarwyn.endercontainers.EnderContainers;
-import fr.utarwyn.endercontainers.containers.MenuContainer;
+import fr.utarwyn.endercontainers.containers.MainMenuContainer;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
 import fr.utarwyn.endercontainers.utils.*;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -17,48 +14,49 @@ import java.util.*;
 
 public class EnderchestsManager {
 
-    public ArrayList<EnderChest> enderchests = new ArrayList<>();
-    public HashMap<Player, EnderChest> enderchestsOpens = new HashMap<>();
-    public HashMap<Player, Player> lastEnderchestOpened = new HashMap<>();
+    private ArrayList<EnderChest> enderchests = new ArrayList<>();
+    private HashMap<Player, EnderChest> enderchestsOpens = new HashMap<>();
 
-    public HashMap<String, HashMap<Integer, EnderChest>> offlineEnderchestsOpened = new HashMap<>();
-    public HashMap<String, Inventory> offlineVanillaEnderchestOpened = new HashMap<>();
+    private EnderChest createNewEnderChest(String playername, Integer num){
+        EnderChest enderchest = new EnderChest(playername, num);
 
-    public void addEnderChest(EnderChest ec) {
-        if (!enderchests.contains(ec))
-            enderchests.add(ec);
+        enderchests.add(enderchest);
+        return enderchest;
+    }
+    private EnderChest createNewEnderChest(Player player, Integer num){
+        EnderChest enderchest = new EnderChest(player, num);
+
+        enderchests.add(enderchest);
+        return enderchest;
     }
 
-    public void removeEnderChest(EnderChest ec) {
-        if (enderchests.contains(ec))
-            enderchests.remove(ec);
-    }
-
-    public EnderChest getPlayerEnderchest(Player player, Integer num) {
-        return getPlayerEnderchest(player.getUniqueId(), player.getName(), num);
-    }
-    public EnderChest getPlayerEnderchest(UUID playerUUID, String playerName, Integer num) {
-        EnderChest ec = null;
-
+    public EnderChest getPlayerEnderchestOf(Player player, Integer num) {
         for (EnderChest enderchest : enderchests) {
-            if (enderchest.getOwner() != null && enderchest.getOwner().getUniqueId().equals(playerUUID) && num.equals(enderchest.getNum()))
-                ec = enderchest;
-            if(enderchest.ownerName != null && enderchest.ownerUUID != null && enderchest.ownerName.equalsIgnoreCase(playerName) && enderchest.ownerUUID.equals(playerUUID) && num.equals(enderchest.getNum()))
-                ec = enderchest;
-        }
-        if (ec == null){
-            ec = new EnderChest(num, playerName, playerUUID);
-            addEnderChest(ec);
+            if(enderchest.getOwner() == null || !enderchest.getOwner().exists()) continue;
+            if(enderchest.getOwner().getPlayerName().equals(player.getName()) && num.equals(enderchest.getNum()))
+                return enderchest;
         }
 
+        return createNewEnderChest(player, num);
+    }
+    public EnderChest getPlayerEnderchestOf(String playername, Integer num) {
+        for (EnderChest enderchest : enderchests) {
+            if(enderchest.getOwner() == null || !enderchest.getOwner().exists()) continue;
+            if(enderchest.getOwner().getPlayerName().equals(playername) && num.equals(enderchest.getNum()))
+                return enderchest;
+        }
 
-        return ec;
+        return createNewEnderChest(playername, num);
     }
 
-    @SuppressWarnings("deprecation")
+    public HashMap<Player, EnderChest> getOpenedEnderchests(){
+        return this.enderchestsOpens;
+    }
+
+
     public void openPlayerMainMenu(Player player, Player playerToSpec) {
         Player mainPlayer = player;
-        if (playerToSpec != null) player = playerToSpec;
+        if (playerToSpec != null && playerToSpec != player) player = playerToSpec;
 
         if(playerToSpec != null){
             if(playerToSpec.getName().equalsIgnoreCase(mainPlayer.getName())){
@@ -76,7 +74,6 @@ public class EnderchestsManager {
 
         int availableEnderchests = EnderChestUtils.getPlayerAvailableEnderchests(player);
 
-        // Update player slots (in BDD or on disk)
         EnderContainers.getEnderchestsManager().savePlayerInfo(player);
 
         if(availableEnderchests == 1){
@@ -84,9 +81,9 @@ public class EnderchestsManager {
             return;
         }
 
-        int cells = (int) (Math.ceil(EnderContainers.getConfigClass().getDouble("main", "enderchests.max") / 9.0) * 9);
-        if (cells > 6 * 9) cells = 6 * 9;
-        MenuContainer menu = new MenuContainer(cells, CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), player));
+        int rows = (int) Math.ceil(EnderContainers.getConfigClass().getDouble("main", "enderchests.max") / 9.0);
+        if (rows > 6) rows = 6;
+        MainMenuContainer menu = new MainMenuContainer(rows, CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), player));
 
         HashMap<Integer, ItemStack> items = new HashMap<>();
         HashMap<Integer, Integer> sqlSlotsChests  = new HashMap<>();
@@ -99,19 +96,21 @@ public class EnderchestsManager {
         }
 
         for (int i = 0; i < Config.maxEnderchests; i++) {
-            ItemStack item = null;
+            ItemStack item;
             int size       = 0;
 
             if(EnderContainers.hasMysql()){
                 if(sqlSlotsChests.containsKey(i)) size = sqlSlotsChests.get(i);
             }else {
-                EnderChest ec = EnderContainers.getEnderchestsManager().getPlayerEnderchest(player, i);
-                if (ec != null) size = ec.getRealSize();
+                EnderChest ec = EnderContainers.getEnderchestsManager().getPlayerEnderchestOf(player, i);
+                assert ec != null;
+
+                if (ec.getContainer() != null) size = ec.getContainer().getFilledSlotsNumber();
             }
 
             if(i == 0) size = CoreUtils.getInventorySize(player.getEnderChest());
 
-            Integer slots = EnderChestUtils.getEnderChestAllowedRows(player, i) * 9;
+            Integer slots = EnderChestUtils.getAllowedRowsFor(player, i) * 9;
             if(size > slots) size = slots;
 
             if (!player.hasPermission(Config.enderchestOpenPerm + i) && i >= Config.defaultEnderchestsNumber) {
@@ -173,6 +172,8 @@ public class EnderchestsManager {
             items.put(i, item);
         }
 
+        menu.setOwner(new EnderChest.EnderChestOwner(player));
+
         menu.setItems(items);
         mainPlayer.openInventory(menu.getInventory());
     }
@@ -182,24 +183,18 @@ public class EnderchestsManager {
             return;
         }
 
-        HashMap<Integer, Integer> accesses = EnderChestUtils.getPlayerAccesses(playername);
-        UUID uuid   = null;
-        String file = "";
-
         if(!Bukkit.getOfflinePlayer(playername).hasPlayedBefore() || (!EnderContainers.hasMysql() && !EnderContainers.getConfigClass().isConfigurationSection("players.yml", playername))){
             CoreUtils.errorMessage(player, EnderContainers.__("enderchest_player_never_connected"));
             return;
         }
 
-        if(!EnderContainers.hasMysql()) {
-            uuid = UUID.fromString(EnderContainers.getConfigClass().getString("players.yml", playername + ".uuid"));
-            file = Config.saveDir + uuid.toString() + ".yml";
-        }else
-            uuid = EnderContainers.getMysqlManager().getPlayerUUIDFromPlayername(playername);
+        HashMap<Integer, Integer> accesses = EnderChestUtils.getPlayerAccesses(playername);
+        UUID uuid   = EnderChestUtils.getPlayerUUIDFromPlayername(playername);
+        String file = Config.saveDir + uuid.toString() + ".yml";
 
-        int cells = (int) (Math.ceil(EnderContainers.getConfigClass().getDouble("main", "enderchests.max") / 9.0) * 9);
-        if (cells > 6 * 9) cells = 6 * 9;
-        MenuContainer menu = new MenuContainer(cells, CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), playername));
+        int rows = (int) Math.ceil(EnderContainers.getConfigClass().getDouble("main", "enderchests.max") / 9.0);
+        if (rows > 6) rows = 6;
+        MainMenuContainer menu = new MainMenuContainer(rows, CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), playername));
 
         HashMap<Integer, ItemStack> items = new HashMap<>();
         HashMap<Integer, Integer> sqlSlotsChests  = new HashMap<>();
@@ -212,7 +207,7 @@ public class EnderchestsManager {
         }
 
         for (int i = 0; i < Config.maxEnderchests; i++) {
-            ItemStack item = null;
+            ItemStack item;
             int size       = 0;
 
             if(EnderContainers.hasMysql()){
@@ -222,9 +217,9 @@ public class EnderchestsManager {
                 size = EnderContainers.getConfigClass().getInt(file, "enderchestsSize." + i);
             }
 
-            if(i == 0) size = CoreUtils.getInventorySize(EnderContainers.getEnderchestsManager().getEnderChestOf(uuid, playername));
+            if(i == 0) size = CoreUtils.getInventorySize(EnderChestUtils.getVanillaEnderChestOf(playername, uuid));
 
-            Integer slots = accesses.get(i) * 9;
+            Integer slots = (accesses.containsKey(i)) ? accesses.get(i) * 9 : ((i == 0) ? 27 : 0);
             if(size > slots) size = slots;
 
             if (!accesses.containsKey(i) && i >= Config.defaultEnderchestsNumber) {
@@ -279,197 +274,84 @@ public class EnderchestsManager {
             items.put(i, item);
         }
 
-        menu.setItems(items);
+        menu.setOwner(new EnderChest.EnderChestOwner(playername));
 
-        menu.offlineOwnerName = playername;
-        menu.offlineOwnerUUID = uuid;
+        menu.setItems(items);
         player.openInventory(menu.getInventory());
     }
 
     public void openPlayerEnderChest(Integer num, Player player, Player playerToSpec) {
         Player owner = player;
-        if (playerToSpec != null) owner = playerToSpec;
+        if (playerToSpec != null && playerToSpec != player) owner = playerToSpec;
+
+        // Verification hooks
+        if (num > Config.maxEnderchests - 1) {
+            PluginMsg.cannotOpenEnderchest(player);
+            return;
+        }
+        if (num > 0 && !player.hasPermission(Config.enderchestOpenPerm + num) && num >= Config.defaultEnderchestsNumber) {
+            PluginMsg.doesNotHavePerm(player);
+            return;
+        }
+
+        EnderChest ec = getPlayerEnderchestOf(owner, num);
+        assert ec != null;
+
+        if (enderchestsOpens.containsKey(player)) enderchestsOpens.remove(player);
+        enderchestsOpens.put(player, ec);
+
+        CoreUtils.playSoundTo(Config.openingChestSound, player);
+        player.openInventory(ec.getContainer().getInventory());
+    }
+    public void openOfflinePlayerEnderChest(Integer num, Player player, String playername){
+        if(Bukkit.getPlayer(playername) != null){
+            openPlayerEnderChest(num, player, Bukkit.getPlayer(playername));
+            return;
+        }
 
         if (num > Config.maxEnderchests - 1) {
             PluginMsg.cannotOpenEnderchest(player);
             return;
         }
 
-        if (num == 0) {
-            playSoundTo(Config.openingChestSound, player);
-            player.openInventory(owner.getEnderChest());
-            return;
-        }
-
-        if (!player.hasPermission(Config.enderchestOpenPerm + num) && num >= Config.defaultEnderchestsNumber) {
-            PluginMsg.doesNotHavePerm(player);
-            return;
-        }
-
-        EnderChest ec = getPlayerEnderchest(owner, num);
-        Integer slots = EnderChestUtils.getEnderChestAllowedRows(owner, num) * 9;
-
-        if(ec != null && ec.lastMenuContainer != null){
-            if (enderchestsOpens.containsKey(player)) enderchestsOpens.remove(player);
-            enderchestsOpens.put(player, ec);
-
-            int size = ec.lastMenuContainer.getInventory().getSize();
-
-            if(size != slots){
-                removeEnderChest(ec);
-                ec = getPlayerEnderchest(owner, num);
-            }else{
-                playSoundTo(Config.openingChestSound, player);
-
-                player.openInventory(ec.lastMenuContainer.getInventory());
-                return;
-            }
-        }
-
-        MenuContainer menu = new MenuContainer(slots, CoreUtils.replaceEnderchestNum(EnderContainers.__("enderchest_gui_title"), (num + 1), owner));
-
-        if(ec == null){
-            PluginMsg.enderchestUnknown(player, num);
-            return;
-        }
-
-        for (Integer index : ec.getItems().keySet()) {
-            if(index + 1 > slots) continue;
-
-            ItemStack i = ec.getItems().get(index);
-            menu.setItem(i, index);
-        }
+        EnderChest ec = getPlayerEnderchestOf(playername, num);
+        assert ec != null;
 
         if (enderchestsOpens.containsKey(player)) enderchestsOpens.remove(player);
         enderchestsOpens.put(player, ec);
 
-        playSoundTo(Config.openingChestSound, player);
-        player.openInventory(menu.getInventory());
-
-        ec.lastMenuContainer = menu;
-    }
-    public void openOfflinePlayerEnderChest(Integer num, Player player, UUID uuid, String playername){
-        if(player.getName().equals(playername)){
-            CoreUtils.errorMessage(player, "You can't open one of your own enderchests ! Please retry.");
-            return;
-        }
-
-        if(Bukkit.getPlayer(playername) != null){
-            openPlayerEnderChest(num, player, Bukkit.getPlayer(playername));
-            return;
-        }
-
-        if(num == 0){
-            Inventory inv = EnderContainers.getEnderchestsManager().getEnderChestOf(uuid, playername);
-            if(inv != null) player.openInventory(inv);
-            return;
-        }
-
-        HashMap<Integer, Integer> accesses = EnderChestUtils.getPlayerAccesses(playername);
-
-        if(!accesses.containsKey(num) && num >= Config.defaultEnderchestsNumber) return;
-        if(offlineEnderchestsOpened.containsKey(playername) && offlineEnderchestsOpened.get(playername).containsKey(num)){
-            EnderChest lastEnderChest = offlineEnderchestsOpened.get(playername).get(num);
-            player.openInventory(lastEnderChest.lastMenuContainer.getInventory());
-
-            if (enderchestsOpens.containsKey(player)) enderchestsOpens.remove(player);
-            enderchestsOpens.put(player, lastEnderChest);
-
-            return;
-        }
-
-        EnderChest ec = getPlayerEnderchest(uuid, playername, num);
-        Integer slots = accesses.get(num) * 9;
-
-        if(ec != null && ec.lastMenuContainer != null){
-            if (!offlineEnderchestsOpened.containsKey(playername)){
-                offlineEnderchestsOpened.put(playername, new HashMap<Integer, EnderChest>());
-            }
-            if(!offlineEnderchestsOpened.get(playername).containsKey(num))
-                offlineEnderchestsOpened.get(playername).put(num, ec);
-
-            if (enderchestsOpens.containsKey(player)) enderchestsOpens.remove(player);
-            enderchestsOpens.put(player, ec);
-
-            playSoundTo(Config.openingChestSound, player);
-
-            player.openInventory(ec.lastMenuContainer.getInventory());
-            return;
-        }
-
-        MenuContainer menu = new MenuContainer(slots, CoreUtils.replaceEnderchestNum(EnderContainers.__("enderchest_gui_title"), (num + 1), playername));
-
-        if(ec == null){
-            PluginMsg.enderchestUnknown(player, num);
-            return;
-        }
-
-        for (Integer index : ec.getItems().keySet()) {
-            if(index + 1 > slots) continue;
-
-            ItemStack i = ec.getItems().get(index);
-            menu.setItem(i, index);
-        }
-
-        if (!offlineEnderchestsOpened.containsKey(playername))
-            offlineEnderchestsOpened.put(playername, new HashMap<Integer, EnderChest>());
-        if(!offlineEnderchestsOpened.get(playername).containsKey(num))
-            offlineEnderchestsOpened.get(playername).put(num, ec);
-        if (enderchestsOpens.containsKey(player)) enderchestsOpens.remove(player);
-        enderchestsOpens.put(player, ec);
-
-        playSoundTo(Config.openingChestSound, player);
-        player.openInventory(menu.getInventory());
-
-        menu.offlineOwnerUUID = uuid;menu.offlineOwnerName = playername;
-        ec.lastMenuContainer = menu;
+        CoreUtils.playSoundTo(Config.openingChestSound, player);
+        player.openInventory(ec.getContainer().getInventory());
     }
 
 
-    public Player getLastEnderchestOpened(Player player){
-        return this.lastEnderchestOpened.get(player);
-    }
-    public void setLastEnderchestOpened(Player player, Player playerOwner){
-        if(this.lastEnderchestOpened.containsKey(player)) this.lastEnderchestOpened.remove(player);
-        this.lastEnderchestOpened.put(player, playerOwner);
-    }
-
-    public Inventory getEnderChestOf(UUID uuid, String playername){
-        if(Bukkit.getPlayer(playername) != null)
-            return Bukkit.getPlayer(playername).getEnderChest();
-
-        if(offlineVanillaEnderchestOpened.containsKey(playername))
-            return offlineVanillaEnderchestOpened.get(playername);
-
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playername);
-
-        if(!offlinePlayer.hasPlayedBefore())
-            return null;
-
-        Player target = NMSHacks.getPlayerObjectOfOfflinePlayer(playername, uuid, NMSHacks.isServerPost16());
-        assert target != null;
-        target.loadData();
-
-        if(!offlineVanillaEnderchestOpened.containsKey(playername))
-            offlineVanillaEnderchestOpened.put(playername, target.getEnderChest());
-
-        return target.getEnderChest();
-    }
-    public void savePlayerInfo(Player p){
-        if(!EnderContainers.hasMysql()){
+    public void savePlayerInfo(Player p) {
+        if (!EnderContainers.hasMysql()) {
             ConfigClass cc = EnderContainers.getConfigClass();
 
             cc.loadConfigFile("players.yml");
 
             cc.set("players.yml", p.getName() + ".uuid", p.getUniqueId().toString());
             cc.set("players.yml", p.getName() + ".accesses", EnderChestUtils.playerAvailableEnderchestsToString(p));
+        } else {
+            EnderContainers.getMysqlManager().updatePlayerUUID(p);
+        }
+    }
+    public void refreshEnderChestsOf(Player p){
+        for(EnderChest enderchest : getOpenedEnderchests().values()){
+            EnderChest.EnderChestOwner owner = enderchest.getOwner();
+            if(owner == null) continue;
+
+            if(!owner.ownerIsOnline() && owner.getPlayerName().equals(p.getName())){
+                enderchest.getContainer().refresh();
+                enderchest.save();
+
+                enderchest.setNewOwner(new EnderChest.EnderChestOwner(p));
+
+                if(enderchest.getNum() == 0)
+                    enderchest.getContainer().setNewInventory(p.getEnderChest());
+            }
         }
     }
 
-    private void playSoundTo(String soundName, Player player){
-        if(CoreUtils.soundExists(soundName))
-            player.playSound(player.getLocation(), Sound.valueOf(soundName), 1F, 1F);
-        else
-            CoreUtils.log("§cThe sound §6" + soundName + "§c doesn't exists. Please change it in the config.", true);
-    }
 }

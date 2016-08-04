@@ -1,4 +1,8 @@
-Version 1.0.8:
-- Support for "Citizens 2"
-- Support for unsafe enchantments (thanks to Kledioz)
-- New API (basics)
+Version 1.0.9:
+- Refractoring of all enderchests managing system (Good!)
+- Possibility to create public enderchests
+- Possibility to disable on custom worlds (config file)
+- Better config.yml file
+
+- Fix bug with saving system (enderchests not saved :[ )
+- Fix bug with offline enderchests

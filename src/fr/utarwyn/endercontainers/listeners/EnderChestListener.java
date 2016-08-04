@@ -2,7 +2,8 @@ package fr.utarwyn.endercontainers.listeners;
 
 import fr.utarwyn.endercontainers.EnderChest;
 import fr.utarwyn.endercontainers.EnderContainers;
-import fr.utarwyn.endercontainers.containers.MenuContainer;
+import fr.utarwyn.endercontainers.containers.EnderChestContainer;
+import fr.utarwyn.endercontainers.containers.MainMenuContainer;
 import fr.utarwyn.endercontainers.dependencies.FactionsProtection;
 import fr.utarwyn.endercontainers.dependencies.PlotSquaredProtection;
 import fr.utarwyn.endercontainers.managers.EnderchestsManager;
@@ -10,7 +11,6 @@ import fr.utarwyn.endercontainers.utils.Config;
 import fr.utarwyn.endercontainers.utils.CoreUtils;
 import fr.utarwyn.endercontainers.utils.EnderChestUtils;
 import fr.utarwyn.endercontainers.utils.PluginMsg;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -23,9 +23,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.UUID;
 
 public class EnderChestListener implements Listener {
 
@@ -68,121 +65,67 @@ public class EnderChestListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        String invname = e.getInventory().getTitle();
+        Integer index = e.getRawSlot();
 
-        if (!(e.getInventory().getHolder() instanceof MenuContainer)) return;
+        // Verify slot index
+        if (index >= e.getInventory().getSize()) return;
+        if (index < 0) return;
+        if (index >= Config.maxEnderchests) return;
 
-        Player playerOwner = EnderContainers.getEnderchestsManager().getLastEnderchestOpened(p);
-        Sound clickSound   = CoreUtils.soundExists("CLICK") ? Sound.valueOf("CLICK") : Sound.valueOf("UI_BUTTON_CLICK");
 
-        if (invname.equalsIgnoreCase(CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), p))) { // Own main enderchest
-            Integer index = e.getRawSlot();
+        Sound clickSound = CoreUtils.soundExists("CLICK") ? Sound.valueOf("CLICK") : Sound.valueOf("UI_BUTTON_CLICK");
 
-            if(e.getCurrentItem() == null || e.getCurrentItem().getType().equals(Material.AIR)){
-                e.setCancelled(true);
-                return;
-            }
+        if (!(e.getInventory().getHolder() instanceof MainMenuContainer)) return;
+        MainMenuContainer container = (MainMenuContainer) e.getInventory().getHolder();
 
-            if (index >= e.getInventory().getSize()) return;
+        e.setCancelled(true);
 
-            e.setCancelled(true);
-            if (index < 0) return;
-            if (index >= Config.maxEnderchests) return;
+        assert container.getOwner() != null;
+        if(!container.getOwner().exists()) return;
 
-            EnderChestUtils.recalculateItems(p, index);
-
-            if (index == 0) {
-                playSoundTo(Config.openingChestSound, p);
-                p.openInventory(p.getEnderChest());
-                return;
-            }
+        if (container.getOwner().getPlayerName().equals(p.getName())) { // Own main enderchest
+            if(e.getCurrentItem() == null || e.getCurrentItem().getType().equals(Material.AIR)) return;
 
             if (p.hasPermission(Config.enderchestOpenPerm + index) || index < Config.defaultEnderchestsNumber) {
                 p.playSound(p.getLocation(), clickSound, 1, 1);
-                EnderContainers.getInstance().enderchestsManager.openPlayerEnderChest(index, p, null);
+                EnderContainers.getEnderchestsManager().openPlayerEnderChest(index, p, null);
             }else{
                 Sound glassSound = CoreUtils.soundExists("GLASS") ? Sound.valueOf("GLASS") : Sound.valueOf("BLOCK_GLASS_HIT");
-
                 p.playSound(p.getLocation(), glassSound, 1, 1);
             }
-        }else if(playerOwner != null && invname.equalsIgnoreCase(CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), playerOwner))){ // Player who open another enderchest
-            Integer index = e.getRawSlot();
-
-            if (index >= e.getInventory().getSize()) return;
-            e.setCancelled(true);
-
-            if (index < 0) return;
-            if (index >= Config.maxEnderchests) return;
+        }else if(container.getOwner().ownerIsOnline()){ // Player who open another enderchest
+            Player playerOwner = container.getOwner().getPlayer();
 
             p.playSound(p.getLocation(), clickSound, 1, 1);
 
-            EnderChest ec = EnderContainers.getEnderchestsManager().getPlayerEnderchest(playerOwner, index);
+            EnderChest ec = EnderContainers.getEnderchestsManager().getPlayerEnderchestOf(playerOwner, index);
             if(ec == null || index > (EnderChestUtils.getPlayerAvailableEnderchests(playerOwner) - 1)) return;
 
-            if (index == 0) {
-                p.playSound(p.getLocation(), Sound.valueOf(Config.openingChestSound), 1, 1);
-                p.openInventory(playerOwner.getEnderChest());
-                return;
-            }
+            EnderContainers.getEnderchestsManager().openPlayerEnderChest(index, p, playerOwner);
+        }else if(!container.getOwner().ownerIsOnline()){ // Player who open an offline enderchest
+            String playername = container.getOwner().getPlayerName();
 
-            if (p.hasPermission(Config.enderchestOpenPerm + index) || index < Config.defaultEnderchestsNumber)
-                EnderContainers.getEnderchestsManager().openPlayerEnderChest(index, p, playerOwner);
-        }else if(playerOwner == null){ // Player who open an offline enderchest
-            if(EnderContainers.getEnderchestsManager().enderchestsOpens.containsKey(p)) return;
-
-            MenuContainer menu = (MenuContainer) e.getInventory().getHolder();
-            Integer index      = e.getRawSlot();
-            String playername  = menu.offlineOwnerName;
-            UUID uuid          = menu.offlineOwnerUUID;
-
-            if(index >= e.getInventory().getSize()) return;
-            if(index < 0) return;
-
-            if(invname.equalsIgnoreCase(CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), playername))){
-                e.setCancelled(true);
-                EnderContainers.getEnderchestsManager().openOfflinePlayerEnderChest(index, p, uuid, playername);
-            }
+            EnderContainers.getEnderchestsManager().openOfflinePlayerEnderChest(index, p, playername);
         }
     }
 
     @EventHandler
     public void onInventoryClosed(InventoryCloseEvent e) {
-        Player p = (Player) e.getPlayer();
+        Player p      = (Player) e.getPlayer();
         Inventory inv = e.getInventory();
-        EnderChest ec = null;
+
         EnderchestsManager ecm = EnderContainers.getEnderchestsManager();
 
-        Player playerOwner = ecm.getLastEnderchestOpened(p);
+        if(!(inv.getHolder() instanceof EnderChestContainer) && !inv.getName().equals("container.enderchest")) return;
+        if (!ecm.getOpenedEnderchests().containsKey(p)) return;
 
-        if(inv.getName().equalsIgnoreCase("container.enderchest")){
-            playSoundTo(Config.closingChestSound, p);
-            return;
-        }
-
-        if (inv.getName().equalsIgnoreCase(CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), p))) return;
-        if (playerOwner != null && inv.getName().equalsIgnoreCase(CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), playerOwner))) return;
-        if (!ecm.enderchestsOpens.containsKey(p)) return;
-        ec = ecm.enderchestsOpens.get(p);
-
-        if(ec != null && ec.getOwner() == null){ // Close offline player's chest (or main menu)
-            if(inv.getName().equalsIgnoreCase(CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), ec.ownerName))) return;
-        }
-
-        ecm.enderchestsOpens.remove(p);
+        EnderChest ec = ecm.getOpenedEnderchests().get(p);
 
         assert ec != null;
-        ec.clearItems();
+        ecm.getOpenedEnderchests().remove(p);
 
-        int index = 0;
-        for (ItemStack i : inv.getContents()) {
-            ec.addItem(index, i);
-            index++;
-        }
-
+        ec.getContainer().refresh();
         ec.save();
-
-        if(ec.lastMenuContainer == null || ec.lastMenuContainer.getInventory() == null)
-            EnderContainers.getEnderchestsManager().removeEnderChest(ec);
 
         playSoundTo(Config.closingChestSound, p);
     }

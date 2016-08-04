@@ -2,10 +2,12 @@ package fr.utarwyn.endercontainers.utils;
 
 import fr.utarwyn.endercontainers.EnderChest;
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.containers.EnderChestContainer;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
 import fr.utarwyn.endercontainers.managers.EnderchestsManager;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -18,11 +20,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 public class EnderChestUtils {
+
+    private static HashMap<String, String> playerUUIDs = new HashMap<>();
 
     public static void initatePlayerFile(String file, String playername) {
         EnderContainers.getConfigClass().set(file, "playername", playername);
@@ -233,62 +238,20 @@ public class EnderChestUtils {
 
 
     public static void saveOpenedEnderchests() {
-        EnderchestsManager m = EnderContainers.getInstance().enderchestsManager;
-        for (Player player : m.enderchestsOpens.keySet()) {
-            EnderChest ec = m.enderchestsOpens.get(player);
+        EnderchestsManager em = EnderContainers.getEnderchestsManager();
+        HashMap<Player, EnderChest> openedEnderchests = em.getOpenedEnderchests();
+
+        for (Player player : openedEnderchests.keySet()) {
+            EnderChest ec = openedEnderchests.get(player);
             InventoryView invView = player.getOpenInventory();
-            Inventory inv = null;
+            Inventory inv;
 
             // Select opened inventory
             if (invView == null) continue;
             inv = invView.getTopInventory();
-            if (inv == null) continue;
-
-            ec.clearItems();
-            int index = 0;
-            for (ItemStack i : inv.getContents()) {
-                ec.addItem(index, i);
-                index++;
-            }
+            if (inv == null || !(inv.getHolder() instanceof EnderChestContainer)) continue;
 
             ec.save();
-        }
-    }
-
-    public static void recalculateItems(Player p, int num) {
-        Inventory ecBukkit = p.getEnderChest();
-        EnderChest ec = EnderContainers.getInstance().enderchestsManager.getPlayerEnderchest(p, num);
-
-        if ((ec == null) || (ecBukkit == null)) return;
-        if (num != 0) return;
-
-        int ecBukkitSize = CoreUtils.getInventorySize(ecBukkit);
-        int ecSize = ec.getItems().size();
-        int maxSize = ecBukkit.getSize();
-
-        if (ecBukkitSize == 0 && ecSize > 0) {
-            ecBukkit.clear();
-            Iterator<Integer> localIterator = ec.getItems().keySet().iterator();
-
-            while (localIterator.hasNext()) {
-                int index = localIterator.next();
-                ecBukkit.setItem(index, ec.getItems().get(index));
-            }
-
-            ec.clearItems();
-            ec.save();
-
-            if (ecBukkitSize + ecSize <= maxSize) {
-                while (localIterator.hasNext()) {
-                    int index = localIterator.next();
-                    ecBukkit.addItem(new ItemStack[]{(ItemStack) ec.getItems().get(Integer.valueOf(index))});
-                }
-
-                ec.clearItems();
-                ec.save();
-            } else {
-                CoreUtils.errorMessage(p, "Your EnderChest doesn't receive all your old items. Please leave slots to get all your items.");
-            }
         }
     }
 
@@ -309,7 +272,7 @@ public class EnderChestUtils {
 
         for(int i = 1; i < Config.maxEnderchests; i++){
             if(p.hasPermission(Config.enderchestOpenPerm + i) || p.isOp() || i < Config.defaultEnderchestsNumber)
-                r += i + ":" + EnderChestUtils.getEnderChestAllowedRows(p, i) + ";";
+                r += i + ":" + getAllowedRowsFor(p, i) + ";";
         }
 
         r = r.substring(0, r.length() - 1);
@@ -342,12 +305,81 @@ public class EnderChestUtils {
         return accesses;
     }
 
-    public static Integer getEnderChestAllowedRows(Player player, Integer enderchestNumber){
-        if(CoreUtils.playerHasPerm(player, "doublechest." + enderchestNumber) || CoreUtils.playerHasPerm(player, "doublechest.*")) return 6;
+    public static Inventory getVanillaEnderChestOf(String playername, UUID playeruuid){
+        if(Bukkit.getPlayer(playername) != null)
+            return Bukkit.getPlayer(playername).getEnderChest();
+
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playername);
+
+        if(!offlinePlayer.hasPlayedBefore())
+            return null;
+
+        Player target = NMSHacks.getPlayerObjectOfOfflinePlayer(playername, playeruuid, NMSHacks.isServerPost16());
+        assert target != null;
+        target.loadData();
+
+        return target.getEnderChest();
+    }
+    public static void saveVanillaEnderChest(EnderChest enderchest){
+        if(enderchest.getContainer() == null || enderchest.getOwner() == null || enderchest.getOwner().ownerIsOnline()) return;
+        String playername = enderchest.getOwner().getPlayerName();
+        UUID playeruuid   = enderchest.getOwner().getPlayerUniqueId();
+
+        if(Bukkit.getPlayer(playername) != null) return;
+
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playername);
+        if(!offlinePlayer.hasPlayedBefore()) return;
+
+        Player target = NMSHacks.getPlayerObjectOfOfflinePlayer(playername, playeruuid, NMSHacks.isServerPost16());
+        assert target != null;
+        target.loadData();
+
+        Inventory inv = target.getEnderChest();
+        inv.clear();
+
+        for(Integer index : enderchest.getContainer().getItems().keySet()){
+            ItemStack item = enderchest.getContainer().getItems().get(index);
+
+            inv.setItem(index, item);
+        }
+
+        System.out.println(Arrays.toString(inv.getContents()));
+
+        target.saveData();
+    }
+
+    public static UUID getPlayerUUIDFromPlayername(String playername){
+        if(playerUUIDs.containsKey(playername))
+            return UUID.fromString(playerUUIDs.get(playername));
+
+        UUID uuid;
+
+        if(!EnderContainers.hasMysql())
+            uuid = UUID.fromString(EnderContainers.getConfigClass().getString("players.yml", playername + ".uuid"));
+        else
+            uuid = EnderContainers.getMysqlManager().getPlayerUUIDFromPlayername(playername);
+
+        if(uuid != null) playerUUIDs.put(playername, uuid.toString());
+        return uuid;
+    }
+    public static Integer getAllowedRowsFor(EnderChest enderchest){
+        Integer num = enderchest.getNum();
+
+        if(enderchest.getOwner().ownerIsOnline()){
+            Player owner = enderchest.getOwner().getPlayer();
+            return getAllowedRowsFor(owner, num);
+        }else{
+            HashMap<Integer, Integer> accesses = getPlayerAccesses(enderchest.getOwner().getPlayerName());
+            if(accesses.containsKey(num)) return accesses.get(num);
+            else return 0;
+        }
+    }
+    public static Integer getAllowedRowsFor(Player owner, Integer num){
+        if(CoreUtils.playerHasPerm(owner, "doublechest." + num) || CoreUtils.playerHasPerm(owner, "doublechest.*")) return 6;
 
         for(int row = 1; row <= 6; row++) {
-            if (CoreUtils.playerHasPerm(player, "slot" + enderchestNumber + ".row" + row)) return row;
-            else if (CoreUtils.playerHasPerm(player, "slots.row" + row)) return row;
+            if (CoreUtils.playerHasPerm(owner, "slot" + num + ".row" + row)) return row;
+            else if (CoreUtils.playerHasPerm(owner, "slots.row" + row)) return row;
         }
 
         return 3;

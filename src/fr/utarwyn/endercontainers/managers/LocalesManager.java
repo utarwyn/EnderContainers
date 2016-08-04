@@ -1,7 +1,7 @@
 package fr.utarwyn.endercontainers.managers;
 
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.utils.Config;
+import fr.utarwyn.endercontainers.utils.CoreUtils;
 import org.bukkit.ChatColor;
 
 import java.nio.charset.Charset;
@@ -43,7 +43,7 @@ public class LocalesManager {
             messages.put(key, getConfigClass().getString(file, key));
         }
     }
-    public Set<String> generateDefaultMessages(){
+    private Set<String> generateDefaultMessages(){
         String locale = Config.pluginLocale;
         String file   = "locales/" + locale + ".yml";
 
@@ -62,7 +62,7 @@ public class LocalesManager {
 
 
     public String get(String key){
-        String bukkitVersion = EnderContainers.getServerVersion();
+        String bukkitVersion = CoreUtils.getServerVersion();
         String message       = messages.get(key);
 
         if(bukkitVersion.contains("v1_7") || bukkitVersion.contains("v1_8"))

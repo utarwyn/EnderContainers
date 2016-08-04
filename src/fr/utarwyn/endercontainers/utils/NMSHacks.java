@@ -1,12 +1,12 @@
 package fr.utarwyn.endercontainers.utils;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 public class NMSHacks {
 
@@ -28,14 +28,17 @@ public class NMSHacks {
 
             Class<?> class_PlayerInteractManager = getNMSClass("PlayerInteractManager");
 
+            assert class_EntityPlayer != null;
             Constructor<?> constructor_EntityPlayer = class_EntityPlayer.getDeclaredConstructor(class_MinecraftServer, getNMSClass("WorldServer"), useGameProfile ? class_GameProfile : String.class,
                     class_PlayerInteractManager);
 
             Constructor<?> constructor_GameProfile = null;
             if(useGameProfile) {
+                assert class_GameProfile != null;
                 constructor_GameProfile = class_GameProfile.getDeclaredConstructor(UUID.class, String.class);
             }
 
+            assert class_PlayerInteractManager != null;
             Constructor<?> constructor_PlayerInteractManager = class_PlayerInteractManager.getDeclaredConstructor(class_World);
 
             Object gameProfile = null;
@@ -67,7 +70,7 @@ public class NMSHacks {
         }
     }
 
-    public static Object getWorldServer0() {
+    private static Object getWorldServer0() {
         try {
             return reflectWorldServer0();
         } catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
@@ -81,7 +84,7 @@ public class NMSHacks {
         return getMinecraftServerInstance().getClass().getMethod("getWorldServer", int.class).invoke(getMinecraftServerInstance(), 0); //Not a method inside DedicatedServer, use getMethod
     }
 
-    public static Object getMinecraftServerInstance() {
+    private static Object getMinecraftServerInstance() {
         try {
             return reflectMinecraftServerInstance();
         } catch(NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -93,12 +96,13 @@ public class NMSHacks {
     private static Object reflectMinecraftServerInstance() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
             InvocationTargetException {
         Class<?> class_DedicatedServer = getNMSClass("DedicatedServer");
+        assert class_DedicatedServer != null;
         Method method_getServer = class_DedicatedServer.getMethod("getServer"); //Use getMethod instead of getDeclaredMethod, because the getServer method is declared in MinecraftServer, not DedicatedServer
 
         return method_getServer.invoke(null); //Forgot about this: reflection's javadocs say that if it is a static method, then parse null to the "obj" argument.
     }
 
-    public static String getCraftbukkitPackage() {
+    private static String getCraftbukkitPackage() {
         if(craftbukkitPackage != null) {
             return craftbukkitPackage;
         }
@@ -115,18 +119,18 @@ public class NMSHacks {
         }
     }
 
-    public static String getNMSPackage() {
+    private static String getNMSPackage() {
         if(nmsPackage != null) {
             return nmsPackage;
         }
 
         return nmsPackage = getCraftbukkitPackage().replace("org.bukkit.craftbukkit", "net.minecraft.server");
     }
-    public static String getUtilNMSPackage() {
+    private static String getUtilNMSPackage() {
         return "com.mojang.authlib.";
     }
 
-    public static Class<?> getUtilNMSClass(String className) {
+    private static Class<?> getUtilNMSClass(String className) {
         try {
             return Class.forName(getUtilNMSPackage() + className);
         } catch(ClassNotFoundException e) {
@@ -134,7 +138,7 @@ public class NMSHacks {
             return null;
         }
     }
-    public static Class<?> getNMSClass(String className) {
+    private static Class<?> getNMSClass(String className) {
         try {
             return Class.forName(getNMSPackage() + className);
         } catch(ClassNotFoundException e) {

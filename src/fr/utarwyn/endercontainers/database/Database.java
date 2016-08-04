@@ -1,6 +1,5 @@
 package fr.utarwyn.endercontainers.database;
 
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.utils.Config;
 import fr.utarwyn.endercontainers.utils.CoreUtils;
 
@@ -47,7 +46,6 @@ public class Database {
             CoreUtils.error("Mysql error: unable to connect to the database. Please retry.");
             CoreUtils.log(Config.pluginPrefix + "§4Module §6Mysql §4disabled.", true);
 
-            EnderContainers.getInstance().loadBackupsConfig();
             Config.mysql = false;Config.enabled = true;
         }
     }

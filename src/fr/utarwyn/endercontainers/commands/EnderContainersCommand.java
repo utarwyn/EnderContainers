@@ -2,8 +2,10 @@ package fr.utarwyn.endercontainers.commands;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
-import fr.utarwyn.endercontainers.dependencies.CitizensIntegration;
-import fr.utarwyn.endercontainers.utils.*;
+import fr.utarwyn.endercontainers.utils.Config;
+import fr.utarwyn.endercontainers.utils.CoreUtils;
+import fr.utarwyn.endercontainers.utils.EnderChestUtils;
+import fr.utarwyn.endercontainers.utils.Updater;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -65,9 +67,6 @@ public class EnderContainersCommand implements CommandExecutor {
                     EnderContainers.getEnderchestsManager().openOfflinePlayerMainMenu(p, playername);
                     return true;
                 }
-
-                if(!p.getName().equalsIgnoreCase(playername))
-                    EnderContainers.getEnderchestsManager().setLastEnderchestOpened(p, playerToSpec);
 
                 EnderContainers.getEnderchestsManager().openPlayerMainMenu(p, playerToSpec);
             } else if (args[0].equalsIgnoreCase("backups")) {
@@ -187,7 +186,7 @@ public class EnderContainersCommand implements CommandExecutor {
     }
 
 
-    public void getHelp(CommandSender p, int page) {
+    private void getHelp(CommandSender p, int page) {
         int maxpage = 2;
         if (maxpage < page) page = maxpage;
 
@@ -217,10 +216,10 @@ public class EnderContainersCommand implements CommandExecutor {
 
         p.sendMessage(" ");
     }
-    public void sendFormattedHelpLine(CommandSender sender, String title, String command, String perm){
+    private void sendFormattedHelpLine(CommandSender sender, String title, String command, String perm){
         sendFormattedHelpLine(sender, title, command, perm, false);
     }
-    public void sendFormattedHelpLine(CommandSender sender, String title, String command, String perm, Boolean isOp){
+    private void sendFormattedHelpLine(CommandSender sender, String title, String command, String perm, Boolean isOp){
         String message       = "§7 - " + title + " : ";
         String hiddenCommand = "§c§k";
 
@@ -235,7 +234,7 @@ public class EnderContainersCommand implements CommandExecutor {
     }
 
 
-    public void getStringConfig(CommandSender p) {
+    private void getStringConfig(CommandSender p) {
         if (!p.isOp()) {
             CoreUtils.accessDenied(p);
             return;
@@ -266,7 +265,7 @@ public class EnderContainersCommand implements CommandExecutor {
         p.sendMessage("§7 - EnderchestTitle = §r" + EnderContainers.__("enderchest_gui_title"));
     }
 
-    public void checkForUpdate(final CommandSender p) {
+    private void checkForUpdate(final CommandSender p) {
         final String version = EnderContainers.getInstance().getDescription().getVersion();
 
         EnderContainers.getInstance().getServer().getScheduler().runTaskAsynchronously(EnderContainers.getInstance(), new Runnable() {
@@ -303,7 +302,7 @@ public class EnderContainersCommand implements CommandExecutor {
         });
     }
 
-    public void doUpdate(final CommandSender p) {
+    private void doUpdate(final CommandSender p) {
         final String version = EnderContainers.getInstance().getDescription().getVersion();
 
         EnderContainers.getInstance().getServer().getScheduler().runTaskAsynchronously(EnderContainers.getInstance(), new Runnable() {
@@ -344,7 +343,7 @@ public class EnderContainersCommand implements CommandExecutor {
     }
 
 
-    public void viewBackups(CommandSender sender) {
+    private void viewBackups(CommandSender sender) {
         boolean mysql = EnderContainers.hasMysql();
         List<DatabaseSet> backups = null;
 
@@ -379,7 +378,7 @@ public class EnderContainersCommand implements CommandExecutor {
         sender.sendMessage(EnderContainers.__("cmd_backup_info").replace("%command%", "/endc backup <name>"));
     }
 
-    public void getBackupInformation(CommandSender p, String name) {
+    private void getBackupInformation(CommandSender p, String name) {
         boolean mysql = EnderContainers.hasMysql();
 
         Timestamp t;

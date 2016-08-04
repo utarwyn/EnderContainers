@@ -6,15 +6,15 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.Collection;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class EnderContainersAPI {
 
     public static Plugin getPlugin(){
         return EnderContainers.getInstance();
     }
 
-
     public static EnderChest getPlayerEnderChest(Player player, Integer number){
-        return new EnderChest().fromPluginChest(EnderContainers.getEnderchestsManager().getPlayerEnderchest(player, number));
+        return new EnderChest().fromPluginChest(EnderContainers.getEnderchestsManager().getPlayerEnderchestOf(player, number));
     }
 
 
@@ -26,16 +26,19 @@ public class EnderContainersAPI {
             throw new NullPointerException("Player seems to be null");
         }
 
-        Player owner = enderChest.getOwner();
+        fr.utarwyn.endercontainers.EnderChest.EnderChestOwner owner = enderChest.getOwner();
 
         if(owner == null){
             throw new NullPointerException("EnderChest's owner seems to be null");
         }
-        if(!owner.isOnline()){
+        if(!owner.exists()){
             throw new IllegalAccessError("EnderChest's owner have to be connected!");
         }
 
-        EnderContainers.getEnderchestsManager().openPlayerEnderChest(enderChest.getNumber(), owner, player);
+        if(owner.ownerIsOnline())
+            EnderContainers.getEnderchestsManager().openPlayerEnderChest(enderChest.getNumber(), owner.getPlayer(), player);
+        else
+            EnderContainers.getEnderchestsManager().openOfflinePlayerEnderChest(enderChest.getNumber(), owner.getPlayer(), owner.getPlayerName());
     }
 
     public static void openEnderChestFor(EnderChest enderChest, Collection<Player> players){

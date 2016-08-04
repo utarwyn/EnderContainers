@@ -21,7 +21,7 @@ public class FloatingTextUtils {
         return getFloatingTextFromHandler(location, text, null);
     }
     public static FloatingText getFloatingTextFromHandler(Location location, String text, Player p){
-        String version = EnderContainers.getServerVersion();
+        String version = CoreUtils.getServerVersion();
         FloatingText floatingText = null;
 
         try {

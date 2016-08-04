@@ -1,15 +1,15 @@
 package fr.utarwyn.endercontainers.listeners;
 
 import fr.utarwyn.endercontainers.EnderContainers;
-import fr.utarwyn.endercontainers.utils.*;
-import org.apache.logging.log4j.core.config.plugins.Plugin;
-import org.bukkit.Bukkit;
+import fr.utarwyn.endercontainers.utils.Config;
+import fr.utarwyn.endercontainers.utils.CoreUtils;
+import fr.utarwyn.endercontainers.utils.EnderChestUtils;
+import fr.utarwyn.endercontainers.utils.FloatingTextUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.server.PluginDisableEvent;
-import org.bukkit.event.server.PluginEnableEvent;
 
 import java.util.HashMap;
 
@@ -42,15 +42,13 @@ public class PluginListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e){
         Player p = e.getPlayer();
 
-        if(p.isOp() && EnderContainers.getInstance().newVersion != null){
+        if((p.isOp() || CoreUtils.playerHasPerm(p, "update")) && EnderContainers.getInstance().newVersion != null){
             p.sendMessage(Config.pluginPrefix + "§a" + EnderContainers.__("other_new_update") + ": §2§l" + EnderContainers.getInstance().newVersion + "§a.");
             p.sendMessage(Config.pluginPrefix + EnderContainers.__("other_new_update_line2").replace("%command%", "/endc update"));
         }
 
-        if(EnderContainers.hasMysql())
-            EnderContainers.getMysqlManager().updatePlayerUUID(p);
-        else
-            EnderContainers.getEnderchestsManager().savePlayerInfo(p);
+        EnderContainers.getEnderchestsManager().savePlayerInfo(p);
+        EnderContainers.getEnderchestsManager().refreshEnderChestsOf(p);
     }
 
 }
