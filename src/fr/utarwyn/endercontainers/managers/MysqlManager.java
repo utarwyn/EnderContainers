@@ -1,10 +1,12 @@
 package fr.utarwyn.endercontainers.managers;
 
+import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.database.Database;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
 import fr.utarwyn.endercontainers.utils.Config;
 import fr.utarwyn.endercontainers.utils.EnderChestUtils;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -22,12 +24,18 @@ public class MysqlManager {
 
 
     // Players table
-    public void updatePlayerUUID(Player player){
+    public void updatePlayerUUID(final Player player){
         if(!Database.isConnected()) return;
 
-        List<DatabaseSet> playerInfo = database.find(Config.DB_PREFIX + "players", DatabaseSet.makeConditions("player_uuid", player.getUniqueId().toString()));
+        Bukkit.getScheduler().runTaskAsynchronously(EnderContainers.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                List<DatabaseSet> playerInfo = database.find(Config.DB_PREFIX + "players", DatabaseSet.makeConditions("player_uuid", player.getUniqueId().toString()));
 
-        if(playerInfo.size() == 0) database.save(Config.DB_PREFIX + "players", DatabaseSet.makeFields("player_name", player.getName(), "player_uuid", player.getUniqueId().toString(), "accesses", EnderChestUtils.playerAvailableEnderchestsToString(player)));
+                if(playerInfo.size() == 0) database.save(Config.DB_PREFIX + "players", DatabaseSet.makeFields("player_name", player.getName(), "player_uuid", player.getUniqueId().toString(), "accesses", EnderChestUtils.playerAvailableEnderchestsToString(player)));
+                else database.save(Config.DB_PREFIX + "players", DatabaseSet.makeFields("accesses", EnderChestUtils.playerAvailableEnderchestsToString(player)), DatabaseSet.makeConditions("player_uuid", player.getUniqueId().toString()));
+            }
+        });
     }
     public HashMap<Integer, Integer> getPlayerAccesses(String playername){
         String table = Config.DB_PREFIX + "players";

@@ -76,7 +76,6 @@ public class EnderchestsManager {
 
         int availableEnderchests = EnderChestUtils.getPlayerAvailableEnderchests(player);
 
-        // Update player slots (in BDD or on disk)
         EnderContainers.getEnderchestsManager().savePlayerInfo(player);
 
         if(availableEnderchests == 1){
@@ -212,7 +211,7 @@ public class EnderchestsManager {
         }
 
         for (int i = 0; i < Config.maxEnderchests; i++) {
-            ItemStack item = null;
+            ItemStack item;
             int size       = 0;
 
             if(EnderContainers.hasMysql()){
@@ -224,7 +223,7 @@ public class EnderchestsManager {
 
             if(i == 0) size = CoreUtils.getInventorySize(EnderContainers.getEnderchestsManager().getEnderChestOf(uuid, playername));
 
-            Integer slots = accesses.get(i) * 9;
+            Integer slots = (accesses.containsKey(i)) ? accesses.get(i) * 9 : ((i == 0) ? 27 : 0);
             if(size > slots) size = slots;
 
             if (!accesses.containsKey(i) && i >= Config.defaultEnderchestsNumber) {
@@ -463,6 +462,8 @@ public class EnderchestsManager {
 
             cc.set("players.yml", p.getName() + ".uuid", p.getUniqueId().toString());
             cc.set("players.yml", p.getName() + ".accesses", EnderChestUtils.playerAvailableEnderchestsToString(p));
+        }else{
+            EnderContainers.getMysqlManager().updatePlayerUUID(p);
         }
     }
 
