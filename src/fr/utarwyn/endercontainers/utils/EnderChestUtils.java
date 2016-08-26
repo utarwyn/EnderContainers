@@ -344,6 +344,18 @@ public class EnderChestUtils {
 
         target.saveData();
     }
+    public static void reloadVanillaEnderChest(EnderChest enderChest){
+        if(enderChest.getNum() != 0 || enderChest.getOwner() == null || !enderChest.getOwner().ownerIsOnline() || enderChest.getContainer() == null) return;
+        Inventory vanillaEc = enderChest.getOwner().getPlayer().getEnderChest();
+
+        vanillaEc.clear();
+
+        for(Integer index : enderChest.getContainer().getItems().keySet()){
+            ItemStack item = enderChest.getContainer().getItems().get(index);
+
+            vanillaEc.setItem(index, item);
+        }
+    }
 
     public static UUID getPlayerUUIDFromPlayername(String playername){
         if(playerUUIDs.containsKey(playername))

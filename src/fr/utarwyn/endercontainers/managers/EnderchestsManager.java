@@ -348,8 +348,10 @@ public class EnderchestsManager {
 
                 enderchest.setNewOwner(new EnderChest.EnderChestOwner(p));
 
-                if(enderchest.getNum() == 0)
+                if(enderchest.getNum() == 0) {
+                    EnderChestUtils.reloadVanillaEnderChest(enderchest);
                     enderchest.getContainer().setNewInventory(p.getEnderChest());
+                }
             }
         }
     }

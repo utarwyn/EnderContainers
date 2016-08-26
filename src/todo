@@ -3,5 +3,5 @@ Version 1.0.9:
 - Possibility to disable on custom worlds (config file) (Good!)
 - Better config.yml file
 
-- Fix bug with saving system (enderchests not saved :[ )
-- Fix bug with offline enderchests
+- Fix bug with saving system (enderchests not saved :[ ) (Good!)
+- Fix bug with offline enderchests (Good!)

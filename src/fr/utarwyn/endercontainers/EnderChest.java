@@ -142,7 +142,7 @@ public class EnderChest {
         EnderContainers.getConfigClass().saveConfig(file);
 
 
-        CoreUtils.log(playername + "'s enderchest saved ! (" + count + " items)");
+        CoreUtils.log(playername + "'s enderchest #" + getNum() + " saved ! (" + count + " items)");
     }
 
     private void loadFromMysql(){
@@ -168,7 +168,6 @@ public class EnderChest {
         String stringItems = ItemSerializer.itemsToString(getContainer().getItems());
         EnderContainers.getMysqlManager().savePlayerEnderchest(uuid, num, slotsUsed, stringItems);
     }
-
 
 
     public static class EnderChestOwner{
