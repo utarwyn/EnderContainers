@@ -24,8 +24,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 
-import java.util.Arrays;
-
 public class EnderChestListener implements Listener {
 
     @EventHandler
@@ -42,9 +40,6 @@ public class EnderChestListener implements Listener {
         } else if (Config.disabledWorlds.contains(p.getWorld().getName())) {
             return;
         }
-
-        System.out.println(p.getWorld().getName());
-        System.out.println(Arrays.toString(Config.disabledWorlds.toArray()));
 
         if (b.getType().equals(Material.ENDER_CHEST)) {
             if (EnderContainers.getDependenciesManager().isDependencyLoaded("Factions")) {

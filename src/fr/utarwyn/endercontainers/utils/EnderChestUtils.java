@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -342,8 +341,6 @@ public class EnderChestUtils {
 
             inv.setItem(index, item);
         }
-
-        System.out.println(Arrays.toString(inv.getContents()));
 
         target.saveData();
     }

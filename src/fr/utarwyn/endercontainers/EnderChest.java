@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -101,9 +100,6 @@ public class EnderChest {
     public void save() {
         if (!getOwner().exists() || num == -1 || getContainer() == null) return;
 
-        System.out.println("Try to save #" + num + " ...");
-        System.out.println(getOwner().toString());
-
         if(!getOwner().ownerIsOnline() && num == 0){
             EnderChestUtils.saveVanillaEnderChest(this);
             return;
@@ -122,9 +118,6 @@ public class EnderChest {
         String path = "enderchests.enderchest" + num;
         EnderContainers.getConfigClass().loadConfigFile(file);
         int count = 0;
-
-        System.out.println("Normal save!");
-        System.out.println(Arrays.toString(getContainer().getItems().values().toArray()));
 
         if (!EnderContainers.getConfigClass().isConfigurationSection(file, "enderchests"))
             EnderChestUtils.initatePlayerFile(file, playername);
