@@ -28,4 +28,8 @@ public class PluginMsg {
     public static void pluginDisabled(Player p){
         CoreUtils.errorMessage(p, EnderContainers.__("error_plugin_disabled"));
     }
+
+    public static void pluginDisabledInWorld(Player p){
+        CoreUtils.errorMessage(p, EnderContainers.__("error_plugin_disabled_world"));
+    }
 }

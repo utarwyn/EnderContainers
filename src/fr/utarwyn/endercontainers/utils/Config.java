@@ -1,5 +1,8 @@
 package fr.utarwyn.endercontainers.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Config {
 
     /**
@@ -9,6 +12,7 @@ public class Config {
     public static boolean enabled = true;
     public static boolean debug = false;
     public static String prefix = "§8[§6EnderContainers§8] §7";
+    public static List<String> disabledWorlds = new ArrayList<>();
     public static String pluginPrefix = prefix + "";
     public static String updateBase = "http://utarwyn.xyz/plugins/endercontainers/";
 

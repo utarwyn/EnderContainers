@@ -2,17 +2,15 @@ package fr.utarwyn.endercontainers.listeners;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.utils.Config;
-import fr.utarwyn.endercontainers.utils.CoreUtils;
 import fr.utarwyn.endercontainers.utils.EnderChestUtils;
+import fr.utarwyn.endercontainers.utils.FloatingTextUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.util.Set;
-
-import fr.utarwyn.endercontainers.utils.FloatingTextUtils;
 import java.util.HashMap;
+import java.util.Set;
 
 public class NameTagTask implements Runnable{
 
@@ -22,6 +20,11 @@ public class NameTagTask implements Runnable{
     public void run() {
         for(Player p : Bukkit.getOnlinePlayers()){
             Block b = p.getTargetBlock((Set<Material>) null, 8);
+
+            // Checks
+            if(b == null) continue;
+            if (Config.disabledWorlds.contains(b.getWorld().getName()))
+                continue;
 
             if(b.getType().equals(Material.ENDER_CHEST)){
                 if(playerActives.containsKey(p)) continue;

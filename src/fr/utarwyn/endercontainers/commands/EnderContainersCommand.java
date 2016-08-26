@@ -2,10 +2,7 @@ package fr.utarwyn.endercontainers.commands;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
-import fr.utarwyn.endercontainers.utils.Config;
-import fr.utarwyn.endercontainers.utils.CoreUtils;
-import fr.utarwyn.endercontainers.utils.EnderChestUtils;
-import fr.utarwyn.endercontainers.utils.Updater;
+import fr.utarwyn.endercontainers.utils.*;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -18,7 +15,6 @@ import org.bukkit.entity.Player;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -56,6 +52,10 @@ public class EnderContainersCommand implements CommandExecutor {
                 }
                 if (!CoreUtils.playerHasPerm(p, "openchests") && !p.isOp()) {
                     CoreUtils.accessDenied(p);
+                    return true;
+                }
+                if (Config.disabledWorlds.contains(p.getWorld().getName())) {
+                    PluginMsg.pluginDisabledInWorld(p);
                     return true;
                 }
 
@@ -160,7 +160,7 @@ public class EnderContainersCommand implements CommandExecutor {
                 }
                 EnderContainers.getInstance().reloadConfiguration();
                 sender.sendMessage(Config.prefix + "§a" + EnderContainers.__("cmd_config_reloaded"));
-            } else if (args[0].equalsIgnoreCase("npc") && EnderContainers.getInstance().getDependenciesManager().isDependencyLoaded("Citizens")) {
+            } else if (args[0].equalsIgnoreCase("npc") && EnderContainers.getDependenciesManager().isDependencyLoaded("Citizens")) {
                 if(!(sender instanceof Player)){CoreUtils.consoleDenied(sender);return true;}
 
                 if (!sender.isOp()) {
@@ -251,6 +251,7 @@ public class EnderContainersCommand implements CommandExecutor {
         p.sendMessage("§7 - Enabled = " + rEna);
         p.sendMessage("§7 - Debug = " + rDeb);
         p.sendMessage("§7 - PluginPrefix = §r" + ChatColor.stripColor(Config.prefix));
+        p.sendMessage("§7 - DisabledWorlds = §r" + Arrays.asList(Config.disabledWorlds.toArray()));
 
         p.sendMessage(" ");
 
@@ -271,8 +272,6 @@ public class EnderContainersCommand implements CommandExecutor {
         EnderContainers.getInstance().getServer().getScheduler().runTaskAsynchronously(EnderContainers.getInstance(), new Runnable() {
             @Override
             public void run() {
-                String newVersion = "-1";
-
                 try {
                     URL url = new URL(Config.updateBase + "version");
                     InputStream is = url.openStream();
@@ -285,7 +284,7 @@ public class EnderContainersCommand implements CommandExecutor {
                     is.close();
                     byte[] data = os.toByteArray();
 
-                    newVersion = new String(data);
+                    String newVersion = new String(data);
 
                     if (!newVersion.equalsIgnoreCase(version)) { // Do an update
                         p.sendMessage(Config.prefix + EnderContainers.__("cmd_update_found").replace("%version%", newVersion).replace("%command%", "/endc update install"));
@@ -293,8 +292,6 @@ public class EnderContainersCommand implements CommandExecutor {
                     } else { // Nothing to do
                         p.sendMessage(Config.prefix + "§a" + EnderContainers.__("cmd_update_notfound"));
                     }
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -308,8 +305,6 @@ public class EnderContainersCommand implements CommandExecutor {
         EnderContainers.getInstance().getServer().getScheduler().runTaskAsynchronously(EnderContainers.getInstance(), new Runnable() {
             @Override
             public void run() {
-                String newVersion = "-1";
-
                 try {
                     URL url = new URL(Config.updateBase + "version");
                     InputStream is = url.openStream();
@@ -322,7 +317,7 @@ public class EnderContainersCommand implements CommandExecutor {
                     is.close();
                     byte[] data = os.toByteArray();
 
-                    newVersion = new String(data);
+                    String newVersion = new String(data);
 
                     if (!newVersion.equalsIgnoreCase(version)) { // Do an update
                         new Updater(EnderContainers.getInstance()).update();
@@ -333,8 +328,6 @@ public class EnderContainersCommand implements CommandExecutor {
                     } else { // Nothing to do
                         p.sendMessage(Config.prefix + "§a" + EnderContainers.__("cmd_update_notfound"));
                     }
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

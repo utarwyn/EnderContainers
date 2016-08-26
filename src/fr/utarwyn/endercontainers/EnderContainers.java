@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class EnderContainers extends JavaPlugin {
@@ -74,6 +75,8 @@ public class EnderContainers extends JavaPlugin {
             getConfigClass().set("main", "debug", Config.debug);
         if (!getConfigClass().contains("main", "prefix"))
             getConfigClass().set("main", "prefix", "&8[&6EnderContainers&8] &7");
+        if (!getConfigClass().contains("main", "disabledWorlds"))
+            getConfigClass().set("main", "disabledWorlds", Collections.singletonList("Example world"));
         if (!getConfigClass().contains("main", "locale"))
             getConfigClass().set("main", "locale", Config.pluginLocale);
         if (!getConfigClass().contains("main", "enderchests.max"))
@@ -96,6 +99,7 @@ public class EnderContainers extends JavaPlugin {
         }
 
         newLocaleKeys.put("enderchest_glasspane_title", localesManager.getDefaultMessages().get("enderchest_glasspane_title"));
+        newLocaleKeys.put("error_plugin_disabled_world", localesManager.getDefaultMessages().get("error_plugin_disabled_world"));
 
 
         // Removing from 1.0.6c version
@@ -131,6 +135,7 @@ public class EnderContainers extends JavaPlugin {
         Config.enabled = getConfigClass().getBoolean("main", "enabled");
         Config.debug = getConfigClass().getBoolean("main", "debug");
         Config.prefix = ChatColor.translateAlternateColorCodes('&', getConfigClass().getString("main", "prefix"));
+        Config.disabledWorlds = getConfigClass().getStringList("main", "disabledWorlds");
         Config.pluginLocale = getConfigClass().getString("main", "locale");
 
         if (getConfigClass().getInt("main", "enderchests.max") <= 54 && getConfigClass().getInt("main", "enderchests.max") > 0)
@@ -263,6 +268,10 @@ public class EnderContainers extends JavaPlugin {
     public static MysqlManager getMysqlManager(){
         return EnderContainers.instance.mysqlManager;
     }
+    public static DependenciesManager getDependenciesManager() {
+        return EnderContainers.instance.dependenciesManager;
+    }
+
     public static String __(String key){
         return EnderContainers.getInstance().localesManager.get(key);
     }
@@ -270,14 +279,6 @@ public class EnderContainers extends JavaPlugin {
     public static ConfigClass getConfigClass() {
         return configClass;
     }
-    public static Database getDB() {
-        return database;
-    }
-
-    public DependenciesManager getDependenciesManager() {
-        return this.dependenciesManager;
-    }
-
     public static CitizensIntegration getCitizensIntegration(){
         return EnderContainers.getInstance().citizensIntegration;
     }
@@ -296,5 +297,8 @@ public class EnderContainers extends JavaPlugin {
     }
     public static Boolean hasMysql(){
         return (Config.mysql && (database != null && Database.isConnected()));
+    }
+    public static Database getDB() {
+        return database;
     }
 }

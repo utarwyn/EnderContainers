@@ -116,6 +116,7 @@ public class LocalesManager {
         messages.put("error_cannot_open_enderchest", "You can't open this EnderChest !");
         messages.put("error_unknown_enderchest", "Enderchest %enderchest% doesn't exist.");
         messages.put("error_plugin_disabled", "The plugin is actually disabled. Please wait.");
+        messages.put("error_plugin_disabled_world", "The plugin is disabled in this world.");
 
         messages.put("help_enderchest_cmd", "Open your enderchest");
         messages.put("help_open_enderchest_cmd", "Open an enderchest");

@@ -3,7 +3,6 @@ package fr.utarwyn.endercontainers.commands;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.utils.Config;
 import fr.utarwyn.endercontainers.utils.CoreUtils;
-import fr.utarwyn.endercontainers.utils.EnderChestUtils;
 import fr.utarwyn.endercontainers.utils.PluginMsg;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Sound;
@@ -24,6 +23,9 @@ public class EnderChestCommand implements CommandExecutor {
 
         if (!Config.enabled) {
             PluginMsg.pluginDisabled(p);
+            return true;
+        } else if (Config.disabledWorlds.contains(p.getWorld().getName())) {
+            PluginMsg.pluginDisabledInWorld(p);
             return true;
         }
 
