@@ -1,13 +1,13 @@
 package fr.utarwyn.endercontainers.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Config {
 
     /**
-     * ----- General configuration
-     * This is the general configuration
+     * General configuration
      */
     public static boolean enabled = true;
     public static boolean debug = false;
@@ -17,18 +17,17 @@ public class Config {
     public static String updateBase = "http://utarwyn.xyz/plugins/endercontainers/";
 
     public static String pluginLocale = "en";
+    public static List<String> dependencies = Arrays.asList("Factions", "PlotSquared", "Citizens");
 
 
     /**
-     * ----- Save configuration
-     * This is the save configuration
+     * Save configuration
      */
     public static String saveDir = "enderchests/"; // End with / !
 
 
     /**
-     * ----- Enderchests configuration
-     * This is the Enderchests configuration
+     * Enderchests configuration
      */
     public static Integer defaultEnderchestsNumber = 1;
 
@@ -37,8 +36,7 @@ public class Config {
 
 
     /**
-     * ----- Database configuration
-     * This is the database configuration
+     * Database configuration
      */
     public static boolean mysql = false;
 
@@ -49,18 +47,9 @@ public class Config {
     public static String DB_BDD    = "default";
     public static String DB_PREFIX = "ec_";
 
-    /**
-     * ----- Dependencies configuration
-     * This is the dependencies configuration
-     */
-    public static boolean factionsSupport = true;
-    public static boolean plotSquaredSupport = true;
-    public static boolean townySupport = true;
-    public static boolean citizensSupport = true;
 
     /**
-     * ----- Fun & others configuration
-     * This is the funnies & others configuration
+     * Fun & other configuration
      */
     public static boolean blockNametag     = false;
     public static String openingChestSound = "CHEST_OPEN";

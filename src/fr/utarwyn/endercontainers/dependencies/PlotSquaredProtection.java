@@ -14,7 +14,7 @@ import java.util.HashSet;
 public class PlotSquaredProtection {
 
     public static boolean canOpenEnderChestInPlot(Block b, Player p) {
-        if (!EnderContainers.getInstance().getDependenciesManager().isDependencyLoaded("PlotSquared")) return true;
+        if (!EnderContainers.getInstance().getDependenciesManager().dependencyIsLoaded("PlotSquared")) return true;
         PlotAPI api = new PlotAPI();
         Plot plot = api.getPlot(b.getLocation());
 

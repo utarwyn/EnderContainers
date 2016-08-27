@@ -1,7 +1,6 @@
 Version 1.0.9:
 - Refractoring of all enderchests managing system (Good!)
 - Possibility to disable on custom worlds (config file) (Good!)
-- Better config.yml file
 
 - Fix bug with saving system (enderchests not saved :[ ) (Good!)
 - Fix bug with offline enderchests (Good!)

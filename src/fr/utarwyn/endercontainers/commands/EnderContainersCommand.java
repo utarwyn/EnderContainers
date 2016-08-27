@@ -160,7 +160,7 @@ public class EnderContainersCommand implements CommandExecutor {
                 }
                 EnderContainers.getInstance().reloadConfiguration();
                 sender.sendMessage(Config.prefix + "§a" + EnderContainers.__("cmd_config_reloaded"));
-            } else if (args[0].equalsIgnoreCase("npc") && EnderContainers.getDependenciesManager().isDependencyLoaded("Citizens")) {
+            } else if (args[0].equalsIgnoreCase("npc") && EnderContainers.getDependenciesManager().dependencyIsLoaded("Citizens")) {
                 if(!(sender instanceof Player)){CoreUtils.consoleDenied(sender);return true;}
 
                 if (!sender.isOp()) {

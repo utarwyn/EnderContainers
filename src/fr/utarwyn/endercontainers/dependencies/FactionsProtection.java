@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 public class FactionsProtection {
 
     public static boolean canOpenEnderChestInFaction(Block b, Player p) {
-        if (!EnderContainers.getInstance().getDependenciesManager().isDependencyLoaded("Factions")) return true;
+        if (!EnderContainers.getInstance().getDependenciesManager().dependencyIsLoaded("Factions")) return true;
         MPlayer mplayer = MPlayer.get(p);
 
         if (mplayer == null) return false;

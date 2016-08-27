@@ -111,7 +111,7 @@ public class CitizensIntegration implements Listener{
                 break;
         }
     }
-    public void onNPCClicked(final Player player, NPC npc){
+    private void onNPCClicked(final Player player, NPC npc){
         NPCLink link = getNPCLinkById(npc.getId());
         if(link == null) return;
 
@@ -149,10 +149,10 @@ public class CitizensIntegration implements Listener{
     }
 
     // EDIT MODE
-    public void startEditModeFor(Player player){
+    private void startEditModeFor(Player player){
         playersChatEditMode.add(new PlayerChatEditMode(player));
     }
-    public PlayerChatEditMode getEditModeFor(Player player){
+    private PlayerChatEditMode getEditModeFor(Player player){
         for(PlayerChatEditMode mode : playersChatEditMode){
             if(mode.getPlayer().getUniqueId().equals(player.getUniqueId()))
                 return mode;
@@ -160,13 +160,13 @@ public class CitizensIntegration implements Listener{
 
         return null;
     }
-    public void stopEditModeFor(Player player){
+    private void stopEditModeFor(Player player){
         PlayerChatEditMode mode = getEditModeFor(player);
         if(mode != null) playersChatEditMode.remove(mode);
     }
 
     // NPC MANAGEMENT
-    public void saveNPCLink(Integer npcId, String linkType, Integer delay, Integer enderchestNumber){
+    private void saveNPCLink(Integer npcId, String linkType, Integer delay, Integer enderchestNumber){
         ConfigClass cc = EnderContainers.getConfigClass();
         if(cc.isConfigurationSection(cfgFile, String.valueOf(npcId))) cc.removePath(cfgFile, String.valueOf(npcId));
 
@@ -179,7 +179,7 @@ public class CitizensIntegration implements Listener{
 
         reloadLinks();
     }
-    public void removeNPCLink(Integer npcId){
+    private void removeNPCLink(Integer npcId){
         NPCLink link = getNPCLinkById(npcId);
         if(link == null) return;
 
@@ -188,13 +188,13 @@ public class CitizensIntegration implements Listener{
 
         NPCLinks.remove(link);
     }
-    public NPCLink getNPCLinkById(Integer npcId){
+    private NPCLink getNPCLinkById(Integer npcId){
         for(NPCLink npcLink : NPCLinks){
             if(npcLink.getNPCId() == npcId) return npcLink;
         }
         return null;
     }
-    public void reloadLinks(){
+    private void reloadLinks(){
         ConfigClass cc = EnderContainers.getConfigClass();
 
         NPCLinks.clear();

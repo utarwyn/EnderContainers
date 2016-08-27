@@ -4,6 +4,7 @@ import fr.utarwyn.endercontainers.EnderContainers;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -37,7 +38,7 @@ public class CoreUtils {
         return player.hasPermission("endercontainers." + perm) || player.isOp();
     }
     public static boolean senderHasPerm(CommandSender sender, String perm){
-        return !(sender instanceof Player && !playerHasPerm((Player) sender, perm)) || !(sender instanceof Player);
+        return !(sender instanceof Player && !playerHasPerm((Player) sender, perm)) || sender instanceof ConsoleCommandSender;
     }
 
     public static String replacePlayerName(String base, Player player) {
@@ -52,9 +53,6 @@ public class CoreUtils {
             r = base;
 
         return r;
-    }
-    public static String replaceEnderchestNum(String base, Integer num, Player player) {
-        return replaceEnderchestNum(base, num, player.getName());
     }
     public static String replaceEnderchestNum(String base, Integer num, String playername) {
         String r = replacePlayerName(base, playername);
@@ -91,4 +89,77 @@ public class CoreUtils {
         String packageName = EnderContainers.getInstance().getServer().getClass().getPackage().getName();
         return packageName.substring(packageName.lastIndexOf('.') + 1);
     }
+
+    /*
+    public static InputStream getDefaultConfiguration(){
+        return EnderContainers.getInstance().getClass().getResourceAsStream("/ressources/config.default.yml");
+    }
+    public static void beautifyConfig(){
+        ConfigClass cc = EnderContainers.getConfigClass();
+        String configVersion = cc.contains("main", "saveVersion") ? cc.getString("main", "saveVersion") : "-1";
+
+        // Check if the action is needed
+        if(configVersion.equals(EnderContainers.getInstance().getDescription().getVersion())) return;
+        System.out.println("Run config beautifier...");
+
+        BufferedReader reader = null; BufferedWriter writer = null;
+
+        try {
+            reader = new BufferedReader(new InputStreamReader(getDefaultConfiguration()));
+            writer = new BufferedWriter(new FileWriter(new File(EnderContainers.getInstance().getDataFolder().toString(), "config.yml")));
+
+            writer.write("");
+
+            for(String line; (line = reader.readLine()) != null;){
+                writer.write(line);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+                if (writer != null) {
+                    writer.close();
+                }
+
+                // refreshConfig();
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+    private static void refreshConfig(){
+        ConfigClass cc = EnderContainers.getConfigClass();
+
+        cc.setAutoSaving = false;
+
+        cc.set("main", "enabled", Config.enabled);
+        cc.set("main", "debug", Config.debug);
+        cc.set("main", "prefix", Config.prefix);
+        cc.set("main", "locale", Config.pluginLocale);
+        cc.set("main", "disabledWorlds", Config.disabledWorlds);
+
+        cc.set("main", "enderchests.max", Config.maxEnderchests);
+        cc.set("main", "enderchests.default", Config.defaultEnderchestsNumber);
+
+        cc.set("main", "mysql.enabled", Config.mysql);
+        cc.set("main", "mysql.host", Config.DB_HOST);
+        cc.set("main", "mysql.port", Config.DB_PORT);
+        cc.set("main", "mysql.user", Config.DB_USER);
+        cc.set("main", "mysql.password", Config.DB_PASS);
+        cc.set("main", "mysql.database", Config.DB_BDD);
+        cc.set("main", "mysql.tablePrefix", Config.DB_PREFIX);
+
+        cc.set("main", "others.blocknametag", Config.blockNametag);
+        cc.set("main", "others.openingChestSound", Config.openingChestSound);
+        cc.set("main", "others.closingChestSound", Config.closingChestSound);
+        cc.set("main", "others.updateChecker", Config.updateChecker);
+
+        cc.setAutoSaving = true;
+        cc.saveConfig("main");
+    }
+    */
 }

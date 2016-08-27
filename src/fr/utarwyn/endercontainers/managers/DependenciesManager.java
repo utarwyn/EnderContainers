@@ -3,10 +3,12 @@ package fr.utarwyn.endercontainers.managers;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.utils.Config;
 import fr.utarwyn.endercontainers.utils.CoreUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class DependenciesManager {
     private EnderContainers instance;
@@ -20,48 +22,47 @@ public class DependenciesManager {
 
     private void loadDependencies() {
         CoreUtils.log("§8[§6EnderContainers§8] -----------§8[§bDependencies§8]§7-----------", true);
-        if (Config.factionsSupport) {
-            loadDependency("Factions");
-        } else {
-            this.dependencies.put("Factions", false);
+
+        for(String dependency : Config.dependencies){
+            loadDependency(dependency);
         }
-        if (Config.plotSquaredSupport) {
-            loadDependency("PlotSquared");
-        } else {
-            this.dependencies.put("PlotSquared", false);
-        }
-        if (Config.citizensSupport) {
-            loadDependency("Citizens");
-        } else {
-            this.dependencies.put("Citizens", false);
-        }
+
+        CoreUtils.log("§8[§6EnderContainers§8] §e  - Enabled: §a" + Arrays.toString(getEnabledDependencies().toArray()), true);
+        CoreUtils.log("§8[§6EnderContainers§8] §e  - Disabled: §c" + Arrays.toString(getDisabledDependencies().toArray()), true);
+
         CoreUtils.log("§8[§6EnderContainers§8] ------------------------------------", true);
     }
 
     private HashMap<String, Boolean> getDependencies() {
         return this.dependencies;
     }
+    private List<String> getDisabledDependencies(){
+        List<String> dps = new ArrayList<>();
 
-    public boolean isDependencyLoaded(String dependency) {
-        if (getDependencies().containsKey(dependency)) {
-            return ((Boolean) getDependencies().get(dependency)).booleanValue();
+        for(String name : getDependencies().keySet()){
+            if(!getDependencies().get(name)) dps.add(name);
         }
-        return false;
+
+        return dps;
+    }
+    private List<String> getEnabledDependencies(){
+        List<String> dps = new ArrayList<>();
+
+        for(String name : getDependencies().keySet()){
+            if(getDependencies().get(name)) dps.add(name);
+        }
+
+        return dps;
+    }
+
+    public boolean dependencyIsLoaded(String dependency) {
+        return getDependencies().containsKey(dependency) && getDependencies().get(dependency);
     }
 
     private void loadDependency(String dependency) {
-        PluginManager pm = this.instance.getServer().getPluginManager();
-        boolean isEnabled = false;
-        if ((pm.getPlugin(dependency) != null) && (pm.getPlugin(dependency).isEnabled())) {
-            isEnabled = true;
-        }
+        PluginManager pm  = this.instance.getServer().getPluginManager();
+        boolean isEnabled = (pm.getPlugin(dependency) != null && pm.getPlugin(dependency).isEnabled());
 
         this.dependencies.put(dependency, isEnabled);
-
-        if (isEnabled) {
-            CoreUtils.log("§8[§6EnderContainers§8] §e   - " + dependency + "§r: " + ChatColor.GREEN + "[Enabled]", true);
-        } else {
-            CoreUtils.log("§8[§6EnderContainers§8] §e   - " + dependency + "§r: " + ChatColor.RED + "[Disabled]", true);
-        }
     }
 }

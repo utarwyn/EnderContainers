@@ -42,14 +42,14 @@ public class EnderChestListener implements Listener {
         }
 
         if (b.getType().equals(Material.ENDER_CHEST)) {
-            if (EnderContainers.getDependenciesManager().isDependencyLoaded("Factions")) {
+            if (EnderContainers.getDependenciesManager().dependencyIsLoaded("Factions")) {
                 if (!FactionsProtection.canOpenEnderChestInFaction(b, p)) {
                     e.setCancelled(true);
                     PluginMsg.cantUseHereFaction(p);
                     return;
                 }
             }
-            if (EnderContainers.getDependenciesManager().isDependencyLoaded("PlotSquared")) {
+            if (EnderContainers.getDependenciesManager().dependencyIsLoaded("PlotSquared")) {
                 if (!PlotSquaredProtection.canOpenEnderChestInPlot(b, p)) {
                     e.setCancelled(true);
                     PluginMsg.cantUseHereFaction(p);

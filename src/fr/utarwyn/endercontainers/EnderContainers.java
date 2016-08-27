@@ -157,6 +157,8 @@ public class EnderContainers extends JavaPlugin {
         Config.openingChestSound = getConfigClass().getString("main", "others.openingChestSound");
         Config.closingChestSound = getConfigClass().getString("main", "others.closingChestSound");
         Config.updateChecker     = getConfigClass().getBoolean("main", "others.updateChecker");
+
+        // CoreUtils.beautifyConfig();
     }
 
     private void loadBackupsConfig() {
@@ -185,7 +187,7 @@ public class EnderContainers extends JavaPlugin {
     }
 
     private void loadDependencies(){
-        if(getDependenciesManager().isDependencyLoaded("Citizens")) {
+        if(getDependenciesManager().dependencyIsLoaded("Citizens")) {
             citizensIntegration.load();
             getServer().getPluginManager().registerEvents(citizensIntegration, this);
         }
