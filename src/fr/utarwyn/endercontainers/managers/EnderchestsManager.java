@@ -90,8 +90,10 @@ public class EnderchestsManager {
 
         if(EnderContainers.hasMysql()){
             List<DatabaseSet> sqlResults = EnderContainers.getMysqlManager().getPlayerEnderchests(player.getUniqueId());
-            for(DatabaseSet result : sqlResults){
-                sqlSlotsChests.put(result.getInteger("enderchest_id"), result.getInteger("slots_used"));
+            if(sqlResults != null) {
+                for (DatabaseSet result : sqlResults) {
+                    sqlSlotsChests.put(result.getInteger("enderchest_id"), result.getInteger("slots_used"));
+                }
             }
         }
 
@@ -183,7 +185,7 @@ public class EnderchestsManager {
             return;
         }
 
-        if(!Bukkit.getOfflinePlayer(playername).hasPlayedBefore() || (!EnderContainers.hasMysql() && !EnderContainers.getConfigClass().isConfigurationSection("players.yml", playername))){
+        if(!EnderChestUtils.playerWasRegistered(playername)){
             CoreUtils.errorMessage(player, EnderContainers.__("enderchest_player_never_connected"));
             return;
         }

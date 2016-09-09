@@ -103,6 +103,15 @@ public class Database {
         }
     }
 
+    public String getMySQLVersion(){
+        try {
+            return (isConnected() ? getConnection().getMetaData().getDatabaseProductVersion() : "-1");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "-1";
+        }
+    }
+
 
     public List<DatabaseSet> find(String table) {
         return this.find(table, null);
@@ -121,6 +130,10 @@ public class Database {
     }
 
     public List<DatabaseSet> find(String table, Map<String, String> conditions, List<String> orderby, List<String> fields, List<Integer> limit) {
+        return find(table, conditions, orderby, fields, null, false);
+    }
+
+    public List<DatabaseSet> find(String table, Map<String, String> conditions, List<String> orderby, List<String> fields, List<Integer> limit, boolean caseSensitive) {
         connect();
 
         List<DatabaseSet> result = null;
@@ -145,6 +158,8 @@ public class Database {
             int index = 1;
 
             req += " WHERE ";
+            if(caseSensitive) req += "BINARY ";
+
             for (String k : conditions.keySet()) {
                 String v = conditions.get(k);
 

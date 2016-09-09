@@ -5,7 +5,9 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ItemSerializer {
@@ -42,9 +44,19 @@ public class ItemSerializer {
                 if (is.getItemMeta().getDisplayName() != null) {
                     String[] itemDisplayName = is.getItemMeta().getDisplayName().split(" ");
                     serializedItemStack += ":n@";
-                    for (int m = 0; m < itemDisplayName.length; m++){
-                        serializedItemStack += itemDisplayName[m] + "=";
-                    }
+
+                    for (String anItemDisplayName : itemDisplayName)
+                        serializedItemStack += escapeItemDisplayName(anItemDisplayName) + "=";
+
+                }
+
+                if (is.getItemMeta().getLore() != null) {
+                    List<String> itemLores = is.getItemMeta().getLore();
+                    serializedItemStack += ":l@";
+
+                    for (String itemLore : itemLores)
+                        serializedItemStack += escapeItemDisplayName(itemLore) + "=";
+
                 }
 
                 serialization += slot + "#" + serializedItemStack + ";";
@@ -54,19 +66,19 @@ public class ItemSerializer {
     }
 
     public static HashMap<Integer, ItemStack> stringToItems(String invString) {
-        String[] serializedBlocks = invString.split(";");
+        String[] serializedBlocks = invString.split("(?<!\\\\);");
         HashMap<Integer, ItemStack> items = new HashMap<>();
 
         for (int i = 1; i < serializedBlocks.length; i++) {
-            String[] serializedBlock = serializedBlocks[i].split("#");
+            String[] serializedBlock = serializedBlocks[i].split("(?<!\\\\)#");
             int stackPosition = Integer.valueOf(serializedBlock[0]);
 
             ItemStack is = null;
             Boolean createdItemStack = false;
 
-            String[] serializedItemStack = serializedBlock[1].split(":");
+            String[] serializedItemStack = serializedBlock[1].split("(?<!\\\\):");
             for (String itemInfo : serializedItemStack) {
-                String[] itemAttribute = itemInfo.split("@");
+                String[] itemAttribute = itemInfo.split("(?<!\\\\)@");
                 if (itemAttribute[0].equals("t")) {
                     is = new ItemStack(Material.getMaterial(Integer.valueOf(itemAttribute[1])));
                     createdItemStack = true;
@@ -81,7 +93,7 @@ public class ItemSerializer {
                     is.addUnsafeEnchantment(enchantment, level);
                 } else if (itemAttribute[0].equals("n") && createdItemStack) {
                     ItemMeta meta = is.getItemMeta();
-                    String[] displayName = itemAttribute[1].split("=");
+                    String[] displayName = itemAttribute[1].split("(?<!\\\\)=");
                     String finalName = "";
 
                     for (int m = 0; m < displayName.length; m++) {
@@ -91,7 +103,19 @@ public class ItemSerializer {
                             finalName += displayName[m] + " ";
                     }
 
+                    finalName = finalName.replaceAll("\\\\", "");
+
                     meta.setDisplayName(finalName);
+                    is.setItemMeta(meta);
+                } else if (itemAttribute[0].equals("l") && createdItemStack) {
+                    ItemMeta meta = is.getItemMeta();
+                    String[] lore = itemAttribute[1].split("(?<!\\\\)=");
+                    List<String> itemLore = new ArrayList<>();
+
+                    for(String l : lore)
+                        itemLore.add(l.replaceAll("\\\\", ""));
+
+                    meta.setLore(itemLore);
                     is.setItemMeta(meta);
                 }
             }
@@ -100,6 +124,27 @@ public class ItemSerializer {
         }
 
         return items;
+    }
+
+
+    private static String escapeItemDisplayName(String displayName){
+        StringBuilder sb = new StringBuilder();
+
+        for (char c : displayName.toCharArray()){
+            switch(c){
+                case ';':
+                case ':':
+                case '@':
+                case '=':
+                case '#':
+                case '\\':
+                    sb.append("\\\\");
+                default:
+                    sb.append(c);
+            }
+        }
+
+        return sb.toString();
     }
 
 }

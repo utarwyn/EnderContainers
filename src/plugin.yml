@@ -1,6 +1,6 @@
 name: EnderContainers
 author: Utarwyn
-version: 1.0.9
+version: 1.0.9b
 main: fr.utarwyn.endercontainers.EnderContainers
 softdepend: [Factions, mcore, PlotSquared, Citizens]
 commands:

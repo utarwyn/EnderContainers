@@ -282,9 +282,7 @@ public class EnderChestUtils {
 
         if(!EnderContainers.hasMysql()) EnderContainers.getConfigClass().loadConfigFile("players.yml");
 
-        if(!Bukkit.getOfflinePlayer(playername).hasPlayedBefore())
-            return accesses;
-        if(!EnderContainers.hasMysql() && !EnderContainers.getConfigClass().isConfigurationSection("players.yml", playername))
+        if(!playerWasRegistered(playername))
             return accesses;
 
         if(!EnderContainers.hasMysql()){
@@ -302,6 +300,11 @@ public class EnderChestUtils {
         }
 
         return accesses;
+    }
+
+    public static boolean playerWasRegistered(String playername){
+        return (EnderContainers.hasMysql() && EnderContainers.getMysqlManager().playerWasRegistered(playername)) ||
+                (!EnderContainers.hasMysql() && EnderContainers.getConfigClass().isConfigurationSection("players.yml", playername));
     }
 
     public static Inventory getVanillaEnderChestOf(String playername, UUID playeruuid){

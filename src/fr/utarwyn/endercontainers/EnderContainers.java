@@ -211,18 +211,23 @@ public class EnderContainers extends JavaPlugin {
                     checkDatabase();
 
                     if(Database.isConnected()){
+                        String sqlVersion = database.getMySQLVersion();
+                        Double version    = Double.valueOf(sqlVersion.substring(0, sqlVersion.lastIndexOf('.')));
+
+                        String collation  = (version >= 5.5) ? "utf8mb4_unicode_ci" : "utf8_unicode_ci";
+
                         if(!database.tableExists(Config.DB_PREFIX + "enderchests")){
-                            database.request("CREATE TABLE `" + Config.DB_PREFIX + "enderchests` (`id` INT(11) NOT NULL AUTO_INCREMENT, `items` MEDIUMTEXT NULL, `slots_used` INT(2) NOT NULL DEFAULT 0, `last_opening_time` TIMESTAMP NULL, `last_save_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, `player_uuid` VARCHAR(36) NULL, `enderchest_id` TINYINT(2) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)) COLLATE='latin1_swedish_ci' ENGINE=InnoDB;");
+                            database.request("CREATE TABLE `" + Config.DB_PREFIX + "enderchests` (`id` INT(11) NOT NULL AUTO_INCREMENT, `items` MEDIUMTEXT NULL, `slots_used` INT(2) NOT NULL DEFAULT 0, `last_opening_time` TIMESTAMP NULL, `last_save_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, `player_uuid` VARCHAR(36) NULL, `enderchest_id` TINYINT(2) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
                             CoreUtils.log(Config.pluginPrefix + "§aMysql: table `" + Config.DB_PREFIX + "enderchests` created.");
                         }
 
                         if(!database.tableExists(Config.DB_PREFIX + "players")){
-                            database.request("CREATE TABLE `" + Config.DB_PREFIX + "players` (`id` INT(11) NOT NULL AUTO_INCREMENT, `player_name` VARCHAR(60) NULL, `player_uuid` VARCHAR(36) NULL, `accesses` TEXT NULL, PRIMARY KEY (`id`)) COLLATE='latin1_swedish_ci' ENGINE=InnoDB;");
+                            database.request("CREATE TABLE `" + Config.DB_PREFIX + "players` (`id` INT(11) NOT NULL AUTO_INCREMENT, `player_name` VARCHAR(60) NULL, `player_uuid` VARCHAR(36) NULL, `accesses` TEXT NULL, PRIMARY KEY (`id`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
                             CoreUtils.log(Config.pluginPrefix + "§aMysql: table `" + Config.DB_PREFIX + "players` created.");
                         }
 
                         if(!database.tableExists(Config.DB_PREFIX + "backups")){
-                            database.request("CREATE TABLE `" + Config.DB_PREFIX + "backups` (`id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255) NULL, `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `type` VARCHAR(255) NULL, `data` MEDIUMTEXT NULL, `created_by` VARCHAR(60) NULL, PRIMARY KEY (`id`)) COLLATE='latin1_swedish_ci' ENGINE=InnoDB;");
+                            database.request("CREATE TABLE `" + Config.DB_PREFIX + "backups` (`id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255) NULL, `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `type` VARCHAR(255) NULL, `data` MEDIUMTEXT NULL, `created_by` VARCHAR(60) NULL, PRIMARY KEY (`id`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
                             CoreUtils.log(Config.pluginPrefix + "§aMysql: table `" + Config.DB_PREFIX + "backups` created.");
                         }
                     }

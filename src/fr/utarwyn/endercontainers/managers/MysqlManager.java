@@ -16,6 +16,7 @@ import java.util.*;
 public class MysqlManager {
 
     private Database database;
+    private Map<String, UUID> playerUUIDs = new HashMap<>();
 
     public void setDatabase(Database database){
         this.database = database;
@@ -41,7 +42,7 @@ public class MysqlManager {
         String table = Config.DB_PREFIX + "players";
         HashMap<Integer, Integer> r = new HashMap<>();
 
-        List<DatabaseSet> accesses = database.find(table, DatabaseSet.makeConditions("player_name", playername), null, Collections.singletonList("accesses"));
+        List<DatabaseSet> accesses = database.find(table, DatabaseSet.makeConditions("player_name", playername), null, Collections.singletonList("accesses"), null, true);
 
         for(DatabaseSet set : accesses){
             for(String accessStr : set.getString("accesses").split(";")) {
@@ -57,11 +58,19 @@ public class MysqlManager {
         return r;
     }
     public UUID getPlayerUUIDFromPlayername(String playername){
+        if(playerUUIDs.containsKey(playername)) return playerUUIDs.get(playername);
+
         String table = Config.DB_PREFIX + "players";
-        List<DatabaseSet> players = database.find(table, DatabaseSet.makeConditions("player_name", playername), null, Collections.singletonList("player_uuid"));
+        List<DatabaseSet> players = database.find(table, DatabaseSet.makeConditions("player_name", playername), null, Collections.singletonList("player_uuid"), null, true);
 
         if(players.size() == 0) return null;
-        return UUID.fromString(players.get(0).getString("player_uuid"));
+
+        UUID uuid = UUID.fromString(players.get(0).getString("player_uuid"));
+        playerUUIDs.put(playername, uuid);
+        return uuid;
+    }
+    public boolean playerWasRegistered(String playername){
+        return (getPlayerUUIDFromPlayername(playername) != null);
     }
 
 
