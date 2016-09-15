@@ -22,11 +22,14 @@ public class MysqlManager {
         this.database = database;
     }
 
+    public boolean databaseIsReady(){
+        return (database != null && Database.isConnected());
+    }
 
 
     // Players table
     public void updatePlayerUUID(final Player player){
-        if(!Database.isConnected()) return;
+        if(!Database.isConnected() || database == null) return;
 
         Bukkit.getScheduler().runTaskAsynchronously(EnderContainers.getInstance(), new Runnable() {
             @Override
@@ -138,8 +141,7 @@ public class MysqlManager {
     }
     public List<DatabaseSet> getPlayerEnderchests(UUID playerUUID){
         String table = Config.DB_PREFIX + "enderchests";
-        List<DatabaseSet> enderchests = database.find(table, DatabaseSet.makeConditions("player_uuid", playerUUID.toString()), null, Arrays.asList("enderchest_id", "slots_used"));
-        return enderchests;
+        return database.find(table, DatabaseSet.makeConditions("player_uuid", playerUUID.toString()), null, Arrays.asList("enderchest_id", "slots_used"));
     }
 
 

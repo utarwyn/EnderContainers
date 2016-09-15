@@ -250,7 +250,9 @@ public class EnderChestUtils {
             inv = invView.getTopInventory();
             if (inv == null || !(inv.getHolder() instanceof EnderChestContainer)) continue;
 
+            // Save it & close inventory
             ec.save();
+            player.closeInventory();
         }
     }
 

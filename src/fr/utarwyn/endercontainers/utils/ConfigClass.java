@@ -25,6 +25,8 @@ public class ConfigClass {
     public ConfigClass(Plugin pl) {
         this.plugin = pl;
         mainConfig = this.plugin.getConfig();
+
+        mainConfig.options().copyDefaults(true);
     }
 
     public void loadConfigFile(String file) {

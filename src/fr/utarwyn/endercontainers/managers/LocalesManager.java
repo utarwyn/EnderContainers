@@ -107,6 +107,7 @@ public class LocalesManager {
         messages.put("enderchest_main_gui_title", "Enderchest of %player%");
         messages.put("enderchest_gui_title", "Enderchest %num% of %player%");
         messages.put("enderchest_glasspane_title", "Enderchest %num% %suffix%");
+        messages.put("enderchest_default_glasspane_title", "Default Enderchest %suffix%");
 
         messages.put("error_command_usage", "Usage");
         messages.put("error_player_noperm", "You don't have the permission to do this.");

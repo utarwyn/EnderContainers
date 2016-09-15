@@ -19,7 +19,7 @@ public class CoreUtils {
     }
 
     public static void error(String message) {
-            Bukkit.getConsoleSender().sendMessage(Config.prefix + "§4" + message);
+        Bukkit.getConsoleSender().sendMessage(Config.prefix + "§4" + message);
     }
 
 

@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.database;
 
 import fr.utarwyn.endercontainers.utils.Config;
 import fr.utarwyn.endercontainers.utils.CoreUtils;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,100 +17,137 @@ public class Database {
     private static String pass = Config.DB_PASS;
     private static String DB = Config.DB_BDD;
 
-    private static Connection conn;
+    public static BasicDataSource source;
     private static String lastRequest;
+    private static List<String> tables;
 
-    private boolean debugMessage = false;
-
-
-    public void setBDD(String BDD) {
-        Database.DB = BDD;
+    public Database(){
+        this.createPool();
     }
 
-    public static Connection getConnection() {
-        return Database.conn;
-    }
-    public static Boolean isConnected(){ return getConnection() != null; }
 
-    public void connect() {
+
+    private void createPool() {
         try {
-            if (Database.conn == null || Database.conn.isClosed()) {
-                Database.conn = DriverManager.getConnection("jdbc:mysql://" + Database.host + ":" + Database.port + "/" + Database.DB, user, pass);
-                if(!debugMessage){
-                    CoreUtils.log(Config.pluginPrefix + "§aMysql: connected to the database '" + Database.DB + "'.");
-                    Config.enabled = true;
-                    debugMessage = true;
-                }
-            }
-        } catch (SQLException e) {
-            Database.conn = null;
-            CoreUtils.error("Mysql error: unable to connect to the database. Please retry.");
+            source = new BasicDataSource();
+            source.setDriverClassName("com.mysql.jdbc.Driver");
+            source.setUrl("jdbc:mysql://" + Database.host + ":" + Database.port + "/" + Database.DB);
+            source.setUsername(Database.user);
+            source.setPassword(Database.pass);
+
+            source.setInitialSize(1);
+            source.setMaxOpenPreparedStatements(8);
+            source.setMaxTotal(8);
+
+            // Connection test
+            Connection conn = source.getConnection();
+            conn.close();
+
+            CoreUtils.log(Config.pluginPrefix + "§aMysql: connected to the database '" + Database.DB + "'.");
+        } catch (Exception e) {
+            Database.source = null;
+            CoreUtils.error("Mysql error: unable to connect to the database at §c" + Database.host + ":" + Database.port + "§4. Please retry.");
             CoreUtils.log(Config.pluginPrefix + "§4Module §6Mysql §4disabled.", true);
 
             Config.mysql = false;Config.enabled = true;
         }
     }
 
-    private void disconnect() {
+    public static Connection getConnection() {
         try {
-            if (getConnection() != null && !getConnection().isClosed()) {
-                Database.conn.close();
-            }
+            return (Database.source != null) ? Database.source.getConnection() : null;
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
+        }
+    }
+    public static Boolean isConnected(){
+        try{
+            return (source != null && !source.isClosed());
+        } catch(Exception e){
+            return false;
         }
     }
 
 
     public void createDatabase(String dbName) {
-        Statement s;
+        Statement s     = null;
+        Connection conn = null;
         try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://" + Database.host + ":" + Database.port + "/?user=" + Database.user + "&password=" + Database.pass);
-            s = conn.createStatement();
-            s.executeUpdate("CREATE DATABASE " + dbName);
+            conn = getConnection();
+            s    = conn.createStatement();
 
-            conn.close();
+            s.executeUpdate("CREATE DATABASE " + dbName);
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeStatement(s);
+            closeConnection(conn);
         }
     }
     public void emptyTable(String tableName) {
-        Statement s;
+        Statement s     = null;
+        Connection conn = null;
+
         try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://" + Database.host + ":" + Database.port + "/?user=" + Database.user + "&password=" + Database.pass);
-            s = conn.createStatement();
+            conn = getConnection();
+            s    = conn.createStatement();
 
             s.executeUpdate("USE " + Database.DB);
             s.executeUpdate("SET SQL_SAFE_UPDATES=0;");
             s.executeUpdate("truncate " + tableName);
             s.executeUpdate("SET SQL_SAFE_UPDATES=1;");
 
-            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeConnection(conn);
+            closeStatement(s);
         }
     }
     public Boolean tableExists(String table){
         if(!isConnected()) return false;
 
-        try{
-            DatabaseMetaData dbm = conn.getMetaData();
-            ResultSet tables     = dbm.getTables(null, null, table, null);
-
-            if(tables.next()) return true;
-            else return false;
-        } catch(Exception e){
-            return false;
-        }
+        if(tables == null) tables = getTables();
+        return tables.contains(table);
     }
 
     public String getMySQLVersion(){
+        Connection conn = null;
+
         try {
-            return (isConnected() ? getConnection().getMetaData().getDatabaseProductVersion() : "-1");
+            conn = getConnection();
+
+            return (isConnected() ? conn.getMetaData().getDatabaseProductVersion() : "0.0");
         } catch (SQLException e) {
             e.printStackTrace();
             return "-1";
+        } finally {
+            closeConnection(conn);
         }
+    }
+    public List<String> getTables(){
+        Connection conn     = null;
+        List<String> tables = new ArrayList<>();
+
+        try{
+            conn = getConnection();
+
+            assert conn != null;
+            DatabaseMetaData dbm = conn.getMetaData();
+            ResultSet result     = dbm.getTables(null, null, "%", null);
+
+            while(result.next()){
+                tables.add(result.getString(3));
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+            return tables;
+        } finally {
+            closeConnection(conn);
+        }
+
+        return tables;
     }
 
 
@@ -134,11 +172,11 @@ public class Database {
     }
 
     public List<DatabaseSet> find(String table, Map<String, String> conditions, List<String> orderby, List<String> fields, List<Integer> limit, boolean caseSensitive) {
-        connect();
-
         List<DatabaseSet> result = null;
         PreparedStatement sql = null;
-        if (getConnection() == null) return null;
+        Connection conn       = null;
+
+        if (!isConnected()) return null;
 
         String strFields = "*";
         if(fields != null){
@@ -179,7 +217,8 @@ public class Database {
 
         try {
             lastRequest = req;
-            sql = getConnection().prepareStatement(req);
+            conn        = getConnection();
+            sql         = conn.prepareStatement(req);
 
             int i = 1;
             for (String s : stringsToExec) {
@@ -191,12 +230,8 @@ public class Database {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            try {
-                if (sql != null) sql.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            disconnect();
+            closeConnection(conn);
+            closeStatement(sql);
         }
 
         return result;
@@ -239,8 +274,8 @@ public class Database {
     }
 
     public boolean save(String table, Map<String, Object> fields, Map<String, String> conditions) {
-        connect();
         PreparedStatement sql = null;
+        Connection conn       = null;
 
         // Make request string
         String req = "";
@@ -313,7 +348,8 @@ public class Database {
 
         try {
             lastRequest = req;
-            sql = getConnection().prepareStatement(req);
+            conn        = getConnection();
+            sql = conn.prepareStatement(req);
 
             int i = 1;
             for (Object o : objsToExec) {
@@ -342,31 +378,31 @@ public class Database {
             e.printStackTrace();
             return false;
         } finally {
-            try {
-                if (sql != null) sql.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            disconnect();
+            closeConnection(conn);
+            closeStatement(sql);
         }
     }
 
     public void request(String request){
-        if(!isConnected()) return;
+        Statement s     = null;
+        Connection conn = null;
 
-        Statement s;
         try {
-            s = conn.createStatement();
+            conn = getConnection();
+            s    = conn.createStatement();
+
             s.executeUpdate(request);
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeStatement(s);
+            closeConnection(conn);
         }
     }
 
     public boolean delete(String table, Map<String, String> conditions) {
-        connect();
-
         PreparedStatement sql = null;
+        Connection conn       = null;
 
         // Make request string
         String req = "DELETE FROM " + table;
@@ -392,7 +428,8 @@ public class Database {
 
         try {
             lastRequest = req;
-            sql = getConnection().prepareStatement(req);
+            conn        = getConnection();
+            sql         = conn.prepareStatement(req);
 
             int i = 1;
             for (Object o : objsToExec) {
@@ -416,17 +453,29 @@ public class Database {
             e.printStackTrace();
             return false;
         } finally {
-            try {
-                if (sql != null) sql.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            disconnect();
+            closeConnection(conn);
+            closeStatement(sql);
         }
     }
 
 
     public String getLastRequest() {
         return lastRequest;
+    }
+
+
+    private void closeStatement(Statement statement){
+        try {
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    private void closeConnection(Connection conn){
+        try {
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

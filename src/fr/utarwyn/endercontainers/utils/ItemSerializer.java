@@ -5,6 +5,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,13 +14,13 @@ import java.util.Map;
 public class ItemSerializer {
 
     public static String itemsToString (HashMap<Integer, ItemStack> items){
-        String serialization = items.size() + ";";
+        String serialization = new String((items.size() + ";").getBytes(), Charset.forName("UTF-8"));
 
         for (Integer slot : items.keySet()) {
             ItemStack is = items.get(slot);
 
             if (is != null) {
-                String serializedItemStack = "";
+                String serializedItemStack = new String("".getBytes(), Charset.forName("UTF-8"));
 
                 String isType = String.valueOf(is.getType().getId());
                 serializedItemStack += "t@" + isType;
@@ -42,7 +43,7 @@ public class ItemSerializer {
                 }
 
                 if (is.getItemMeta().getDisplayName() != null) {
-                    String[] itemDisplayName = is.getItemMeta().getDisplayName().split(" ");
+                    String[] itemDisplayName = new String(is.getItemMeta().getDisplayName().getBytes(Charset.forName("UTF-8")), Charset.forName("UTF-8")).split(" ");
                     serializedItemStack += ":n@";
 
                     for (String anItemDisplayName : itemDisplayName)
@@ -62,6 +63,7 @@ public class ItemSerializer {
                 serialization += slot + "#" + serializedItemStack + ";";
             }
         }
+
         return serialization;
     }
 

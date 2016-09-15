@@ -55,4 +55,6 @@ public class Config {
     public static String openingChestSound = "CHEST_OPEN";
     public static String closingChestSound = "CHEST_CLOSE";
     public static boolean updateChecker    = true;
+
+    public static int refreshTimeout = 60;
 }

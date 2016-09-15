@@ -33,8 +33,10 @@ public class EnderchestsManager {
     public EnderChest getPlayerEnderchestOf(Player player, Integer num) {
         for (EnderChest enderchest : enderchests) {
             if(enderchest.getOwner() == null || !enderchest.getOwner().exists()) continue;
-            if(enderchest.getOwner().getPlayerName().equals(player.getName()) && num.equals(enderchest.getNum()))
+            if(enderchest.getOwner().getPlayerName().equals(player.getName()) && num.equals(enderchest.getNum())){
                 return enderchest;
+            }
+
         }
 
         return createNewEnderChest(player, num);
@@ -85,8 +87,8 @@ public class EnderchestsManager {
         if (rows > 6) rows = 6;
         MainMenuContainer menu = new MainMenuContainer(rows, CoreUtils.replacePlayerName(EnderContainers.__("enderchest_main_gui_title"), player));
 
-        HashMap<Integer, ItemStack> items = new HashMap<>();
-        HashMap<Integer, Integer> sqlSlotsChests  = new HashMap<>();
+        HashMap<Integer, ItemStack> items        = new HashMap<>();
+        HashMap<Integer, Integer> sqlSlotsChests = new HashMap<>();
 
         if(EnderContainers.hasMysql()){
             List<DatabaseSet> sqlResults = EnderContainers.getMysqlManager().getPlayerEnderchests(player.getUniqueId());
@@ -99,7 +101,7 @@ public class EnderchestsManager {
 
         for (int i = 0; i < Config.maxEnderchests; i++) {
             ItemStack item;
-            int size       = 0;
+            int size = 0;
 
             if(EnderContainers.hasMysql()){
                 if(sqlSlotsChests.containsKey(i)) size = sqlSlotsChests.get(i);
@@ -133,7 +135,7 @@ public class EnderchestsManager {
             String suffix    = suffixDef;
             Boolean hasPerm  = !(!player.hasPermission(Config.enderchestOpenPerm + i) && i != 0 && i >= Config.defaultEnderchestsNumber);
 
-            String metaTitle = ((hasPerm) ? "§a" : "§c") + EnderContainers.__("enderchest_glasspane_title");
+            String metaTitle = ((hasPerm) ? "§a" : "§c") + ((i > 0) ? EnderContainers.__("enderchest_glasspane_title") : EnderContainers.__("enderchest_default_glasspane_title"));
 
             if (size > 0)
                 suffix = "§a" + suffixDef;
@@ -144,7 +146,7 @@ public class EnderchestsManager {
             if (size == 0)
                 suffix = "§r" + suffixDef;
 
-            metaTitle = metaTitle.replace("%num%", String.valueOf(i + 1)).replace("%suffix%", suffix);
+            metaTitle = metaTitle.replace("%num%", String.valueOf(i)).replace("%suffix%", suffix);
 
             if (!hasPerm) {
                 meta.setDisplayName(metaTitle);

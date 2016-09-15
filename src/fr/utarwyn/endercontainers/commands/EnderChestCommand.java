@@ -5,6 +5,7 @@ import fr.utarwyn.endercontainers.utils.Config;
 import fr.utarwyn.endercontainers.utils.CoreUtils;
 import fr.utarwyn.endercontainers.utils.PluginMsg;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,7 +20,8 @@ public class EnderChestCommand implements CommandExecutor {
             CoreUtils.consoleDenied(sender);
             return true;
         }
-        Player p = (Player) sender;
+
+        final Player p = (Player) sender;
 
         if (!Config.enabled) {
             PluginMsg.pluginDisabled(p);
@@ -30,28 +32,41 @@ public class EnderChestCommand implements CommandExecutor {
         }
 
         if(args.length >= 1 && StringUtils.isNumeric(args[0])){
-            int index = Integer.parseInt(args[0]) - 1;
+            final int index = Integer.parseInt(args[0]);
 
-            if(index < -1){
-                EnderContainers.getEnderchestsManager().openPlayerEnderChest(0, p, null);
+            if(index == 0){
+                Bukkit.getScheduler().runTask(EnderContainers.getInstance(), new Runnable() {
+                    @Override
+                    public void run() {
+                        EnderContainers.getEnderchestsManager().openPlayerEnderChest(0, p, null);
+                    }
+                });
+
                 return true;
-            }
-
-            if(index < 0 || index > Config.maxEnderchests - 1){
-                if(index < 0) index = 0;
-                PluginMsg.enderchestUnknown(p, index);
+            }else if(index < 0 || index > Config.maxEnderchests - 1){
+                PluginMsg.enderchestUnknown(p, (index < 0) ? 0 : index);
                 return true;
             }
 
             if(CoreUtils.playerHasPerm(p, "cmd.enderchest." + index) || p.isOp()){
-                EnderContainers.getEnderchestsManager().openPlayerEnderChest(index, p, null);
+                Bukkit.getScheduler().runTask(EnderContainers.getInstance(), new Runnable() {
+                    @Override
+                    public void run() {
+                        EnderContainers.getEnderchestsManager().openPlayerEnderChest(index, p, null);
+                    }
+                });
             }else{
                 PluginMsg.doesNotHavePerm(p);
             }
         }else{
             if(CoreUtils.playerHasPerm(p, "cmd.enderchests") || p.isOp()){
-                playSoundTo(Config.openingChestSound, p);
-                EnderContainers.getEnderchestsManager().openPlayerMainMenu(p, null);
+                Bukkit.getScheduler().runTask(EnderContainers.getInstance(), new Runnable() {
+                    @Override
+                    public void run() {
+                        playSoundTo(Config.openingChestSound, p);
+                        EnderContainers.getEnderchestsManager().openPlayerMainMenu(p, null);
+                    }
+                });
             }else{
                 PluginMsg.doesNotHavePerm(p);
             }

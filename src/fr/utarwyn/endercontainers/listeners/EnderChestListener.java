@@ -11,6 +11,7 @@ import fr.utarwyn.endercontainers.utils.Config;
 import fr.utarwyn.endercontainers.utils.CoreUtils;
 import fr.utarwyn.endercontainers.utils.EnderChestUtils;
 import fr.utarwyn.endercontainers.utils.PluginMsg;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -28,12 +29,12 @@ public class EnderChestListener implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
-        Player p = e.getPlayer();
-        Block b = e.getClickedBlock();
-
+        final Player p = e.getPlayer();
         if (!e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
+        final Block b  = e.getClickedBlock();
         if (b == null) return;
-        if (!Config.enabled){
+
+        if (!Config.enabled || (Config.mysql && !EnderContainers.getMysqlManager().databaseIsReady())){
             e.setCancelled(true);
             PluginMsg.pluginDisabled(p);
             return;
@@ -57,17 +58,25 @@ public class EnderChestListener implements Listener {
                 }
             }
 
-            playSoundInWorld(Config.openingChestSound, p, b.getLocation());
-
-            EnderContainers.getEnderchestsManager().openPlayerMainMenu(p, null);
             e.setCancelled(true);
+
+            Bukkit.getScheduler().runTask(EnderContainers.getInstance(), new Runnable() {
+                @Override
+                public void run() {
+                    playSoundInWorld(Config.openingChestSound, p, b.getLocation());
+                    EnderContainers.getEnderchestsManager().openPlayerMainMenu(p, null);
+                }
+            });
         }
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
-        Player p = (Player) e.getWhoClicked();
-        Integer index = e.getRawSlot();
+        final Player p = (Player) e.getWhoClicked();
+        final Integer index = e.getRawSlot();
+
+        // Verify inventory
+        if (!(e.getInventory().getHolder() instanceof MainMenuContainer)) return;
 
         // Verify slot index
         if (index >= e.getInventory().getSize()) return;
@@ -75,9 +84,7 @@ public class EnderChestListener implements Listener {
         if (index >= Config.maxEnderchests) return;
 
 
-        Sound clickSound = CoreUtils.soundExists("CLICK") ? Sound.valueOf("CLICK") : Sound.valueOf("UI_BUTTON_CLICK");
-
-        if (!(e.getInventory().getHolder() instanceof MainMenuContainer)) return;
+        final Sound clickSound      = CoreUtils.soundExists("CLICK") ? Sound.valueOf("CLICK") : Sound.valueOf("UI_BUTTON_CLICK");
         MainMenuContainer container = (MainMenuContainer) e.getInventory().getHolder();
 
         e.setCancelled(true);
@@ -89,25 +96,40 @@ public class EnderChestListener implements Listener {
             if(e.getCurrentItem() == null || e.getCurrentItem().getType().equals(Material.AIR)) return;
 
             if (p.hasPermission(Config.enderchestOpenPerm + index) || index < Config.defaultEnderchestsNumber) {
-                p.playSound(p.getLocation(), clickSound, 1, 1);
-                EnderContainers.getEnderchestsManager().openPlayerEnderChest(index, p, null);
+                Bukkit.getScheduler().runTask(EnderContainers.getInstance(), new Runnable() {
+                    @Override
+                    public void run() {
+                        p.playSound(p.getLocation(), clickSound, 1, 1);
+                        EnderContainers.getEnderchestsManager().openPlayerEnderChest(index, p, null);
+                    }
+                });
             }else{
                 Sound glassSound = CoreUtils.soundExists("GLASS") ? Sound.valueOf("GLASS") : Sound.valueOf("BLOCK_GLASS_HIT");
                 p.playSound(p.getLocation(), glassSound, 1, 1);
             }
         }else if(container.getOwner().ownerIsOnline()){ // Player who open another enderchest
-            Player playerOwner = container.getOwner().getPlayer();
+            final Player playerOwner = container.getOwner().getPlayer();
 
-            p.playSound(p.getLocation(), clickSound, 1, 1);
+            Bukkit.getScheduler().runTask(EnderContainers.getInstance(), new Runnable() {
+                @Override
+                public void run() {
+                    p.playSound(p.getLocation(), clickSound, 1, 1);
 
-            EnderChest ec = EnderContainers.getEnderchestsManager().getPlayerEnderchestOf(playerOwner, index);
-            if(ec == null || index > (EnderChestUtils.getPlayerAvailableEnderchests(playerOwner) - 1)) return;
+                    EnderChest ec = EnderContainers.getEnderchestsManager().getPlayerEnderchestOf(playerOwner, index);
+                    if(ec == null || index > (EnderChestUtils.getPlayerAvailableEnderchests(playerOwner) - 1)) return;
 
-            EnderContainers.getEnderchestsManager().openPlayerEnderChest(index, p, playerOwner);
+                    EnderContainers.getEnderchestsManager().openPlayerEnderChest(index, p, playerOwner);
+                }
+            });
         }else if(!container.getOwner().ownerIsOnline()){ // Player who open an offline enderchest
-            String playername = container.getOwner().getPlayerName();
+            final String playername = container.getOwner().getPlayerName();
 
-            EnderContainers.getEnderchestsManager().openOfflinePlayerEnderChest(index, p, playername);
+            Bukkit.getScheduler().runTask(EnderContainers.getInstance(), new Runnable() {
+                @Override
+                public void run() {
+                    EnderContainers.getEnderchestsManager().openOfflinePlayerEnderChest(index, p, playername);
+                }
+            });
         }
     }
 
@@ -121,15 +143,20 @@ public class EnderChestListener implements Listener {
         if(!(inv.getHolder() instanceof EnderChestContainer) && !inv.getName().equals("container.enderchest")) return;
         if (!ecm.getOpenedEnderchests().containsKey(p)) return;
 
-        EnderChest ec = ecm.getOpenedEnderchests().get(p);
+        final EnderChest ec = ecm.getOpenedEnderchests().get(p);
 
         assert ec != null;
         ecm.getOpenedEnderchests().remove(p);
 
         ec.getContainer().refresh();
-        ec.save();
-
         playSoundTo(Config.closingChestSound, p);
+
+        Bukkit.getScheduler().runTaskAsynchronously(EnderContainers.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                ec.save();
+            }
+        });
     }
 
     private void playSoundTo(String soundName, Player player){

@@ -43,6 +43,7 @@ public class EnderChest {
         return this.owner;
     }
     public EnderChestContainer getContainer(){
+        this.refresh();
         return this.container;
     }
 
@@ -56,6 +57,9 @@ public class EnderChest {
 
         // Generate menu container
         generateMenuContainer();
+
+        // Bypass loading if number == 0 (default enderchest)
+        if(num == 0) return;
 
         if(EnderContainers.hasMysql()){
             this.loadFromMysql();
@@ -96,6 +100,13 @@ public class EnderChest {
 
             this.container = new EnderChestContainer(rows, title);
         }
+    }
+    private void refresh(){
+        if(container == null) return;
+        Integer rows = EnderChestUtils.getAllowedRowsFor(this);
+
+        if((rows * 9) != container.getSize())
+            this.generateMenuContainer();
     }
     public void save() {
         if (!getOwner().exists() || num == -1 || getContainer() == null) return;

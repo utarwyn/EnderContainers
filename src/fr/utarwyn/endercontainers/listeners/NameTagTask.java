@@ -11,10 +11,11 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Set;
+import java.util.UUID;
 
 public class NameTagTask implements Runnable{
 
-    private HashMap<Player, FloatingTextUtils.FloatingText> playerActives = new HashMap<>();
+    private HashMap<UUID, FloatingTextUtils.FloatingText> playerActives = new HashMap<>();
 
     @Override
     public void run() {
@@ -23,29 +24,28 @@ public class NameTagTask implements Runnable{
 
             // Checks
             if(b == null) continue;
-            if (Config.disabledWorlds.contains(b.getWorld().getName()))
-                continue;
+            if (Config.disabledWorlds.contains(b.getWorld().getName())) continue;
 
             if(b.getType().equals(Material.ENDER_CHEST)){
-                if(playerActives.containsKey(p)) continue;
+                if(playerActives.containsKey(p.getUniqueId())) continue;
 
                 int copEcs = EnderChestUtils.getPlayerAvailableEnderchests(p);
 
                 String nameTag = EnderContainers.__("enderchest_nametag").replace("%enderchests%", Integer.toString(copEcs)).replaceAll("%plurial%", ((copEcs > 1) ? "s" : ""));
                 FloatingTextUtils.FloatingText ft = FloatingTextUtils.displayFloatingTextAtFor(nameTag, b.getLocation().clone().add(0.5, 1, 0.5), p);
 
-                playerActives.put(p, ft);
+                playerActives.put(p.getUniqueId(), ft);
             }else{
-                if(playerActives.containsKey(p)){
-                    FloatingTextUtils.removeFloatingText(playerActives.get(p));
-                    playerActives.remove(p);
+                if(playerActives.containsKey(p.getUniqueId())){
+                    FloatingTextUtils.removeFloatingText(playerActives.get(p.getUniqueId()));
+                    playerActives.remove(p.getUniqueId());
                 }
             }
         }
     }
 
 
-    public HashMap<Player, FloatingTextUtils.FloatingText> getActiveNametags(){
+    public HashMap<UUID, FloatingTextUtils.FloatingText> getActiveNametags(){
         return this.playerActives;
     }
 }
