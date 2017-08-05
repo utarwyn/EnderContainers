@@ -391,7 +391,7 @@ public class EnderChestUtils {
     public static Integer getAllowedRowsFor(Player owner, Integer num){
         if(CoreUtils.playerHasPerm(owner, "doublechest." + num) || CoreUtils.playerHasPerm(owner, "doublechest.*")) return 6;
 
-        for(int row = 1; row <= 6; row++) {
+        for(int row = 6; row > 0; row--){
             if (CoreUtils.playerHasPerm(owner, "slot" + num + ".row" + row)) return row;
             else if (CoreUtils.playerHasPerm(owner, "slots.row" + row)) return row;
         }
