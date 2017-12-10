@@ -1,8 +1,0 @@
-Version 1.0.9b:
-- Improvements of ItemSerializer
-- Fix saving system in a database
-- Mysql: support for item lores
-- Mysql: support for all characters
-- Store Map< uuid -> playername >
-- EnderchestsManager is now "case sensitive" for offline players
-- Now fully support multi-servers

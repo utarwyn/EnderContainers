@@ -1,0 +1,11 @@
+## Intellij IDEA ##
+
+.idea/*
+
+
+## Maven / JAVA ##
+
+out/
+*.iml
+META-INF/*
+target/*

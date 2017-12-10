@@ -1,0 +1,74 @@
+# # # # # # # # # # # # # # # # # # # # #
+#   EnderContainers configuration       #
+#   Version: 2.0.0                      #
+#   An enderchests plugin by Utarwyn    #
+# # # # # # # # # # # # # # # # # # # # #
+
+# Enable the plugin
+enabled: true
+
+# Enable debugging (use this only when you have a problem with the plugin)
+debug: false
+
+# Prefix added before all messages of the plugin
+prefix: '&8[&6EnderContainers&8] &7'
+
+# The locale of the plugin
+locale: en
+
+# A list of worlds in which the plugin will be automatically disabled
+disabledWorlds:
+  - 'example'
+
+
+# Enderchests configuration
+enderchests:
+
+  # Here, you can choose the max number of enderchests available in the main menu.
+  # Authorized range: 1 - 54
+  max: 27
+
+  # With this option you can choose the default number of
+  # enderchests available for all users, without any permission.
+  # Authorized range: 1 - 54
+  default: 1
+
+  # By changing this you can hide all inaccessible enderchests
+  # in the chests' list menu.
+  onlyShowAccessible: false
+
+  # You can choose here if you want to use the vanilla enderchest
+  # for the first slot in the list menu.
+  # If not, the first enderchest will be saved in EnderContainers database (or flat file).
+  useVanillaEnderchest: true
+
+
+# Mysql configuration (Optional)
+# Change these values only if you want to link the plugin with a MySQL database
+# (Also compatible with MariaDB)
+mysql:
+
+  # You can enable the MySQL module here
+  enabled: false
+
+  # Configuration of your MySQL database
+  host: 'localhost'
+  port: 3306
+  user: 'root'
+  password: ''
+  database: 'example'
+
+  # You can choose a prefix for all EnderContainers tables
+  tablePrefix: 'ec_'
+
+
+# Miscellaneous configuration
+# You can change what you want in this category, all options are optionals
+others:
+
+  # Make the text above enderchests visible (or not)
+  blockNametag: false
+
+  # Check automatically for update?
+  updateChecker: true
+
