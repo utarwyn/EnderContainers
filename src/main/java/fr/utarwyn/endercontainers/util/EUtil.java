@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.File;
 import java.util.Map;
 import java.util.UUID;
 
@@ -216,6 +217,28 @@ public class EUtil {
 				return true;
 
 		return false;
+	}
+
+	/**
+	 * Delete a folder recursively with all files inside of it
+	 * @param folder Folder to delete
+	 * @return True if the folder have been dekleted without errors.
+	 */
+	public static boolean deleteFolder(File folder) {
+		File[] files = folder.listFiles();
+		if (files == null)
+			return folder.delete();
+
+		for (File file : files) {
+			if (file.isDirectory()) {
+				if (!deleteFolder(file))
+					return false;
+			} else
+				if (!file.delete())
+					return false;
+		}
+
+		return folder.delete();
 	}
 
 }

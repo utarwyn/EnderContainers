@@ -94,11 +94,11 @@ public class LocaleManager extends AbstractManager {
 		String bukkitVersion = EUtil.getServerVersion();
 		String message = messages.get(key);
 
-		if (bukkitVersion.contains("v1_7") || bukkitVersion.contains("v1_8"))
-			message = new String(messages.get(key).getBytes(), Charset.forName("UTF-8"));
-
 		if (!messages.containsKey(key))
 			throw new IllegalArgumentException("Locale key '" + key + "' does not exists in the locale file!");
+
+		if (bukkitVersion.contains("v1_7") || bukkitVersion.contains("v1_8"))
+			message = new String(messages.get(key).getBytes(), Charset.forName("UTF-8"));
 
 		return ChatColor.translateAlternateColorCodes('&', message);
 	}

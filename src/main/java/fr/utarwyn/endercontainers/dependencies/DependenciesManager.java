@@ -53,7 +53,8 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	 */
 	@Override
 	protected void unload() {
-
+		for (Dependency dependency : this.dependencies)
+			dependency.onDisable();
 	}
 
 	/**

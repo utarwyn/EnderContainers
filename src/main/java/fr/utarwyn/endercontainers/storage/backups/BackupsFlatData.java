@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.storage.backups;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.storage.FlatFile;
+import fr.utarwyn.endercontainers.util.EUtil;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -96,7 +97,7 @@ public class BackupsFlatData extends BackupsData {
 	public boolean removeBackup(Backup backup) {
 		// Delete backup folder.
 		File folder = new File(EnderContainers.getInstance().getDataFolder(), "backups/" + backup.getName() + "/");
-		if (folder.exists() && !this.deleteFolder(folder))
+		if (folder.exists() && !EUtil.deleteFolder(folder))
 			return false;
 
 		// Remove the backup from the configuration file.
@@ -107,6 +108,12 @@ public class BackupsFlatData extends BackupsData {
 		return true;
 	}
 
+	/**
+	 * Copy all files from a folder to a different folder
+	 * @param from Source folder
+	 * @param to Destination folder
+	 * @return True if all files have been copied in destination folder.
+	 */
 	private boolean copyFolderFiles(File from, File to) {
 		File[] filesFrom = from.listFiles();
 		if (filesFrom == null) return false;
@@ -124,23 +131,6 @@ public class BackupsFlatData extends BackupsData {
 		}
 
 		return true;
-	}
-
-	private boolean deleteFolder(File folder) {
-		File[] files = folder.listFiles();
-		if (files == null)
-			return folder.delete();
-
-		for (File file : files) {
-			if (file.isDirectory()) {
-				if (!this.deleteFolder(file))
-					return false;
-			} else
-				if (!file.delete())
-					return false;
-		}
-
-		return folder.delete();
 	}
 
 }
