@@ -117,7 +117,7 @@ public class YamlNewConfiguration extends YamlConfiguration {
 		for (String line : contents.split("\n")) {
 			String trimmedLine = line.trim();
 
-			if (trimmedLine.isEmpty() || trimmedLine.startsWith(COMMENT_PREFIX)) {
+			if (trimmedLine.isEmpty() || trimmedLine.startsWith(COMMENT_PREFIX.trim())) {
 				lastComments.add(line);
 			} else {
 				if (lastComments.size() > 0) {
@@ -151,6 +151,29 @@ public class YamlNewConfiguration extends YamlConfiguration {
 
 		// Remove the default header
 		options().header("");
+	}
+
+	/**
+	 * Apply a configuration to this one by using a link map.
+	 * The link map will be used to link old keys to new keys in this
+	 * new configuration. (old key -> new key)
+	 * <p>
+	 * So, values will be copied from the old key to the location targetted by the new key.
+	 * Old keys that are not binded will be ignored.
+	 * </p>
+	 *
+	 * @param configuration Configuration to apply on this one
+ 	 * @param linkMap Link map used to connect old keys and new keys
+	 */
+	public void applyConfiguration(YamlConfiguration configuration, Map<String, String> linkMap) {
+		for (Map.Entry<String, String> link : linkMap.entrySet()) {
+			// Check existance of both values
+			if (!configuration.contains(link.getKey()) || !this.contains(link.getValue()))
+				continue;
+
+			// Set the old config value at the location of the new value
+			this.set(link.getValue(), configuration.get(link.getKey()));
+		}
 	}
 
 	/**

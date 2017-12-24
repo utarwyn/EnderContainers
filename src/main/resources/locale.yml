@@ -23,8 +23,8 @@ commands:
     label_name: 'Name'
     label_date: 'Creation date'
     label_by: 'Created by'
-    label_loadcmd: '&a✔ &8To apply this backup'
-    label_rmcmd: '&c✘ &8To remove this backup'
+    label_loadcmd: '&8To apply this backup'
+    label_rmcmd: '&8To remove this backup'
 
   config_reloaded: 'Configuration reloaded!'
   no_update: 'There is no update at this time. Retry later.'

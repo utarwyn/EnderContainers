@@ -148,7 +148,7 @@ public abstract class Migration {
 	private static void recursiveCopy(File fSource, File fDest) {
 		try {
 			if (fSource.isDirectory()) {
-				if (!fDest.exists() && fDest.mkdirs())
+				if (!fDest.exists() && !fDest.mkdirs())
 					return;
 
 				// Create list of files and directories on the current source
