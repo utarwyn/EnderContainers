@@ -167,23 +167,21 @@ public abstract class Migration {
 			}
 			else {
 				// Found a file. Copy it into the destination, which is already created in 'if' condition above
-
 				FileInputStream fInStream = new FileInputStream(fSource);
 				FileOutputStream fOutStream = new FileOutputStream(fDest);
 
 				byte[] buffer = new byte[2048];
 				int iBytesReads;
 
-				while ((iBytesReads = fInStream.read(buffer)) >= 0) {
+				while ((iBytesReads = fInStream.read(buffer)) >= 0)
 					fOutStream.write(buffer, 0, iBytesReads);
-				}
 
 				fInStream.close();
 				fOutStream.close();
 			}
 		}
 		catch (Exception ex) {
-			// Please handle all the relevant exceptions here
+			ex.printStackTrace();
 		}
 	}
 

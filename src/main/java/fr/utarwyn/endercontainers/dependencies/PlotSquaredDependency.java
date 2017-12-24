@@ -4,6 +4,8 @@ import com.intellectualcrafters.plot.flag.Flags;
 import com.intellectualcrafters.plot.object.Location;
 import com.intellectualcrafters.plot.object.Plot;
 import com.intellectualcrafters.plot.object.PlotBlock;
+import fr.utarwyn.endercontainers.util.Locale;
+import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -49,10 +51,7 @@ public class PlotSquaredDependency extends Dependency {
 	@Override
 	public boolean onBlockChestOpened(Block block, Player player) {
 		Plot plot = this.getP2Location(block.getLocation()).getPlot();
-
-		if (plot == null) return true;
-		if (player.isOp()) return true;
-
+		if (plot == null || player.isOp()) return true;
 
 		if (plot.hasFlag(Flags.USE)) {
 			boolean containsBlock = false;
@@ -66,7 +65,10 @@ public class PlotSquaredDependency extends Dependency {
 				}
 			}
 
-			return !containsBlock || plot.isAdded(player.getUniqueId());
+			if (containsBlock && !plot.isAdded(player.getUniqueId())) {
+				PluginMsg.errorMessage(player, Locale.accessDeniedPlotSq);
+				return false;
+			}
 		}
 
 		return true;

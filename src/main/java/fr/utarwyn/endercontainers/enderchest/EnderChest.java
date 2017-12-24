@@ -138,6 +138,14 @@ public class EnderChest {
 	}
 
 	/**
+	 * Returns true if the container is empty
+	 * @return True if the container is empty
+	 */
+	public boolean isEmpty() {
+		return this.getSize() == 0;
+	}
+
+	/**
 	 * Returns true if the chest was not used
 	 * (not used mean that the owner is offline and the container has no viewer
 	 *  so it have to be cleared from the memory)

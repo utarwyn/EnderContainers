@@ -82,7 +82,7 @@ public class Database {
 	}
 
 	/**
-	 *Drop all data from a specific table passed in parameter
+	 * Drop all data from a specific table passed in parameter
 	 * @param tableName The name of the table to empty
 	 */
 	public void emptyTable(String tableName) {
@@ -134,7 +134,7 @@ public class Database {
 	}
 
 	/**
-	 * Used to close the connection to the MySQL server
+	 * Closes the connection to the MySQL server
 	 * @throws SQLException Exception throwed if the connection cannot be closed.
 	 */
 	public void close() throws SQLException {
@@ -142,7 +142,7 @@ public class Database {
 	}
 
 	/**
-	 * Used to know if a table exists in the database or not.
+	 * Returns if a table exists in the database or not.
 	 * @param table The name of the table to search.
 	 * @return True if the table exists.
 	 */

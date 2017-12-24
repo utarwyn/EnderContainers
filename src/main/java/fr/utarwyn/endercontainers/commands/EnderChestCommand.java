@@ -4,7 +4,7 @@ import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.EUtil;
-import fr.utarwyn.endercontainers.util.LocaleManager;
+import fr.utarwyn.endercontainers.util.Locale;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
@@ -43,19 +43,19 @@ public class EnderChestCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player)) {
-			PluginMsg.errorMessage(sender, LocaleManager.__("error_console_denied"));
+			PluginMsg.errorMessage(sender, Locale.nopermConsole);
 			return true;
 		}
 
 		Player player = (Player) sender;
 
 		if (!Config.enabled) {
-			PluginMsg.pluginDisabled(player);
+			PluginMsg.errorMessage(player, Locale.pluginDisabled);
 			return true;
 		}
 
 		if (Config.disabledWorlds.contains(player.getWorld().getName())) {
-			PluginMsg.pluginDisabledInWorld(player);
+			PluginMsg.errorMessage(player, Locale.pluginWorldDisabled);
 			return true;
 		}
 
@@ -63,7 +63,7 @@ public class EnderChestCommand implements CommandExecutor {
 		int index = (hasParam) ? Integer.parseInt(args[0]) - 1 : -1;
 
 		if (hasParam && (index < 0 || index >= Config.maxEnderchests)) {
-			PluginMsg.doesNotHavePerm(player);
+			PluginMsg.accessDenied(player);
 			return true;
 		}
 
@@ -72,16 +72,16 @@ public class EnderChestCommand implements CommandExecutor {
 				if (player.hasPermission("cmd.enderchests"))
 					this.manager.openHubMenuFor(player);
 				else
-					PluginMsg.doesNotHavePerm(player);
+					PluginMsg.accessDenied(player);
 
 				return;
 			}
 
 			if (player.hasPermission("cmd.enderchest." + index))
 				if (!this.manager.openEnderchestFor(player, index))
-					player.sendMessage(EUtil.getPrefix() + ChatColor.RED + LocaleManager.__("error_cannot_open_enderchest"));
+					player.sendMessage(Config.PREFIX + ChatColor.RED + Locale.nopermOpenChest);
 				else
-					PluginMsg.doesNotHavePerm(player);
+					PluginMsg.accessDenied(player);
 		});
 
 		return true;

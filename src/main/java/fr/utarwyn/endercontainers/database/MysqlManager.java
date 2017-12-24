@@ -207,12 +207,12 @@ public class MysqlManager extends AbstractManager {
 
 		if (!database.tableExists(formatTable(CHEST_TABLE))) {
 			database.request("CREATE TABLE `" + formatTable(CHEST_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `num` TINYINT(2) NOT NULL DEFAULT '0', `owner` VARCHAR(36) NULL, `contents` MEDIUMTEXT NULL, `rows` INT(1) NOT NULL DEFAULT 0, `last_locking_time` TIMESTAMP NULL, PRIMARY KEY (`id`), INDEX `USER KEY` (`num`, `owner`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
-			Log.log(Config.prefix + "§aMysql: table `" + formatTable(CHEST_TABLE) + "` created.");
+			Log.log(Config.PREFIX + "§aMysql: table `" + formatTable(CHEST_TABLE) + "` created.");
 		}
 
 		if (!database.tableExists(formatTable(BACKUP_TABLE))) {
 			database.request("CREATE TABLE `" + formatTable(BACKUP_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255) NOT NULL, `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `type` VARCHAR(60) NULL, `data` MEDIUMTEXT NULL, `created_by` VARCHAR(60) NULL, PRIMARY KEY (`id`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
-			Log.log(Config.prefix + "§aMysql: table `" + formatTable(BACKUP_TABLE) + "` created.");
+			Log.log(Config.PREFIX + "§aMysql: table `" + formatTable(BACKUP_TABLE) + "` created.");
 		}
 	}
 

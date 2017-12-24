@@ -5,7 +5,7 @@ import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.EUtil;
-import fr.utarwyn.endercontainers.util.LocaleManager;
+import fr.utarwyn.endercontainers.util.Locale;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -41,7 +41,7 @@ public class EnderChestHubMenu extends AbstractMenu {
 	 * @param owner The player who owns enderchests in the menu
 	 */
 	public EnderChestHubMenu(UUID owner) {
-		super(LocaleManager.__("enderchest_main_gui_title").replace("%player%", Objects.requireNonNull(UUIDFetcher.getName(owner))));
+		super(Locale.menuMainTitle.replace("%player%", Objects.requireNonNull(UUIDFetcher.getName(owner))));
 
 		this.owner = owner;
 		this.manager = EnderContainers.getInstance().getInstance(EnderChestManager.class);
@@ -112,7 +112,7 @@ public class EnderChestHubMenu extends AbstractMenu {
 		String counter = chatColor + "(" + ec.getSize() + "/" + ec.getMaxSize() + ")" + titleColor;
 		String percent = chatColor + "(" + String.format("%.0f", ec.getFillPercentage()*100) + "%)" + titleColor;
 
-		String metaTitle = titleColor + LocaleManager.__("enderchest_glasspane_title");
+		String metaTitle = titleColor + Locale.menuPaneTitle;
 
 		metaTitle = metaTitle.replace("%num%", String.valueOf(ec.getNum() + 1)).replace("%counter%", counter).replace("%percent%", percent);
 		meta.setDisplayName(metaTitle);
@@ -120,9 +120,12 @@ public class EnderChestHubMenu extends AbstractMenu {
 		List<String> lore = new ArrayList<>();
 
 		if (!accessible)
-			lore.add(LocaleManager.__("enderchest_locked"));
+			lore.add(Locale.menuChestLocked);
+
 		if (ec.isFull())
-			lore.add(LocaleManager.__("enderchest_inventoryfull"));
+			lore.add(Locale.menuChestFull);
+		else if (ec.isEmpty())
+			lore.add(Locale.menuChestEmpty);
 
 		meta.setLore(lore);
 

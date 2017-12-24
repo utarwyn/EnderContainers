@@ -137,15 +137,6 @@ public class NMSHacks {
 		return craftbukkitPackage = Bukkit.getServer().getClass().getPackage().getName() + ".";
 	}
 
-	public static Class<?> getCraftbukkitClass(String className) {
-		try {
-			return Class.forName(getCraftbukkitPackage() + className);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
 	private static String getNMSPackage() {
 		if (nmsPackage != null) {
 			return nmsPackage;

@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers.util;
 
 import com.google.common.collect.Maps;
-import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
@@ -79,14 +78,6 @@ public class EUtil {
 				r++;
 
 		return r;
-	}
-
-	/**
-	 * Gets the formatted prefix to display in the chat
-	 * @return The chat prefix
-	 */
-	public static String getPrefix() {
-		return ChatColor.translateAlternateColorCodes('&', Config.prefix);
 	}
 
 	/**

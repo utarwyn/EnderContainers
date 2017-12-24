@@ -34,16 +34,16 @@ public class Menus implements Listener {
 	 */
 	private Menus() { }
 
-	static {
-		menuSet = new HashSet<>();
-		Bukkit.getPluginManager().registerEvents(new Menus(), EnderContainers.getInstance());
-	}
-
 	/**
 	 * Register an AbstractMenu
 	 * @param menu Menu to register
 	 */
 	static void registerMenu(AbstractMenu menu) {
+		if (menuSet == null) {
+			menuSet = new HashSet<>();
+			Bukkit.getPluginManager().registerEvents(new Menus(), EnderContainers.getInstance());
+		}
+
 		menuSet.add(menu);
 	}
 

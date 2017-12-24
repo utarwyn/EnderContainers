@@ -10,9 +10,6 @@ enabled: true
 # Enable debugging (use this only when you have a problem with the plugin)
 debug: false
 
-# Prefix added before all messages of the plugin
-prefix: '&8[&6EnderContainers&8] &7'
-
 # The locale of the plugin
 locale: en
 

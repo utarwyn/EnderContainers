@@ -10,7 +10,7 @@ import fr.utarwyn.endercontainers.dependencies.DependenciesManager;
 import fr.utarwyn.endercontainers.dependencies.Dependency;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.EUtil;
-import fr.utarwyn.endercontainers.util.LocaleManager;
+import fr.utarwyn.endercontainers.util.Locale;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import fr.utarwyn.endercontainers.util.Updater;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
@@ -62,13 +62,13 @@ public class EnderContainersCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!Config.enabled) {
-			PluginMsg.errorMessage(sender, LocaleManager.__("error_plugin_disabled"));
+			PluginMsg.errorMessage(sender, Locale.pluginDisabled);
 			return true;
 		}
 
 		if (args.length == 0) {
-			sender.sendMessage(EUtil.getPrefix() + "Created by §3Utarwyn§7. Version §e" + EnderContainers.getInstance().getDescription().getVersion() + "§7.");
-			sender.sendMessage(EUtil.getPrefix() + "To show plugin's help: §d/ecp help§7.");
+			sender.sendMessage(Config.PREFIX + "Created by §3Utarwyn§7. Version §e" + EnderContainers.getInstance().getDescription().getVersion() + "§7.");
+			sender.sendMessage(Config.PREFIX + "To show plugin's help: §d/ecp help§7.");
 			return true;
 		}
 
@@ -84,14 +84,14 @@ public class EnderContainersCommand implements CommandExecutor {
 
 			case "open":
 				if (!(sender instanceof Player)) {
-					PluginMsg.errorMessage(sender, LocaleManager.__("error_console_denied"));
+					PluginMsg.errorMessage(sender, Locale.nopermConsole);
 					return true;
 				}
 
 				Player player = (Player) sender;
 
 				if (args.length <= 1) {
-					PluginMsg.errorMessage(player, LocaleManager.__("error_command_usage") + ": /ecp open <player>");
+					PluginMsg.errorMessage(player, "Usage: /ecp open <player>");
 					return true;
 				}
 
@@ -101,7 +101,7 @@ public class EnderContainersCommand implements CommandExecutor {
 				}
 
 				if (Config.disabledWorlds.contains(player.getWorld().getName())) {
-					PluginMsg.pluginDisabledInWorld(player);
+					PluginMsg.errorMessage(player, Locale.pluginWorldDisabled);
 					return true;
 				}
 
@@ -115,7 +115,7 @@ public class EnderContainersCommand implements CommandExecutor {
 						if (uuid != null)
 							this.chestManager.openHubMenuFor(uuid, player);
 						else
-							player.sendMessage(EUtil.getPrefix() + "§cPlayer §6" + args[1] + " §cwas not found.");
+							player.sendMessage(Config.PREFIX + "§cPlayer §6" + args[1] + " §cwas not found.");
 					} else
 						this.chestManager.openHubMenuFor(playerToSpec.getUniqueId(), player);
 				});
@@ -138,7 +138,7 @@ public class EnderContainersCommand implements CommandExecutor {
 				}
 
 				if (args.length < 2) {
-					PluginMsg.errorMessage(sender, LocaleManager.__("error_command_usage") + ": /ecp backup <name>");
+					PluginMsg.errorMessage(sender, "Usage: /ecp backup <name>");
 					return true;
 				} else {
 					String name = args[1];
@@ -154,18 +154,18 @@ public class EnderContainersCommand implements CommandExecutor {
 				}
 
 				if (args.length < 2) {
-					PluginMsg.errorMessage(sender, LocaleManager.__("error_command_usage") + ": /ecp createbackup <name>");
+					PluginMsg.errorMessage(sender, "Usage: /ecp createbackup <name>");
 					return true;
 				} else {
 					String name = args[1];
 
-					sender.sendMessage(EUtil.getPrefix() + LocaleManager.__("cmd_backup_creation_starting"));
+					sender.sendMessage(Config.PREFIX + Locale.backupCreationStarting);
 
 					EUtil.runAsync(() -> {
 						if (this.backupManager.createBackup(name, sender.getName()))
-							sender.sendMessage(EUtil.getPrefix() + LocaleManager.__("cmd_backup_created").replace("%backup_name%", name));
+							sender.sendMessage(Config.PREFIX + Locale.backupCreated.replace("%backup%", name));
 						else
-							PluginMsg.errorMessage(sender, LocaleManager.__("cmd_backup_exists_error").replace("%backup_name%", name));
+							PluginMsg.errorMessage(sender, Locale.backupExists.replace("%backup%", name));
 					});
 				}
 				break;
@@ -178,18 +178,18 @@ public class EnderContainersCommand implements CommandExecutor {
 				}
 
 				if (args.length < 2) {
-					PluginMsg.errorMessage(sender, LocaleManager.__("error_command_usage") + ": /ecp applybackup <name>");
+					PluginMsg.errorMessage(sender, "Usage: /ecp applybackup <name>");
 					return true;
 				} else {
 					String name = args[1];
 
-					sender.sendMessage(EUtil.getPrefix() + LocaleManager.__("cmd_backup_loading_starting"));
+					sender.sendMessage(Config.PREFIX + Locale.backupLoadingStarted);
 
 					EUtil.runAsync(() -> {
 						if (this.backupManager.applyBackup(name))
-							sender.sendMessage(EUtil.getPrefix() + LocaleManager.__("cmd_backup_loaded").replace("%backup_name%", name));
+							sender.sendMessage(Config.PREFIX + Locale.backupLoaded.replace("%backup%", name));
 						else
-							sender.sendMessage(EUtil.getPrefix() + ChatColor.RED + LocaleManager.__("cmd_backup_unknown").replace("%backup_name%", name));
+							sender.sendMessage(Config.PREFIX + ChatColor.RED + Locale.backupUnknown.replace("%backup%", name));
 					});
 				}
 				break;
@@ -202,16 +202,16 @@ public class EnderContainersCommand implements CommandExecutor {
 				}
 
 				if (args.length < 2) {
-					PluginMsg.errorMessage(sender, LocaleManager.__("error_command_usage") + ": /ecp rmbackup <name>");
+					PluginMsg.errorMessage(sender, "Usage: /ecp rmbackup <name>");
 					return true;
 				} else {
 					String name = args[1];
 
 					EUtil.runAsync(() -> {
 						if (this.backupManager.removeBackup(name))
-							sender.sendMessage(EUtil.getPrefix() + LocaleManager.__("cmd_backup_removed").replace("%backup_name%", name));
+							sender.sendMessage(Config.PREFIX + Locale.backupRemoved.replace("%backup_name%", name));
 						else
-							sender.sendMessage(EUtil.getPrefix() + ChatColor.RED + LocaleManager.__("cmd_backup_unknown").replace("%backup_name%", name));
+							sender.sendMessage(Config.PREFIX + ChatColor.RED + Locale.backupUnknown.replace("%backup_name%", name));
 					});
 				}
 				break;
@@ -221,7 +221,7 @@ public class EnderContainersCommand implements CommandExecutor {
 				if (dependency != null) {
 					CitizensDependency dep = (CitizensDependency) dependency;
 					if (!(sender instanceof Player)) {
-						PluginMsg.errorMessage(sender, LocaleManager.__("error_console_denied"));
+						PluginMsg.errorMessage(sender, Locale.nopermConsole);
 						return true;
 					}
 
@@ -231,7 +231,7 @@ public class EnderContainersCommand implements CommandExecutor {
 					}
 
 					if (args.length <= 1) {
-						PluginMsg.errorMessage(sender, LocaleManager.__("error_command_usage") + ": /ecp npc <link|info|unlink>");
+						PluginMsg.errorMessage(sender, "Usage: /ecp npc <link|info|unlink>");
 						return true;
 					}
 
@@ -246,28 +246,34 @@ public class EnderContainersCommand implements CommandExecutor {
 					return true;
 				}
 
-				if (!Config.reload()) {
-					sender.sendMessage(EUtil.getPrefix() + "§cError when reloading config! See the console for more info!");
-					sender.sendMessage(EUtil.getPrefix() + "§8Plugin now disabled.");
+				if (!Config.get().reload()) {
+					sender.sendMessage(Config.PREFIX + "§cError when reloading config! See the console for more info!");
+					sender.sendMessage(Config.PREFIX + "§8Plugin now disabled.");
+					return true;
+				}
+
+				if (!Locale.get().reload()) {
+					sender.sendMessage(Config.PREFIX + "§cError when reloading plugin locale! See the console for more info!");
+					sender.sendMessage(Config.PREFIX + "§8Plugin now disabled.");
 					return true;
 				}
 
 				Managers.reloadAll();
 
-				sender.sendMessage(EUtil.getPrefix() + "§a" + LocaleManager.__("cmd_config_reloaded"));
+				sender.sendMessage(Config.PREFIX + "§a" + Locale.configReloaded);
 				break;
 
 			case "update":
 				if (!Updater.getInstance().isUpToDate()) {
-					sender.sendMessage(EUtil.getPrefix() + "§a" + LocaleManager.__("other_new_update") + ": §2§l" + Updater.getInstance().getNewestVersion() + "§a.");
-					sender.sendMessage(EUtil.getPrefix() + LocaleManager.__("other_new_update_line2").replace("%link%", Config.DOWNLOAD_LINK));
+					sender.sendMessage(Config.PREFIX + "§aThere is a newer version available: §2§l" + Updater.getInstance().getNewestVersion() + "§a.");
+					sender.sendMessage(Config.PREFIX + "&7Click here to download it: " + Config.DOWNLOAD_LINK);
 				} else {
-					sender.sendMessage(EUtil.getPrefix() + "§7" + LocaleManager.__("cmd_update_notfound"));
+					sender.sendMessage(Config.PREFIX + "§7" + Locale.noUpdate);
 				}
 				break;
 
 			default:
-				sender.sendMessage(EUtil.getPrefix() + "§c" + LocaleManager.__("cmd_unknown_error") + ": §d/ecp help§c.");
+				sender.sendMessage(Config.PREFIX + "§c" + Locale.cmdUnknown + ": §d/ecp help§c.");
 				break;
 		}
 
@@ -287,20 +293,20 @@ public class EnderContainersCommand implements CommandExecutor {
 		p.sendMessage(" ");
 
 		if (page == 1) {
-			sendFormattedHelpLine(p, LocaleManager.__("help_enderchest_cmd"), "§e/enderchest [number]", "cmd");
-			sendFormattedHelpLine(p, LocaleManager.__("help_open_enderchest_cmd"), "§b/ecp open <player>", "backups.openchests");
+			sendFormattedHelpLine(p, "Open your enderchest", "§e/enderchest [number]", "cmd");
+			sendFormattedHelpLine(p, "Open an enderchest", "§b/ecp open <player>", "backups.openchests");
 
-			sendFormattedHelpLine(p, LocaleManager.__("help_backups_cmd"), "§b/ecp backups", "backups.view");
-			sendFormattedHelpLine(p, LocaleManager.__("help_create_backup_cmd"), "§b/ecp createbackup <name>", "backups.create");
-			sendFormattedHelpLine(p, LocaleManager.__("help_backup_info_cmd"), "§b/ecp backup <name>", "backups.info");
+			sendFormattedHelpLine(p, "List backups", "§b/ecp backups", "backups.view");
+			sendFormattedHelpLine(p, "Create a backup", "§b/ecp createbackup <name>", "backups.create");
+			sendFormattedHelpLine(p, "Show backup information", "§b/ecp backup <name>", "backups.info");
 		} else if (page == 2) {
-			sendFormattedHelpLine(p, LocaleManager.__("help_backup_load_cmd"), "§b/ecp applybackup <name>", "backups.apply");
-			sendFormattedHelpLine(p, LocaleManager.__("help_remove_backup_cmd"), "§b/ecp rmbackup <name>", "backups.remove");
+			sendFormattedHelpLine(p, "Load a backup", "§b/ecp applybackup <name>", "backups.apply");
+			sendFormattedHelpLine(p, "Remove a backup", "§b/ecp rmbackup <name>", "backups.remove");
 
 			p.sendMessage(" ");
 
-			sendFormattedHelpLine(p, LocaleManager.__("help_updates_check_cmd"), "§e/ecp update", "update");
-			sendFormattedHelpLine(p, LocaleManager.__("help_reload_plugin_cmd"), "§e/ecp reload", "reload");
+			sendFormattedHelpLine(p, "Check for updates", "§e/ecp update", "update");
+			sendFormattedHelpLine(p, "Reload the plugin", "§e/ecp reload", "reload");
 		}
 
 		p.sendMessage(" ");
@@ -349,11 +355,11 @@ public class EnderContainersCommand implements CommandExecutor {
 				);
 
 			sender.sendMessage(" ");
-			sender.sendMessage(" §r §7" + LocaleManager.__("cmd_backup_info").replace("%command%", "/ecp backup <name>"));
+			sender.sendMessage(" §r §7" + Locale.backupInfo.replace("%command%", "/ecp backup <name>"));
 			sender.sendMessage(" §r §8♣ Backup list (page 1)");
 			PluginMsg.endBar(sender);
 		} else {
-			sender.sendMessage(EUtil.getPrefix() + ChatColor.RED + LocaleManager.__("cmd_nobackup").replace("%command%", "/ecp createbackup"));
+			sender.sendMessage(Config.PREFIX + ChatColor.RED + Locale.backupZero.replace("%command%", "/ecp createbackup"));
 		}
 	}
 
@@ -366,18 +372,18 @@ public class EnderContainersCommand implements CommandExecutor {
 		Backup backup = this.backupManager.getBackupByName(name);
 
 		if (backup == null) {
-			p.sendMessage(EUtil.getPrefix() + ChatColor.RED + LocaleManager.__("cmd_backup_unknown").replace("%backup_name%", name));
+			p.sendMessage(Config.PREFIX + ChatColor.RED + Locale.backupUnknown.replace("%backup_name%", name));
 			return;
 		}
 
 		PluginMsg.pluginBar(p);
 		p.sendMessage(" ");
-		p.sendMessage(" §7  " + LocaleManager.__("cmd_backup_label_name") + ": §r" + backup.getName() + " §7(" + backup.getType() + ")");
-		p.sendMessage(" §7  " + LocaleManager.__("cmd_backup_label_creationdate") + ": §r" + backup.getDate());
-		p.sendMessage(" §7  " + LocaleManager.__("cmd_backup_label_createdby") + ": §e" + backup.getCreatedBy());
+		p.sendMessage(" §7  " + Locale.backupLabelName + ": §r" + backup.getName() + " §7(" + backup.getType() + ")");
+		p.sendMessage(" §7  " + Locale.backupLabelDate + ": §r" + backup.getDate());
+		p.sendMessage(" §7  " + Locale.backupLabelBy + ": §e" + backup.getCreatedBy());
 		p.sendMessage(" ");
-		p.sendMessage(" §8  " + LocaleManager.__("cmd_backup_label_loadcmd") + ": §d/ecp applybackup " + name);
-		p.sendMessage(" §8  " + LocaleManager.__("cmd_backup_label_removecmd") + ": §c/ecp rmbackup " + name);
+		p.sendMessage(" §8  " + Locale.backupLabelLoadCmd + ": §d/ecp applybackup " + name);
+		p.sendMessage(" §8  " + Locale.backupLabelRmCmd + ": §c/ecp rmbackup " + name);
 		p.sendMessage(" ");
 		PluginMsg.endBar(p);
 	}

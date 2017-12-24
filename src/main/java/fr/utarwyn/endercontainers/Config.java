@@ -1,12 +1,10 @@
 package fr.utarwyn.endercontainers;
 
 import fr.utarwyn.endercontainers.util.Configurable;
-import fr.utarwyn.endercontainers.util.Log;
-import org.bukkit.configuration.file.FileConfiguration;
+import fr.utarwyn.endercontainers.util.YamlLinker;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -14,7 +12,12 @@ import java.util.List;
  * @since 2.0.0
  * @author Utarwyn
  */
-public class Config {
+public class Config extends YamlLinker {
+
+	/**
+	 * The config static instance
+	 */
+	private static Config instance;
 
 	/**
 	 * No constructor, its an utility class
@@ -26,14 +29,16 @@ public class Config {
 	 */
 	public static final String DOWNLOAD_LINK = "http://bit.ly/2A8Xv8S";
 
+	/**
+	 * The plugin prefix
+	 */
+	public static final String PREFIX = "§8[§6EnderContainers§8] §7";
+
 	@Configurable
 	public static boolean enabled;
 
 	@Configurable
 	public static boolean debug;
-
-	@Configurable
-	public static String prefix;
 
 	@Configurable
 	public static String locale;
@@ -80,66 +85,23 @@ public class Config {
 	@Configurable(key = "others.updateChecker")
 	public static boolean updateChecker;
 
-	/**
-	 * Initialize the config from the file.
-	 * @param plugin Bukkit plugin used to locate the config file.
-	 * @return True if the initialization phase succeed.
-	 */
-	static boolean initialize(JavaPlugin plugin) {
+	public boolean initialize(JavaPlugin plugin) {
 		// Create config.yml file if not exists
 		if (!new File(plugin.getDataFolder(), "config.yml").exists())
 			plugin.saveDefaultConfig();
 
 		// And load all config values ...
-		return load(plugin.getConfig());
+		return this.load(plugin.getConfig());
 	}
 
 	/**
-	 * Reload the configuration from the Plugin config file.
-	 * @return True if the reload was a success.
+	 * Gets the Config instance from anywhere!
+	 * (Create it if it don't exists)
+	 * @return The config instance.
 	 */
-	public static boolean reload() {
-		JavaPlugin plugin = EnderContainers.getInstance();
-
-		plugin.reloadConfig();
-		return initialize(plugin);
-	}
-
-	/**
-	 * Fill all config attributes in this class with the {@link fr.utarwyn.endercontainers.util.Configurable Configurable} annotation.
-	 * @param pluginConfiguration Configuration used to load all config key/values.
-	 * @return True if all configuration values has been loaded.
-	 */
-	private static boolean load(FileConfiguration pluginConfiguration) {
-		// Load every needed config value dynamically!
-		for (Field field : Config.class.getDeclaredFields()) {
-			Configurable conf = field.getAnnotation(Configurable.class);
-			if (conf == null) continue;
-
-			// Getting the config key associated with the field
-			String configKey = (conf.key().isEmpty()) ? field.getName() : conf.key();
-
-			// Changing the value of the field
-			try {
-				field.set(null, pluginConfiguration.get(configKey));
-			} catch (Exception e) {
-				Log.error("");
-				Log.error(">> --------------- <<");
-				Log.error(">> CRITICAL ERROR! <<");
-				Log.error(">> --------------- <<");
-				Log.error("");
-				Log.error(">> Error when loading config! Config value " + configKey.toUpperCase() + " cannot be parsed!");
-				Log.error(">> Are you sure that value '" + pluginConfiguration.get(configKey) + "' is good?");
-				Log.error("");
-
-				e.printStackTrace();
-
-				EnderContainers.getInstance().getPluginLoader().disablePlugin(EnderContainers.getInstance());
-				return false;
-			}
-		}
-
-		return true;
+	public static Config get() {
+		if (instance != null) return instance;
+		return instance = new Config();
 	}
 
 }

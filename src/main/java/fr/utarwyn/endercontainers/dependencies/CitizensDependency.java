@@ -3,8 +3,6 @@ package fr.utarwyn.endercontainers.dependencies;
 import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
-import fr.utarwyn.endercontainers.util.EUtil;
-import fr.utarwyn.endercontainers.util.LocaleManager;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.NPCLeftClickEvent;
@@ -159,12 +157,12 @@ public class CitizensDependency extends Dependency implements Listener {
 				}
 
 				removeNPCLink(link.getNPCId());
-				player.sendMessage(EUtil.getPrefix() + "§aYou have successfully unlinked the NPC §e'" + selectedNPC.getName() + "'§a with EnderContainers.");
+				player.sendMessage(Config.PREFIX + "§aYou have successfully unlinked the NPC §e'" + selectedNPC.getName() + "'§a with EnderContainers.");
 
 				break;
 
 			default:
-				PluginMsg.errorMessage(player, LocaleManager.__("error_command_usage") + ": /endc npc <link|info|unlink>");
+				PluginMsg.errorMessage(player, "Usage: /endc npc <link|info|unlink>");
 				break;
 		}
 	}
@@ -187,7 +185,7 @@ public class CitizensDependency extends Dependency implements Listener {
 				if (link.getDelay() == 0)
 					this.manager.openHubMenuFor(player);
 				else {
-					player.sendMessage(EUtil.getPrefix() + "Opening enderchest in §6" + link.getDelay() + "§7 seconds...");
+					player.sendMessage(Config.PREFIX + "Opening enderchest in §6" + link.getDelay() + "§7 seconds...");
 					Bukkit.getScheduler().scheduleSyncDelayedTask(
 							EnderContainers.getInstance(),
 							() -> this.manager.openHubMenuFor(player),
@@ -204,7 +202,7 @@ public class CitizensDependency extends Dependency implements Listener {
 				if (link.getDelay() == 0)
 					this.manager.openEnderchestFor(player, n);
 				else {
-					player.sendMessage(EUtil.getPrefix() + "Opening enderchest in §6" + link.getDelay() + "§7 seconds...");
+					player.sendMessage(Config.PREFIX + "Opening enderchest in §6" + link.getDelay() + "§7 seconds...");
 
 					Bukkit.getScheduler().scheduleSyncDelayedTask(
 							EnderContainers.getInstance(),
@@ -343,14 +341,14 @@ public class CitizensDependency extends Dependency implements Listener {
 
 		if (e.getMessage().equals("cancel")) {
 			stopEditModeFor(player);
-			player.sendMessage(EUtil.getPrefix() + "You have stopped the link configuration.");
+			player.sendMessage(Config.PREFIX + "You have stopped the link configuration.");
 			return;
 		}
 
 		switch (mode.getCurrentStep()) {
 			case 1:
 				if (!e.getMessage().equals("main") && !e.getMessage().equals("enderchest")) {
-					player.sendMessage(EUtil.getPrefix() + "§cPlease type §6main§c or §6enderchest§c.");
+					player.sendMessage(Config.PREFIX + "§cPlease type §6main§c or §6enderchest§c.");
 					return;
 				}
 
@@ -379,7 +377,7 @@ public class CitizensDependency extends Dependency implements Listener {
 
 			case 2:
 				if (!e.getMessage().equals("no") && !StringUtils.isNumeric(e.getMessage())) {
-					player.sendMessage(EUtil.getPrefix() + "§cPlease type the delay (seconds) or §6no§c if you don't want to have a delay.");
+					player.sendMessage(Config.PREFIX + "§cPlease type the delay (seconds) or §6no§c if you don't want to have a delay.");
 					return;
 				}
 
@@ -393,12 +391,12 @@ public class CitizensDependency extends Dependency implements Listener {
 
 				saveNPCLink(selectedNPC.getId(), mode.getAnswerForStep(1), delay, -1);
 
-				player.sendMessage(EUtil.getPrefix() + "§eNPC §a'" + selectedNPC.getName() + "'§e linked with EnderContainers. Enjoy!");
+				player.sendMessage(Config.PREFIX + "§eNPC §a'" + selectedNPC.getName() + "'§e linked with EnderContainers. Enjoy!");
 				break;
 
 			case 3:
 				if (!StringUtils.isNumeric(e.getMessage()) || Integer.parseInt(e.getMessage()) < 0 || Integer.parseInt(e.getMessage()) > Config.maxEnderchests - 1) {
-					player.sendMessage(EUtil.getPrefix() + "§cPlease type an enderchest number between §60 and " + (Config.maxEnderchests - 1) + "§c.");
+					player.sendMessage(Config.PREFIX + "§cPlease type an enderchest number between §60 and " + (Config.maxEnderchests - 1) + "§c.");
 					return;
 				}
 
@@ -419,7 +417,7 @@ public class CitizensDependency extends Dependency implements Listener {
 
 			case 4:
 				if (!e.getMessage().equals("no") && !StringUtils.isNumeric(e.getMessage())) {
-					player.sendMessage(EUtil.getPrefix() + "§cPlease type the delay (seconds) or §6no§c if you don't want to have a delay.");
+					player.sendMessage(Config.PREFIX + "§cPlease type the delay (seconds) or §6no§c if you don't want to have a delay.");
 					return;
 				}
 
@@ -436,7 +434,7 @@ public class CitizensDependency extends Dependency implements Listener {
 
 				saveNPCLink(selectedNPC.getId(), mode.getAnswerForStep(1), delay, chestNumber);
 
-				player.sendMessage(EUtil.getPrefix() + "§eNPC §a'" + selectedNPC.getName() + "'§e linked with EnderContainers. Enjoy!");
+				player.sendMessage(Config.PREFIX + "§eNPC §a'" + selectedNPC.getName() + "'§e linked with EnderContainers. Enjoy!");
 				break;
 		}
 	}

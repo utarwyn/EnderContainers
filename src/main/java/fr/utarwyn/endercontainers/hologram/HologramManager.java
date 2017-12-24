@@ -4,7 +4,7 @@ import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
-import fr.utarwyn.endercontainers.util.LocaleManager;
+import fr.utarwyn.endercontainers.util.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -91,7 +91,7 @@ public class HologramManager extends AbstractManager implements Runnable {
 
 				int copEcs = this.chestManager.getEnderchestsNbOf(uuid);
 
-				String title = LocaleManager.__("enderchest_nametag")
+				String title = Locale.chestNametag
 						.replace("%enderchests%", String.valueOf(copEcs))
 						.replace("%maxenderchests%", String.valueOf(Config.maxEnderchests))
 						.replaceAll("%plurial%", ((copEcs > 1) ? "s" : ""));

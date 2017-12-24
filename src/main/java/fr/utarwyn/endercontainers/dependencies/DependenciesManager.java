@@ -158,8 +158,9 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	@Override
 	public boolean onBlockChestOpened(Block block, Player player) {
 		for (Dependency dependency : this.dependencies)
-			if (!dependency.onBlockChestOpened(block, player))
+			if (!dependency.onBlockChestOpened(block, player)) {
 				return false;
+			}
 
 		return true;
 	}

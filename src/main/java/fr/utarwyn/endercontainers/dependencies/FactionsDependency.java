@@ -4,6 +4,8 @@ import com.massivecraft.factions.entity.BoardColl;
 import com.massivecraft.factions.entity.Faction;
 import com.massivecraft.factions.entity.MPlayer;
 import com.massivecraft.massivecore.ps.PS;
+import fr.utarwyn.endercontainers.util.Locale;
+import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -56,9 +58,13 @@ public class FactionsDependency extends Dependency {
 
 		if (currentFac != null) {
 			String facName = ChatColor.stripColor(currentFac.getName());
+			boolean canOpen = facName.equals("Wilderness") || facName.equals("WarZone") || facName.equals("SafeZone") ||
+					          (playerFac != null) && (currentFac.getName().equals(playerFac.getName()));
 
-			return facName.equals("Wilderness") || facName.equals("WarZone") || facName.equals("SafeZone") ||
-					(playerFac != null) && (currentFac.getName().equals(playerFac.getName()));
+			if (!canOpen) {
+				PluginMsg.errorMessage(player, Locale.accessDeniedFactions.replace("%faction%", facName));
+				return false;
+			}
 		}
 
 		return true;

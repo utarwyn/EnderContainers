@@ -4,8 +4,6 @@ import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.dependencies.DependenciesManager;
 import fr.utarwyn.endercontainers.menu.OfflineEnderChestMenu;
 import fr.utarwyn.endercontainers.util.EUtil;
-import fr.utarwyn.endercontainers.util.LocaleManager;
-import fr.utarwyn.endercontainers.util.PluginMsg;
 import fr.utarwyn.endercontainers.util.Updater;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -67,10 +65,8 @@ public class EnderChestListener implements Listener {
 
 			e.setCancelled(true);
 
-			if (!this.dependenciesManager.onBlockChestOpened(block, player)) {
-				PluginMsg.cantUseHereFaction(player);
+			if (!this.dependenciesManager.onBlockChestOpened(block, player))
 				return;
-			}
 
 			EUtil.runAsync(() -> {
 				this.manager.openHubMenuFor(player);
@@ -89,8 +85,8 @@ public class EnderChestListener implements Listener {
 
 		// Send update message to the player is he has the permission.
 		if (player.hasPermission("endercontainers.update") && !Updater.getInstance().isUpToDate()) {
-			player.sendMessage(EUtil.getPrefix()+ "§a" + LocaleManager.__("other_new_update") + ": §2§l" + Updater.getInstance().getNewestVersion() + "§a.");
-			player.sendMessage(EUtil.getPrefix() + LocaleManager.__("other_new_update_line2").replace("%link%", Config.DOWNLOAD_LINK));
+			player.sendMessage(Config.PREFIX+ "§aThere is a newer version available: §2§l" + Updater.getInstance().getNewestVersion() + "§a.");
+			player.sendMessage(Config.PREFIX + "&7Click here to download it: " + Config.DOWNLOAD_LINK);
 			player.playSound(player.getLocation(), Sound.NOTE_PLING, 2f, .5f);
 		}
 	}

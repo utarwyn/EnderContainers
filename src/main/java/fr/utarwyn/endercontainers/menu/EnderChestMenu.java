@@ -4,7 +4,7 @@ import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.util.EUtil;
-import fr.utarwyn.endercontainers.util.LocaleManager;
+import fr.utarwyn.endercontainers.util.Locale;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -33,7 +33,7 @@ public class EnderChestMenu extends AbstractMenu {
 	public EnderChestMenu(EnderChest enderChest) {
 		super(
 				enderChest.getRows(),
-				LocaleManager.__("enderchest_gui_title")
+				Locale.menuChestTitle
 						.replace("%player%", Objects.requireNonNull(UUIDFetcher.getName(enderChest.getOwner())))
 						.replace("%num%", String.valueOf(enderChest.getNum() + 1))
 		);

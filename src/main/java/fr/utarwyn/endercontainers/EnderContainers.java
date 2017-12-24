@@ -8,7 +8,7 @@ import fr.utarwyn.endercontainers.dependencies.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.hologram.HologramManager;
 import fr.utarwyn.endercontainers.migration.MigrationManager;
-import fr.utarwyn.endercontainers.util.LocaleManager;
+import fr.utarwyn.endercontainers.util.Locale;
 import fr.utarwyn.endercontainers.util.Updater;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,7 +37,8 @@ public class EnderContainers extends JavaPlugin {
 		instance = this;
 
 		// Load main configuration ...
-		Config.initialize(this);
+		if (!Config.get().initialize(this))
+			return;
 
 		// Load needed managers ...
 		new DependenciesManager();
@@ -53,8 +54,11 @@ public class EnderContainers extends JavaPlugin {
 		// Load others managers ...
 		new EnderChestManager();
 		new BackupManager();
-		new LocaleManager();
 		new HologramManager();
+
+		// Load plugin locale ...
+		if (!Locale.get().initialize(this))
+			return;
 
 		// Load commands ...
 		getCommand("endercontainers").setExecutor(new EnderContainersCommand());

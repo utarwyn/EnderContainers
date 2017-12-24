@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.util;
 
+import fr.utarwyn.endercontainers.Config;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -25,7 +26,7 @@ public class PluginMsg {
 	 * @param message Error message to send
 	 */
 	public static void errorMessage(CommandSender sender, String message) {
-		sender.sendMessage(EUtil.getPrefix() + ChatColor.RED + message);
+		sender.sendMessage(Config.PREFIX + ChatColor.RED + message);
 	}
 
 	/**
@@ -33,39 +34,10 @@ public class PluginMsg {
 	 * @param sender The sender
 	 */
 	public static void accessDenied(CommandSender sender) {
-		errorMessage(sender, LocaleManager.__("error_player_denied"));
-	}
-
-	/**
-	 * Inform a player that it does not have the perm to do an action
-	 * @param p Player to process
-	 */
-	public static void doesNotHavePerm(Player p) {
-		errorMessage(p, "You don't have the permission to do this.");
-	}
-
-	/**
-	 * Inform a player that it does not have the perm to use a chest in an enemy faction
-	 * @param p Player to process
-	 */
-	public static void cantUseHereFaction(Player p) {
-		errorMessage(p, LocaleManager.__("error_access_denied_factions"));
-	}
-
-	/**
-	 * Inform a player that the plugin is disabled
-	 * @param p Player to process
-	 */
-	public static void pluginDisabled(Player p) {
-		errorMessage(p, LocaleManager.__("error_plugin_disabled"));
-	}
-
-	/**
-	 * Inform a player that the plugin is disabled in the world where he is.
-	 * @param p Player to process
-	 */
-	public static void pluginDisabledInWorld(Player p) {
-		errorMessage(p, LocaleManager.__("error_plugin_disabled_world"));
+		if (sender instanceof Player)
+			errorMessage(sender, Locale.nopermPlayer);
+		else
+			errorMessage(sender, Locale.nopermConsole);
 	}
 
 	/**

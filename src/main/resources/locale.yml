@@ -1,53 +1,76 @@
-cmd_backup_created: '&aBackup created with the name &b%backup_name%&a.'
-cmd_backup_creation_starting: Starting backup creation...
-cmd_backup_exists_error: Backup &6%backup_name% &calready exists. Please change name.
-cmd_backup_folder_unknown: Backup folder of &6%backup_name%&c not exist.
-cmd_backup_info: '&7To show information about a backup: &c%command%'
-cmd_backup_label_backuppath: Backup path
-cmd_backup_label_backuptype: Backup Type
-cmd_backup_label_createdby: Created by
-cmd_backup_label_creationdate: Creation date
-cmd_backup_label_loadcmd: '&a✔ &8To apply this backup'
-cmd_backup_label_name: Name
-cmd_backup_label_removecmd: '&c✘ &8To remove this backup'
-cmd_backup_loaded: '&aBackup &b%backup_name%&a loaded indefinitly.'
-cmd_backup_loading_starting: Starting backup loading...
-cmd_backup_removed: '&aBackup &b%backup_name%&a removed.'
-cmd_backup_unknown: Backup &6%backup_name%&c is undefined.
-cmd_config_reloaded: Configuration reloaded!
-cmd_nobackup: '&cNo backups. Create backups : &6%command%'
-cmd_unknown_error: Unknown command
-cmd_update_found: '&7Update found : v&e%version%&7. To do this update : &6%command%'
-cmd_update_install_error: Before install any update, do &6%command% &cto check for updates.
-cmd_update_notfound: There is no update at this time. Retry later.
-enderchest_empty: '&2This enderchest is empty.'
-enderchest_glasspane_title: Enderchest %num% %counter%
-enderchest_gui_title: Enderchest %num% of %player%
-enderchest_inventoryfull: '&cInventory full!'
-enderchest_locked: '&8&o>> Enderchest locked!'
-enderchest_main_gui_title: Enderchest of %player%
-enderchest_nametag: '&6&l%enderchests%/%maxenderchests%&r&e enderchest%plurial% available'
-enderchest_player_denied: '&cThe player don''t have access to this enderchest.'
-enderchest_player_never_connected: This player has never played on the server! Please retry.
-enderchest_show_contents: '&aClick to show this enderchest.'
-error_access_denied_factions: You can't use this EnderChest here.
-error_cannot_open_enderchest: You can't open this EnderChest!
-error_command_usage: Usage
-error_console_denied: You must be a player to do this.
-error_player_denied: You don't have access to this command.
-error_player_noperm: You don't have the permission to do this.
-error_plugin_disabled: The plugin is actually disabled. Please wait.
-error_plugin_disabled_world: The plugin is disabled in this world.
-error_unknown_enderchest: Enderchest %enderchest% doesn't exist.
-help_backup_info_cmd: Show backup information
-help_backup_load_cmd: Load a backup (indefinitly)
-help_backups_cmd: List backups
-help_create_backup_cmd: Create a backup
-help_enderchest_cmd: Open your enderchest
-help_open_enderchest_cmd: Open an enderchest
-help_reload_plugin_cmd: Reload plugin configuration
-help_remove_backup_cmd: Remove a backup
-help_updates_check_cmd: Check for updates
-help_view_config_cmd: View config
-other_new_update: There is a newer version available
-other_new_update_line2: '&7Click here to download it: &d%link%'
+# # # # # # # # # # # # # # # # # # # # # #
+#   EnderContainers default locale (EN)   #
+#   Version: 2.0.0                        #
+#   An enderchests plugin by Utarwyn      #
+# # # # # # # # # # # # # # # # # # # # # #
+
+##                 ##
+#  Commands locale  #
+##                 ##
+commands:
+
+  backups:
+    created: '&aBackup created with the name &b%backup%&a.'
+    creation_starting: 'Starting backup creation...'
+    exists: 'Backup &6%backup% &calready exists. Please change name.'
+    info: '&7To show information about a backup: &c%command%'
+    loaded: '&aBackup &b%backup%&a loaded indefinitly.'
+    loading_starting: 'Starting backup loading...'
+    removed: '&aBackup &b%backup%&a removed.'
+    unknown: 'Backup &6%backup%&c is undefined.'
+    zero: '&cNo backups. Create backups : &6%command%'
+
+    label_name: 'Name'
+    label_date: 'Creation date'
+    label_by: 'Created by'
+    label_loadcmd: '&a✔ &8To apply this backup'
+    label_rmcmd: '&c✘ &8To remove this backup'
+
+  config_reloaded: 'Configuration reloaded!'
+  no_update: 'There is no update at this time. Retry later.'
+  unknown: 'Unknown command'
+
+
+##              ##
+#  Menus locale  #
+##              ##
+menus:
+
+  main_title: 'Enderchests of %player%'
+  chest_title: 'Enderchest %num% of %player%'
+  pane_title: 'Enderchest %num% %counter%'
+
+  chest_empty: '&2This enderchest is empty!'
+  chest_full: '&cInventory full!'
+  chest_locked: '&8&o>> Enderchest locked!'
+
+
+##               ##
+#  Errors locale  #
+##               ##
+errors:
+
+  noperm_open_chest: 'You can''t open this EnderChest!'
+  noperm_console: 'You must be a player to do this!'
+  noperm_player: 'You haven''t the permission to do that!'
+  plugin_disabled: 'Plugin is actually disabled. Please enable it from the config!'
+  plugin_world_disabled: 'Plugin is disabled in this world.'
+
+
+##                     ##
+#  Dependencies locale  #
+##                     ##
+dependencies:
+
+  # Factions plugin
+  access_denied_factions: 'You can''t use the enderchest in %faction%''s territory!'
+  # PlotSquared Plugin
+  access_denied_plotsq: 'You can''t use the enderchest in this plot!'
+
+
+##                      ##
+#  Miscellaneous locale  #
+##                      ##
+miscellaneous:
+
+  chest_nametag: '&6&l%enderchests%/%maxenderchests%&r&e enderchest%plurial% available'
