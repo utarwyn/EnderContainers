@@ -166,13 +166,23 @@ public class YamlNewConfiguration extends YamlConfiguration {
  	 * @param linkMap Link map used to connect old keys and new keys
 	 */
 	public void applyConfiguration(YamlConfiguration configuration, Map<String, String> linkMap) {
+		Object value;
+
 		for (Map.Entry<String, String> link : linkMap.entrySet()) {
 			// Check existance of both values
 			if (!configuration.contains(link.getKey()) || !this.contains(link.getValue()))
 				continue;
 
+			value = configuration.get(link.getKey());
+
+			// Resolve old variables for locale config .yml file
+			if (value instanceof String) {
+				value = ((String) value).replace("%backup_name%", "%backup%");
+				value = ((String) value).replace("%suffix%", "%counter%");
+			}
+
 			// Set the old config value at the location of the new value
-			this.set(link.getValue(), configuration.get(link.getKey()));
+			this.set(link.getValue(), value);
 		}
 	}
 

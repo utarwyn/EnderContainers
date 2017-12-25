@@ -209,9 +209,9 @@ public class EnderContainersCommand implements CommandExecutor {
 
 					EUtil.runAsync(() -> {
 						if (this.backupManager.removeBackup(name))
-							sender.sendMessage(Config.PREFIX + Locale.backupRemoved.replace("%backup_name%", name));
+							sender.sendMessage(Config.PREFIX + Locale.backupRemoved.replace("%backup%", name));
 						else
-							sender.sendMessage(Config.PREFIX + ChatColor.RED + Locale.backupUnknown.replace("%backup_name%", name));
+							sender.sendMessage(Config.PREFIX + ChatColor.RED + Locale.backupUnknown.replace("%backup%", name));
 					});
 				}
 				break;
@@ -372,7 +372,7 @@ public class EnderContainersCommand implements CommandExecutor {
 		Backup backup = this.backupManager.getBackupByName(name);
 
 		if (backup == null) {
-			p.sendMessage(Config.PREFIX + ChatColor.RED + Locale.backupUnknown.replace("%backup_name%", name));
+			p.sendMessage(Config.PREFIX + ChatColor.RED + Locale.backupUnknown.replace("%backup%", name));
 			return;
 		}
 

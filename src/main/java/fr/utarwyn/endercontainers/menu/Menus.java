@@ -109,6 +109,8 @@ public class Menus implements Listener {
 				continue;
 			}
 
+			if (menuSet == null) continue;
+
 			for (AbstractMenu menu : menuSet)
 				if (openInv.getHolder() == menu) {
 					menu.updateItems();

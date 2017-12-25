@@ -111,7 +111,7 @@ public abstract class Migration2_0 extends Migration {
 
 		for (File localeFile : localeFiles) {
 			oldConf = YamlConfiguration.loadConfiguration(localeFile);
-			newConf = YamlNewConfiguration.loadConfiguration(this.getClass().getResourceAsStream("/locale.yml"));
+			newConf = YamlNewConfiguration.loadConfiguration(EnderContainers.getInstance().getResource("locale.yml"));
 
 			// Apply old configuration on new configuration
 			newConf.applyConfiguration(oldConf, LOCALE_LINK_MAP);

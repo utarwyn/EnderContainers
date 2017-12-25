@@ -77,11 +77,11 @@ public class EnderChestCommand implements CommandExecutor {
 				return;
 			}
 
-			if (player.hasPermission("cmd.enderchest." + index))
+			if (player.hasPermission("cmd.enderchest." + index)) {
 				if (!this.manager.openEnderchestFor(player, index))
 					player.sendMessage(Config.PREFIX + ChatColor.RED + Locale.nopermOpenChest);
-				else
-					PluginMsg.accessDenied(player);
+			} else
+				PluginMsg.accessDenied(player);
 		});
 
 		return true;
