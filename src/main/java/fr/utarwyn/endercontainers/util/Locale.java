@@ -142,12 +142,13 @@ public class Locale extends YamlLinker {
 	 */
 	public boolean initialize(JavaPlugin plugin) {
 		// Create custom locale .yml file if not exists
-		File file = new File(plugin.getDataFolder(), "locales/" + Config.locale + ".yml");
+		File localeFolder = new File(plugin.getDataFolder(), "locales/");
+		File file = new File(localeFolder, Config.locale + ".yml");
 
 		if (!file.exists()) {
 			// File doesn't exists... use the template to pre-fill the data.
 			try {
-				if (!file.getParentFile().mkdir()) return false;
+				if (!localeFolder.exists() && !localeFolder.mkdir()) return false;
 				if (!file.createNewFile()) return false;
 
 				InputStream in = plugin.getResource("locale.yml");

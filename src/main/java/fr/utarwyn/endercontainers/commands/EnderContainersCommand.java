@@ -249,12 +249,16 @@ public class EnderContainersCommand implements CommandExecutor {
 				if (!Config.get().reload()) {
 					sender.sendMessage(Config.PREFIX + "§cError when reloading config! See the console for more info!");
 					sender.sendMessage(Config.PREFIX + "§8Plugin now disabled.");
+
+					Bukkit.getPluginManager().disablePlugin(EnderContainers.getInstance());
 					return true;
 				}
 
 				if (!Locale.get().reload()) {
 					sender.sendMessage(Config.PREFIX + "§cError when reloading plugin locale! See the console for more info!");
 					sender.sendMessage(Config.PREFIX + "§8Plugin now disabled.");
+
+					Bukkit.getPluginManager().disablePlugin(EnderContainers.getInstance());
 					return true;
 				}
 
