@@ -4,15 +4,13 @@ import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.database.Database;
 import fr.utarwyn.endercontainers.database.MysqlManager;
 import fr.utarwyn.endercontainers.util.Log;
+import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -50,7 +48,6 @@ public abstract class Migration {
 	public Migration(String fromVers, String toVers) {
 		this.fromVers = fromVers;
 		this.toVers = toVers;
-
 	}
 
 	/**
@@ -81,6 +78,7 @@ public abstract class Migration {
 		if (file.exists()) {
 			try {
 				this.dataVersion = new Scanner(new FileInputStream(file)).nextLine();
+				return this.dataVersion;
 			} catch (FileNotFoundException e) {
 				System.err.println("Cannot get the local version of the plugin! Please fix that by creating a \"version\" file in the data folder of the plugin with the version of the plugin inside (" + getPluginVersion() + ").");
 				e.printStackTrace();
@@ -191,6 +189,51 @@ public abstract class Migration {
 	 */
 	static String getPluginVersion() {
 		return EnderContainers.getInstance().getDescription().getVersion();
+	}
+
+	/**
+	 * Updates the configuration with the old configuration.
+	 * This method keeps configuration comments in the Yaml file!
+	 * @return True if the configuration has been updated
+	 */
+	protected boolean updateConfiguration() {
+		File confFile = new File(this.getDataFolder(), "config.yml");
+		YamlConfiguration config = YamlConfiguration.loadConfiguration(confFile);
+
+		EnderContainers.getInstance().saveResource("config.yml", true);
+		YamlNewConfiguration newConfig = YamlNewConfiguration.loadConfiguration(confFile);
+
+		newConfig.applyConfiguration(config);
+
+		try {
+			newConfig.save(confFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns all files in which there are chests configurations
+	 * @return Enderchests files
+	 */
+	protected List<File> getChestFiles() {
+		List<File> files = new ArrayList<>();
+
+		// Get all normal chest files
+		files.addAll(Arrays.asList(Objects.requireNonNull(new File(this.getDataFolder(), "data/").listFiles())));
+
+		// Add all backups chests
+		File globalBackupsFolder = new File(this.getDataFolder(), "backups/");
+
+		if (globalBackupsFolder.isDirectory())
+			for (File backupFolder : Objects.requireNonNull(globalBackupsFolder.listFiles()))
+				if (backupFolder.isDirectory())
+					files.addAll(Arrays.asList(Objects.requireNonNull(backupFolder.listFiles())));
+
+		return files;
 	}
 
 	/**

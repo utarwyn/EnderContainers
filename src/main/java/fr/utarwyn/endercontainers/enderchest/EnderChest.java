@@ -242,8 +242,7 @@ public class EnderChest {
 		if (this.num == 0 && Config.useVanillaEnderchest) return 3;
 
 		for (int row = 6; row > 0; row--)
-			if (player.hasPermission("endercontainers.slot" + this.num + ".row" + row) ||
-					player.hasPermission("endercontainers.slots.row" + row))
+			if (EUtil.playerHasPerm(player, "slot" + this.num + ".row" + row) || EUtil.playerHasPerm(player, "slots.row" + row))
 				return row;
 
 		return 3;

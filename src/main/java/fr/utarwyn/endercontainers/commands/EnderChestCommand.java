@@ -69,7 +69,7 @@ public class EnderChestCommand implements CommandExecutor {
 
 		EUtil.runAsync(() -> {
 			if (!hasParam) {
-				if (player.hasPermission("cmd.enderchests"))
+				if (EUtil.playerHasPerm(player, "cmd.enderchests"))
 					this.manager.openHubMenuFor(player);
 				else
 					PluginMsg.accessDenied(player);
@@ -77,7 +77,7 @@ public class EnderChestCommand implements CommandExecutor {
 				return;
 			}
 
-			if (player.hasPermission("cmd.enderchest." + index)) {
+			if (EUtil.playerHasPerm(player, "cmd.enderchests") || EUtil.playerHasPerm(player, "cmd.enderchest." + index)) {
 				if (!this.manager.openEnderchestFor(player, index))
 					player.sendMessage(Config.PREFIX + ChatColor.RED + Locale.nopermOpenChest);
 			} else

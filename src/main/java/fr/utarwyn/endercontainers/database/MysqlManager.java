@@ -57,8 +57,11 @@ public class MysqlManager extends AbstractManager {
 
 		if (this.isReady())
 			Log.log("MySQL enabled and ready. Connected to database " + Config.mysqlHost + ":" + Config.mysqlPort, true);
-		else
+		else {
+			Config.mysql = false;
 			Log.log("MySQL disabled because of an error during the connection. Now using flat system to store data.", true);
+			return;
+		}
 
 		// Initialize the database ...
 		this.init();

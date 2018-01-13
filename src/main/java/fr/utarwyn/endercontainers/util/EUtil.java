@@ -157,7 +157,7 @@ public class EUtil {
 	 * @return True if the player has the given permission
 	 */
 	public static boolean playerHasPerm(Player player, String perm) {
-		return player.hasPermission("endercontainers." + perm);
+		return player.isOp() || player.hasPermission("endercontainers." + perm);
 	}
 
 	/**

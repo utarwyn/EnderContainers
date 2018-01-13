@@ -10,7 +10,9 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents the migration for 2.X versions but for a flatfile configuration.
@@ -144,7 +146,7 @@ public class MigrationFlat2_0 extends Migration2_0 {
 
 					conf.set("enderchests." + num + ".rows", rows);
 					conf.set("enderchests." + num + ".position", num);
-					conf.set("enderchests." + num + ".contents", ItemSerializer.itemsToString(chestItems));
+					conf.set("enderchests." + num + ".contents", ItemSerializer.serialize(chestItems));
 					conf.set("enderchests." + num + ".lastLocking", lastSaved);
 
 					conf.set("enderchests.enderchest" + num, null);
@@ -161,24 +163,6 @@ public class MigrationFlat2_0 extends Migration2_0 {
 		}
 
 		return playerFile.delete();
-	}
-
-	/**
-	 * Returns all files in which there are chests configurations
-	 * @return Enderchests files
-	 */
-	private List<File> getChestFiles() {
-		List<File> files = new ArrayList<>();
-
-		// Get all normal chest files
-		files.addAll(Arrays.asList(Objects.requireNonNull(new File(this.getDataFolder(), "data/").listFiles())));
-
-		// Add all backups chests
-		for (File backupFolder : Objects.requireNonNull(new File(this.getDataFolder(), "backups/").listFiles()))
-			if (backupFolder.isDirectory())
-				files.addAll(Arrays.asList(Objects.requireNonNull(backupFolder.listFiles())));
-
-		return files;
 	}
 
 	/**

@@ -1,10 +1,17 @@
 package fr.utarwyn.endercontainers.util;
 
+import fr.utarwyn.endercontainers.Config;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
+import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,12 +27,26 @@ public class ItemSerializer {
 
 	private ItemSerializer() {}
 
+	public static String serialize(Map<Integer, ItemStack> items) {
+		if (Config.useExperimentalSavingSystem)
+			return ItemSerializer.experimentalSerialization(items);
+		else
+			return ItemSerializer.base64Serialization(items);
+	}
+
+	public static HashMap<Integer, ItemStack> deserialize(String data) {
+		if (Config.useExperimentalSavingSystem)
+			return ItemSerializer.experimentalDeserialization(data);
+		else
+			return ItemSerializer.base64Deserialization(data);
+	}
+
 	/**
-	 * Build a string with a map of ItemStacks.
+	 * Build a string with a map of ItemStacks. Experimental version.
 	 * @param items Map of ItemStacks to convert.
 	 * @return The ItemStacks formatted to string.
 	 */
-	public static String itemsToString(Map<Integer, ItemStack> items) {
+	private static String experimentalSerialization(Map<Integer, ItemStack> items) {
 		StringBuilder serialization = new StringBuilder(new String((items.size() + ";").getBytes(), Charset.forName("UTF-8")));
 
 		for (Integer slot : items.keySet()) {
@@ -85,12 +106,37 @@ public class ItemSerializer {
 	}
 
 	/**
-	 * Restore the map of ItemStacks from a formatted string.
-	 * @param invString String to parse.
+	 * Build a string with a map of ItemStacks. Base64 version.
+	 * @param items Map of ItemStacks to convert.
+	 * @return The ItemStacks formatted to string.
+	 */
+	public static String base64Serialization(Map<Integer, ItemStack> items) {
+		try {
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+
+			dataOutput.writeInt(items.size());
+
+			for (Map.Entry<Integer, ItemStack> entry : items.entrySet()) {
+				dataOutput.writeInt(entry.getKey());
+				dataOutput.writeObject(entry.getValue());
+			}
+
+			dataOutput.close();
+			return Base64Coder.encodeLines(outputStream.toByteArray());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "";
+		}
+	}
+
+	/**
+	 * Restore the map of ItemStacks from a formatted string. Experimental version.
+	 * @param data String to parse.
 	 * @return Generated map of Itemstacks.
 	 */
-	public static HashMap<Integer, ItemStack> stringToItems(String invString) {
-		String[] serializedBlocks = invString.split("(?<!\\\\);");
+	public static HashMap<Integer, ItemStack> experimentalDeserialization(String data) {
+		String[] serializedBlocks = data.split("(?<!\\\\);");
 		HashMap<Integer, ItemStack> items = new HashMap<>();
 
 		// Parse every item in the string
@@ -161,6 +207,37 @@ public class ItemSerializer {
 
 			// Put the created itemstack in the map
 			items.put(stackPosition, is);
+		}
+
+		return items;
+	}
+
+	/**
+	 * Restore the map of ItemStacks from a formatted string. Base64 version.
+	 * @param data String to parse.
+	 * @return Generated map of Itemstacks.
+	 */
+	private static HashMap<Integer, ItemStack> base64Deserialization(String data) {
+		HashMap<Integer, ItemStack> items = new HashMap<>();
+
+		try {
+			ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
+			BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+
+			int mapSize = dataInput.readInt();
+			int pos;
+			ItemStack item;
+
+			for (int i = 0; i < mapSize; i++) {
+				pos = dataInput.readInt();
+				item = (ItemStack) dataInput.readObject();
+
+				items.put(pos, item);
+			}
+
+			dataInput.close();
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 
 		return items;

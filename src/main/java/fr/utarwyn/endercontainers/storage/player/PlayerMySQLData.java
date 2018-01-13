@@ -39,7 +39,7 @@ public class PlayerMySQLData extends PlayerData {
 	public HashMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
 		for (DatabaseSet chestSet : this.enderchestsDataset)
 			if (chestSet.getInteger("num") == enderChest.getNum())
-				return ItemSerializer.stringToItems(chestSet.getString("contents"));
+				return ItemSerializer.deserialize(chestSet.getString("contents"));
 
 		return new HashMap<>();
 	}
@@ -63,7 +63,7 @@ public class PlayerMySQLData extends PlayerData {
 				break;
 			}
 
-		String contents = ItemSerializer.itemsToString(enderChest.getContents());
+		String contents = ItemSerializer.serialize(enderChest.getContents());
 
 		getMysqlManager().saveEnderchest(
 				insert,

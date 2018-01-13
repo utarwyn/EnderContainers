@@ -74,30 +74,6 @@ public abstract class Migration2_0 extends Migration {
 	}
 
 	/**
-	 * Updates the configuration with the old configuration.
-	 * This method keeps configuration comments in the Yaml file!
-	 * @return True if the configuration has been updated
-	 */
-	boolean updateConfiguration() {
-		File confFile = new File(this.getDataFolder(), "config.yml");
-		YamlConfiguration config = YamlConfiguration.loadConfiguration(confFile);
-
-		EnderContainers.getInstance().saveResource("config.yml", true);
-		YamlNewConfiguration newConfig = YamlNewConfiguration.loadConfiguration(confFile);
-
-		newConfig.applyConfiguration(config);
-
-		try {
-			newConfig.save(confFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * Updates locales of the plugin.
 	 * @return True if locales have been updated
 	 */

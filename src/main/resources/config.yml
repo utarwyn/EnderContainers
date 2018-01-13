@@ -69,3 +69,7 @@ others:
   # Check automatically for update?
   updateChecker: true
 
+  # You can put this value to true if you want to use an experimental saving system.
+  # It will use less disk space but some items data may not be saved.
+  useExperimentalSavingSystem: false
+

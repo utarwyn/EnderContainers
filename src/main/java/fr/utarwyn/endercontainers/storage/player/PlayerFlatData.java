@@ -38,7 +38,7 @@ public class PlayerFlatData extends PlayerData {
 		if (!this.flatFile.getConfiguration().contains(path))
 			return new HashMap<>();
 
-		return ItemSerializer.stringToItems(this.flatFile.getConfiguration().getString(path));
+		return ItemSerializer.deserialize(this.flatFile.getConfiguration().getString(path));
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class PlayerFlatData extends PlayerData {
 
 		this.flatFile.getConfiguration().set(path + "rows", enderChest.getRows());
 		this.flatFile.getConfiguration().set(path + "position", enderChest.getNum());
-		this.flatFile.getConfiguration().set(path + "contents", ItemSerializer.itemsToString(enderChest.getContents()));
+		this.flatFile.getConfiguration().set(path + "contents", ItemSerializer.serialize(enderChest.getContents()));
 		this.flatFile.getConfiguration().set(path + "lastlocking", System.currentTimeMillis() / 1000); // UNIX format
 
 		this.save();

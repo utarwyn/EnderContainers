@@ -4,6 +4,7 @@ import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.migration.migration2_0.Migration2_0;
+import fr.utarwyn.endercontainers.migration.migration2_0_1.Migration2_0_1;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,6 +49,7 @@ public class MigrationManager extends AbstractManager {
 	public void initialize() {
 		this.migrations = new ArrayList<>();
 		this.loadMigration(Migration2_0.class);
+		this.loadMigration(Migration2_0_1.class);
 
 		for (Migration migration : this.migrations)
 			if (migration.hasToBePerformed()) {

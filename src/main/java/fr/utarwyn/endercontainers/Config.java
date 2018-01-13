@@ -85,6 +85,9 @@ public class Config extends YamlLinker {
 	@Configurable(key = "others.updateChecker")
 	public static boolean updateChecker;
 
+	@Configurable(key = "others.useExperimentalSavingSystem")
+	public static boolean useExperimentalSavingSystem;
+
 	public boolean initialize(JavaPlugin plugin) {
 		// Create config.yml file if not exists
 		if (!new File(plugin.getDataFolder(), "config.yml").exists())
