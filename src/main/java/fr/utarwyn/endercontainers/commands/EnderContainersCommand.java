@@ -298,7 +298,7 @@ public class EnderContainersCommand implements CommandExecutor {
 
 		if (page == 1) {
 			sendFormattedHelpLine(p, "Open your enderchest", "§e/enderchest [number]", "cmd");
-			sendFormattedHelpLine(p, "Open an enderchest", "§b/ecp open <player>", "backups.openchests");
+			sendFormattedHelpLine(p, "Open an enderchest", "§b/ecp open <player>", "openchests");
 
 			sendFormattedHelpLine(p, "List backups", "§b/ecp backups", "backups.view");
 			sendFormattedHelpLine(p, "Create a backup", "§b/ecp createbackup <name>", "backups.create");
