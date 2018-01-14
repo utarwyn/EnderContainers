@@ -1,4 +1,4 @@
-# EnderContainers v2.0.1
+# EnderContainers v2.0.2
 [![Plugin's logo](https://www.spigotmc.org/attachments/logo-png.25339/)](https://www.spigotmc.org/resources/endercontainers-1-8-x-to-1-10-x.4750/)
 
 [![Travis](https://img.shields.io/travis/utarwyn/EnderContainers.svg?style=flat-square)](https://travis-ci.org/utarwyn/EnderContainers) [![Github All Releases](https://img.shields.io/badge/dynamic/json.svg?label=Spigot%20downloads&colorB=ff69b4&prefix=&suffix=&query=$.downloads&uri=https%3A%2F%2Fapi.spiget.org%2Fv2%2Fresources%2F4750&style=flat-square)](https://www.spigotmc.org/resources/endercontainers-1-8-x-to-1-10-x.4750/) [![GitHub last commit (branch)](https://img.shields.io/github/last-commit/utarwyn/endercontainers/master.svg?style=flat-square)](https://github.com/utarwyn/EnderContainers/commits/master) \

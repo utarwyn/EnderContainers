@@ -130,8 +130,6 @@ public abstract class Migration {
 	void end() {
 		Log.log("", true);
 		Log.log("Migration from " + this.fromVers + " to " + this.toVers + " finished!", true);
-		Log.log("Please restart the server to enable the plugin!", true);
-		Log.log("If you have any error after the restart, please contact the plugin's author!", true);
 	}
 
 	/**

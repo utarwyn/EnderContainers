@@ -5,6 +5,7 @@ import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.migration.migration2_0.Migration2_0;
 import fr.utarwyn.endercontainers.migration.migration2_0_1.Migration2_0_1;
+import fr.utarwyn.endercontainers.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -63,7 +64,12 @@ public class MigrationManager extends AbstractManager {
 				break;
 			}
 
-		this.writeVersion();
+		if (this.migrationDone) {
+			Log.log("Please restart the server to enable the plugin!", true);
+			Log.log("If you have any error after the restart, please contact the plugin's author!", true);
+		}
+
+		this.writeVersion(Migration.getPluginVersion());
 	}
 
 	/**
@@ -114,7 +120,7 @@ public class MigrationManager extends AbstractManager {
 	/**
 	 * Writes the current version of the plugin in a file
 	 */
-	private void writeVersion() {
+	private void writeVersion(String version) {
 		File versionFile = new File(EnderContainers.getInstance().getDataFolder(), VERSION_FILE);
 
 		try {
@@ -124,7 +130,7 @@ public class MigrationManager extends AbstractManager {
 			PrintWriter pw = new PrintWriter(new FileOutputStream(versionFile));
 
 			pw.flush();
-			pw.print(Migration.getPluginVersion());
+			pw.print(version);
 			pw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
