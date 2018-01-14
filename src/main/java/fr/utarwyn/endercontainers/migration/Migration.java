@@ -85,7 +85,8 @@ public abstract class Migration {
 			}
 		}
 
-		return null;
+		// If no version found, use the saved one!
+		return Migration.getPluginVersion();
 	}
 
 	/**
