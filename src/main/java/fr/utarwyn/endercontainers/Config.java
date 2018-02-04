@@ -88,6 +88,9 @@ public class Config extends YamlLinker {
 	@Configurable(key = "others.useExperimentalSavingSystem")
 	public static boolean useExperimentalSavingSystem;
 
+	@Configurable(key = "others.globalSound")
+	public static boolean globalSound;
+
 	public boolean initialize(JavaPlugin plugin) {
 		// Create config.yml file if not exists
 		if (!new File(plugin.getDataFolder(), "config.yml").exists())

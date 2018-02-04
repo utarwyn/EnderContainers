@@ -75,7 +75,11 @@ public class EnderChestMenu extends AbstractMenu {
 	public void onClose(Player player) {
 		if (EnderContainers.getInstance().isEnabled()) {
 			Bukkit.getScheduler().runTaskAsynchronously(EnderContainers.getInstance(), this.enderChest::save);
-			EUtil.playSound(player.getLocation(), "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
+
+			if (Config.globalSound)
+				EUtil.playSound(player.getLocation(), "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
+			else
+				EUtil.playSound(player, "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
 		} else {
 			// Do the save synchronously because the plugin is disabling...
 			this.enderChest.save();

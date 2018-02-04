@@ -73,3 +73,6 @@ others:
   # It will use less disk space but some items data may not be saved.
   useExperimentalSavingSystem: false
 
+  # Use a global sound when a player opens/closes an enderchest
+  globalSound: true
+

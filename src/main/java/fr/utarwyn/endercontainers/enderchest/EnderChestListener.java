@@ -73,7 +73,11 @@ public class EnderChestListener implements Listener {
 
 			EUtil.runAsync(() -> {
 				this.manager.openHubMenuFor(player);
-				EUtil.playSound(block.getLocation(), "CHEST_OPEN", "BLOCK_CHEST_OPEN");
+
+				if (Config.globalSound)
+					EUtil.playSound(block.getLocation(), "CHEST_OPEN", "BLOCK_CHEST_OPEN");
+				else
+					EUtil.playSound(player, "CHEST_OPEN", "BLOCK_CHEST_OPEN");
 			});
 		}
 	}

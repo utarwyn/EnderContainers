@@ -75,9 +75,9 @@ public class EnderChestHubMenu extends AbstractMenu {
 
 			if (chest.isAccessible()) {
 				chest.openContainerFor(player);
-				EUtil.playSound(player.getLocation(), "CLICK", "UI_BUTTON_CLICK");
+				EUtil.playSound(player, "CLICK", "UI_BUTTON_CLICK");
 			} else {
-				EUtil.playSound(player.getLocation(), "ANVIL_BREAK", "BLOCK_ANVIL_BREAK");
+				EUtil.playSound(player, "ANVIL_BREAK", "BLOCK_ANVIL_BREAK");
 			}
 		});
 
