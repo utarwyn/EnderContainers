@@ -149,4 +149,11 @@ public class EnderChestManager extends AbstractManager {
 		this.enderchests.removeIf(EnderChest::isUnused);
 	}
 
+	/**
+	 * Purge all chests of a player from memory
+	 */
+	void deleteChestsOf(Player player) {
+		this.enderchests.removeIf(chest -> chest.getOwner().equals(player.getUniqueId()));
+	}
+
 }

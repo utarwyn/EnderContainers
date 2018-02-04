@@ -171,6 +171,7 @@ public abstract class AbstractMenu implements InventoryHolder {
 
 			if (this.dynamicSize) {
 				int maxPos = 0;
+
 				for (Integer n : this.items.keySet())
 					if (n > maxPos)
 						maxPos = n;
@@ -186,6 +187,9 @@ public abstract class AbstractMenu implements InventoryHolder {
 
 		if (this.inventory.getViewers().size() == 0)
 			for (Integer index : items.keySet()) {
+				if (index < 0 || index >= this.inventory.getSize())
+					continue;
+
 				ItemStack i = items.get(index);
 				this.inventory.setItem(index, i);
 			}

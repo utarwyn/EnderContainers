@@ -9,3 +9,4 @@ out/
 *.iml
 META-INF/*
 target/*
+dependency-reduced-pom.xml

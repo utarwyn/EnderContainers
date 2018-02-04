@@ -3,6 +3,8 @@ package fr.utarwyn.endercontainers.enderchest;
 import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.dependencies.DependenciesManager;
 import fr.utarwyn.endercontainers.menu.OfflineEnderChestMenu;
+import fr.utarwyn.endercontainers.storage.StorageWrapper;
+import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import fr.utarwyn.endercontainers.util.EUtil;
 import fr.utarwyn.endercontainers.util.Updater;
 import org.bukkit.Material;
@@ -16,6 +18,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 
 /**
@@ -89,6 +92,20 @@ public class EnderChestListener implements Listener {
 			player.sendMessage(Config.PREFIX + "&7Click here to download it: " + Config.DOWNLOAD_LINK);
 			player.playSound(player.getLocation(), Sound.NOTE_PLING, 2f, .5f);
 		}
+	}
+
+	/**
+	 * Method called when a player quits the server
+	 * @param event The quit event
+	 */
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent event) {
+		Player player = event.getPlayer();
+
+		// When a player quits, clear all of its data from memory.
+		// (force method, instead of waiting the automatic purge task)
+		this.manager.deleteChestsOf(player);
+		StorageWrapper.unload(PlayerData.class, player.getUniqueId());
 	}
 
 	/**
