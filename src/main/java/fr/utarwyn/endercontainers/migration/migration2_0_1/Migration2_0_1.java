@@ -9,7 +9,7 @@ public abstract class Migration2_0_1 extends Migration {
 
 	private static Pattern BASE64_PATTERN = Pattern.compile("([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)");
 
-	Migration2_0_1() {
+	public Migration2_0_1() {
 		super("2.0.0", "2.0.1");
 	}
 

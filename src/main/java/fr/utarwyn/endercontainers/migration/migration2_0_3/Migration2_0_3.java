@@ -3,9 +3,9 @@ package fr.utarwyn.endercontainers.migration.migration2_0_3;
 import fr.utarwyn.endercontainers.migration.Migration;
 import fr.utarwyn.endercontainers.util.Log;
 
-public abstract class Migration2_0_3 extends Migration {
+public class Migration2_0_3 extends Migration {
 
-	Migration2_0_3() {
+	public Migration2_0_3() {
 		super("2.0.2", "2.0.3");
 	}
 

@@ -59,7 +59,7 @@ public abstract class Migration2_0 extends Migration {
 		put("enderchest_nametag", "miscellaneous.chest_nametag");
 	}};
 
-	Migration2_0() {
+	public Migration2_0() {
 		super("1.*", "2.*");
 	}
 
