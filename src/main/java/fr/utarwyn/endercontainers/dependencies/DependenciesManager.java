@@ -157,6 +157,10 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	 */
 	@Override
 	public boolean onBlockChestOpened(Block block, Player player) {
+		// Bypass foreach with no dependency.
+		if (this.dependencies.isEmpty())
+			return true;
+
 		for (Dependency dependency : this.dependencies)
 			if (!dependency.onBlockChestOpened(block, player)) {
 				return false;

@@ -1,14 +1,9 @@
 package fr.utarwyn.endercontainers.dependencies;
 
-import com.massivecraft.factions.entity.BoardColl;
-import com.massivecraft.factions.entity.Faction;
-import com.massivecraft.factions.entity.MPlayer;
-import com.massivecraft.massivecore.ps.PS;
-import fr.utarwyn.endercontainers.util.Locale;
-import fr.utarwyn.endercontainers.util.PluginMsg;
-import org.bukkit.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 /**
  * Dependency used to interact with the Factions plugin
@@ -16,6 +11,8 @@ import org.bukkit.entity.Player;
  * @author Utarwyn
  */
 public class FactionsDependency extends Dependency {
+
+	private FactionsHook factionHook;
 
 	/**
 	 * Construct the dependency object
@@ -29,7 +26,22 @@ public class FactionsDependency extends Dependency {
 	 */
 	@Override
 	public void onEnable() {
+		Plugin factions = Bukkit.getPluginManager().getPlugin("Factions");
+		// No plugin Factions detected?
+		if (factions == null) return;
 
+		// Get Factions version
+		String[] components = factions.getDescription().getVersion().split("\\.");
+		String version = components.length < 2 ? "" : components[0] + "." + components[1];
+
+		// Instanciate the correct hook in terms of the version of Factions
+		switch (version) {
+			case "1.6": // Old version of Factions - FactionsUUID - SavageFactions
+				this.factionHook = new Factions0106Dependency();
+				break;
+			default:    // New versions of Factions!
+				this.factionHook = new Factions0212Dependency();
+		}
 	}
 
 	/**
@@ -48,26 +60,7 @@ public class FactionsDependency extends Dependency {
 	 */
 	@Override
 	public boolean onBlockChestOpened(Block block, Player player) {
-		MPlayer mplayer = MPlayer.get(player);
-
-		if (mplayer == null) return false;
-		if (mplayer.isOverriding()) return true;
-
-		Faction playerFac = mplayer.getFaction();
-		Faction currentFac = BoardColl.get().getFactionAt(PS.valueOf(block.getLocation()));
-
-		if (currentFac != null) {
-			String facName = ChatColor.stripColor(currentFac.getName());
-			boolean canOpen = facName.equals("Wilderness") || facName.equals("WarZone") || facName.equals("SafeZone") ||
-					          (playerFac != null) && (currentFac.getName().equals(playerFac.getName()));
-
-			if (!canOpen) {
-				PluginMsg.errorMessage(player, Locale.accessDeniedFactions.replace("%faction%", facName));
-				return false;
-			}
-		}
-
-		return true;
+		return this.factionHook.onBlockChestOpened(block, player);
 	}
 
 }

@@ -32,16 +32,23 @@
             <url>http://repo.citizensnpcs.co/</url>
         </repository>
         <repository>
-            <id>dustplanet-repo</id>
-            <url>https://repo.dustplanet.de/artifactory/ext-release-local/</url>
-        </repository>
-        <repository>
             <id>sk89q-repo</id>
             <url>http://maven.sk89q.com/repo/</url>
         </repository>
+        <!-- PlotSquared repo -->
         <repository>
             <id>plotsquared-repo</id>
             <url>http://ci.athion.net/job/PlotSquared/ws/mvn/</url>
+        </repository>
+        <!-- Factions&MassiveCore repo -->
+        <repository>
+            <id>fractal-repo</id>
+            <url>https://fractal.lindegaard.one:8187/artifactory/plugins-release/</url>
+        </repository>
+        <!-- FactionsUUID repo -->
+        <repository>
+            <id>factionsuuid-repo</id>
+            <url>https://ci.ender.zone/plugin/repository/everything/</url>
         </repository>
         <repository>
             <id>bstats-repo</id>
@@ -74,16 +81,30 @@
 
         <!-- Factions -->
         <dependency>
-            <groupId>com.massivecraft</groupId>
-            <artifactId>massivecore</artifactId>
-            <version>2.8.6</version>
-            <type>jar</type>
+            <groupId>com.massivecraft.massivecore</groupId>
+            <artifactId>MassiveCore</artifactId>
+            <version>2.12.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.massivecraft.factions</groupId>
+            <artifactId>Factions</artifactId>
+            <version>2.12.1</version>
         </dependency>
         <dependency>
             <groupId>com.massivecraft</groupId>
-            <artifactId>factions</artifactId>
-            <version>2.8.6</version>
-            <type>jar</type>
+            <artifactId>Factions</artifactId>
+            <version>1.6.9.5-U0.2.2</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>mkremins</groupId>
+                    <artifactId>fanciful</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sk89q</groupId>
+                    <artifactId>worldguard</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- PlotSquared -->
