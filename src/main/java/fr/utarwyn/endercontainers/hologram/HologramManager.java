@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.hologram;
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.dependencies.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.Locale;
 import org.bukkit.Bukkit;
@@ -31,6 +32,11 @@ public class HologramManager extends AbstractManager implements Runnable {
 	private EnderChestManager chestManager;
 
 	/**
+	 * The dependencies manager
+	 */
+	private DependenciesManager dependenciesManager;
+
+	/**
 	 * The BukkitTask object which manage the spawning/dispawning of holograms
 	 */
 	private BukkitTask task;
@@ -53,6 +59,7 @@ public class HologramManager extends AbstractManager implements Runnable {
 	@Override
 	public void initialize() {
 		this.chestManager = EnderContainers.getInstance().getInstance(EnderChestManager.class);
+		this.dependenciesManager = EnderContainers.getInstance().getInstance(DependenciesManager.class);
 
 		this.task = Bukkit.getScheduler().runTaskTimer(EnderContainers.getInstance(), this, 20L, 5L);
 		this.holograms = new HashMap<>();
@@ -83,11 +90,15 @@ public class HologramManager extends AbstractManager implements Runnable {
 			if (Config.disabledWorlds.contains(player.getWorld().getName())) continue;
 			UUID uuid = player.getUniqueId();
 
-			Block b = player.getTargetBlock((Set<Material>) null, 8);
+			Block b = player.getTargetBlock((Set<Material>) null, 6);
 			if (b == null) continue;
 
 			if (b.getType().equals(Material.ENDER_CHEST)) {
 				if (this.holograms.containsKey(uuid)) continue;
+
+				// Check player perms before displaying the hologram
+				if (!this.dependenciesManager.onBlockChestOpened(b, player))
+					return;
 
 				int copEcs = this.chestManager.getEnderchestsNbOf(uuid);
 
