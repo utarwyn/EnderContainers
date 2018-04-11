@@ -19,7 +19,7 @@ public class Factions0106Dependency implements FactionsHook {
 		if (fPlayer == null) return false;
 		if (fPlayer.isAdminBypassing()) return true;
 
-		// Init factions
+		// Init checking variables
 		Faction playerFac = fPlayer.getFaction();
 		Faction currentFac = Board.getInstance().getFactionAt(new FLocation(block));
 

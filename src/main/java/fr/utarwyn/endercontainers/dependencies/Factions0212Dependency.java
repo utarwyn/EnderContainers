@@ -17,7 +17,7 @@ public class Factions0212Dependency implements FactionsHook {
 		if (mplayer == null) return false;
 		if (mplayer.isOverriding()) return true;
 
-		// Init factions & Color
+		// Init checking variables
 		Faction playerFac = mplayer.getFaction();
 		Faction currentFac = BoardColl.get().getFactionAt(PS.valueOf(block));
 

@@ -19,7 +19,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	/**
 	 * A field which represents all plugins supported by EnderContainers as dependency.
 	 */
-	private static final String[] DEPENDENCIES_NAMES = new String[] { "Factions", "PlotSquared", "Citizens" };
+	private static final String[] DEPENDENCIES_NAMES = new String[] { "Factions", "WorldGuard", "Citizens", "PlotSquared" };
 
 	/**
 	 * A list of all loaded dependencies
@@ -157,7 +157,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	 */
 	@Override
 	public boolean onBlockChestOpened(Block block, Player player) {
-		// Bypass foreach with no dependency.
+		// Bypass foreach when no dependency is loaded.
 		if (this.dependencies.isEmpty())
 			return true;
 

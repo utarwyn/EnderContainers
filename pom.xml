@@ -79,6 +79,13 @@
             <type>jar</type>
         </dependency>
 
+        <!-- WorldGuard -->
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldguard</artifactId>
+            <version>6.1.1-SNAPSHOT</version>
+        </dependency>
+
         <!-- Factions -->
         <dependency>
             <groupId>com.massivecraft.massivecore</groupId>
