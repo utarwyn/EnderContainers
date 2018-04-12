@@ -21,7 +21,7 @@ Long live the enderchests!
  - Support for all items (item lore, enchant...) (and unsafe enchantments)
  - MySQL/MariaDB Support
  - Complete backups management
- - Integrations with **Factions, Towny, PlotSquared, Citizens**.
+ - Integrations with **Factions, FactionsUUID, WorldGuard, PlotSquared, Citizens**.
 
 
 ### Installation
