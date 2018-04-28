@@ -8,7 +8,6 @@ import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import fr.utarwyn.endercontainers.util.EUtil;
 import fr.utarwyn.endercontainers.util.Updater;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -93,8 +92,8 @@ public class EnderChestListener implements Listener {
 		// Send update message to the player is he has the permission.
 		if (EUtil.playerHasPerm(player, "update") && !Updater.getInstance().isUpToDate()) {
 			player.sendMessage(Config.PREFIX+ "§aThere is a newer version available: §2§l" + Updater.getInstance().getNewestVersion() + "§a.");
-			player.sendMessage(Config.PREFIX + "&7Click here to download it: " + Config.DOWNLOAD_LINK);
-			player.playSound(player.getLocation(), Sound.NOTE_PLING, 2f, .5f);
+			player.sendMessage(Config.PREFIX + "Download it here: §f§n" + Config.DOWNLOAD_LINK);
+			EUtil.playSound(player, "NOTE_PLING", "BLOCK_NOTE_PLING");
 		}
 	}
 
