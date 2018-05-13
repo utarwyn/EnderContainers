@@ -97,7 +97,7 @@ public class HologramManager extends AbstractManager implements Runnable {
 				if (this.holograms.containsKey(uuid)) continue;
 
 				// Check player perms before displaying the hologram
-				if (!this.dependenciesManager.onBlockChestOpened(b, player))
+				if (!this.dependenciesManager.onBlockChestOpened(b, player, false))
 					continue;
 
 				int copEcs = this.chestManager.getEnderchestsNbOf(uuid);

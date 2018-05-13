@@ -30,6 +30,15 @@ public class PluginMsg {
 	}
 
 	/**
+	 * Send a given error message to a specific sender (simple message without prefix)
+	 * @param sender The sender
+	 * @param message Error message to send
+	 */
+	public static void errorSMessage(CommandSender sender, String message) {
+		sender.sendMessage("§c§l(!) §c" + message);
+	}
+
+	/**
 	 * Inform a sender that the access is denied for him
 	 * @param sender The sender
 	 */

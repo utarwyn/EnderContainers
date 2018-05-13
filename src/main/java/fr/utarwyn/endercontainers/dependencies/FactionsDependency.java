@@ -56,11 +56,12 @@ public class FactionsDependency extends Dependency {
 	 * Called when a player wants to open its enderchest by interacting with an enderchest block
 	 * @param block The block clicked by the player
 	 * @param player The player who interacts with the chest
+	 * @param sendMessage The plugin have to send a message to the player?
 	 * @return True if the block chest can be opened
 	 */
 	@Override
-	public boolean onBlockChestOpened(Block block, Player player) {
-		return this.factionHook.onBlockChestOpened(block, player);
+	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
+		return this.factionHook.onBlockChestOpened(block, player, sendMessage);
 	}
 
 }

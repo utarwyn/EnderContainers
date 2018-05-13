@@ -15,8 +15,9 @@ public interface DependencyListener {
 	 * Called when a player wants to open its enderchest by interacting with an enderchest block
 	 * @param block The block clicked by the player
 	 * @param player The player who interacts with the chest.
+	 * @param sendMessage The plugin have to send message to the player?
 	 * @return True if the block chest can be opened
 	 */
-	boolean onBlockChestOpened(Block block, Player player);
+	boolean onBlockChestOpened(Block block, Player player, boolean sendMessage);
 
 }

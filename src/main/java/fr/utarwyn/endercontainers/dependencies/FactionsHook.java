@@ -5,6 +5,6 @@ import org.bukkit.entity.Player;
 
 public interface FactionsHook {
 
-	boolean onBlockChestOpened(Block block, Player player);
+	boolean onBlockChestOpened(Block block, Player player, boolean sendMessage);
 
 }

@@ -504,7 +504,7 @@ public class CitizensDependency extends Dependency implements Listener {
 	 * @return True if the block chest can be opened
 	 */
 	@Override
-	public boolean onBlockChestOpened(Block block, Player player) {
+	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
 		return true;
 	}
 

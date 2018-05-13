@@ -150,19 +150,20 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 
 	/**
 	 * Called when a player wants to open its enderchest by interacting with an enderchest block
-	 * (This method loop loaded dependencies to call the {@link fr.utarwyn.endercontainers.dependencies.DependencyListener#onBlockChestOpened(Block, Player)} method on each of them)
+	 * (This method loop loaded dependencies to call the {@link fr.utarwyn.endercontainers.dependencies.DependencyListener#onBlockChestOpened(Block, Player, boolean)} method on each of them)
 	 * @param block The block clicked by the player
 	 * @param player The player who interacts with the chest.
+	 * @param sendMessage The plugin have to send a message to the player.
 	 * @return True if the block chest can be opened
 	 */
 	@Override
-	public boolean onBlockChestOpened(Block block, Player player) {
+	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
 		// Bypass foreach when no dependency is loaded.
 		if (this.dependencies.isEmpty())
 			return true;
 
 		for (Dependency dependency : this.dependencies)
-			if (!dependency.onBlockChestOpened(block, player)) {
+			if (!dependency.onBlockChestOpened(block, player, sendMessage)) {
 				return false;
 			}
 

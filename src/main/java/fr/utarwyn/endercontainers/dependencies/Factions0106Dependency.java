@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 public class Factions0106Dependency implements FactionsHook {
 
 	@Override
-	public boolean onBlockChestOpened(Block block, Player player) {
+	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
 		FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
 
 		// Bypass the check?
@@ -34,8 +34,8 @@ public class Factions0106Dependency implements FactionsHook {
 			canOpen = !currentFacIsReal;
 
 			// Send message only when needed (to not interfere with Factions!)!
-			if (!canOpen)
-				PluginMsg.errorMessage(player, Locale.accessDeniedFactions.replace("%faction%", currentFac.getTag() + ChatColor.RED));
+			if (!canOpen && sendMessage)
+				PluginMsg.errorSMessage(player, Locale.accessDeniedFactions.replace("%faction%", currentFac.getTag() + ChatColor.RED));
 		}
 
 		return canOpen;

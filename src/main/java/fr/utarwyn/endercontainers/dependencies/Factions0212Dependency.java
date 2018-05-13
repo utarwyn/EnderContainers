@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.dependencies;
 import com.massivecraft.factions.entity.*;
 import com.massivecraft.massivecore.ps.PS;
 import fr.utarwyn.endercontainers.util.Locale;
+import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -10,7 +11,7 @@ import org.bukkit.entity.Player;
 public class Factions0212Dependency implements FactionsHook {
 
 	@Override
-	public boolean onBlockChestOpened(Block block, Player player) {
+	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
 		MPlayer mplayer = MPlayer.get(player);
 
 		// Bypass the check?
@@ -40,7 +41,10 @@ public class Factions0212Dependency implements FactionsHook {
 
 		// Prevent to access to the enderchest if needed!
 		if (!canOpen) {
-			player.sendMessage(ChatColor.RED + Locale.accessDeniedFactions.replace("%faction%", facColor + currentFac.getName() + ChatColor.RED));
+			// Sending the message only in a specific case!
+			if (sendMessage)
+				PluginMsg.errorSMessage(player, Locale.accessDeniedFactions.replace("%faction%", facColor + currentFac.getName() + ChatColor.RED));
+
 			return false;
 		}
 

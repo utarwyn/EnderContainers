@@ -28,7 +28,7 @@ public class WorldGuardDependency extends Dependency {
 	}
 
 	@Override
-	public boolean onBlockChestOpened(Block block, Player player) {
+	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
 		// OP? Ok, you can do whatever you want...
 		if (player.isOp()) return true;
 

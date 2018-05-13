@@ -49,7 +49,7 @@ public class PlotSquaredDependency extends Dependency {
 	 * @return True if the block chest can be opened
 	 */
 	@Override
-	public boolean onBlockChestOpened(Block block, Player player) {
+	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
 		Plot plot = this.getP2Location(block.getLocation()).getPlot();
 		if (plot == null || player.isOp()) return true;
 
@@ -66,7 +66,9 @@ public class PlotSquaredDependency extends Dependency {
 			}
 
 			if (containsBlock && !plot.isAdded(player.getUniqueId())) {
-				PluginMsg.errorMessage(player, Locale.accessDeniedPlotSq);
+				if (sendMessage)
+					PluginMsg.errorSMessage(player, Locale.accessDeniedPlotSq);
+
 				return false;
 			}
 		}

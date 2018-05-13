@@ -67,17 +67,18 @@ public class EnderChestListener implements Listener {
 
 			e.setCancelled(true);
 
-			if (!this.dependenciesManager.onBlockChestOpened(block, player))
+			// Check dependencies
+			if (!this.dependenciesManager.onBlockChestOpened(block, player, true))
 				return;
 
-			EUtil.runAsync(() -> {
-				this.manager.openHubMenuFor(player);
+			// Open the main menu for the player
+			EUtil.runAsync(() -> this.manager.openHubMenuFor(player));
 
-				if (Config.globalSound)
-					EUtil.playSound(block.getLocation(), "CHEST_OPEN", "BLOCK_CHEST_OPEN");
-				else
-					EUtil.playSound(player, "CHEST_OPEN", "BLOCK_CHEST_OPEN");
-			});
+			// Play sound (not in async mode)!
+			if (Config.globalSound)
+				EUtil.playSound(block.getLocation(), "CHEST_OPEN", "BLOCK_CHEST_OPEN");
+			else
+				EUtil.playSound(player, "CHEST_OPEN", "BLOCK_CHEST_OPEN");
 		}
 	}
 
