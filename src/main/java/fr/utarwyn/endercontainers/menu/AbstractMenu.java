@@ -161,6 +161,18 @@ public abstract class AbstractMenu implements InventoryHolder {
 	}
 
 	/**
+	 * Update all items in the inventory with items in memory.
+	 */
+	void updateInventory() {
+		if (this.inventory == null) return;
+
+		for (int i = 0; i < this.inventory.getSize(); i++) {
+			ItemStack itemStack = this.items.getOrDefault(i, null);
+			this.inventory.setItem(i, itemStack);
+		}
+	}
+
+	/**
 	 * Returns the generated inventory with items stored before
 	 * @return The generated inventory
 	 */

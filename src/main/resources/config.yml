@@ -22,12 +22,12 @@ disabledWorlds:
 enderchests:
 
   # Here, you can choose the max number of enderchests available in the main menu.
-  # Authorized range: 1 - 54
+  # Authorized range: 1 - infinite
   max: 27
 
   # With this option you can choose the default number of
   # enderchests available for all users, without any permission.
-  # Authorized range: 1 - 54
+  # Authorized range: 1 - max
   default: 1
 
   # By changing this you can hide all inaccessible enderchests

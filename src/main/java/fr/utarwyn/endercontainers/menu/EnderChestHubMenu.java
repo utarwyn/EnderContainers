@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,21 @@ import java.util.UUID;
 public class EnderChestHubMenu extends AbstractMenu {
 
 	/**
+	 * Static fields which represents the maximum number of items per page
+	 */
+	private static final int PER_PAGE = 52;
+
+	/**
+	 * Represents the item to go to the previous page
+	 */
+	private static final ItemStack PREV_PAGE_ITEM = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+
+	/**
+	 * Represents the item to go to the next page
+	 */
+	private static final ItemStack NEXT_PAGE_ITEM = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+
+	/**
 	 * The enderchest manager
 	 */
 	private EnderChestManager manager;
@@ -37,6 +53,11 @@ public class EnderChestHubMenu extends AbstractMenu {
 	private UUID owner;
 
 	/**
+	 * Current page for the player who has opened the menu
+	 */
+	private int page;
+
+	/**
 	 * Construct the Hub menu for a player
 	 * @param owner The player who owns enderchests in the menu
 	 */
@@ -45,28 +66,70 @@ public class EnderChestHubMenu extends AbstractMenu {
 
 		this.owner = owner;
 		this.manager = EnderContainers.getInstance().getInstance(EnderChestManager.class);
+		this.page = 1;
+	}
+
+	static {
+		SkullMeta prevSkullMeta = (SkullMeta) PREV_PAGE_ITEM.getItemMeta();
+		prevSkullMeta.setOwner("MHF_ArrowLeft");
+		prevSkullMeta.setDisplayName(ChatColor.RED + "≪ Previous page");
+		PREV_PAGE_ITEM.setItemMeta(prevSkullMeta);
+
+		SkullMeta nextSkullMeta = (SkullMeta) NEXT_PAGE_ITEM.getItemMeta();
+		nextSkullMeta.setOwner("MHF_ArrowRight");
+		nextSkullMeta.setDisplayName(ChatColor.RED + "Next page ≫");
+		NEXT_PAGE_ITEM.setItemMeta(nextSkullMeta);
 	}
 
 	@Override
 	public void prepare() {
-		int nb = Math.min(Config.maxEnderchests, 54);
+		// Calculate the number of enderchests to display in the inventory
+		int min = this.getFirstChestIndex();
+		int nb = Math.min(min + PER_PAGE + 2, Config.maxEnderchests);
 
-		for (int i = 0; i < nb; i++) {
-			EnderChest ec = this.manager.getEnderChest(this.owner, i);
+		// Clear any previous items
+		this.clear();
+
+		// Adding chest items
+		for (int num = min; num < nb; num++) {
+			EnderChest ec = this.manager.getEnderChest(this.owner, num);
 			// Reload chest's metas before.
 			ec.reloadMeta();
 
 			if (!ec.isAccessible() && Config.onlyShowAccessibleEnderchests)
 				continue;
 
-			this.setItem(i, this.getItemStackOf(ec));
+			this.setItem(num - min, this.getItemStackOf(ec));
+		}
+
+		// Adding previous page item (if the user is not on the first page)
+		if (this.page > 1) {
+			this.removeItemAt(52);
+			this.setItem(52, PREV_PAGE_ITEM);
+			this.removeItemAt(53);
+		}
+		// Adding next page item (if there is more chests than the current page can display)
+		if (min + PER_PAGE < Config.maxEnderchests) {
+			this.removeItemAt(53);
+			this.setItem(53, NEXT_PAGE_ITEM);
 		}
 	}
 
 	@Override
 	public boolean onClick(Player player, int slot) {
 		EUtil.runSync(() -> {
-			EnderChest chest = this.manager.getEnderChest(this.owner, slot);
+			// Check for previous/next page
+			if (slot >= PER_PAGE && this.getItemAt(slot).getType() == Material.SKULL_ITEM) {
+				if (slot == PER_PAGE) this.page--;
+				else if (slot == PER_PAGE + 1) this.page++;
+
+				this.prepare();
+				this.updateInventory();
+				return;
+			}
+
+			// Check for a chest (with the slot and the index of the first chest in the menu)
+			EnderChest chest = this.manager.getEnderChest(this.owner, this.getFirstChestIndex() + slot);
 
 			// Reload the chest's metas before opening it.
 			// It allows to check if the player has kept his permission
@@ -145,6 +208,14 @@ public class EnderChestHubMenu extends AbstractMenu {
 			return ChatColor.GOLD;
 
 		return ChatColor.GREEN;
+	}
+
+	/**
+	 * Calculate the minimum chest's number in terms of the current page
+	 * @return The first chest's index for the current page
+	 */
+	private int getFirstChestIndex() {
+		return this.page == 1 ? 0 : Math.max(0, (this.page - 1) * PER_PAGE + 1);
 	}
 
 }

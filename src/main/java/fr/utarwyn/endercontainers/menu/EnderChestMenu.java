@@ -55,7 +55,7 @@ public class EnderChestMenu extends AbstractMenu {
 
 	@Override
 	public int getFilledSlotsNb() {
-		// Use the default enderchest to calculaate the filled slots.
+		// Use the default enderchest to calculate the filled slots.
 		if (this.enderChest.getNum() == 0 && Config.useVanillaEnderchest) {
 			Inventory chest = EUtil.getVanillaEnderchestOf(this.enderChest.getOwner());
 			assert chest != null;
