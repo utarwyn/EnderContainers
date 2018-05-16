@@ -72,12 +72,12 @@ public class EnderChestHubMenu extends AbstractMenu {
 	static {
 		SkullMeta prevSkullMeta = (SkullMeta) PREV_PAGE_ITEM.getItemMeta();
 		prevSkullMeta.setOwner("MHF_ArrowLeft");
-		prevSkullMeta.setDisplayName(ChatColor.RED + "≪ Previous page");
+		prevSkullMeta.setDisplayName(ChatColor.RED + Locale.menuPreviousPage);
 		PREV_PAGE_ITEM.setItemMeta(prevSkullMeta);
 
 		SkullMeta nextSkullMeta = (SkullMeta) NEXT_PAGE_ITEM.getItemMeta();
 		nextSkullMeta.setOwner("MHF_ArrowRight");
-		nextSkullMeta.setDisplayName(ChatColor.RED + "Next page ≫");
+		nextSkullMeta.setDisplayName(ChatColor.RED + Locale.menuNextPage);
 		NEXT_PAGE_ITEM.setItemMeta(nextSkullMeta);
 	}
 
@@ -109,7 +109,10 @@ public class EnderChestHubMenu extends AbstractMenu {
 			this.removeItemAt(53);
 		}
 		// Adding next page item (if there is more chests than the current page can display)
-		if (min + PER_PAGE < Config.maxEnderchests) {
+		int nbForNext = min + PER_PAGE;
+		if (this.page == 1) nbForNext += 2;
+
+		if (nbForNext < Config.maxEnderchests) {
 			this.removeItemAt(53);
 			this.setItem(53, NEXT_PAGE_ITEM);
 		}

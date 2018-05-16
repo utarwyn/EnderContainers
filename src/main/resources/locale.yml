@@ -44,6 +44,9 @@ menus:
   chest_full: '&cInventory full!'
   chest_locked: '&8&o>> Enderchest locked!'
 
+  previous_page: '&c≪ Previous page'
+  next_page: '&cNext page ≫'
+
 
 ##               ##
 #  Errors locale  #

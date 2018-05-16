@@ -96,6 +96,12 @@ public class Locale extends YamlLinker {
 	@Configurable(key = "menus.chest_locked")
 	public static String menuChestLocked;
 
+	@Configurable(key = "menus.previous_page")
+	public static String menuPreviousPage;
+
+	@Configurable(key = "menus.next_page")
+	public static String menuNextPage;
+
 	@Configurable(key = "errors.noperm_open_chest")
 	public static String nopermOpenChest;
 
