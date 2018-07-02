@@ -173,6 +173,14 @@ public abstract class AbstractMenu implements InventoryHolder {
 	}
 
 	/**
+	 * Destroy the menu when it becomes unused.
+	 */
+	public void destroy() {
+		this.clear();
+		Menus.unregisterMenu(this);
+	}
+
+	/**
 	 * Returns the generated inventory with items stored before
 	 * @return The generated inventory
 	 */

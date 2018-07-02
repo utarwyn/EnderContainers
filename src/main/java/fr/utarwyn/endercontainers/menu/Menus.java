@@ -11,8 +11,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages all menus of the plugin.
@@ -40,11 +40,21 @@ public class Menus implements Listener {
 	 */
 	static void registerMenu(AbstractMenu menu) {
 		if (menuSet == null) {
-			menuSet = new HashSet<>();
+			menuSet = ConcurrentHashMap.newKeySet();
 			Bukkit.getPluginManager().registerEvents(new Menus(), EnderContainers.getInstance());
 		}
 
 		menuSet.add(menu);
+	}
+
+	/**
+	 * Unregister an AbstractMenu to liberate memory
+	 * @param menu Menu to unregister
+	 */
+	static void unregisterMenu(AbstractMenu menu) {
+		if (menuSet != null) {
+			menuSet.remove(menu);
+		}
 	}
 
 	/**

@@ -153,8 +153,17 @@ public class EnderChest {
 	 * @see EnderChestPurgeTask Task which uses this method to clear unused data.
 	 * @return True if the chest is unused
 	 */
-	public boolean isUnused() {
+	boolean isUnused() {
 		return this.getOwnerPlayer() == null && this.container.getViewers().size() == 0;
+	}
+
+	/**
+	 * Destroys the container linked to this enderchest to liberate the memory.
+	 */
+	void destroyContainer() {
+		if (this.container != null) {
+			this.container.destroy();
+		}
 	}
 
 	/**

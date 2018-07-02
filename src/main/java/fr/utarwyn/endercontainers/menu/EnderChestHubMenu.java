@@ -152,7 +152,7 @@ public class EnderChestHubMenu extends AbstractMenu {
 
 	@Override
 	public void onClose(Player player) {
-
+		this.destroy();
 	}
 
 	/**

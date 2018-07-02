@@ -10,6 +10,7 @@ import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -146,14 +147,32 @@ public class EnderChestManager extends AbstractManager {
 	 * Method called by the {@link EnderChestPurgeTask} to delete unused chest objects in memory
 	 */
 	void deleteUnusedChests() {
-		this.enderchests.removeIf(EnderChest::isUnused);
+		Iterator<EnderChest> chestIterator = this.enderchests.iterator();
+
+		while (chestIterator.hasNext()) {
+			EnderChest chest = chestIterator.next();
+
+			if (chest.isUnused()) {
+				chest.destroyContainer();
+				chestIterator.remove();
+			}
+		}
 	}
 
 	/**
 	 * Purge all chests of a player from memory
 	 */
 	void deleteChestsOf(Player player) {
-		this.enderchests.removeIf(chest -> chest.getOwner().equals(player.getUniqueId()));
+		Iterator<EnderChest> chestIterator = this.enderchests.iterator();
+
+		while (chestIterator.hasNext()) {
+			EnderChest chest = chestIterator.next();
+
+			if (chest.getOwner().equals(player.getUniqueId())) {
+				chest.destroyContainer();
+				chestIterator.remove();
+			}
+		}
 	}
 
 }
