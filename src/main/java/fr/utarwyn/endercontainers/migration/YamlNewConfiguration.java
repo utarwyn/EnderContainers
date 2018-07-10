@@ -7,7 +7,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -16,8 +19,8 @@ import java.util.logging.Level;
  * The particularity of this one is that it supports comments!
  * Note that this implementation is not synchronized.
  *
- * @since 2.0.0
  * @author Utarwyn
+ * @since 2.0.0
  */
 public class YamlNewConfiguration extends YamlConfiguration {
 
@@ -36,6 +39,7 @@ public class YamlNewConfiguration extends YamlConfiguration {
 	/**
 	 * Save the configuration into a string object
 	 * and supports configuration comments!
+	 *
 	 * @return Configuration saved into a formatted string
 	 */
 	@Override
@@ -102,8 +106,8 @@ public class YamlNewConfiguration extends YamlConfiguration {
 	 *
 	 * @param contents Contents of a Configuration to load.
 	 * @throws InvalidConfigurationException Thrown if the specified string is
-	 *     invalid.
-	 * @throws IllegalArgumentException Thrown if contents is null.
+	 *                                       invalid.
+	 * @throws IllegalArgumentException      Thrown if contents is null.
 	 */
 	@Override
 	public void loadFromString(String contents) throws InvalidConfigurationException {
@@ -163,7 +167,7 @@ public class YamlNewConfiguration extends YamlConfiguration {
 	 * </p>
 	 *
 	 * @param configuration Configuration to apply on this one
- 	 * @param linkMap Link map used to connect old keys and new keys
+	 * @param linkMap       Link map used to connect old keys and new keys
 	 */
 	public void applyConfiguration(YamlConfiguration configuration, Map<String, String> linkMap) {
 		Object value;
@@ -199,6 +203,7 @@ public class YamlNewConfiguration extends YamlConfiguration {
 
 	/**
 	 * Apply a configuration section on this configuration
+	 *
 	 * @param section Configuration section to apply.
 	 */
 	private void applySection(ConfigurationSection section) {
@@ -238,35 +243,6 @@ public class YamlNewConfiguration extends YamlConfiguration {
 		} catch (FileNotFoundException ignored) {
 		} catch (IOException | InvalidConfigurationException ex) {
 			Bukkit.getLogger().log(Level.SEVERE, "Cannot load " + file, ex);
-		}
-
-		return config;
-	}
-
-	/**
-	 * Creates a new {@link YamlNewConfiguration}, loading from the given stream.
-	 * <p>
-	 * Any errors loading the Configuration will be logged and then ignored.
-	 * If the specified input is not a valid config, a blank config will be
-	 * returned.
-	 *
-	 * @param stream Input stream
-	 * @return Resulting configuration
-	 * @throws IllegalArgumentException Thrown if stream is null
-	 * @deprecated does not properly consider encoding
-	 * @see #load(InputStream)
-	 * @see #loadConfiguration(Reader)
-	 */
-	@Deprecated
-	public static YamlNewConfiguration loadConfiguration(InputStream stream) {
-		Validate.notNull(stream, "Stream cannot be null");
-
-		YamlNewConfiguration config = new YamlNewConfiguration();
-
-		try {
-			config.load(stream);
-		} catch (IOException | InvalidConfigurationException ex) {
-			Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", ex);
 		}
 
 		return config;

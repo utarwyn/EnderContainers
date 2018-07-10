@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.migration.migration2_0;
 
+import com.google.common.base.Charsets;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.migration.Migration;
 import fr.utarwyn.endercontainers.migration.YamlNewConfiguration;
@@ -7,6 +8,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,10 +86,12 @@ public abstract class Migration2_0 extends Migration {
 
 		YamlConfiguration oldConf;
 		YamlNewConfiguration newConf;
+		InputStreamReader localeStreamReader;
 
 		for (File localeFile : localeFiles) {
 			oldConf = YamlConfiguration.loadConfiguration(localeFile);
-			newConf = YamlNewConfiguration.loadConfiguration(EnderContainers.getInstance().getResource("locale.yml"));
+			localeStreamReader = new InputStreamReader(EnderContainers.getInstance().getResource("locale.yml"), Charsets.UTF_8);
+			newConf = YamlNewConfiguration.loadConfiguration(localeStreamReader);
 
 			// Apply old configuration on new configuration
 			newConf.applyConfiguration(oldConf, LOCALE_LINK_MAP);
@@ -97,6 +101,13 @@ public abstract class Migration2_0 extends Migration {
 			} catch (IOException e) {
 				e.printStackTrace();
 				return false;
+			} finally {
+				// Close the locale stream reader in any case
+				try {
+					localeStreamReader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
