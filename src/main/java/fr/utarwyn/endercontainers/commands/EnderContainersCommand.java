@@ -112,12 +112,15 @@ public class EnderContainersCommand implements CommandExecutor {
 
 					if (playerToSpec == null || !playerToSpec.isOnline()) {
 						UUID uuid = UUIDFetcher.getUUID(args[1]);
-						if (uuid != null)
+
+						if (uuid != null) {
 							this.chestManager.openHubMenuFor(uuid, player);
-						else
-							player.sendMessage(Config.PREFIX + "§cPlayer §6" + args[1] + " §cwas not found.");
-					} else
+						} else {
+							player.sendMessage(Config.PREFIX + "§cPlayer §6" + args[1] + " §cnot found.");
+						}
+					} else {
 						this.chestManager.openHubMenuFor(playerToSpec.getUniqueId(), player);
+					}
 				});
 
 				break;

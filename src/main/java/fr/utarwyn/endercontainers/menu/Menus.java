@@ -65,15 +65,25 @@ public class Menus implements Listener {
 	 */
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {
-		AbstractMenu menu = this.getMenuFromInventory(event.getInventory());
-		Player player = (Player) event.getWhoClicked();
-
-		if (menu == null || event.getSlot() < 0)
+		// We need to be sure that the top inventory of the current view exists!
+		if (event.getView().getTopInventory() == null) {
 			return;
-		if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
-			return;
+		}
 
-		event.setCancelled(menu.onClick(player, event.getSlot()));
+		// Only detect clicks inside the top inventory of the view!
+		Inventory inventory = event.getView().getTopInventory();
+
+		if (event.getRawSlot() < inventory.getSize()) {
+			AbstractMenu menu = this.getMenuFromInventory(inventory);
+			Player player = (Player) event.getWhoClicked();
+
+			if (menu == null || event.getSlot() < 0)
+				return;
+			if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
+				return;
+
+			event.setCancelled(menu.onClick(player, event.getSlot()));
+		}
 	}
 
 	/**
