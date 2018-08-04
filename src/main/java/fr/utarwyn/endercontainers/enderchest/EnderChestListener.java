@@ -56,10 +56,12 @@ public class EnderChestListener implements Listener {
 		Player player = e.getPlayer();
 		Block block = e.getClickedBlock();
 
-		if (block == null || player.isSneaking()) return;
-
 		// Right click on an ender chest?
-		if (block.getType().equals(Material.ENDER_CHEST)) {
+		if (block != null && block.getType().equals(Material.ENDER_CHEST)) {
+
+			// Player is in sneaking mode with item in the hand?
+			if (player.isSneaking() && !player.getInventory().getItemInMainHand().getType().equals(Material.AIR))
+				return;
 
 			// Plugin not enabled or world disabled in config?
 			if (!Config.enabled || Config.disabledWorlds.contains(player.getWorld().getName()))
@@ -123,6 +125,14 @@ public class EnderChestListener implements Listener {
 		Player player = (Player) event.getPlayer();
 		Inventory inventory = event.getInventory();
 
+		// Play the closing sound when we use the default enderchest!
+		if (inventory.getType().equals(InventoryType.ENDER_CHEST) && Config.useVanillaEnderchest) {
+			if (Config.globalSound)
+				EUtil.playSound(player.getLocation(), "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
+			else
+				EUtil.playSound(player, "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
+		}
+
 		/*
 		 * To save a vanilla enderchest of an offline player,
 		 * we need to force the writing of owner data on the disk
@@ -130,7 +140,7 @@ public class EnderChestListener implements Listener {
 		 * start the custom method.
 		 */
 		EUtil.runAsync(() -> {
-			if (inventory.getType() == InventoryType.ENDER_CHEST) {
+			if (inventory.getType().equals(InventoryType.ENDER_CHEST)) {
 				EnderChest chest = OfflineEnderChestMenu.getOpenedChestFor(player);
 
 				if (chest != null)
