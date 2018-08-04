@@ -175,7 +175,7 @@ public class EnderChest {
 	}
 
 	/**
-	 * Save the enderchest
+	 * Save the enderchest. This method has to be called asynchronously if possible!
 	 */
 	public void save() {
 		PlayerData pData = StorageWrapper.get(PlayerData.class, this.owner);

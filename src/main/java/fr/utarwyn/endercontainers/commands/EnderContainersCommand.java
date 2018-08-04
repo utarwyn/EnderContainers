@@ -221,6 +221,7 @@ public class EnderContainersCommand implements CommandExecutor {
 
 			case "npc":
 				Dependency dependency = EnderContainers.getInstance().getInstance(DependenciesManager.class).getDependencyByName("Citizens");
+
 				if (dependency != null) {
 					CitizensDependency dep = (CitizensDependency) dependency;
 					if (!(sender instanceof Player)) {

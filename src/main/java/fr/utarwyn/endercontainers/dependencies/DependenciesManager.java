@@ -71,6 +71,15 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	}
 
 	/**
+	 * Checks if a dependency is loaded or not.
+	 * @param dependencyName The dependency name used for the check
+	 * @return True if the dependency has been found, false otherwise.
+	 */
+	public boolean isDependencyLoaded(String dependencyName) {
+		return this.getDependencyByName(dependencyName) != null;
+	}
+
+	/**
 	 * Load each dependency if the needed plugin is enabled.
 	 */
 	private void loadDependencies() {
