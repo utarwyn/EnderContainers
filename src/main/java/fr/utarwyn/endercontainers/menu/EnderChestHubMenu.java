@@ -171,32 +171,59 @@ public class EnderChestHubMenu extends AbstractMenu {
 
 		if (!accessible) dyeColor = DyeColor.BLACK;
 
+		// TODO: maybe add an option to personalize the material here (instead of a glass pane)?
 		ItemStack itemstack = new ItemStack(Material.STAINED_GLASS_PANE, 1, dyeColor.getWoolData());
-		ChatColor titleColor = accessible ? ChatColor.GREEN : ChatColor.RED;
-
 		ItemMeta meta = itemstack.getItemMeta();
-		String counter = chatColor + "(" + ec.getSize() + "/" + ec.getMaxSize() + ")" + titleColor;
-		String percent = chatColor + "(" + String.format("%.0f", ec.getFillPercentage()*100) + "%)" + titleColor;
-
-		String metaTitle = titleColor + Locale.menuPaneTitle;
-
-		metaTitle = metaTitle.replace("%num%", String.valueOf(ec.getNum() + 1)).replace("%counter%", counter).replace("%percent%", percent);
-		meta.setDisplayName(metaTitle);
 
 		List<String> lore = new ArrayList<>();
 
+		// Update lore with the chest's status
+		// TODO: maybe allow users to integrally personalize the description!
 		if (!accessible)
 			lore.add(Locale.menuChestLocked);
-
 		if (ec.isFull())
 			lore.add(Locale.menuChestFull);
 		else if (ec.isEmpty())
 			lore.add(Locale.menuChestEmpty);
 
+		// Update itemstack metadata
+		meta.setDisplayName(this.formatPaneTitle(ec, Locale.menuPaneTitle));
 		meta.setLore(lore);
 
 		itemstack.setItemMeta(meta);
 		return itemstack;
+	}
+
+	/**
+	 * Format the pane title from the configuration to have info about an enderchest.
+	 *
+	 * @param chest Enderchest represented by the pane
+	 * @param title Original title got from the configuration
+	 * @return Formatted title ready to be displayed in the menu
+	 */
+	private String formatPaneTitle(EnderChest chest, String title) {
+		ChatColor fillingColor = this.getPercentageColor(chest.getFillPercentage());
+		ChatColor accessibilityColor = chest.isAccessible() ? ChatColor.GREEN : ChatColor.RED;
+
+		// Adding the color before all text
+		title = accessibilityColor + title;
+
+		// Separate all placeholders to improve performance
+		if (title.contains("%num%")) {
+			title = title.replace("%num%", String.valueOf(chest.getNum() + 1));
+		}
+
+		if (title.contains("%counter%")) {
+			title = title.replace("%counter%", fillingColor + "(" + chest.getSize() + "/" + chest.getMaxSize() + ")" + accessibilityColor);
+		}
+
+		if (title.contains("%percent%")) {
+			title = title.replace("%percent%", fillingColor + "(" + String.format("%.0f", chest.getFillPercentage() * 100) + "%)" + accessibilityColor);
+		}
+
+		// TODO: items number placeholder?
+
+		return title;
 	}
 
 	/**
