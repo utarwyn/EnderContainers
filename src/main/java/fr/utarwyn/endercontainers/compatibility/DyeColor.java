@@ -18,8 +18,8 @@ public enum DyeColor implements CompatibilityObject {
 	BLUE(ChatColor.DARK_BLUE),
 	BROWN(ChatColor.GOLD),
 	GREEN(ChatColor.DARK_GREEN),
-	RED(ChatColor.RED),
-	BLACK(ChatColor.DARK_RED);
+	RED(ChatColor.DARK_RED),
+	BLACK(ChatColor.BLACK);
 
 	private String oldDyeKey;
 

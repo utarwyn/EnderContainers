@@ -4,6 +4,7 @@ import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.compatibility.DyeColor;
 import fr.utarwyn.endercontainers.compatibility.MaterialHelper;
+import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.EUtil;
@@ -175,7 +176,7 @@ public class EnderChestHubMenu extends AbstractMenu {
 		if (!accessible) dyeColor = DyeColor.BLACK;
 
 		// TODO: maybe add an option to personalize the material here (instead of a glass pane)?
-		ItemStack itemstack = new ItemStack(MaterialHelper.match("STAINED_GLASS_PANE"), 1, dyeColor.get().getWoolData());
+		ItemStack itemstack = this.createGlassPaneItem(dyeColor);
 		ItemMeta meta = itemstack.getItemMeta();
 
 		List<String> lore = new ArrayList<>();
@@ -195,6 +196,20 @@ public class EnderChestHubMenu extends AbstractMenu {
 
 		itemstack.setItemMeta(meta);
 		return itemstack;
+	}
+
+	/**
+	 * Generate a glass pane itemstack with a color.
+	 *
+	 * @param dyeColor The color of the glass pane
+	 * @return The itemstack generated
+	 */
+	private ItemStack createGlassPaneItem(DyeColor dyeColor) {
+		if (ServerVersion.isOlderThan(ServerVersion.V1_13)) {
+			return new ItemStack(MaterialHelper.match("STAINED_GLASS_PANE"), 1, dyeColor.get().getWoolData());
+		} else {
+			return new ItemStack(MaterialHelper.match(dyeColor.name() + "_STAINED_GLASS_PANE"));
+		}
 	}
 
 	/**

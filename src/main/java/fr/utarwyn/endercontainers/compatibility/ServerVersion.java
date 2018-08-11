@@ -19,10 +19,12 @@ public enum ServerVersion {
 
 	private static ServerVersion currentVersion;
 
+	private static String bukkitVersion;
+
 	static {
 		// Getting the bukkit Server version!
 		String path = Bukkit.getServer().getClass().getPackage().getName();
-		String bukkitVersion = path.substring(path.lastIndexOf(".") + 1);
+		bukkitVersion = path.substring(path.lastIndexOf(".") + 1);
 
 		for (ServerVersion version : values()) {
 			if (bukkitVersion.startsWith(version.name().toLowerCase())) {
@@ -34,6 +36,10 @@ public enum ServerVersion {
 
 	public static ServerVersion get() {
 		return currentVersion;
+	}
+
+	public static String getBukkitVersion() {
+		return bukkitVersion;
 	}
 
 	public static boolean is(ServerVersion version) {
