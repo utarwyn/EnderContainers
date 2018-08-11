@@ -58,7 +58,7 @@ public class ItemSerializer {
 				StringBuilder serializedItemStack = new StringBuilder(new String("".getBytes(), Charset.forName("UTF-8")));
 
 				// Item type
-				String isType = String.valueOf(is.getType().name());
+				String isType = String.valueOf(is.getType());
 				serializedItemStack.append("t@").append(isType);
 
 				// Item durability

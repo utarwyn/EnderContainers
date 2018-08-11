@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static fr.utarwyn.endercontainers.compatibility.ServerVersion.V1_13;
 
 /**
- * Helper class for materials (to solve compatibility problems).
+ * Helper class to solve compatibility problems.
  *
  * @since 2.2.0
  * @author Utarwyn
@@ -129,7 +129,7 @@ public class CompatibilityHelper {
 
 	public static Enchantment enchantmentFromString(String value) {
 		if (!StringUtils.isNumeric(value)) { // Name or NamespacedKey
-			if (ServerVersion.is(V1_13)) {
+			if (ServerVersion.is(V1_13) && value.contains("!")) {
 				// New method to get en enchantment!
 				String[] parts = value.split("!");
 				return Enchantment.getByKey(new NamespacedKey(parts[0], parts[1]));
