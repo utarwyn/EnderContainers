@@ -1,10 +1,10 @@
 package fr.utarwyn.endercontainers.util;
 
 import fr.utarwyn.endercontainers.Config;
-import fr.utarwyn.endercontainers.compatibility.Enchantment;
-import fr.utarwyn.endercontainers.compatibility.MaterialHelper;
+import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -58,8 +58,7 @@ public class ItemSerializer {
 				StringBuilder serializedItemStack = new StringBuilder(new String("".getBytes(), Charset.forName("UTF-8")));
 
 				// Item type
-				// TODO: prefer using names instead of ids (deprecated in the Bukkit API)
-				String isType = String.valueOf(is.getType().getId());
+				String isType = String.valueOf(is.getType().name());
 				serializedItemStack.append("t@").append(isType);
 
 				// Item durability
@@ -75,11 +74,13 @@ public class ItemSerializer {
 				}
 
 				// Enchantments
-				Map<Enchantment, Integer> isEnch = Enchantment.wrapItemEnchantments(is);
+				Map<Enchantment, Integer> isEnch = is.getEnchantments();
+
 				if (isEnch.size() > 0) {
-					for (Map.Entry<Enchantment, Integer> ench : isEnch.entrySet()) {
-						// TODO: prefer using names instead of ids (deprecated in the Bukkit API)
-						serializedItemStack.append(":e@").append(ench.getKey().getId()).append("@").append(ench.getValue());
+					for (Map.Entry<Enchantment, Integer> entry : isEnch.entrySet()) {
+						serializedItemStack
+								.append(":e@").append(CompatibilityHelper.enchantmentToString(entry.getKey()))
+								.append("@").append(entry.getValue());
 					}
 				}
 
@@ -163,9 +164,9 @@ public class ItemSerializer {
 
 					// Material ids is an old way to store items, now we use material names (more reliable).
 					if (StringUtils.isNumeric(value)) {
-						material = MaterialHelper.fromId(Integer.valueOf(value));
+						material = CompatibilityHelper.materialFromId(Integer.valueOf(value));
 					} else {
-						material = MaterialHelper.match(value);
+						material = CompatibilityHelper.matchMaterial(value);
 					}
 
 					if (material == null) {
@@ -185,10 +186,10 @@ public class ItemSerializer {
 						} else
 							// Enchantments
 							if (itemAttribute[0].equals("e") && createdItemStack) {
-								Enchantment enchantment = Enchantment.fromId(Integer.valueOf(itemAttribute[1]));
+								Enchantment enchantment = CompatibilityHelper.enchantmentFromString(itemAttribute[1]);
 								int level = Integer.parseInt(itemAttribute[2]);
 
-								is.addUnsafeEnchantment(enchantment.get(), level);
+								is.addUnsafeEnchantment(enchantment, level);
 							} else
 								// Itemstack display name
 								if (itemAttribute[0].equals("n") && createdItemStack) {
