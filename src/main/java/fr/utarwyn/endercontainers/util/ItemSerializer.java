@@ -1,8 +1,10 @@
 package fr.utarwyn.endercontainers.util;
 
 import fr.utarwyn.endercontainers.Config;
+import fr.utarwyn.endercontainers.compatibility.Enchantment;
+import fr.utarwyn.endercontainers.compatibility.MaterialHelper;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -56,6 +58,7 @@ public class ItemSerializer {
 				StringBuilder serializedItemStack = new StringBuilder(new String("".getBytes(), Charset.forName("UTF-8")));
 
 				// Item type
+				// TODO: prefer using names instead of ids (deprecated in the Bukkit API)
 				String isType = String.valueOf(is.getType().getId());
 				serializedItemStack.append("t@").append(isType);
 
@@ -72,10 +75,13 @@ public class ItemSerializer {
 				}
 
 				// Enchantments
-				Map<Enchantment, Integer> isEnch = is.getEnchantments();
-				if (isEnch.size() > 0)
-					for (Map.Entry<Enchantment, Integer> ench : isEnch.entrySet())
+				Map<Enchantment, Integer> isEnch = Enchantment.wrapItemEnchantments(is);
+				if (isEnch.size() > 0) {
+					for (Map.Entry<Enchantment, Integer> ench : isEnch.entrySet()) {
+						// TODO: prefer using names instead of ids (deprecated in the Bukkit API)
 						serializedItemStack.append(":e@").append(ench.getKey().getId()).append("@").append(ench.getValue());
+					}
+				}
 
 				// Display name
 				if (is.getItemMeta().getDisplayName() != null) {
@@ -145,17 +151,28 @@ public class ItemSerializer {
 			int stackPosition = Integer.valueOf(serializedBlock[0]);
 
 			ItemStack is = null;
-			Boolean createdItemStack = false;
+			boolean createdItemStack = false;
 
 			String[] serializedItemStack = serializedBlock[1].split("(?<!\\\\):");
 			for (String itemInfo : serializedItemStack) {
 				String[] itemAttribute = itemInfo.split("(?<!\\\\)@");
 				// Item type
 				if (itemAttribute[0].equals("t")) {
-					Material mat = Material.getMaterial(Integer.valueOf(itemAttribute[1]));
-					if (mat == null) continue;
+					String value = itemAttribute[1];
+					Material material;
 
-					is = new ItemStack(mat);
+					// Material ids is an old way to store items, now we use material names (more reliable).
+					if (StringUtils.isNumeric(value)) {
+						material = MaterialHelper.fromId(Integer.valueOf(value));
+					} else {
+						material = MaterialHelper.match(value);
+					}
+
+					if (material == null) {
+						continue;
+					}
+
+					is = new ItemStack(material);
 					createdItemStack = true;
 				} else
 					// Item durability
@@ -168,10 +185,10 @@ public class ItemSerializer {
 						} else
 							// Enchantments
 							if (itemAttribute[0].equals("e") && createdItemStack) {
-								Enchantment enchantment = Enchantment.getById(Integer.valueOf(itemAttribute[1]));
-								Integer level = Integer.valueOf(itemAttribute[2]);
+								Enchantment enchantment = Enchantment.fromId(Integer.valueOf(itemAttribute[1]));
+								int level = Integer.parseInt(itemAttribute[2]);
 
-								is.addUnsafeEnchantment(enchantment, level);
+								is.addUnsafeEnchantment(enchantment.get(), level);
 							} else
 								// Itemstack display name
 								if (itemAttribute[0].equals("n") && createdItemStack) {

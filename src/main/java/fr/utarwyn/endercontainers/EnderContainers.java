@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.commands.EnderChestCommand;
 import fr.utarwyn.endercontainers.commands.EnderContainersCommand;
+import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 import fr.utarwyn.endercontainers.database.MysqlManager;
 import fr.utarwyn.endercontainers.dependencies.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
@@ -70,6 +71,12 @@ public class EnderContainers extends JavaPlugin {
 
 		// Load metrics (bStats) ...
 		new Metrics(this);
+
+		// Test!
+		ServerVersion.isOlderThan(ServerVersion.V1_8);
+		ServerVersion.isOlderThan(ServerVersion.V1_9);
+		ServerVersion.isOlderThan(ServerVersion.V1_12);
+		ServerVersion.isOlderThan(ServerVersion.V1_13);
 	}
 
 	/**

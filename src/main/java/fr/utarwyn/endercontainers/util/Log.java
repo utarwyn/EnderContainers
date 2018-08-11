@@ -38,6 +38,14 @@ public class Log {
 	}
 
 	/**
+	 * Send a warning message to the console
+	 * @param message Message to send
+	 */
+	public static void warn(String message) {
+		logger.log(Level.WARNING, message);
+	}
+
+	/**
 	 * Send an info message to the console only in debug mode
 	 * @param message Message to send
 	 */

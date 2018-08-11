@@ -2,13 +2,14 @@ package fr.utarwyn.endercontainers.menu;
 
 import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.compatibility.DyeColor;
+import fr.utarwyn.endercontainers.compatibility.MaterialHelper;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.EUtil;
 import fr.utarwyn.endercontainers.util.Locale;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -32,15 +33,17 @@ public class EnderChestHubMenu extends AbstractMenu {
 	 */
 	private static final int PER_PAGE = 52;
 
+	private static final Material SKULL_MATERIAL = MaterialHelper.match("SKULL_ITEM");
+
 	/**
 	 * Represents the item to go to the previous page
 	 */
-	private static final ItemStack PREV_PAGE_ITEM = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+	private static final ItemStack PREV_PAGE_ITEM = new ItemStack(SKULL_MATERIAL, 1, (short) 3);
 
 	/**
 	 * Represents the item to go to the next page
 	 */
-	private static final ItemStack NEXT_PAGE_ITEM = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+	private static final ItemStack NEXT_PAGE_ITEM = new ItemStack(SKULL_MATERIAL, 1, (short) 3);
 
 	/**
 	 * The enderchest manager
@@ -122,7 +125,7 @@ public class EnderChestHubMenu extends AbstractMenu {
 	public boolean onClick(Player player, int slot) {
 		EUtil.runSync(() -> {
 			// Check for previous/next page
-			if (slot >= PER_PAGE && this.getItemAt(slot).getType() == Material.SKULL_ITEM) {
+			if (slot >= PER_PAGE && this.getItemAt(slot).getType() == SKULL_MATERIAL) {
 				if (slot == PER_PAGE) this.page--;
 				else if (slot == PER_PAGE + 1) this.page++;
 
@@ -167,12 +170,12 @@ public class EnderChestHubMenu extends AbstractMenu {
 		double fillPerc = ec.getFillPercentage();
 
 		ChatColor chatColor = this.getPercentageColor(fillPerc);
-		DyeColor dyeColor = EUtil.getDyeColorFromChatColor(chatColor);
+		DyeColor dyeColor = DyeColor.fromChatColor(chatColor);
 
 		if (!accessible) dyeColor = DyeColor.BLACK;
 
 		// TODO: maybe add an option to personalize the material here (instead of a glass pane)?
-		ItemStack itemstack = new ItemStack(Material.STAINED_GLASS_PANE, 1, dyeColor.getWoolData());
+		ItemStack itemstack = new ItemStack(MaterialHelper.match("STAINED_GLASS_PANE"), 1, dyeColor.get().getWoolData());
 		ItemMeta meta = itemstack.getItemMeta();
 
 		List<String> lore = new ArrayList<>();

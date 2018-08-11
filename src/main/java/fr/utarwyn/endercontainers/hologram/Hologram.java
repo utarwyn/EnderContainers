@@ -87,8 +87,9 @@ class Hologram {
 	private Object destroyPacket;
 
 	static {
+		// TODO: use the ServerVersion class!
 		String path = Bukkit.getServer().getClass().getPackage().getName();
-		version = path.substring(path.lastIndexOf(".") + 1, path.length());
+		version = path.substring(path.lastIndexOf(".") + 1);
 
 		try {
 			Class<?> worldClass = Class.forName("net.minecraft.server." + version + ".World");
