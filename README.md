@@ -1,13 +1,14 @@
 # EnderContainers v2.1.0
 [![Plugin's logo](https://www.spigotmc.org/attachments/logo-png.25339/)](https://www.spigotmc.org/resources/endercontainers-1-8-x-to-1-10-x.4750/)
 
-[![Travis](https://img.shields.io/travis/utarwyn/EnderContainers.svg?style=flat-square)](https://travis-ci.org/utarwyn/EnderContainers) [![Github All Releases](https://img.shields.io/badge/dynamic/json.svg?label=Spigot%20downloads&colorB=ff69b4&prefix=&suffix=&query=$.downloads&uri=https%3A%2F%2Fapi.spiget.org%2Fv2%2Fresources%2F4750&style=flat-square)](https://www.spigotmc.org/resources/endercontainers-1-8-x-to-1-10-x.4750/) ![Minecraft](https://img.shields.io/badge/Minecraft-1.8--1.12.2-red.svg?style=flat-square) \
+[![Travis](https://img.shields.io/travis/utarwyn/EnderContainers.svg?style=flat-square)](https://travis-ci.org/utarwyn/EnderContainers) [![Github All Releases](https://img.shields.io/badge/dynamic/json.svg?label=Spigot%20downloads&colorB=ff69b4&prefix=&suffix=&query=$.downloads&uri=https%3A%2F%2Fapi.spiget.org%2Fv2%2Fresources%2F4750&style=flat-square)](https://www.spigotmc.org/resources/endercontainers-1-8-x-to-1-10-x.4750/) ![Minecraft](https://img.shields.io/badge/Minecraft-1.8--1.13-red.svg?style=flat-square) \
 [![GitHub last commit (branch)](https://img.shields.io/github/last-commit/utarwyn/endercontainers/master.svg?style=flat-square)](https://github.com/utarwyn/EnderContainers/commits/master) [![license](https://img.shields.io/github/license/utarwyn/endercontainers.svg?style=flat-square)](https://github.com/utarwyn/EnderContainers/blob/master/LICENSE) \
 \
 EnderContainers is a Bukkit/Spigot plugin (MineCraft) which allows you to create multiple enderchests in one simply.
 Long live the enderchests!
 
-**Works with Bukkit/Spigot 1.8.X, 1.9.X, 1.10.X, 1.11.X and 1.12.X!**
+**Works with Bukkit/Spigot 1.8.X, 1.9.X, 1.10.X, 1.11.X, 1.12.X and 1.13!**\
+:warning: **1.13 support version is still under development!**
 
 ### Features
 

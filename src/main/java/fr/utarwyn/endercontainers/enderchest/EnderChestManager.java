@@ -89,7 +89,7 @@ public class EnderChestManager extends AbstractManager {
 	public int getEnderchestsNbOf(UUID owner) {
 		int nb = 0;
 
-		for (int i = 0; i < Math.min(Config.maxEnderchests, 54); i++) {
+		for (int i = 0; i < Config.maxEnderchests; i++) {
 			EnderChest ec = this.getEnderChest(owner, i);
 			// Reload chest information before display the hologram.
 			ec.reloadMeta();

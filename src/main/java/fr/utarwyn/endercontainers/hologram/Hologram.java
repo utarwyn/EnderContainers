@@ -1,6 +1,6 @@
 package fr.utarwyn.endercontainers.hologram;
 
-import org.bukkit.Bukkit;
+import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -27,11 +27,6 @@ class Hologram {
 	private static final double ABS = 0.23D;
 
 	/**
-	 * Field which stores the version of the Bukkit server
-	 */
-	private static String version;
-
-	/**
 	 * Reflection NMS Entity class
 	 */
 	private static Class<?> nmsEntity;
@@ -55,6 +50,16 @@ class Hologram {
 	 * Reflection EntityLiving class
 	 */
 	private static Class<?> entityLivingClass;
+
+	/**
+	 * CraftChatMessages class for 1.13 holograms
+	 */
+	private static Class<?> chatMessageClass;
+
+	/**
+	 * IChatBaseComponent class for 1.13 holograms
+	 */
+	private static Class<?> chatBaseComponentClass;
 
 	/**
 	 * Constructor of the ArmorStand class
@@ -87,8 +92,7 @@ class Hologram {
 	private Object destroyPacket;
 
 	static {
-		String path = Bukkit.getServer().getClass().getPackage().getName();
-		version = path.substring(path.lastIndexOf(".") + 1, path.length());
+		String version = ServerVersion.getBukkitVersion();
 
 		try {
 			Class<?> worldClass = Class.forName("net.minecraft.server." + version + ".World");
@@ -101,6 +105,12 @@ class Hologram {
 			entityLivingClass = Class.forName("net.minecraft.server." + version + ".EntityLiving");
 			armorStandConstructor = armorStandClass.getConstructor(worldClass);
 			destroyPacketConstructor = destroyPacketClass.getConstructor(int[].class);
+
+			// Two classes used to format messages for holograms (only with the 1.13 version)
+			if (ServerVersion.is(ServerVersion.V1_13)) {
+				chatMessageClass = Class.forName("org.bukkit.craftbukkit." + version + ".util.CraftChatMessage");
+				chatBaseComponentClass = Class.forName("net.minecraft.server." + version + ".IChatBaseComponent");
+			}
 
 			nmsPacket = Class.forName("net.minecraft.server." + version + ".Packet");
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
@@ -189,13 +199,21 @@ class Hologram {
 			Method getHandleMethod = craftWorldObj.getClass().getMethod("getHandle");
 			Object entityObject = armorStandConstructor.newInstance(getHandleMethod.invoke(craftWorldObj));
 
-			Method setCustomName = entityObject.getClass().getMethod("setCustomName", String.class);
-			setCustomName.invoke(entityObject, text);
+			if (ServerVersion.is(ServerVersion.V1_13)) {
+				Method fromStringOrNullMethod = chatMessageClass.getMethod("fromStringOrNull", String.class);
+				Object chatComponent = fromStringOrNullMethod.invoke(null, text);
+
+				Method setCustomName = entityObject.getClass().getMethod("setCustomName", chatBaseComponentClass);
+				setCustomName.invoke(entityObject, chatComponent);
+			} else {
+				Method setCustomName = entityObject.getClass().getMethod("setCustomName", String.class);
+				setCustomName.invoke(entityObject, text);
+			}
 
 			Method setCustomNameVisible = nmsEntity.getMethod("setCustomNameVisible", boolean.class);
 			setCustomNameVisible.invoke(entityObject, true);
 
-			if (version.startsWith("v1_8") || version.startsWith("v1_9")) { // 1.8 / 1.9
+			if (ServerVersion.isOlderThan(ServerVersion.V1_10)) { // 1.8 / 1.9
 				Method setGravity = entityObject.getClass().getMethod("setGravity", boolean.class);
 				setGravity.invoke(entityObject, false);
 			} else {                          // 1.10+

@@ -2,6 +2,8 @@ package fr.utarwyn.endercontainers.menu;
 
 import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
+import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.EUtil;
@@ -33,14 +35,19 @@ public class EnderChestHubMenu extends AbstractMenu {
 	private static final int PER_PAGE = 52;
 
 	/**
+	 * Bukkit skull material
+	 */
+	private static final Material SKULL_MATERIAL;
+
+	/**
 	 * Represents the item to go to the previous page
 	 */
-	private static final ItemStack PREV_PAGE_ITEM = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+	private static final ItemStack PREV_PAGE_ITEM;
 
 	/**
 	 * Represents the item to go to the next page
 	 */
-	private static final ItemStack NEXT_PAGE_ITEM = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+	private static final ItemStack NEXT_PAGE_ITEM;
 
 	/**
 	 * The enderchest manager
@@ -70,6 +77,15 @@ public class EnderChestHubMenu extends AbstractMenu {
 	}
 
 	static {
+		if (ServerVersion.is(ServerVersion.V1_13)) {
+			SKULL_MATERIAL = Material.PLAYER_HEAD;
+		} else {
+			SKULL_MATERIAL = CompatibilityHelper.matchMaterial("SKULL_ITEM");
+		}
+
+		PREV_PAGE_ITEM = new ItemStack(SKULL_MATERIAL, 1, (short) 3);
+		NEXT_PAGE_ITEM = new ItemStack(SKULL_MATERIAL, 1, (short) 3);
+
 		SkullMeta prevSkullMeta = (SkullMeta) PREV_PAGE_ITEM.getItemMeta();
 		prevSkullMeta.setOwner("MHF_ArrowLeft");
 		prevSkullMeta.setDisplayName(ChatColor.RED + Locale.menuPreviousPage);
@@ -122,7 +138,7 @@ public class EnderChestHubMenu extends AbstractMenu {
 	public boolean onClick(Player player, int slot) {
 		EUtil.runSync(() -> {
 			// Check for previous/next page
-			if (slot >= PER_PAGE && this.getItemAt(slot).getType() == Material.SKULL_ITEM) {
+			if (slot >= PER_PAGE && this.getItemAt(slot).getType() == SKULL_MATERIAL) {
 				if (slot == PER_PAGE) this.page--;
 				else if (slot == PER_PAGE + 1) this.page++;
 
@@ -164,16 +180,18 @@ public class EnderChestHubMenu extends AbstractMenu {
 	 */
 	private ItemStack getItemStackOf(EnderChest ec) {
 		boolean accessible = ec.isAccessible();
-		double fillPerc = ec.getFillPercentage();
+		DyeColor dyeColor = ec.isAccessible() ? this.getDyePercentageColor(ec.getFillPercentage()) : DyeColor.BLACK;
 
-		ChatColor chatColor = this.getPercentageColor(fillPerc);
-		DyeColor dyeColor = EUtil.getDyeColorFromChatColor(chatColor);
-
-		if (!accessible) dyeColor = DyeColor.BLACK;
+		ItemStack itemStack;
 
 		// TODO: maybe add an option to personalize the material here (instead of a glass pane)?
-		ItemStack itemstack = new ItemStack(Material.STAINED_GLASS_PANE, 1, dyeColor.getWoolData());
-		ItemMeta meta = itemstack.getItemMeta();
+		if (ServerVersion.is(ServerVersion.V1_13)) {
+			itemStack = new ItemStack(CompatibilityHelper.matchMaterial(dyeColor.name() + "_STAINED_GLASS_PANE"));
+		} else {
+			itemStack = new ItemStack(CompatibilityHelper.matchMaterial("STAINED_GLASS_PANE"), 1, dyeColor.getWoolData());
+		}
+
+		ItemMeta meta = itemStack.getItemMeta();
 
 		List<String> lore = new ArrayList<>();
 
@@ -190,8 +208,8 @@ public class EnderChestHubMenu extends AbstractMenu {
 		meta.setDisplayName(this.formatPaneTitle(ec, Locale.menuPaneTitle));
 		meta.setLore(lore);
 
-		itemstack.setItemMeta(meta);
-		return itemstack;
+		itemStack.setItemMeta(meta);
+		return itemStack;
 	}
 
 	/**
@@ -238,6 +256,20 @@ public class EnderChestHubMenu extends AbstractMenu {
 			return ChatColor.GOLD;
 
 		return ChatColor.GREEN;
+	}
+
+	/**
+	 * Get the dye color in terms of a percentage between 0 and 1
+	 * @param perc The percentage
+	 * @return The dye color used for the itemstack
+	 */
+	private DyeColor getDyePercentageColor(double perc) {
+		if (perc >= 1)
+			return DyeColor.RED;
+		if (perc >= .5)
+			return DyeColor.ORANGE;
+
+		return DyeColor.LIME;
 	}
 
 	/**

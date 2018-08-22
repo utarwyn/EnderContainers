@@ -1,8 +1,9 @@
 package fr.utarwyn.endercontainers.util;
 
-import com.google.common.collect.Maps;
 import fr.utarwyn.endercontainers.EnderContainers;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -10,7 +11,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -23,47 +23,9 @@ import java.util.UUID;
 public class EUtil {
 
 	/**
-	 * A map to store relations between dye colors and chat colors
-	 */
-	private static Map<DyeColor, ChatColor> dyeChatMap;
-
-	/**
 	 * It's an utility class. It cannot be instanciated.
 	 */
 	private EUtil() {  }
-
-	static {
-		dyeChatMap = Maps.newHashMap();
-		dyeChatMap.put(DyeColor.BLACK, ChatColor.DARK_GRAY);
-		dyeChatMap.put(DyeColor.BLUE, ChatColor.DARK_BLUE);
-		dyeChatMap.put(DyeColor.BROWN, ChatColor.GOLD);
-		dyeChatMap.put(DyeColor.CYAN, ChatColor.AQUA);
-		dyeChatMap.put(DyeColor.GRAY, ChatColor.GRAY);
-		dyeChatMap.put(DyeColor.GREEN, ChatColor.DARK_GREEN);
-		dyeChatMap.put(DyeColor.LIGHT_BLUE, ChatColor.BLUE);
-		dyeChatMap.put(DyeColor.LIME, ChatColor.GREEN);
-		dyeChatMap.put(DyeColor.MAGENTA, ChatColor.LIGHT_PURPLE);
-		dyeChatMap.put(DyeColor.ORANGE, ChatColor.GOLD);
-		dyeChatMap.put(DyeColor.PINK, ChatColor.LIGHT_PURPLE);
-		dyeChatMap.put(DyeColor.PURPLE, ChatColor.DARK_PURPLE);
-		dyeChatMap.put(DyeColor.RED, ChatColor.DARK_RED);
-		dyeChatMap.put(DyeColor.SILVER, ChatColor.GRAY);
-		dyeChatMap.put(DyeColor.WHITE, ChatColor.WHITE);
-		dyeChatMap.put(DyeColor.YELLOW, ChatColor.YELLOW);
-	}
-
-	/**
-	 * Gets a dye color from a chat color. That's all.
-	 * @param chatColor The chat color
-	 * @return Dye color related or null
-	 */
-	public static DyeColor getDyeColorFromChatColor(ChatColor chatColor) {
-		for (Map.Entry<DyeColor, ChatColor> entry : dyeChatMap.entrySet())
-			if (entry.getValue().equals(chatColor))
-				return entry.getKey();
-
-		return null;
-	}
 
 	/**
 	 * Gets the content size of an inventory (filled slots)
