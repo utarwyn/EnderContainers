@@ -11,14 +11,14 @@ commands:
 
   backups:
     created: '&aBackup created with the name &b%backup%&a.'
-    creation_starting: 'Starting backup creation...'
-    exists: 'Backup &6%backup% &calready exists. Please change name.'
-    info: '&7To show information about a backup: &c%command%'
-    loaded: '&aBackup &b%backup%&a loaded indefinitly.'
-    loading_starting: 'Starting backup loading...'
-    removed: '&aBackup &b%backup%&a removed.'
-    unknown: 'Backup &6%backup%&c is undefined.'
-    zero: '&cNo backups. Create backups : &6%command%'
+    creation_starting: 'Starting backup creation in the background...'
+    exists: 'Backup &6%backup% &calready exists. Please choose another name.'
+    info: '&6%command% &7to have more information about a backup.'
+    loaded: '&aHooray! Backup &b%backup%&a successfully loaded!'
+    loading_starting: 'Starting backup loading in the background...'
+    removed: '&aBackup &b%backup%&a removed with all of its data.'
+    unknown: 'Backup &6%backup%&c not found.'
+    zero: '&cNo backup. Use &6%command% option to create your first backup!'
 
     label_name: 'Name'
     label_date: 'Creation date'
@@ -28,7 +28,6 @@ commands:
 
   config_reloaded: 'Configuration reloaded!'
   no_update: 'There is no update at this time. Retry later.'
-  unknown: 'Unknown command'
 
 
 ##              ##
@@ -55,7 +54,7 @@ errors:
 
   noperm_open_chest: 'You can''t open this EnderChest!'
   noperm_console: 'You must be a player to do this!'
-  noperm_player: 'You haven''t the permission to do that!'
+  noperm_player: 'You don''t have the permission to do this!'
   plugin_disabled: 'Plugin is actually disabled. Please enable it from the config!'
   plugin_world_disabled: 'Plugin is disabled in this world.'
 

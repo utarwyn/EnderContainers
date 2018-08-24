@@ -75,9 +75,6 @@ public class Locale extends YamlLinker {
 	@Configurable(key = "commands.no_update")
 	public static String noUpdate;
 
-	@Configurable(key = "commands.unknown")
-	public static String cmdUnknown;
-
 	@Configurable(key = "menus.main_title")
 	public static String menuMainTitle;
 
