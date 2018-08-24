@@ -40,6 +40,15 @@ public class Log {
 	/**
 	 * Send a warning message to the console
 	 * @param message Message to send
+	 * @param exception Exception that causes this warn.
+	 */
+	public static void warn(String message, Exception exception) {
+		logger.log(Level.WARNING, message, exception);
+	}
+
+	/**
+	 * Send a warning message to the console
+	 * @param message Message to send
 	 */
 	public static void warn(String message) {
 		logger.log(Level.WARNING, message);

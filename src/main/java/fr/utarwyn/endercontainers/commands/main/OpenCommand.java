@@ -1,26 +1,31 @@
-package fr.utarwyn.endercontainers.commands;
+package fr.utarwyn.endercontainers.commands.main;
 
 import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.commands.AbstractCommand;
 import fr.utarwyn.endercontainers.commands.parameter.Parameter;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.EUtil;
 import fr.utarwyn.endercontainers.util.Locale;
 import fr.utarwyn.endercontainers.util.PluginMsg;
-import org.bukkit.ChatColor;
+import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class EnderchestCommand extends AbstractCommand {
+import java.util.UUID;
+
+public class OpenCommand extends AbstractCommand {
 
 	private EnderChestManager manager;
 
-	public EnderchestCommand() {
-		super("enderchest", "ec", "endchest");
+	public OpenCommand() {
+		super("open");
 
 		this.manager = EnderContainers.getInstance().getInstance(EnderChestManager.class);
 
-		this.addParameter(Parameter.INT.optional());
+		this.setPermission(Config.PERM_PREFIX + "openchests");
+		this.addParameter(Parameter.STRING.withPlayersCompletion());
 	}
 
 	@Override
@@ -35,29 +40,21 @@ public class EnderchestCommand extends AbstractCommand {
 			return;
 		}
 
-		Integer argument = this.readArgOrDefault(null);
-		int chestNumber = (argument != null) ? argument - 1 : -1;
-
-		if (argument != null && (chestNumber < 0 || chestNumber >= Config.maxEnderchests)) {
-			PluginMsg.accessDenied(player);
-			return;
-		}
+		String toInspect = this.readArg();
 
 		EUtil.runAsync(() -> {
-			if (argument == null) {
-				if (EUtil.playerHasPerm(player, "cmd.enderchests")) {
-					this.manager.openHubMenuFor(player);
+			Player playerToSpec = Bukkit.getPlayer(toInspect);
+
+			if (playerToSpec == null || !playerToSpec.isOnline()) {
+				UUID uuid = UUIDFetcher.getUUID(toInspect);
+
+				if (uuid != null) {
+					this.manager.openHubMenuFor(uuid, player);
 				} else {
-					PluginMsg.accessDenied(player);
+					player.sendMessage(Config.PREFIX + "§cPlayer §6" + toInspect + " §cnot found.");
 				}
 			} else {
-				if (EUtil.playerHasPerm(player, "cmd.enderchests") || EUtil.playerHasPerm(player, "cmd.enderchest." + chestNumber)) {
-					if (!this.manager.openEnderchestFor(player, chestNumber)) {
-						this.sendTo(player, ChatColor.RED + Locale.nopermOpenChest);
-					}
-				} else {
-					PluginMsg.accessDenied(player);
-				}
+				this.manager.openHubMenuFor(playerToSpec.getUniqueId(), player);
 			}
 		});
 	}

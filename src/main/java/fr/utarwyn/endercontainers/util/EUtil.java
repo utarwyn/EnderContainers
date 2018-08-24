@@ -43,6 +43,17 @@ public class EUtil {
 	}
 
 	/**
+	 * Method to clamp a value
+	 * @param val Value
+	 * @param min Minimum
+	 * @param max Maximum
+	 * @return The clamped value
+	 */
+	public static int clamp(int val, int min, int max) {
+		return Math.max(min, Math.min(max, val));
+	}
+
+	/**
 	 * Plays a sound at a specific location with support of 1.8 sound and 1.9+ sound.
 	 * @param location Location where to play the sound
 	 * @param sound18 Sound string for 1.8 versions

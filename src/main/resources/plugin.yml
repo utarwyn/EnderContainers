@@ -4,12 +4,3 @@ version: 2.1.0
 main: fr.utarwyn.endercontainers.EnderContainers
 api-version: 1.13
 softdepend: [Factions, PlotSquared, Citizens]
-commands:
-  endercontainers:
-    aliases: [enderc, endc, enc, ecp]
-    description: Main command of the EnderContainers plugin
-    usage: "Usage: /endercontainers help"
-  enderchest:
-    aliases: [ec, enderc, enderch, echest, endchest]
-    description: Allow you to open an enderchest anywhere
-    usage: "Usage: /enderchest [number]"

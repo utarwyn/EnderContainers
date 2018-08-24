@@ -1,8 +1,9 @@
 package fr.utarwyn.endercontainers;
 
 import fr.utarwyn.endercontainers.backup.BackupManager;
-import fr.utarwyn.endercontainers.commands.EnderChestCommand;
-import fr.utarwyn.endercontainers.commands.EnderContainersCommand;
+import fr.utarwyn.endercontainers.commands.AbstractCommand;
+import fr.utarwyn.endercontainers.commands.EnderchestCommand;
+import fr.utarwyn.endercontainers.commands.MainCommand;
 import fr.utarwyn.endercontainers.database.MysqlManager;
 import fr.utarwyn.endercontainers.dependencies.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
@@ -61,8 +62,8 @@ public class EnderContainers extends JavaPlugin {
 			return;
 
 		// Load commands ...
-		getCommand("endercontainers").setExecutor(new EnderContainersCommand());
-		getCommand("enderchest").setExecutor(new EnderChestCommand());
+		AbstractCommand.register(new MainCommand());
+		AbstractCommand.register(new EnderchestCommand());
 
 		// Check for update if needed ...
 		if (Config.updateChecker)

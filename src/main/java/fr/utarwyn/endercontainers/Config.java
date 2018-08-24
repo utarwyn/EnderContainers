@@ -34,6 +34,11 @@ public class Config extends YamlLinker {
 	 */
 	public static final String PREFIX = "§8[§6EnderContainers§8] §7";
 
+	/**
+	 * Prefix for all permissions of the plugin
+	 */
+	public static final String PERM_PREFIX = "endercontainers.";
+
 	@Configurable
 	public static boolean enabled;
 
