@@ -49,7 +49,7 @@ public class FactionsDependency extends Dependency {
 	 */
 	@Override
 	public void onDisable() {
-
+		this.factionHook = null;
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class FactionsDependency extends Dependency {
 	 */
 	@Override
 	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
-		return this.factionHook.onBlockChestOpened(block, player, sendMessage);
+		return this.factionHook == null || this.factionHook.onBlockChestOpened(block, player, sendMessage);
 	}
 
 }

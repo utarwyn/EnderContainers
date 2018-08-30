@@ -320,6 +320,48 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 	 * @param command Object to register inside the Bukkit server
 	 */
 	public static void register(AbstractCommand command) {
+		if (getCommandMap() == null) {
+			return;
+		}
+
+		getCommandMap().register("endercontainers", command);
+	}
+
+	/**
+	 * Unregister an exisiting command registered from another plugin.
+	 * This method also removes all aliases of the command.
+	 *
+	 * @param command Command to unregister completely from the server.
+	 */
+	public static void unregister(PluginCommand command) {
+		if (getCommandMap() == null) {
+			return;
+		}
+
+		try {
+			CommandMap map = getCommandMap();
+			Field fKownCmds = map.getClass().getDeclaredField("knownCommands");
+
+			fKownCmds.setAccessible(true);
+			HashMap<String, Command> knownCmds = (HashMap<String, Command>) fKownCmds.get(map);
+			fKownCmds.setAccessible(false);
+
+			knownCmds.remove(command.getName());
+			for (String alias : command.getAliases()){
+				if(knownCmds.containsKey(alias) && knownCmds.get(alias).toString().contains(command.getName())){
+					knownCmds.remove(alias);
+				}
+			}
+		} catch (Exception ex) {
+			Log.warn("Cannot unregister the command " + command.getName() +  " from the server!", ex);
+		}
+	}
+
+	/**
+	 * This method returns the command map of the server!
+	 * @return The Bukkit internal Command map
+	 */
+	private static CommandMap getCommandMap() {
 		// Get the command map of the server first!
 		if (commandMap == null) {
 			try {
@@ -331,11 +373,11 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 				fMap.setAccessible(false);
 			} catch (Exception ex) {
 				Log.warn("Cannot fetch the command map from the server!", ex);
-				return;
+				return null;
 			}
 		}
 
-		commandMap.register("endercontainers", command);
+		return commandMap;
 	}
 
 }

@@ -7,19 +7,24 @@ import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class which manage all the dependencies of the plugin.
- * @since 1.0.3
+ *
  * @author Utarwyn
+ * @since 1.0.3
  */
 public class DependenciesManager extends AbstractManager implements DependencyListener {
 
 	/**
 	 * A field which represents all plugins supported by EnderContainers as dependency.
 	 */
-	private static final String[] DEPENDENCIES_NAMES = new String[] { "Factions", "WorldGuard", "Citizens", "PlotSquared" };
+	private static final String[] DEPENDENCIES_NAMES = new String[]{
+			"Factions", "WorldGuard", "Citizens",
+			"PlotSquared", "Essentials"
+	};
 
 	/**
 	 * A list of all loaded dependencies
@@ -40,11 +45,17 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	public void initialize() {
 		this.dependencies = new ArrayList<>();
 
+		Log.log("-----------[Dependencies]-----------", true);
+
 		this.loadDependencies();
 
-		Log.log("-----------[Dependencies]-----------", true);
-		Log.log("  - Enabled: " + Arrays.toString(this.getEnabledDependencies().toArray()), true);
-		Log.log("  - Disabled: " + Arrays.toString(this.getDisabledDependencies().toArray()), true);
+		int size = this.dependencies.size();
+		if (size > 0) {
+			Log.log("  " + size + " dependenc" + (size > 1 ? "ies" : "y") + " loaded!", true);
+		} else {
+			Log.log("  No dependency found.", true);
+		}
+
 		Log.log("------------------------------------", true);
 	}
 
@@ -59,6 +70,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 
 	/**
 	 * Returns a dependency by its name
+	 *
 	 * @param dependencyName The name used for the research.
 	 * @return The dependency found with the name otherwise null.
 	 */
@@ -72,6 +84,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 
 	/**
 	 * Checks if a dependency is loaded or not.
+	 *
 	 * @param dependencyName The dependency name used for the check
 	 * @return True if the dependency has been found, false otherwise.
 	 */
@@ -90,7 +103,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 					String version = Bukkit.getPluginManager().getPlugin(depName).getDescription().getVersion();
 
 					this.registerDependency((Dependency) cl.newInstance());
-					Log.log("Use " + depName + " (v" + version + ") as a dependency!", true);
+					Log.log("  Use " + depName + " (v" + version + ") as a dependency!", true);
 				} catch (Exception ex) {
 					System.out.println("Class of dependency \"" + depName + "\" not found! Please contact the plugin's author.");
 					ex.printStackTrace();
@@ -101,6 +114,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 
 	/**
 	 * Register a dependency class into the memory
+	 *
 	 * @param dependency Dependency to register
 	 */
 	private void registerDependency(Dependency dependency) {
@@ -110,6 +124,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 
 	/**
 	 * Know if a plugin's name is referenced to an enabled plugin on the server
+	 *
 	 * @param name The plugin's name to check
 	 * @return True if the plugin exists and it's loaded
 	 */
@@ -118,50 +133,11 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	}
 
 	/**
-	 * Get the name of disabled dependencies inside a collection of String
-	 * @return The names collection of disabled dependencies
-	 */
-	private Set<String> getDisabledDependencies() {
-		Set<String> str = new HashSet<>();
-
-		for (String depName : DEPENDENCIES_NAMES) {
-			boolean f = false;
-
-			for (Dependency dependency : this.dependencies)
-				if (dependency.getName().equals(depName))
-					f = true;
-
-			if (!f) str.add(depName);
-		}
-
-		return str;
-	}
-
-	/**
-	 * Get the name of enabled dependencies inside a collection of String
-	 * @return The names collection of enabled dependencies
-	 */
-	private Set<String> getEnabledDependencies() {
-		Set<String> str = new HashSet<>();
-
-		for (String depName : DEPENDENCIES_NAMES) {
-			boolean f = false;
-
-			for (Dependency dependency : this.dependencies)
-				if (dependency.getName().equals(depName))
-					f = true;
-
-			if (f) str.add(depName);
-		}
-
-		return str;
-	}
-
-	/**
 	 * Called when a player wants to open its enderchest by interacting with an enderchest block
 	 * (This method loop loaded dependencies to call the {@link fr.utarwyn.endercontainers.dependencies.DependencyListener#onBlockChestOpened(Block, Player, boolean)} method on each of them)
-	 * @param block The block clicked by the player
-	 * @param player The player who interacts with the chest.
+	 *
+	 * @param block       The block clicked by the player
+	 * @param player      The player who interacts with the chest.
 	 * @param sendMessage The plugin have to send a message to the player.
 	 * @return True if the block chest can be opened
 	 */
