@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.util.StringUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -340,11 +341,24 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 
 		try {
 			CommandMap map = getCommandMap();
-			Field fKownCmds = map.getClass().getDeclaredField("knownCommands");
 
-			fKownCmds.setAccessible(true);
-			HashMap<String, Command> knownCmds = (HashMap<String, Command>) fKownCmds.get(map);
-			fKownCmds.setAccessible(false);
+			Field fKownCmds;
+			HashMap<String, Command> knownCmds;
+
+			try {
+				fKownCmds = map.getClass().getDeclaredField("knownCommands");
+			} catch (NoSuchFieldException ex) {
+				fKownCmds = null;
+			}
+
+			if (fKownCmds != null) { // Old versions
+				fKownCmds.setAccessible(true);
+			 	knownCmds = (HashMap<String, Command>) fKownCmds.get(map);
+				fKownCmds.setAccessible(false);
+			} else { // For 1.13 servers
+				Method m = map.getClass().getDeclaredMethod("getKnownCommands");
+				knownCmds = (HashMap<String, Command>) m.invoke(map);
+			}
 
 			knownCmds.remove(command.getName());
 			for (String alias : command.getAliases()){
