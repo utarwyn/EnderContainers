@@ -57,6 +57,8 @@ errors:
   noperm_player: 'You don''t have the permission to do this!'
   plugin_disabled: 'Plugin is actually disabled. Please enable it from the config!'
   plugin_world_disabled: 'Plugin is disabled in this world.'
+  cmd_invalid_parameter: 'Parameter &6%param% &cis not valid.'
+  cmd_wrong_argument_count: 'Wrong argument count. &6/ecp help &cto show the plugin''s help!'
 
 
 ##                     ##

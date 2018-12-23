@@ -114,6 +114,12 @@ public class Locale extends YamlLinker {
 	@Configurable(key = "errors.plugin_world_disabled")
 	public static String pluginWorldDisabled;
 
+	@Configurable(key = "errors.cmd_invalid_parameter")
+	public static String cmdInvalidParameter;
+
+	@Configurable(key = "errors.cmd_wrong_argument_count")
+	public static String cmdWrongArgumentCount;
+
 	@Configurable(key = "dependencies.access_denied_factions")
 	public static String accessDeniedFactions;
 

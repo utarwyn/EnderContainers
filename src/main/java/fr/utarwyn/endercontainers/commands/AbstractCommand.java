@@ -7,6 +7,7 @@ import fr.utarwyn.endercontainers.commands.parameter.ParameterChecker;
 import fr.utarwyn.endercontainers.util.Locale;
 import fr.utarwyn.endercontainers.util.Log;
 import fr.utarwyn.endercontainers.util.PluginMsg;
+import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
@@ -89,7 +90,7 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 
 		// Check argument count
 		if (!this.checkArgLength(args.length)) {
-			sender.sendMessage(Config.PREFIX + "§cWrong argument count. §6/ecp help §cto show the plugin's help!");
+			sender.sendMessage(Config.PREFIX + ChatColor.RED + Locale.cmdWrongArgumentCount);
 			return true;
 		}
 
@@ -97,10 +98,10 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 		int i = 0;
 		for (Parameter param : this.parameters) {
 			if (i < args.length && !param.check(args[i])) {
-				sender.sendMessage(Config.PREFIX + "§cParameter §6" + args[i] + " §cis not valid.");
+				sender.sendMessage(Config.PREFIX + ChatColor.RED +
+						Locale.cmdInvalidParameter.replace("%param%", args[i]));
 				return true;
 			}
-
 			i++;
 		}
 

@@ -19,7 +19,7 @@ public class Migration2_1_1 extends Migration {
 	}
 
 	private void updateLocales() {
-		// TODO: I need to add to all locale files new keys next/previous page for menus
+		// TODO: I need to add to all locale files new keys next/previous page for menus and cmd errors
 	}
 
 }
