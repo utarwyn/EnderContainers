@@ -109,6 +109,7 @@ public class NMSHacks {
 		Object serverInstance = getMinecraftServerInstance();
 		assert serverInstance != null;
 
+		// TODO This method does not work on 1.13.1 version anymore
 		return serverInstance.getClass().getMethod("getWorldServer", int.class).invoke(getMinecraftServerInstance(), 0); //Not a method inside DedicatedServer, use getMethod
 	}
 

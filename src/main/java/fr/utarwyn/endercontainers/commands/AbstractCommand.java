@@ -145,7 +145,7 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 					return subCommand.tabComplete(sender, alias, Arrays.copyOfRange(args, 1, args.length));
 
 		// Now check completions of this command
-		if (!this.subCommands.isEmpty()) {
+		if (!this.subCommands.isEmpty() && args.length > 0) {
 			String lastWord = args[args.length - 1];
 			List<String> matchedCommands = new ArrayList<>();
 			Iterator<AbstractCommand> commandIterator = this.subCommands.iterator();
