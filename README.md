@@ -1,40 +1,72 @@
-# EnderContainers v2.1.0
-[![Plugin's logo](https://www.spigotmc.org/attachments/logo-png.25339/)](https://www.spigotmc.org/resources/endercontainers-1-8-x-to-1-10-x.4750/)
+[![Plugin's logo](https://www.spigotmc.org/attachments/logo-png.25339/)](https://www.spigotmc.org/resources/4750/)
 
-[![Travis](https://img.shields.io/travis/utarwyn/EnderContainers.svg?style=flat-square)](https://travis-ci.org/utarwyn/EnderContainers) [![Github All Releases](https://img.shields.io/badge/dynamic/json.svg?label=Spigot%20downloads&colorB=ff69b4&prefix=&suffix=&query=$.downloads&uri=https%3A%2F%2Fapi.spiget.org%2Fv2%2Fresources%2F4750&style=flat-square)](https://www.spigotmc.org/resources/endercontainers-1-8-x-to-1-10-x.4750/) ![Minecraft](https://img.shields.io/badge/Minecraft-1.8--1.13-red.svg?style=flat-square) \
-[![GitHub last commit (branch)](https://img.shields.io/github/last-commit/utarwyn/endercontainers/master.svg?style=flat-square)](https://github.com/utarwyn/EnderContainers/commits/master) [![license](https://img.shields.io/github/license/utarwyn/endercontainers.svg?style=flat-square)](https://github.com/utarwyn/EnderContainers/blob/master/LICENSE) \
-\
-EnderContainers is a Bukkit/Spigot plugin (MineCraft) which allows you to create multiple enderchests in one simply.
-Long live the enderchests!
+<h4 align="center">
+A modern Bukkit plugin to divide enderchest into multiple inventories.
+<br>
+Works with Bukkit/Spigot 1.8 to 1.13!
+</h4>
 
-**Works with Bukkit/Spigot 1.8.X, 1.9.X, 1.10.X, 1.11.X, 1.12.X and 1.13!**\
-:warning: **1.13 support version is still under development!**
+<p align="center">
+    <a href="https://travis-ci.org/utarwyn/EnderContainers">
+        <img src="https://img.shields.io/travis/utarwyn/EnderContainers.svg" alt="Travis">
+    </a>
+    <a href="https://www.spigotmc.org/resources/4750/">
+        <img src="https://img.shields.io/badge/dynamic/json.svg?label=Downloads&colorB=orange&query=$.downloads&uri=https%3A%2F%2Fapi.spiget.org%2Fv2%2Fresources%2F4750" alt="Downloads">
+    </a>
+     <a href="https://www.spigotmc.org/resources/4750/">
+        <img src="https://img.shields.io/badge/dynamic/json.svg?label=Global%20rating&colorB=blue&query=$.rating.average&uri=https%3A%2F%2Fapi.spiget.org%2Fv2%2Fresources%2F4750" alt="Rating">
+    </a>
+    <br>
+    <a href="https://github.com/utarwyn/EnderContainers/commits/master">
+        <img src="https://img.shields.io/github/last-commit/utarwyn/endercontainers/master.svg" alt="Last commit">
+    </a>
+    <a href="https://github.com/utarwyn/EnderContainers/blob/master/LICENSE">
+        <img src="https://img.shields.io/github/license/utarwyn/endercontainers.svg" alt="License">
+    </a>
+</p>
 
-### Features
+<p align="center">
+    <img src="https://i.imgur.com/VCz4kFS.gif" alt="demo">
+</p>
 
- - Configurable amount of allowed enderchests and size of chests (1 to 6 rows by chest)
- - Possibility to open offline chests
- - Possibility to open player's chests
- - Premium and offline UUID compatible
+> :warning: Latest stable version available on Spigot is **NOT compatible** with **1.13 versions** of Minecraft yet. You **have to download an unstable development build** from this repo to get this support.
+
+> :wave: Need help about the plugin? Go to the [official wiki](https://github.com/utarwyn/EnderContainers/wiki). \
+> You will found a guide to **install and configure it** very quickly and easily.
+
+
+## Key Features
+
+ - Give access to an **infinite number of enderchests** for your players!
+ - Each enderchest can have from 1 to 6 rows
+ - Ability to open enderchests of **online and offline players**
+ - **Absolutely full customization**
+ - Support for all items, **even custom items**!
+ - Complete backup management
+ - Integrations with **Factions, FactionsUUID, WorldGuard, PlotSquared**.
+
+
+## Technical Features
+
+ - **MySQL/MariaDB database** or flat file storage
+ - Works with **Premium and offline servers**
  - Console commands support
- - Full titles, messages, GUI texts customization
- - Support for all items (item lore, enchant...) (and unsafe enchantments)
- - MySQL/MariaDB Support
- - Complete backups management
- - Integrations with **Factions, FactionsUUID, WorldGuard, PlotSquared, Citizens**.
+ - **Light as possible**, can work for all sizes of server
+ - Efficient commented code *(open-source of course)*
+ - **No dependency needed!** :tada:
 
 
-### Installation
-
- 1. Download the plugin from the [Spigot/BukkitDev page](https://www.spigotmc.org/resources/endercontainers-1-8-x-to-1-10-x.4750/).
- 2. Put the EnderContainers.jar file in your plugins' folder.
- 3. Restart your server!
- 4. Configure the plugin in config.yml file and type ***/ecp reload***
- 5. You are done!
- 6. Enjoy the plugin!
-
-
- ### Support the project!
+## Support
  
-[Click here to donate](https://www.tipeeestream.com/utarwyn/donation) if you want to offer me a coffee or a pizza! \
-Thank you for your participation! :heart_eyes:
+ <a href="https://www.buymeacoff.ee/utarwyn" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/purple_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a> \
+**Thank you for your support!** :heart_eyes:
+
+
+## License
+
+BSD 3-Clause "New" or "Revised" License
+
+---
+
+> GitHub [@utarwyn](https://github.com/utarwyn) &nbsp;&middot;&nbsp;
+> Twitter [@Utarwyn](https://twitter.com/Utarwyn)
