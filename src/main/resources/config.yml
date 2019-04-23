@@ -15,7 +15,7 @@ locale: en
 
 # A list of worlds in which the plugin will be automatically disabled
 disabledWorlds:
-  - 'example'
+  - 'my_disabled_world'
 
 
 # Enderchests configuration

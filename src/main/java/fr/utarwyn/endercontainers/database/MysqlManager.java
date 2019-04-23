@@ -46,7 +46,7 @@ public class MysqlManager extends AbstractManager {
 	public void initialize() {
 		// MySQL is enabled or not?
 		if (!Config.mysql) {
-			Log.log("MySQL disabled. Use flat system to store data.", true);
+			Log.log("MySQL disabled. Using flat system to store data.", true);
 			return;
 		}
 
@@ -55,18 +55,18 @@ public class MysqlManager extends AbstractManager {
 		// Connect to the MySQL server ...
 		this.database = new Database(Config.mysqlHost, Config.mysqlPort, Config.mysqlUser, Config.mysqlPassword, Config.mysqlDatabase);
 
-		if (this.isReady())
+		if (this.isReady()) {
 			Log.log("MySQL enabled and ready. Connected to database " + Config.mysqlHost + ":" + Config.mysqlPort, true);
-		else {
+		} else {
 			Config.mysql = false;
 			Log.log("MySQL disabled because of an error during the connection. Now using flat system to store data.", true);
 			return;
 		}
 
+		Log.log("Connection time: " + (System.currentTimeMillis() - begin) + "ms");
+
 		// Initialize the database ...
 		this.init();
-
-		Log.log("Connected to the MySQL server in " + (System.currentTimeMillis() - begin) + "ms!");
 	}
 
 	/**
@@ -75,7 +75,9 @@ public class MysqlManager extends AbstractManager {
 	@Override
 	protected void unload() {
 		try {
-			this.close();
+			if (this.isReady()) {
+				this.database.close();
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -200,32 +202,17 @@ public class MysqlManager extends AbstractManager {
 	 * Initialize the database if this is the first launch of the MySQL manager
 	 */
 	private void init() {
-		String sqlVersion = database.getMySQLVersion();
-		if (sqlVersion.indexOf("-") > 0)
-			sqlVersion = sqlVersion.split("-")[0];
+		String collation = (database.getServerVersion() >= 5.5) ? "utf8mb4_unicode_ci" : "utf8_unicode_ci";
+		List<String> tables = this.database.getTables();
 
-		int pointIndex = (sqlVersion.lastIndexOf('.') == -1) ? (sqlVersion.length() - 1) : sqlVersion.lastIndexOf('.');
-		Double version = Double.valueOf(sqlVersion.substring(0, pointIndex));
-		String collation = (version >= 5.5) ? "utf8mb4_unicode_ci" : "utf8_unicode_ci";
-
-		if (!database.tableExists(formatTable(CHEST_TABLE))) {
+		if (!tables.contains(formatTable(CHEST_TABLE))) {
 			database.request("CREATE TABLE `" + formatTable(CHEST_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `num` TINYINT(2) NOT NULL DEFAULT '0', `owner` VARCHAR(36) NULL, `contents` MEDIUMTEXT NULL, `rows` INT(1) NOT NULL DEFAULT 0, `last_locking_time` TIMESTAMP NULL, PRIMARY KEY (`id`), INDEX `USER KEY` (`num`, `owner`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
-			Log.log(Config.PREFIX + "§aMysql: table `" + formatTable(CHEST_TABLE) + "` created.");
+			Log.log("Table `" + formatTable(CHEST_TABLE) + "` created in the database.");
 		}
-
-		if (!database.tableExists(formatTable(BACKUP_TABLE))) {
+		if (!tables.contains(formatTable(BACKUP_TABLE))) {
 			database.request("CREATE TABLE `" + formatTable(BACKUP_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255) NOT NULL, `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `type` VARCHAR(60) NULL, `data` MEDIUMTEXT NULL, `created_by` VARCHAR(60) NULL, PRIMARY KEY (`id`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
-			Log.log(Config.PREFIX + "§aMysql: table `" + formatTable(BACKUP_TABLE) + "` created.");
+			Log.log("Table `" + formatTable(BACKUP_TABLE) + "` created in the database.");
 		}
-	}
-
-	/**
-	 * Close the connection without to manage the exception
-	 * @throws SQLException Exception throwed if the connection cannot be closed
-	 */
-	private void close() throws SQLException {
-		if (this.isReady())
-			this.database.close();
 	}
 
 	/**

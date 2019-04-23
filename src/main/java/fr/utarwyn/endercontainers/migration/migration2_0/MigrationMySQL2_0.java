@@ -64,8 +64,8 @@ public class MigrationMySQL2_0 extends Migration2_0 {
 	 */
 	private boolean backupSQL() {
 		Database db = getDatabase();
-		if (db == null) return false;
-		String dump = db.dump();
+		if (db == null || db.getDumper() == null) return false;
+		String dump = db.getDumper().dump();
 		if (dump == null) return false;
 
 		File file = new File(this.getBackupFolder(), "mysqldump.sql");
