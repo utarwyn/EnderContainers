@@ -38,7 +38,7 @@
         <!-- PlotSquared repo -->
         <repository>
             <id>plotsquared-repo</id>
-            <url>http://ci.athion.net/job/PlotSquared/ws/mvn/</url>
+            <url>http://ci.athion.net/job/PlotSquared-Releases/ws/mvn/</url>
         </repository>
         <!-- Factions&MassiveCore repo -->
         <repository>
@@ -116,10 +116,16 @@
 
         <!-- PlotSquared -->
         <dependency>
-            <groupId>com.plotsquared</groupId>
-            <artifactId>plotsquared-api</artifactId>
+            <groupId>com.github.intellectualsites.plotsquared</groupId>
+            <artifactId>PlotSquared-API</artifactId>
             <version>latest</version>
             <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- JUnit -->

@@ -1,16 +1,14 @@
 package fr.utarwyn.endercontainers.dependencies;
 
-import com.intellectualcrafters.plot.flag.Flags;
-import com.intellectualcrafters.plot.object.Location;
-import com.intellectualcrafters.plot.object.Plot;
-import com.intellectualcrafters.plot.object.PlotBlock;
+import com.github.intellectualsites.plotsquared.plot.flag.Flags;
+import com.github.intellectualsites.plotsquared.plot.object.Location;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.object.PlotBlock;
 import fr.utarwyn.endercontainers.util.Locale;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-
-import java.util.HashSet;
 
 /**
  * Dependency used to interact with the PlotSquared plugin
@@ -55,13 +53,12 @@ public class PlotSquaredDependency extends Dependency {
 
 		if (plot.hasFlag(Flags.USE)) {
 			boolean containsBlock = false;
+			PlotBlock enderchestBlock = PlotBlock.get(Material.ENDER_CHEST.getId(), (byte) 0);
 
-			for (HashSet<PlotBlock> blocks : plot.getFlag(Flags.USE).asSet()) {
-				for (PlotBlock plotBlock : blocks) {
-					if (plotBlock.equals(PlotBlock.get(Material.ENDER_CHEST.getId(), (byte) 0))) {
-						containsBlock = true;
-						break;
-					}
+			for (PlotBlock plotBlock : plot.getFlag(Flags.USE).get()) {
+				if (plotBlock.equals(enderchestBlock)) {
+					containsBlock = true;
+					break;
 				}
 			}
 
