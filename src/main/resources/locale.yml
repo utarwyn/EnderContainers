@@ -13,7 +13,7 @@ commands:
     created: '&aBackup created with the name &b%backup%&a.'
     creation_starting: 'Starting backup creation in the background...'
     exists: 'Backup &6%backup% &calready exists. Please choose another name.'
-    info: '&6%command% &7to have more information about a backup.'
+    info: '&6%command% &7to have more info about a backup.'
     loaded: '&aHooray! Backup &b%backup%&a successfully loaded!'
     loading_starting: 'Starting backup loading in the background...'
     removed: '&aBackup &b%backup%&a removed with all of its data.'

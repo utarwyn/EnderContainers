@@ -10,7 +10,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.text.DateFormat;
+
 public class InfoCommand extends AbstractBackupCommand {
+
+	private static final DateFormat DATE_FORMAT = DateFormat.getDateInstance(DateFormat.MEDIUM);
 
 	public InfoCommand(BackupManager manager) {
 		super("info", manager);
@@ -32,7 +36,7 @@ public class InfoCommand extends AbstractBackupCommand {
 		PluginMsg.pluginBar(sender);
 		sender.sendMessage(" ");
 		sender.sendMessage(" §7  " + Locale.backupLabelName + ": §r" + backup.getName() + " §7(" + backup.getType() + ")");
-		sender.sendMessage(" §7  " + Locale.backupLabelDate + ": §r" + backup.getDate());
+		sender.sendMessage(" §7  " + Locale.backupLabelDate + ": §r" + DATE_FORMAT.format(backup.getDate()));
 		sender.sendMessage(" §7  " + Locale.backupLabelBy + ": §e" + backup.getCreatedBy());
 		sender.sendMessage(" ");
 		sender.sendMessage(" §8  " + Locale.backupLabelLoadCmd + ": §d/ecp backup load " + name);

@@ -33,7 +33,7 @@ public class ListCommand extends AbstractBackupCommand {
 				);
 
 			sender.sendMessage(" ");
-			sender.sendMessage(" §r §7" + Locale.backupInfo.replace("%command%", "/ecp backup <name>"));
+			sender.sendMessage(" §r §7" + Locale.backupInfo.replace("%command%", "/ecp backup info <name>"));
 			sender.sendMessage(" §r §8♣ Backup list (page 1)");
 			PluginMsg.endBar(sender);
 		} else {
