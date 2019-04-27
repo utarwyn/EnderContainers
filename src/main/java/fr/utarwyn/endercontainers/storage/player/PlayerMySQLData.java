@@ -25,7 +25,7 @@ public class PlayerMySQLData extends PlayerData {
 
 	@Override
 	protected void load() {
-		this.enderchestsDataset = getMysqlManager().getEnderchestsOf(this.getUUID());
+		this.enderchestsDataset = getDatabaseManager().getEnderchestsOf(this.getUUID());
 		if (this.enderchestsDataset == null)
 			this.enderchestsDataset = new ArrayList<>();
 	}
@@ -65,7 +65,7 @@ public class PlayerMySQLData extends PlayerData {
 
 		String contents = ItemSerializer.serialize(enderChest.getContents());
 
-		getMysqlManager().saveEnderchest(
+		getDatabaseManager().saveEnderchest(
 				insert,
 				enderChest.getOwner(), enderChest.getNum(), enderChest.getRows(),
 				contents

@@ -51,7 +51,7 @@ public class Managers {
 	public static void reloadAll() {
 		for (AbstractManager manager : instances.values()) {
 			manager.unload();
-			manager.initialize();
+			manager.load();
 		}
 	}
 
@@ -71,7 +71,7 @@ public class Managers {
 		if (!instances.containsKey(managerClazz)) return;
 
 		instances.get(managerClazz).unload();
-		instances.get(managerClazz).initialize();
+		instances.get(managerClazz).load();
 	}
 
 }

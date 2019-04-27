@@ -7,8 +7,14 @@ import java.sql.*;
 import java.util.logging.Logger;
 
 /**
- * Allows to dump an entire database into a string.
- * @since 2.1.1
+ * Dump all tables (included data) into a generated string.
+ *
+ * You can use, modify and freely distribute this file as long as you credit Isocra Ltd.
+ * There is no explicit or implied guarantee of functionality associated with this file, use it at your own risk.
+ * Adapted for EnderContainers.
+ *
+ * @since 2.0.0
+ * @author Isocra Ltd
  * @author Utarwyn <maxime.malgorn@laposte.net>
  */
 public class MysqlDumper {
@@ -29,13 +35,7 @@ public class MysqlDumper {
 	}
 
 	/**
-	 * Dump all tables (included data) into a generated string.
-	 *
-	 * Copyright Isocra Ltd 2004
-	 * You can use, modify and freely distribute this file as long as you credit Isocra Ltd.
-	 * There is no explicit or implied guarantee of functionality associated with this file, use it at your own risk.
-	 * Adapted for EnderContainers.
-	 *
+	 * Dump all tables into a string
 	 * @return String of the data dumped from the connected database.
 	 */
 	public String dump() {

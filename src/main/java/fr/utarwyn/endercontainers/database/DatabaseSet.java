@@ -54,6 +54,18 @@ public class DatabaseSet {
 	}
 
 	/**
+	 * Returns a Boolean object for the row
+	 * @param key The column used to get the value.
+	 * @return The value stored in the selected column (key)
+	 */
+	public Boolean getBoolean(String key) {
+		if (set.containsKey(key) && set.get(key) instanceof Boolean)
+			return (Boolean) set.get(key);
+		else
+			return null;
+	}
+
+	/**
 	 * Returns a Float object for the row
 	 * @param key The column used to get the value.
 	 * @return The value stored in the selected column (key)
@@ -102,11 +114,19 @@ public class DatabaseSet {
 	}
 
 	/**
-	 * Returns all the data for the row
-	 * @return Map with all data stored in memory for this row
+	 * Returns all keys for the row
+	 * @return Map with all keys for this row
 	 */
-	public Map<String, Object> getObjects() {
-		return this.set;
+	public List<String> getKeys() {
+		return new ArrayList<>(this.set.keySet());
+	}
+
+	/**
+	 * Returns all values for the row
+	 * @return Map with all values for this row
+	 */
+	public List<Object> getValues() {
+		return new ArrayList<>(this.set.values());
 	}
 
 	/**
@@ -119,12 +139,31 @@ public class DatabaseSet {
 		set.put(key, value);
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder s = new StringBuilder("{DatabaseSet #" + this.hashCode() + " (");
+
+		int i = 0;
+		for (String key : this.set.keySet()) {
+			Object obj = this.set.get(key);
+
+			s.append(key).append("=").append(obj);
+			s.append((i < this.set.size() - 1) ? " " : "");
+
+			i++;
+		}
+
+		s.append(")}");
+
+		return s.toString();
+	}
+
 	/**
 	 * Transform a SQL ResultSet object into a DatabaseSet object
 	 * @param resultSet Result from the SQL Connection object
 	 * @return Converted data into database sets
 	 */
-	public static List<DatabaseSet> resultSetToDatabaseSet(ResultSet resultSet) {
+	static List<DatabaseSet> resultSetToDatabaseSet(ResultSet resultSet) {
 		List<DatabaseSet> result = new ArrayList<>();
 
 		try {
@@ -149,76 +188,6 @@ public class DatabaseSet {
 		}
 
 		return result;
-	}
-
-	/**
-	 * Create a conditions map easily with a list of conditions passed to the method.
-	 * @param conditions The list of conditions to combine into a Java map
-	 * @return The generated conditions map.
-	 */
-	public static Map<String, String> makeConditions(String... conditions) {
-		Map<String, String> r = new HashMap<>();
-		boolean key = true;
-		String lastString = "";
-
-		for (String s : conditions) {
-			if (key) {
-				lastString = s;
-				key = false;
-			} else {
-				r.put(lastString, s);
-				key = true;
-			}
-		}
-
-		return r;
-	}
-
-	/**
-	 * Create a fields map easily with a list of fields passed to the method.
-	 * @param fields The list of fields to combine into a Java map
-	 * @return The generated fields map.
-	 */
-	public static Map<String, Object> makeFields(Object... fields) {
-		Map<String, Object> r = new HashMap<>();
-		boolean key = true;
-		Object lastString = "";
-
-		for (Object s : fields) {
-			if (key) {
-				lastString = s;
-				key = false;
-			} else {
-				r.put((String) lastString, s);
-				key = true;
-			}
-		}
-
-		return r;
-	}
-
-	/**
-	 * Create a list of "order by" for a request easily
-	 * @param column The column in which the order by will be applied
-	 * @param type The type of ordering
-	 * @return The generated orders list
-	 */
-	public static List<String> makeOrderBy(String column, String type) {
-		return new ArrayList<String>() {{
-			add(column); add(type);
-		}};
-	}
-
-	/**
-	 * Create a list of "limit" for a request easily
-	 * @param begin The begin number of the limitation
-	 * @param num The number used in the limit action
-	 * @return The generated limits list
-	 */
-	public static List<Integer> makeLimit(Integer begin, Integer num) {
-		return new ArrayList<Integer>() {{
-			add(begin); add(num);
-		}};
 	}
 
 }

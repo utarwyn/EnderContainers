@@ -315,6 +315,8 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 		return (T) arg;
 	}
 
+	// TODO Separate all this code in a different file!
+
 	/**
 	 * Register an abstract command directly inside the server's command map.
 	 * This method is called by the AsbtractCommand class.

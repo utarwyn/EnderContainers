@@ -43,7 +43,7 @@ public class EnderChestManager extends AbstractManager {
 	 * Called when the manager is initializing
 	 */
 	@Override
-	public void initialize() {
+	public void load() {
 		this.enderchests = new ArrayList<>();
 		// Start the purge task
 		this.purgeTask = new EnderChestPurgeTask(this);

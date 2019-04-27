@@ -1,16 +1,23 @@
 package fr.utarwyn.endercontainers.database;
 
 import fr.utarwyn.endercontainers.Config;
+import fr.utarwyn.endercontainers.database.request.DeleteRequest;
+import fr.utarwyn.endercontainers.database.request.IRequest;
+import fr.utarwyn.endercontainers.database.request.SavingRequest;
+import fr.utarwyn.endercontainers.database.request.SelectRequest;
 import fr.utarwyn.endercontainers.util.Log;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Class used to manage a remote MySQL database
+ * Class used to manage a remote SQL database.
+ *
+ * Requests model is inspired from my UtariaDatabase plugin.
+ * (you can see the source code here: https://github.com/Utaria/UtariaDatabase)
+ *
  * @since 1.0.5
  * @author Utarwyn
  */
@@ -197,235 +204,35 @@ public class Database {
 	}
 
 	/**
-	 * Find data in the database
-	 * @param table The table to start the selection
-	 * @return List of all rows selected in the specified table.
+	 * Select data on a specific table
+	 * @param fields Fields to be selected
+	 * @return The Request object
 	 */
-	public List<DatabaseSet> find(String table) {
-		return this.find(table, null);
+	public SelectRequest select(String... fields) {
+		return new SelectRequest(this, fields);
 	}
 
 	/**
-	 * Find data in the database
-	 * @param table The table to start the selection
-	 * @param conditions A map which represents "WHERE" in SQL
-	 * @return List of all rows selected in the specified table.
+	 * Update a table with new rows or edit some of them.
+	 * @param table Table to be updated
+	 * @return The Request object
 	 */
-	public List<DatabaseSet> find(String table, Map<String, String> conditions) {
-		return this.find(table, conditions, null);
+	public SavingRequest update(String table) {
+		return new SavingRequest(this, table);
 	}
 
 	/**
-	 * Find data in the database
-	 * @param table The table to start the selection
-	 * @param conditions A map which represents "WHERE" in SQL
-	 * @param orderby A list which represents "ORDER BY" in SQL
-	 * @return List of all rows selected in the specified table.
+	 * Create a delete request with conditions to be executed on a table.
+	 * @param conditions Conditions to perform the delete request
+	 * @return The Request object
 	 */
-	public List<DatabaseSet> find(String table, Map<String, String> conditions, List<String> orderby) {
-		return this.find(table, conditions, orderby, null);
+	public DeleteRequest delete(String... conditions) {
+		return new DeleteRequest(this, conditions);
 	}
 
 	/**
-	 * Find data in the database
-	 * @param table The table to start the selection
-	 * @param conditions A map which represents "WHERE" in SQL
-	 * @param orderby A list which represents "ORDER BY" in SQL
-	 * @param fields A list which includes all fields that will be returned by the request
-	 * @return List of all rows selected in the specified table.
-	 */
-	public List<DatabaseSet> find(String table, Map<String, String> conditions, List<String> orderby, List<String> fields) {
-		return find(table, conditions, orderby, fields, null);
-	}
-
-	/**
-	 * Find data in the database
-	 * @param table The table to start the selection
-	 * @param conditions A map which represents "WHERE" in SQL
-	 * @param orderby A list which represents "ORDER BY" in SQL
-	 * @param fields A list which includes all fields that will be returned by the request
-	 * @param limit Used to precise a SQL limitation for the prepared statement
-	 * @return List of all rows selected in the specified table.
-	 */
-	public List<DatabaseSet> find(String table, Map<String, String> conditions, List<String> orderby, List<String> fields, List<Integer> limit) {
-		List<DatabaseSet> result = null;
-		PreparedStatement statement = null;
-		Connection conn = null;
-
-		if (!isConnected()) return null;
-
-		StringBuilder strFields = new StringBuilder();
-		if (fields != null) {
-			for (String field : fields) {
-				strFields.append(field).append(",");
-			}
-			strFields = new StringBuilder(strFields.substring(0, strFields.length() - 1));
-		} else {
-			strFields.append('*');
-		}
-
-		// Format fields & elements
-		StringBuilder request = new StringBuilder();
-		List<Object> objects = new ArrayList<>();
-
-		request.append("SELECT ").append(strFields).append(" FROM `").append(table).append('`');
-		this.prepareRequestWhere(request, conditions, objects);
-
-		if (orderby != null && orderby.size() == 2) {
-			request.append(" ORDER BY `").append(orderby.get(0)).append("` ").append(orderby.get(1));
-		}
-		if (limit != null && limit.size() == 2) {
-			request.append(" LIMIT ").append(limit.get(0)).append(",").append(limit.get(1));
-		}
-
-		try {
-			conn = getConnection();
-			statement = conn.prepareStatement(request.toString());
-			Log.log("Executing request '" + request + "'");
-
-			this.insertStatementPreparedValues(statement, objects);
-			result = DatabaseSet.resultSetToDatabaseSet(statement.executeQuery());
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			closeConnection(conn);
-			closeStatement(statement);
-		}
-
-		return result;
-	}
-
-	/**
-	 * Find a row data in the database
-	 * @param table The table to start the selection
-	 * @return The specific row selected in the specified table or null if not found.
-	 */
-	public DatabaseSet findFirst(String table) {
-		return this.findFirst(table, null);
-	}
-
-	/**
-	 * Find a row data in the database
-	 * @param table The table to start the selection
-	 * @param conditions A map which represents "WHERE" in SQL
-	 * @return The specific row selected in the specified table or null if not found.
-	 */
-	public DatabaseSet findFirst(String table, Map<String, String> conditions) {
-		return this.findFirst(table, conditions, null);
-	}
-
-	/**
-	 * Find a row data in the database
-	 * @param table The table to start the selection
-	 * @param conditions A map which represents "WHERE" in SQL
-	 * @param orderby A list which represents "ORDER BY" in SQL
-	 * @return The specific row selected in the specified table or null if not found.
-	 */
-	public DatabaseSet findFirst(String table, Map<String, String> conditions, List<String> orderby) {
-		return this.findFirst(table, conditions, orderby, null);
-	}
-
-	/**
-	 * Find a row data in the database
-	 * @param table The table to start the selection
-	 * @param conditions A map which represents "WHERE" in SQL
-	 * @param orderby A list which represents "ORDER BY" in SQL
-	 * @param fields A list which includes all fields that will be returned by the request
-	 * @return The specific row selected in the specified table or null if not found.
-	 */
-	public DatabaseSet findFirst(String table, Map<String, String> conditions, List<String> orderby, List<String> fields) {
-		return this.findFirst(table, conditions, orderby, fields, null);
-	}
-
-	/**
-	 * Find a row data in the database
-	 * @param table The table to start the selection
-	 * @param conditions A map which represents "WHERE" in SQL
-	 * @param orderby A list which represents "ORDER BY" in SQL
-	 * @param fields A list which includes all fields that will be returned by the request
-	 * @param limit Used to precise a SQL limitation for the prepared statement
-	 * @return The specific row selected in the specified table or null if not found.
-	 */
-	public DatabaseSet findFirst(String table, Map<String, String> conditions, List<String> orderby, List<String> fields, List<Integer> limit) {
-		List<DatabaseSet> r = this.find(table, conditions, orderby, fields, limit);
-		return (r != null && r.size() > 0) ? r.get(0) : null;
-	}
-
-	/**
-	 * Save data into the database
-	 * @param table Table where to save data
-	 * @param fields Field & data to save
-	 * @return True if the data was successfully saved.
-	 */
-	public boolean save(String table, Map<String, Object> fields) {
-		return this.save(table, fields, null);
-	}
-
-	/**
-	 * Save data into the database
-	 * @param table Table where to save data
-	 * @param fields Field & data to save
-	 * @param conditions A conditions map used to do an update instead of an insert.
-	 * @return True if the data was successfully saved.
-	 */
-	public boolean save(String table, Map<String, Object> fields, Map<String, String> conditions) {
-		// Make request string
-		StringBuilder request = new StringBuilder();
-		List<Object> objects = new ArrayList<>();
-
-		if (conditions == null) { // INSERT
-			request.append("INSERT INTO `").append(table).append("` (");
-
-			int keyCount = fields.keySet().size();
-			int i = 1;
-			int j = 1;
-
-			// Keys
-			for (String key : fields.keySet()) {
-				request.append('`').append(key).append('`');
-				request.append(i != keyCount ? ',' : ')');
-
-				i++;
-			}
-
-			request.append(" VALUES (");
-			// Values
-			for (String key : fields.keySet()) {
-				if (j != keyCount)
-					request.append("?,");
-				else
-					request.append("?)");
-
-				objects.add(fields.get(key));
-				j++;
-			}
-		} else { // UPDATE
-			request.append("UPDATE `").append(table).append("` SET ");
-
-			// Keys & Values
-			int keyCount = fields.keySet().size();
-			int i = 1;
-
-			for (String key : fields.keySet()) {
-				Object o = fields.get(key);
-				request.append('`').append(key).append("` = ?");
-				request.append(i != keyCount ? ", " : "");
-
-				objects.add(o);
-				i++;
-			}
-
-			// Where clause
-			this.prepareRequestWhere(request, conditions, objects);
-		}
-
-		return this.executeRequest(request, objects);
-	}
-
-	/**
-	 * Process a custom request into the database.
-	 * Used for very complex requests.
-	 * @param request The request to execute
+	 * Send a custom request into the database.
+	 * @param request The special request to execute!
 	 */
 	public void request(String request) {
 		Connection conn = null;
@@ -445,19 +252,48 @@ public class Database {
 	}
 
 	/**
-	 * Delete data from the database
-	 * @param table Table where the data to remove is stored
-	 * @param conditions Conditions map to filter data which have to be deleted
-	 * @return True if the data was successfully deleted
+	 * Execute a select request on the database.
+	 * This method must be called from a Request object.
+	 *
+	 * @param request Request to execute
+	 * @return Result of the processed request
+	 * @throws SQLException if a SQL exception has been thrown during the process
 	 */
-	public boolean delete(String table, Map<String, String> conditions) {
-		StringBuilder request = new StringBuilder();
-		List<Object> objects = new ArrayList<>();
+	public List<DatabaseSet> execQueryStatement(SelectRequest request) throws SQLException {
+		Connection conn = this.getConnection();
+		if (conn == null) return null;
 
-		request.append("DELETE FROM `").append(table).append('`');
-		this.prepareRequestWhere(request, conditions, objects);
+		Object[] attributes = request.getAttributes();
+		PreparedStatement st = conn.prepareStatement(request.getRequest());
 
-		return this.executeRequest(request, objects);
+		for (int i = 1; i <= attributes.length; i++) {
+			st.setObject(i, attributes[i - 1]);
+		}
+
+		return DatabaseSet.resultSetToDatabaseSet(st.executeQuery());
+	}
+
+	/**
+	 * Execute an update statement on the database.
+	 * This method must be called from a Request object.
+	 *
+	 * @param request Request object to manage
+	 * @return True if the update statement was executed
+	 * @throws SQLException if a SQL exception has been thrown during the process
+	 */
+	public boolean execUpdateStatement(IRequest request) throws SQLException {
+		Connection conn = this.getConnection();
+		if (conn == null) return false;
+
+		// Si la connexion est en lecture seule, on interdit l'écriture dans la base.
+		Object[] attributes = request.getAttributes();
+		PreparedStatement st = conn.prepareStatement(request.getRequest());
+
+		for (int i = 1; i <= attributes.length; i++) {
+			st.setObject(i, attributes[i - 1]);
+		}
+
+		return st.executeUpdate() > 0;
 	}
 
 	/**
@@ -497,97 +333,10 @@ public class Database {
 			this.dumper = new MysqlDumper(this);
 		} catch (Exception e) {
 			this.source = null;
-			Log.error("Mysql error: unable to connect to the database at " + this.host + ":" + this.port + ". Please retry.");
+			Log.error("Mysql error: unable to connect to the database at " + this.host + ":" + this.port + ". Please verify your credentials.");
 
 			Config.mysql = false;
 			Config.enabled = true;
-		}
-	}
-
-	/**
-	 * Prepare the WHERE clause of a request and create a list of all objects to append.
-	 * @param request Request string builder
-	 * @param conditions Map with all conditions and values to handle
-	 * @param objects An empty list where objects will be added
-	 */
-	private void prepareRequestWhere(StringBuilder request, Map<String, String> conditions, List<Object> objects) {
-		if (conditions != null && conditions.size() > 0) {
-			int count = conditions.size();
-			int index = 1;
-
-			request.append(" WHERE ");
-			for (String k : conditions.keySet()) {
-				String v = conditions.get(k);
-				request.append('`').append(k).append("` = ?");
-				request.append(index != count ? " AND " : "");
-
-				objects.add(v);
-				index++;
-			}
-		}
-	}
-
-	/**
-	 * Insert a list of values inside a prepared statement
-	 * @param statement Statement to be filled
-	 * @param values Values to insert
-	 * @throws SQLException if the index does not correspond to a parameter
-	 * marker in the SQL statement; if a database access error occurs or
-	 * this method is called on a closed <code>PreparedStatement</code>
-	 */
-	private void insertStatementPreparedValues(PreparedStatement statement, List<Object> values) throws SQLException {
-		if (values != null) {
-			int i = 1;
-			for (Object o : values) {
-				if (o instanceof String) {
-					statement.setString(i, (String) o);
-				} else if (o instanceof Integer) {
-					statement.setInt(i, (Integer) o);
-				} else if (o instanceof Long) {
-					statement.setLong(i, (Long) o);
-				} else if (o instanceof Float) {
-					statement.setFloat(i, (Float) o);
-				} else if (o instanceof Double) {
-					statement.setDouble(i, (Double) o);
-				} else if (o instanceof Timestamp) {
-					statement.setTimestamp(i, (Timestamp) o);
-				} else {
-					statement.setNull(i, Types.TIMESTAMP);
-				}
-				i++;
-			}
-		}
-	}
-
-	/**
-	 * Execute a request which DO NOT return data.
-	 * @param request Request to execute
-	 * @param objects Objects to link with the prepared request
-	 * @return True if the the request has been processed, false otherwise.
-	 */
-	private boolean executeRequest(StringBuilder request, List<Object> objects) {
-		Connection conn = null;
-		PreparedStatement statement = null;
-
-		try {
-			conn = getConnection();
-			if (conn != null) {
-				statement = conn.prepareStatement(request.toString());
-				this.insertStatementPreparedValues(statement, objects);
-
-				Log.log("Executing request '" + request + "'");
-
-				statement.execute();
-				return true;
-			} else {
-				return false;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			closeConnection(conn);
-			closeStatement(statement);
 		}
 	}
 

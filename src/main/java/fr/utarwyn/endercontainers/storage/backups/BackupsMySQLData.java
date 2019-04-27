@@ -23,7 +23,7 @@ public class BackupsMySQLData extends BackupsData {
 
 	@Override
 	protected void load() {
-		for (DatabaseSet set : getMysqlManager().getBackups())
+		for (DatabaseSet set : getDatabaseManager().getBackups())
 			this.backups.add(new Backup(
 					set.getString("name"), set.getTimestamp("date"),
 					set.getString("type"), set.getString("created_by")
@@ -37,8 +37,9 @@ public class BackupsMySQLData extends BackupsData {
 
 	@Override
 	public boolean saveNewBackup(Backup backup) {
-		getMysqlManager().saveBackup(
-				backup.getName(), backup.getDate().getTime(), backup.getType(), this.getEnderchestsStringData(), backup.getCreatedBy()
+		getDatabaseManager().saveBackup(
+				backup.getName(), backup.getDate().getTime(), backup.getType(),
+				this.getEnderchestsStringData(), backup.getCreatedBy()
 		);
 
 		return true;
@@ -51,21 +52,21 @@ public class BackupsMySQLData extends BackupsData {
 
 	@Override
 	public boolean applyBackup(Backup backup) {
-		DatabaseSet backupSet = getMysqlManager().getBackup(backup.getName());
+		DatabaseSet backupSet = getDatabaseManager().getBackup(backup.getName());
 		if (backupSet == null) return false;
 
-		getMysqlManager().emptyChestTable();
-		getMysqlManager().saveEnderchestSets(this.getEnderchestsFromString(backupSet.getString("data")));
+		getDatabaseManager().emptyChestTable();
+		getDatabaseManager().saveEnderchestSets(this.getEnderchestsFromString(backupSet.getString("data")));
 		return true;
 	}
 
 	@Override
 	public boolean removeBackup(Backup backup) {
-		return getMysqlManager().removeBackup(backup.getName());
+		return getDatabaseManager().removeBackup(backup.getName());
 	}
 
 	private String getEnderchestsStringData() {
-		List<DatabaseSet> sets = getMysqlManager().getAllEnderchests();
+		List<DatabaseSet> sets = getDatabaseManager().getAllEnderchests();
 		if (sets == null) return "";
 
 		List<String> dataElementList = new ArrayList<>();

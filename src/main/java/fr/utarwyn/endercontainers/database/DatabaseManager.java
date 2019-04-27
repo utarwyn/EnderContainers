@@ -15,7 +15,7 @@ import java.util.UUID;
  * @since 1.0.5
  * @author Utarwyn
  */
-public class MysqlManager extends AbstractManager {
+public class DatabaseManager extends AbstractManager {
 
 	/**
 	 * The chest table where to store all data of enderchests
@@ -35,7 +35,7 @@ public class MysqlManager extends AbstractManager {
 	/**
 	 * Used to construct the MySQL manager
 	 */
-	public MysqlManager() {
+	public DatabaseManager() {
 		super(EnderContainers.getInstance());
 	}
 
@@ -43,7 +43,7 @@ public class MysqlManager extends AbstractManager {
 	 * Called when the manager is initializing
 	 */
 	@Override
-	public void initialize() {
+	public void load() {
 		// MySQL is enabled or not?
 		if (!Config.mysql) {
 			Log.log("MySQL disabled. Using flat system to store data.", true);
@@ -100,23 +100,20 @@ public class MysqlManager extends AbstractManager {
 	 * @param contents All contents of the chest
 	 */
 	public void saveEnderchest(boolean insert, UUID owner, int num, int rows, String contents) {
+		Timestamp now = new Timestamp(System.currentTimeMillis());
+
 		if (insert) {
-			database.save(formatTable(CHEST_TABLE), DatabaseSet.makeFields(
-					"num", num,
-					"owner", owner.toString(),
-					"rows", rows,
-					"contents", contents,
-					"last_locking_time", new Timestamp(System.currentTimeMillis())
-			));
+			database.update(formatTable(CHEST_TABLE))
+					.fields("num", "owner", "rows", "contents", "last_locking_time")
+					.values(num, owner.toString(), rows, contents, now)
+					.execute();
 		} else {
-			database.save(formatTable(CHEST_TABLE), DatabaseSet.makeFields(
-					"rows", rows,
-					"contents", contents,
-					"last_locking_time", new Timestamp(System.currentTimeMillis())
-			), DatabaseSet.makeConditions(
-					"num", String.valueOf(num),
-					"owner", owner.toString()
-			));
+			database.update(formatTable(CHEST_TABLE))
+					.fields("rows", "contents", "last_locking_time")
+					.values(rows, contents, now)
+					.where("`num` = ?", "`owner` = ?")
+					.attributes(String.valueOf(num), owner.toString())
+					.execute();
 		}
 	}
 
@@ -125,7 +122,7 @@ public class MysqlManager extends AbstractManager {
 	 * @return The list of saved enderchests
 	 */
 	public List<DatabaseSet> getAllEnderchests() {
-		return database.find(formatTable(CHEST_TABLE));
+		return database.select().from(formatTable(CHEST_TABLE)).findAll();
 	}
 
 	/**
@@ -134,7 +131,9 @@ public class MysqlManager extends AbstractManager {
 	 * @return The list of all chests for a player
 	 */
 	public List<DatabaseSet> getEnderchestsOf(UUID owner) {
-		return database.find(formatTable(CHEST_TABLE), DatabaseSet.makeConditions("owner", owner.toString()));
+		return database.select().from(formatTable(CHEST_TABLE))
+				.where("`owner` = ?").attributes(owner.toString())
+				.findAll();
 	}
 
 	/**
@@ -150,8 +149,12 @@ public class MysqlManager extends AbstractManager {
 	 * @param chestSets The list of enderchests to save
 	 */
 	public void saveEnderchestSets(List<DatabaseSet> chestSets) {
-		for (DatabaseSet set : chestSets)
-			database.save(formatTable(CHEST_TABLE), set.getObjects());
+		for (DatabaseSet set : chestSets) {
+			database.update(formatTable(CHEST_TABLE))
+					.fields((String[]) set.getKeys().toArray())
+					.values(set.getValues())
+					.execute();
+		}
 	}
 
 	/**
@@ -159,7 +162,7 @@ public class MysqlManager extends AbstractManager {
 	 * @return The list of saved backups
 	 */
 	public List<DatabaseSet> getBackups() {
-		return database.find(formatTable(BACKUP_TABLE));
+		return database.select().from(formatTable(BACKUP_TABLE)).findAll();
 	}
 
 	/**
@@ -168,7 +171,9 @@ public class MysqlManager extends AbstractManager {
 	 * @return The found backup (or null if not found)
 	 */
 	public DatabaseSet getBackup(String name) {
-		return database.findFirst(formatTable(BACKUP_TABLE), DatabaseSet.makeConditions("name", name));
+		return database.select().from(formatTable(BACKUP_TABLE))
+				.where("`name` = ?").attributes(name)
+				.find();
 	}
 
 	/**
@@ -180,13 +185,10 @@ public class MysqlManager extends AbstractManager {
 	 * @param createdBy Entity who created the backup (console or player)
 	 */
 	public void saveBackup(String name, long date, String type, String data, String createdBy) {
-		database.save(formatTable(BACKUP_TABLE), DatabaseSet.makeFields(
-				"name", name,
-				"date", new Timestamp(date),
-				"type", type,
-				"data", data,
-				"created_by", createdBy
-		));
+		database.update(formatTable(BACKUP_TABLE))
+				.fields("name", "date", "type", "data", "created_by")
+				.values(name, new Timestamp(date), type, data, createdBy)
+				.execute();
 	}
 
 	/**
@@ -195,7 +197,8 @@ public class MysqlManager extends AbstractManager {
 	 * @return True if the backup was successfully removed.
 	 */
 	public boolean removeBackup(String name) {
-		return this.database.delete(formatTable(BACKUP_TABLE), DatabaseSet.makeConditions("name", name));
+		return this.database.delete("`name` = ?").from(formatTable(BACKUP_TABLE))
+				.attributes(name).execute();
 	}
 
 	/**
@@ -222,6 +225,20 @@ public class MysqlManager extends AbstractManager {
 	 */
 	private String formatTable(String table) {
 		return Config.mysqlTablePrefix + table;
+	}
+
+	/**
+	 * Escape a list of fields to be sure that all requests are
+	 * compliants with all SQL servers.
+	 *
+	 * @param fields Fields to wrap with quotes (to escape)
+	 * @return Escaped fields, columns or table names
+	 */
+	public static String[] escapeFieldArray(String[] fields) {
+		for (int i = 0; i < fields.length; i++) {
+			fields[i] = '`' + fields[i] + '`';
+		}
+		return fields;
 	}
 
 }

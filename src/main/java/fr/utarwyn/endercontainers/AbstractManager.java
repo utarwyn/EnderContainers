@@ -37,7 +37,7 @@ public abstract class AbstractManager implements Listener {
 
 
 		// We start the initialization of the manager
-		this.initialize();
+		this.load();
 
 		// Register the manager for the plugin
 		try {
@@ -64,10 +64,10 @@ public abstract class AbstractManager implements Listener {
 	}
 
 	/**
-	 * Called when the manager is initializing.
+	 * Called when the manager is loading.
 	 * Called in the constructor so before the constructor of sub-managers.
 	 */
-	public abstract void initialize();
+	public abstract void load();
 
 	/**
 	 * Called when the manager is unloading.

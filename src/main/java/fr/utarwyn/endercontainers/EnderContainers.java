@@ -4,7 +4,7 @@ import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.commands.AbstractCommand;
 import fr.utarwyn.endercontainers.commands.EnderchestCommand;
 import fr.utarwyn.endercontainers.commands.MainCommand;
-import fr.utarwyn.endercontainers.database.MysqlManager;
+import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.dependencies.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.hologram.HologramManager;
@@ -43,7 +43,7 @@ public class EnderContainers extends JavaPlugin {
 
 		// Load needed managers ...
 		new DependenciesManager();
-		new MysqlManager();
+		new DatabaseManager();
 
 		// Load the migration manager and stop the plugin if a migration have been done.
 		MigrationManager mm = new MigrationManager();

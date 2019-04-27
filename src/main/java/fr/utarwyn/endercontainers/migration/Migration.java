@@ -2,7 +2,7 @@ package fr.utarwyn.endercontainers.migration;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.database.Database;
-import fr.utarwyn.endercontainers.database.MysqlManager;
+import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.util.Log;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -257,7 +257,7 @@ public abstract class Migration {
 		if (database != null)
 			return database;
 
-		MysqlManager manager = EnderContainers.getInstance().getInstance(MysqlManager.class);
+		DatabaseManager manager = EnderContainers.getInstance().getInstance(DatabaseManager.class);
 		if (!manager.isReady()) return null;
 
 		// Not very clear but its necessary to modify tables like we want
@@ -284,10 +284,11 @@ public abstract class Migration {
 	 * </p>
 	 */
 	protected static void recreateMySQLTables() {
-		MysqlManager manager = EnderContainers.getInstance().getInstance(MysqlManager.class);
+		DatabaseManager manager = EnderContainers.getInstance().getInstance(DatabaseManager.class);
 		if (!manager.isReady()) return;
 
 		// Not very clear but its necessary to recreate tables easily from a migration
+		// TODO Wtf with this code?? Very bad
 		try {
 			Method init = manager.getClass().getDeclaredMethod("init");
 

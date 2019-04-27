@@ -84,15 +84,15 @@ public class MigrationMySQL2_0 extends Migration2_0 {
 
 	@Override
 	boolean reconfigureBackups() {
-		Database db = getDatabase();
-		if (db == null) return false;
+		Database database = getDatabase();
+		if (database == null) return false;
 		String backupTable = Config.mysqlTablePrefix + "backups";
 
 		List<String> dataElements;
 		String newCreatedBy;
 
 		// Reformat data and created_by fields of all backups
-		for (DatabaseSet backup : db.find(backupTable)) {
+		for (DatabaseSet backup : database.select().from(backupTable).findAll()) {
 			String oldData = backup.getString("data");
 
 			dataElements = new ArrayList<>();
@@ -106,14 +106,15 @@ public class MigrationMySQL2_0 extends Migration2_0 {
 			}
 
 			// Save the updated field in the table
-			if (!db.save(
-					backupTable,
-					DatabaseSet.makeFields(
-							"data", StringUtils.join(dataElements, ";"),
-							"created_by", newCreatedBy
-					),
-					DatabaseSet.makeConditions("id", String.valueOf(backup.getInteger("id")))
-			)) return false;
+			boolean saved = database.update(backupTable).fields("data", "created_by")
+					.values(StringUtils.join(dataElements, ";"), newCreatedBy)
+					.where("`id` = ?").attributes(backup.getInteger("id"))
+					.execute();
+
+			if (!saved) {
+				Log.error("Error when migrating the backup '" + backup.getString("name") + "'!");
+				return false;
+			}
 		}
 
 		return true;
@@ -121,19 +122,19 @@ public class MigrationMySQL2_0 extends Migration2_0 {
 
 	@Override
 	boolean reconfigureEnderchests() {
-		Database db = getDatabase();
-		if (db == null) return false;
+		Database database = getDatabase();
+		if (database == null) return false;
 		String chestsTable = Config.mysqlTablePrefix + "enderchests";
 		String playersTable = Config.mysqlTablePrefix + "players";
 
-		List<DatabaseSet> players = db.find(playersTable);
-		List<DatabaseSet> chests = db.find(chestsTable);
+		List<DatabaseSet> players = database.select().from(playersTable).findAll();
+		List<DatabaseSet> chests = database.select().from(chestsTable).findAll();
 
 		String owner;
 		int num, rows;
 
 		// Reformat the enderchests table
-		db.dropTable(chestsTable);
+		database.dropTable(chestsTable);
 		Migration.recreateMySQLTables();
 
 		for (DatabaseSet chest : chests) {
@@ -161,20 +162,16 @@ public class MigrationMySQL2_0 extends Migration2_0 {
 			}
 
 			// Save the new enderchest in the table
-			db.save(
-					chestsTable, DatabaseSet.makeFields(
-							"id", chest.getInteger("id"),
-							"num", num,
-							"owner", owner,
-							"contents", chest.getString("items"),
-							"rows", rows,
-							"last_locking_time", chest.getTimestamp("last_save_time")
-					)
-			);
+			database.update(chestsTable)
+					.fields("id", "num", "owner", "contents", "rows", "last_locking_time")
+					.values(
+							chest.getInteger("id"), num, owner,
+							chest.getString("items"), rows, chest.getTimestamp("last_save_time")
+					).execute();
 		}
 
 		// Remove the old players table
-		db.dropTable(playersTable);
+		database.dropTable(playersTable);
 
 		return true;
 	}

@@ -49,7 +49,7 @@ public class MigrationManager extends AbstractManager {
 	 * Called when the manager initializes
 	 */
 	@Override
-	public void initialize() {
+	public void load() {
 		this.migrations = new ArrayList<>();
 		this.loadMigration(Migration2_0.class);
 		this.loadMigration(Migration2_0_1.class);

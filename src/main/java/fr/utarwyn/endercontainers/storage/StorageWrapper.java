@@ -1,7 +1,7 @@
 package fr.utarwyn.endercontainers.storage;
 
 import fr.utarwyn.endercontainers.EnderContainers;
-import fr.utarwyn.endercontainers.database.MysqlManager;
+import fr.utarwyn.endercontainers.database.DatabaseManager;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -32,10 +32,10 @@ public abstract class StorageWrapper {
 	/**
 	 * The MySQL manager used by storages using MySQL
 	 */
-	private static MysqlManager mysqlManager;
+	private static DatabaseManager databaseManager;
 
 	static {
-		mysqlManager = EnderContainers.getInstance().getInstance(MysqlManager.class);
+		databaseManager = EnderContainers.getInstance().getInstance(DatabaseManager.class);
 		classCacheMap = new HashMap<>();
 		cacheMap = new HashMap<>();
 	}
@@ -44,8 +44,8 @@ public abstract class StorageWrapper {
 	 * Returns the MySQL manager used by some MySQL storages
 	 * @return The MySQL manager
 	 */
-	protected static MysqlManager getMysqlManager() {
-		return mysqlManager;
+	protected static DatabaseManager getDatabaseManager() {
+		return databaseManager;
 	}
 
 	/**
@@ -97,7 +97,7 @@ public abstract class StorageWrapper {
 		Class<? extends StorageWrapper> usedDataClazz = null;
 
 		if (!classCacheMap.containsKey(clazz)) {
-			String dataClazzName = (mysqlManager.isReady()) ? clazz.getName().replace("Data", "MySQLData") : clazz.getName().replace("Data", "FlatData");
+			String dataClazzName = (databaseManager.isReady()) ? clazz.getName().replace("Data", "MySQLData") : clazz.getName().replace("Data", "FlatData");
 
 			try {
 				usedDataClazz = (Class<? extends StorageWrapper>) Class.forName(dataClazzName);

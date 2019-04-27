@@ -39,7 +39,7 @@ public class BackupManager extends AbstractManager {
 	 * Called when the manager is initializing
 	 */
 	@Override
-	public void initialize() {
+	public void load() {
 		this.backupsStorage = StorageWrapper.get(BackupsData.class);
 		assert this.backupsStorage != null;
 
@@ -78,7 +78,7 @@ public class BackupManager extends AbstractManager {
 	/**
 	 * Create a backup with a name and an author
 	 * @param name The name of the backup which have to be created.
-	 * @param creator The name of the player who initialize this action.
+	 * @param creator The name of the player who load this action.
 	 * @return True if the backup was created with success.
 	 */
 	public boolean createBackup(String name, String creator) {

@@ -57,7 +57,7 @@ public class HologramManager extends AbstractManager implements Runnable {
 	 * Called when the manager is initializing
 	 */
 	@Override
-	public void initialize() {
+	public void load() {
 		this.chestManager = EnderContainers.getInstance().getInstance(EnderChestManager.class);
 		this.dependenciesManager = EnderContainers.getInstance().getInstance(DependenciesManager.class);
 

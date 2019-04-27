@@ -42,7 +42,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	 * Called when the manager is initializing
 	 */
 	@Override
-	public void initialize() {
+	public void load() {
 		this.dependencies = new ArrayList<>();
 
 		Log.log("-----------[Dependencies]-----------", true);
