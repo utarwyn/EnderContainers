@@ -10,6 +10,9 @@ Works with Bukkit/Spigot 1.8 to 1.13!
     <a href="https://travis-ci.org/utarwyn/EnderContainers">
         <img src="https://img.shields.io/travis/utarwyn/EnderContainers.svg" alt="Travis">
     </a>
+    <a href="https://sonarcloud.io/dashboard?id=fr.utarwyn%3AEnderContainers">
+        <img src="https://sonarcloud.io/api/project_badges/measure?project=fr.utarwyn%3AEnderContainers&metric=alert_status" alt="SonarQube Quality gate">
+    </a>
     <a href="https://www.spigotmc.org/resources/4750/">
         <img src="https://img.shields.io/badge/dynamic/json.svg?label=Downloads&colorB=orange&query=$.downloads&uri=https%3A%2F%2Fapi.spiget.org%2Fv2%2Fresources%2F4750" alt="Downloads">
     </a>
