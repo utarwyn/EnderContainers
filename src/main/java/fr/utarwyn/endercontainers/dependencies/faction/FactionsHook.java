@@ -1,4 +1,4 @@
-package fr.utarwyn.endercontainers.dependencies;
+package fr.utarwyn.endercontainers.dependencies.faction;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;

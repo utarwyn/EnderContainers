@@ -59,24 +59,6 @@ public class CitizensDependency extends Dependency implements Listener {
 	private Set<NPCLink> NPCLinks;
 
 	/**
-	 * Construct the dependency object
-	 */
-	public CitizensDependency() {
-		super("Citizens");
-
-		File file = this.getConfigFile();
-		if (file == null) return;
-
-		this.configuration = YamlConfiguration.loadConfiguration(file);
-
-		this.playersChatEditMode = new HashSet<>();
-		this.NPCLinks = new HashSet<>();
-
-		Bukkit.getPluginManager().registerEvents(this, EnderContainers.getInstance());
-		this.reloadLinks();
-	}
-
-	/**
 	 * Called when a player type a command that starts with "/ecp npc"
 	 * @param player The player who type the command
 	 * @param subcommand The subcommand performed
@@ -189,7 +171,7 @@ public class CitizensDependency extends Dependency implements Listener {
 					Bukkit.getScheduler().scheduleSyncDelayedTask(
 							EnderContainers.getInstance(),
 							() -> this.manager.openHubMenuFor(player),
-							link.getDelay() * 20
+							link.getDelay() * 20L
 					);
 				}
 
@@ -207,7 +189,7 @@ public class CitizensDependency extends Dependency implements Listener {
 					Bukkit.getScheduler().scheduleSyncDelayedTask(
 							EnderContainers.getInstance(),
 							() -> this.manager.openEnderchestFor(player, n),
-							link.getDelay() * 20
+							link.getDelay() * 20L
 					);
 				}
 
@@ -317,11 +299,11 @@ public class CitizensDependency extends Dependency implements Listener {
 		NPCLinks.clear();
 
 		for (String linkId : this.configuration.getKeys(false)) {
-			Integer npcId = Integer.parseInt(linkId);
+			int npcId = Integer.parseInt(linkId);
 			String type = this.configuration.getString(linkId + ".type");
-			Integer delay = this.configuration.getInt(linkId + ".delay");
+			int delay = this.configuration.getInt(linkId + ".delay");
 
-			Integer enderchestNumber = this.configuration.contains(linkId + ".chestNumber") ? this.configuration.getInt(linkId + ".chestNumber") : -1;
+			int enderchestNumber = this.configuration.contains(linkId + ".chestNumber") ? this.configuration.getInt(linkId + ".chestNumber") : -1;
 			NPCLinks.add(new NPCLink(npcId, type, delay, enderchestNumber));
 		}
 	}
@@ -486,7 +468,16 @@ public class CitizensDependency extends Dependency implements Listener {
 	 */
 	@Override
 	public void onEnable() {
+		File file = this.getConfigFile();
+		if (file == null) return;
 
+		this.configuration = YamlConfiguration.loadConfiguration(file);
+
+		this.playersChatEditMode = new HashSet<>();
+		this.NPCLinks = new HashSet<>();
+
+		Bukkit.getPluginManager().registerEvents(this, EnderContainers.getInstance());
+		this.reloadLinks();
 	}
 
 	/**

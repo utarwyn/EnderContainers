@@ -13,10 +13,6 @@ public class WorldGuardDependency extends Dependency {
 
 	private WorldGuardPlugin wgPlugin;
 
-	WorldGuardDependency() {
-		super("WorldGuard");
-	}
-
 	@Override
 	public void onEnable() {
 		this.wgPlugin = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin(this.getName());
@@ -32,7 +28,7 @@ public class WorldGuardDependency extends Dependency {
 		// OP? Ok, you can do whatever you want...
 		if (player.isOp()) return true;
 
-		// Retreives the WorldGuard Player instance & create a region query.
+		// Retreive the WorldGuard Player instance and create a region query.
 		LocalPlayer localPlayer = this.wgPlugin.wrapPlayer(player);
 		RegionQuery query = WGBukkit.getPlugin().getRegionContainer().createQuery();
 

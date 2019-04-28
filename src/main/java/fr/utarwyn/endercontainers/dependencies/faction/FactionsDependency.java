@@ -1,9 +1,8 @@
-package fr.utarwyn.endercontainers.dependencies;
+package fr.utarwyn.endercontainers.dependencies.faction;
 
-import org.bukkit.Bukkit;
+import fr.utarwyn.endercontainers.dependencies.Dependency;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 /**
  * Dependency used to interact with the Factions plugin
@@ -15,32 +14,25 @@ public class FactionsDependency extends Dependency {
 	private FactionsHook factionHook;
 
 	/**
-	 * Construct the dependency object
-	 */
-	FactionsDependency() {
-		super("Factions");
-	}
-
-	/**
 	 * Called when the dependency is enabling
 	 */
 	@Override
 	public void onEnable() {
-		Plugin factions = Bukkit.getPluginManager().getPlugin("Factions");
-		// No plugin Factions detected?
-		if (factions == null) return;
-
 		// Get Factions version
-		String[] components = factions.getDescription().getVersion().split("\\.");
-		String version = components.length < 2 ? "" : components[0] + "." + components[1];
+		String pluginVersion = this.getPluginVersion();
 
-		// Instanciate the correct hook in terms of the version of Factions
-		switch (version) {
-			case "1.6": // Old version of Factions - FactionsUUID - SavageFactions
-				this.factionHook = new Factions0106Dependency();
-				break;
-			default:    // New versions of Factions!
-				this.factionHook = new Factions0212Dependency();
+		if (pluginVersion != null) {
+			String[] components = pluginVersion.split("\\.");
+			String version = components.length < 2 ? "" : components[0] + "." + components[1];
+
+			// Instanciate the correct hook in terms of the version of Factions
+			if ("1.6".equals(version)) {
+				// Old version of Factions - FactionsUUID - SavageFactions
+				this.factionHook = new FactionsLegacyHook();
+			} else {
+				// New versions of Factions!
+				this.factionHook = new FactionsV2Hook();
+			}
 		}
 	}
 

@@ -324,11 +324,11 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 	 * @param command Object to register inside the Bukkit server
 	 */
 	public static void register(AbstractCommand command) {
-		if (getCommandMap() == null) {
-			return;
-		}
+		CommandMap commandMap = getCommandMap();
 
-		getCommandMap().register("endercontainers", command);
+		if (commandMap != null) {
+			commandMap.register("endercontainers", command);
+		}
 	}
 
 	/**
@@ -338,29 +338,29 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 	 * @param command Command to unregister completely from the server.
 	 */
 	public static void unregister(PluginCommand command) {
-		if (getCommandMap() == null) {
+		CommandMap commandMap = getCommandMap();
+
+		if (commandMap == null) {
 			return;
 		}
 
 		try {
-			CommandMap map = getCommandMap();
-
 			Field fKownCmds;
 			HashMap<String, Command> knownCmds;
 
 			try {
-				fKownCmds = map.getClass().getDeclaredField("knownCommands");
+				fKownCmds = commandMap.getClass().getDeclaredField("knownCommands");
 			} catch (NoSuchFieldException ex) {
 				fKownCmds = null;
 			}
 
 			if (fKownCmds != null) { // Old versions
 				fKownCmds.setAccessible(true);
-			 	knownCmds = (HashMap<String, Command>) fKownCmds.get(map);
+			 	knownCmds = (HashMap<String, Command>) fKownCmds.get(commandMap);
 				fKownCmds.setAccessible(false);
 			} else { // For 1.13 servers
-				Method m = map.getClass().getDeclaredMethod("getKnownCommands");
-				knownCmds = (HashMap<String, Command>) m.invoke(map);
+				Method m = commandMap.getClass().getDeclaredMethod("getKnownCommands");
+				knownCmds = (HashMap<String, Command>) m.invoke(commandMap);
 			}
 
 			knownCmds.remove(command.getName());

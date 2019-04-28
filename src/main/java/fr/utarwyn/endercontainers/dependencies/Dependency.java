@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.dependencies;
 
-import fr.utarwyn.endercontainers.EnderContainers;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 
 /**
  * Class which represents a plugin dependency
@@ -15,14 +16,6 @@ public abstract class Dependency implements DependencyListener {
 	private String name;
 
 	/**
-	 * Construct a dependency object with a specified name of the plugin
-	 * @param name Name of the plugin to work with
-	 */
-	Dependency(String name) {
-		this.name = name;
-	}
-
-	/**
 	 * Returns the name of the dependency
 	 * @return The name of the dependency
 	 */
@@ -31,11 +24,20 @@ public abstract class Dependency implements DependencyListener {
 	}
 
 	/**
-	 * Get the plugin more easily than using the static way.
-	 * @return The EnderContainers main class
+	 * Define the name of the plugin used by the dependency object
+	 * @param name Name of the Bukkit plugin
 	 */
-	protected EnderContainers getPlugin() {
-		return EnderContainers.getInstance();
+	void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * Gets the version of the linked plugin.
+	 * @return Version of the plugin used for the dependency!
+	 */
+	protected String getPluginVersion() {
+		Plugin plugin = Bukkit.getPluginManager().getPlugin(this.name);
+		return plugin != null ? plugin.getDescription().getVersion() : null;
 	}
 
 	/**

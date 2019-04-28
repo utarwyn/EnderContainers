@@ -1,4 +1,4 @@
-package fr.utarwyn.endercontainers.dependencies;
+package fr.utarwyn.endercontainers.dependencies.faction;
 
 import com.massivecraft.factions.*;
 import com.massivecraft.factions.zcore.fperms.Access;
@@ -9,7 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-public class Factions0106Dependency implements FactionsHook {
+public class FactionsLegacyHook implements FactionsHook {
 
 	@Override
 	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {

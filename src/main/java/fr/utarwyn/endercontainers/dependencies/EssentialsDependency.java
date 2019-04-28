@@ -11,10 +11,6 @@ import java.util.List;
 
 public class EssentialsDependency extends Dependency {
 
-	EssentialsDependency() {
-		super("Essentials");
-	}
-
 	@Override
 	public void onEnable() {
 		// Remove the essentials /enderchest command from the server!
@@ -25,7 +21,7 @@ public class EssentialsDependency extends Dependency {
 		PluginCommand pluginCommand = Bukkit.getPluginCommand("essentials:enderchest");
 
 		// Server administrators can keep up the Essentials command by adding it to the list of overridden commands.
-		if (pluginCommand != null && (overriddenCmds == null || !overriddenCmds.contains("enderchest"))) {
+		if (pluginCommand != null && !overriddenCmds.contains("enderchest")) {
 			AbstractCommand.unregister(pluginCommand);
 		}
 	}

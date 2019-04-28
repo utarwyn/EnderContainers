@@ -10,19 +10,15 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.util.HashSet;
+import java.util.Optional;
+
 /**
  * Dependency used to interact with the PlotSquared plugin
  * @since 1.0.6
  * @author Utarwyn
  */
 public class PlotSquaredDependency extends Dependency {
-
-	/**
-	 * Construct the dependency object
-	 */
-	PlotSquaredDependency() {
-		super("PlotSquared");
-	}
 
 	/**
 	 * Called when the dependency is enabling
@@ -48,14 +44,19 @@ public class PlotSquaredDependency extends Dependency {
 	 */
 	@Override
 	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
-		Plot plot = this.getP2Location(block.getLocation()).getPlot();
+		Location location = this.getP2Location(block.getLocation());
+		if (location == null) return true;
+
+		Plot plot = location.getPlot();
 		if (plot == null || player.isOp()) return true;
 
-		if (plot.hasFlag(Flags.USE)) {
+		Optional<HashSet<PlotBlock>> flag = plot.getFlag(Flags.USE);
+
+		if (flag.isPresent()) {
 			boolean containsBlock = false;
 			PlotBlock enderchestBlock = PlotBlock.get(Material.ENDER_CHEST.getId(), (byte) 0);
 
-			for (PlotBlock plotBlock : plot.getFlag(Flags.USE).get()) {
+			for (PlotBlock plotBlock : flag.get()) {
 				if (plotBlock.equals(enderchestBlock)) {
 					containsBlock = true;
 					break;
@@ -63,8 +64,9 @@ public class PlotSquaredDependency extends Dependency {
 			}
 
 			if (containsBlock && !plot.isAdded(player.getUniqueId())) {
-				if (sendMessage)
+				if (sendMessage) {
 					PluginMsg.errorSMessage(player, Locale.accessDeniedPlotSq);
+				}
 
 				return false;
 			}
@@ -79,7 +81,11 @@ public class PlotSquaredDependency extends Dependency {
 	 * @return The Plot² formatted Location
 	 */
 	private Location getP2Location(org.bukkit.Location location) {
-		return new Location(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+		if (location.getWorld() != null) {
+			return new Location(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+		} else {
+			return null;
+		}
 	}
 
 }

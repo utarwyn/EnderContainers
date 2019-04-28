@@ -1,4 +1,4 @@
-package fr.utarwyn.endercontainers.dependencies;
+package fr.utarwyn.endercontainers.dependencies.faction;
 
 import com.massivecraft.factions.entity.*;
 import com.massivecraft.massivecore.ps.PS;
@@ -8,7 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-public class Factions0212Dependency implements FactionsHook {
+public class FactionsV2Hook implements FactionsHook {
 
 	@Override
 	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {

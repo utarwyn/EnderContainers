@@ -221,7 +221,7 @@ public class UUIDFetcher {
 	 */
 	private static class Cache<K, V> {
 
-		private long expireTime = 1000 * 60 * 5; //default 5 min
+		private long expireTime = 1000L * 60 * 5; //default 5 min
 
 		private Map<K, CachedEntry<V>> map = new HashMap<>();
 

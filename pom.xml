@@ -22,6 +22,22 @@
         </license>
     </licenses>
 
+    <properties>
+        <bukkit.version>1.13.2-R0.1-SNAPSHOT</bukkit.version>
+        <dbcp.version>2.1.1</dbcp.version>
+        <citizensapi.version>2.0.23-SNAPSHOT</citizensapi.version>
+        <worldguard.version>6.1.1-SNAPSHOT</worldguard.version>
+        <factions.version>2.12.1</factions.version>
+        <factions.legacy.version>1.6.9.5-U0.2.2</factions.legacy.version>
+        <plotsquared.version>latest</plotsquared.version>
+        <bstats.version>1.2</bstats.version>
+        <junit.version>4.11</junit.version>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
     <repositories>
         <repository>
             <id>spigot-repo</id>
@@ -32,22 +48,19 @@
             <url>http://repo.citizensnpcs.co/</url>
         </repository>
         <repository>
-            <id>sk89q-repo</id>
+            <id>worldguard-repo</id>
             <url>http://maven.sk89q.com/repo/</url>
         </repository>
-        <!-- PlotSquared repo -->
         <repository>
             <id>plotsquared-repo</id>
             <url>http://ci.athion.net/job/PlotSquared-Releases/ws/mvn/</url>
         </repository>
-        <!-- Factions&MassiveCore repo -->
         <repository>
-            <id>fractal-repo</id>
+            <id>factions-repo</id>
             <url>https://fractal.lindegaard.one:8187/artifactory/plugins-release/</url>
         </repository>
-        <!-- FactionsUUID repo -->
         <repository>
-            <id>factionsuuid-repo</id>
+            <id>factions-legacy-repo</id>
             <url>https://ci.ender.zone/plugin/repository/everything/</url>
         </repository>
         <repository>
@@ -61,21 +74,21 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.13.1-R0.1-SNAPSHOT</version>
+            <version>${bukkit.version}</version>
         </dependency>
 
         <!-- DBCP 2 -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
-            <version>2.1.1</version>
+            <version>${dbcp.version}</version>
         </dependency>
 
         <!-- Citizens -->
         <dependency>
             <groupId>net.citizensnpcs</groupId>
             <artifactId>citizensapi</artifactId>
-            <version>2.0.23-SNAPSHOT</version>
+            <version>${citizensapi.version}</version>
             <type>jar</type>
         </dependency>
 
@@ -83,24 +96,24 @@
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldguard</artifactId>
-            <version>6.1.1-SNAPSHOT</version>
+            <version>${worldguard.version}</version>
         </dependency>
 
         <!-- Factions -->
         <dependency>
             <groupId>com.massivecraft.massivecore</groupId>
             <artifactId>MassiveCore</artifactId>
-            <version>2.12.1</version>
+            <version>${factions.version}</version>
         </dependency>
         <dependency>
             <groupId>com.massivecraft.factions</groupId>
             <artifactId>Factions</artifactId>
-            <version>2.12.1</version>
+            <version>${factions.version}</version>
         </dependency>
         <dependency>
             <groupId>com.massivecraft</groupId>
             <artifactId>Factions</artifactId>
-            <version>1.6.9.5-U0.2.2</version>
+            <version>${factions.legacy.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -118,7 +131,7 @@
         <dependency>
             <groupId>com.github.intellectualsites.plotsquared</groupId>
             <artifactId>PlotSquared-API</artifactId>
-            <version>latest</version>
+            <version>${plotsquared.version}</version>
             <type>jar</type>
             <exclusions>
                 <exclusion>
@@ -128,19 +141,17 @@
             </exclusions>
         </dependency>
 
-        <!-- JUnit -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
 
-        <!-- Metrics -->
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>1.2</version>
+            <version>${bstats.version}</version>
         </dependency>
     </dependencies>
 
@@ -186,11 +197,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <outputDirectory>target/</outputDirectory>
-    </properties>
 </project>

@@ -151,7 +151,7 @@ public class DatabaseManager extends AbstractManager {
 	public void saveEnderchestSets(List<DatabaseSet> chestSets) {
 		for (DatabaseSet set : chestSets) {
 			database.update(formatTable(CHEST_TABLE))
-					.fields((String[]) set.getKeys().toArray())
+					.fields(set.getKeys().toArray(new String[0]))
 					.values(set.getValues())
 					.execute();
 		}
