@@ -2,13 +2,14 @@ package fr.utarwyn.endercontainers.dependencies.faction;
 
 import com.massivecraft.factions.entity.*;
 import com.massivecraft.massivecore.ps.PS;
+import fr.utarwyn.endercontainers.dependencies.DependencyListener;
 import fr.utarwyn.endercontainers.util.Locale;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-public class FactionsV2Hook implements FactionsHook {
+public class FactionsV2Hook implements DependencyListener {
 
 	@Override
 	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {

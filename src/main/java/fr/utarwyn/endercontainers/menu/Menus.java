@@ -65,11 +65,6 @@ public class Menus implements Listener {
 	 */
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {
-		// We need to be sure that the top inventory of the current view exists!
-		if (event.getView().getTopInventory() == null) {
-			return;
-		}
-
 		// Only detect clicks inside the top inventory of the view!
 		Inventory inventory = event.getView().getTopInventory();
 
@@ -120,25 +115,23 @@ public class Menus implements Listener {
 	 */
 	public static void closeAll() {
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.getOpenInventory() == null || player.getOpenInventory().getTopInventory() == null)
-				continue;
-
 			Inventory openInv = player.getOpenInventory().getTopInventory();
-			if (openInv.getType() == InventoryType.ENDER_CHEST) {
+			if (InventoryType.ENDER_CHEST.equals(openInv.getType())) {
 				player.closeInventory();
 				continue;
 			}
 
-			if (menuSet == null) continue;
+			if (menuSet != null) {
+				for (AbstractMenu menu : menuSet) {
+					if (openInv.getHolder() == menu) {
+						menu.updateItems();
+						menu.onClose(player);
 
-			for (AbstractMenu menu : menuSet)
-				if (openInv.getHolder() == menu) {
-					menu.updateItems();
-					menu.onClose(player);
-
-					player.closeInventory();
-					break;
+						player.closeInventory();
+						break;
+					}
 				}
+			}
 		}
 	}
 

@@ -14,7 +14,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -88,12 +87,11 @@ public class HologramManager extends AbstractManager implements Runnable {
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (Config.disabledWorlds.contains(player.getWorld().getName())) continue;
+
 			UUID uuid = player.getUniqueId();
+			Block b = player.getTargetBlock(null, 6);
 
-			Block b = player.getTargetBlock((Set<Material>) null, 6);
-			if (b == null) continue;
-
-			if (b.getType().equals(Material.ENDER_CHEST)) {
+			if (Material.ENDER_CHEST.equals(b.getType())) {
 				if (this.holograms.containsKey(uuid)) continue;
 
 				// Check player perms before displaying the hologram

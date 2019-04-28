@@ -3,10 +3,11 @@ package fr.utarwyn.endercontainers.dependencies;
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.dependencies.faction.FactionsDependency;
+import fr.utarwyn.endercontainers.dependencies.worldguard.WorldGuardDependency;
 import fr.utarwyn.endercontainers.util.Log;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +21,11 @@ import java.util.Map;
  * @since 1.0.3
  */
 public class DependenciesManager extends AbstractManager implements DependencyListener {
+
+	/**
+	 * The Bukkit plugin manager
+	 */
+	private PluginManager pluginManager;
 
 	/**
 	 * A list of all loaded dependencies
@@ -39,6 +45,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	@Override
 	public void load() {
 		this.dependencies = new ArrayList<>();
+		this.pluginManager = this.getPlugin().getServer().getPluginManager();
 
 		this.loadDependencies();
 		this.logLoadedDependencies();
@@ -90,7 +97,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 
 		// And register them if the plugin is loaded on the server.
 		for (Map.Entry<String, Class<? extends Dependency>> dependency : dependencies.entrySet()) {
-			if (isValidPlugin(dependency.getKey())) {
+			if (this.pluginManager.isPluginEnabled(dependency.getKey())) {
 				try {
 					this.registerDependency(dependency.getKey(), dependency.getValue().newInstance());
 				} catch (InstantiationException | IllegalAccessException e) {
@@ -128,17 +135,9 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	 */
 	private void registerDependency(String name, Dependency dependency) {
 		dependency.setName(name);
+		dependency.setPlugin(this.pluginManager.getPlugin(name));
 		dependency.onEnable();
 		this.dependencies.add(dependency);
-	}
-
-	/**
-	 * Enable us to know if a plugin is loaded and enabled on the server
-	 * @param name Name of the plugin to check
-	 * @return if the plugin is loaded and enabled
-	 */
-	private boolean isValidPlugin(String name) {
-		return Bukkit.getPluginManager().isPluginEnabled(name);
 	}
 
 }

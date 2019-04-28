@@ -21,22 +21,6 @@ import java.util.Optional;
 public class PlotSquaredDependency extends Dependency {
 
 	/**
-	 * Called when the dependency is enabling
-	 */
-	@Override
-	public void onEnable() {
-
-	}
-
-	/**
-	 * Called when the dependency is disabling
-	 */
-	@Override
-	public void onDisable() {
-
-	}
-
-	/**
 	 * Called when a player wants to open its enderchest by interacting with an enderchest block
 	 * @param block The block clicked by the player
 	 * @param player The player who interacts with the chest

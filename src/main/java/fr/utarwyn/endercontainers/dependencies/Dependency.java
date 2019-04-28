@@ -1,6 +1,5 @@
 package fr.utarwyn.endercontainers.dependencies;
 
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -14,6 +13,25 @@ public abstract class Dependency implements DependencyListener {
 	 * The name of the plugin/dependency
 	 */
 	private String name;
+
+	/**
+	 * Plugin attached to the dependency object
+	 */
+	private Plugin plugin;
+
+	/**
+	 * Called when the dependency have been enabled
+	 */
+	public void onEnable() {
+
+	}
+
+	/**
+	 * Called when the dependency have been disabled
+	 */
+	public void onDisable() {
+
+	}
 
 	/**
 	 * Returns the name of the dependency
@@ -32,22 +50,28 @@ public abstract class Dependency implements DependencyListener {
 	}
 
 	/**
+	 * Gets the plugin attached to the dependency if loaded and enabled
+	 * @return the Bukkit plugin
+	 */
+	protected Plugin getPlugin() {
+		return this.plugin;
+	}
+
+	/**
+	 * Attached a Plugin object to the dependency object
+	 * @param plugin Bukkit plugin to attach
+	 */
+	void setPlugin(Plugin plugin) {
+		this.plugin = plugin;
+	}
+
+	/**
 	 * Gets the version of the linked plugin.
 	 * @return Version of the plugin used for the dependency!
 	 */
 	protected String getPluginVersion() {
-		Plugin plugin = Bukkit.getPluginManager().getPlugin(this.name);
+		Plugin plugin = this.getPlugin();
 		return plugin != null ? plugin.getDescription().getVersion() : null;
 	}
-
-	/**
-	 * Called when the dependency have been enabled
-	 */
-	public abstract void onEnable();
-
-	/**
-	 * Called when the dependency have been disabled
-	 */
-	public abstract void onDisable();
 
 }

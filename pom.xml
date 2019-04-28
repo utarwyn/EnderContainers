@@ -26,7 +26,8 @@
         <bukkit.version>1.13.2-R0.1-SNAPSHOT</bukkit.version>
         <dbcp.version>2.1.1</dbcp.version>
         <citizensapi.version>2.0.23-SNAPSHOT</citizensapi.version>
-        <worldguard.version>6.1.1-SNAPSHOT</worldguard.version>
+        <worldguard.version>7.0.0-SNAPSHOT</worldguard.version>
+        <worldguard.old.version>6.1.1-SNAPSHOT</worldguard.old.version>
         <factions.version>2.12.1</factions.version>
         <factions.legacy.version>1.6.9.5-U0.2.2</factions.legacy.version>
         <plotsquared.version>latest</plotsquared.version>
@@ -50,7 +51,7 @@
         </repository>
         <repository>
             <id>worldguard-repo</id>
-            <url>http://maven.sk89q.com/repo/</url>
+            <url>https://maven.sk89q.com/repo/</url>
         </repository>
         <repository>
             <id>plotsquared-repo</id>
@@ -76,6 +77,7 @@
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
             <version>${bukkit.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- DBCP 2 -->
@@ -90,14 +92,42 @@
             <groupId>net.citizensnpcs</groupId>
             <artifactId>citizensapi</artifactId>
             <version>${citizensapi.version}</version>
+            <scope>provided</scope>
             <type>jar</type>
         </dependency>
 
-        <!-- WorldGuard -->
+        <!-- WorldGuard 6+ and 7+ -->
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldguard</artifactId>
+            <version>${worldguard.old.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sk89q.spigot</groupId>
+                    <artifactId>bukkit-classloader-check</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sk89q</groupId>
+                    <artifactId>commandbook</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldguard</groupId>
+            <artifactId>worldguard-legacy</artifactId>
             <version>${worldguard.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bukkit</groupId>
+                    <artifactId>bukkit</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sk89q</groupId>
+                    <artifactId>commandbook</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Factions -->
@@ -105,11 +135,13 @@
             <groupId>com.massivecraft.massivecore</groupId>
             <artifactId>MassiveCore</artifactId>
             <version>${factions.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.massivecraft.factions</groupId>
             <artifactId>Factions</artifactId>
             <version>${factions.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.massivecraft</groupId>
@@ -118,12 +150,8 @@
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>mkremins</groupId>
-                    <artifactId>fanciful</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sk89q</groupId>
-                    <artifactId>worldguard</artifactId>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -133,6 +161,7 @@
             <groupId>com.github.intellectualsites.plotsquared</groupId>
             <artifactId>PlotSquared-API</artifactId>
             <version>${plotsquared.version}</version>
+            <scope>provided</scope>
             <type>jar</type>
             <exclusions>
                 <exclusion>
