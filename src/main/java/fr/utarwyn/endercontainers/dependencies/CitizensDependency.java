@@ -56,7 +56,7 @@ public class CitizensDependency extends Dependency implements Listener {
 	/**
 	 * The collection which store all links established between EnderContainers and Citizens
 	 */
-	private Set<NPCLink> NPCLinks;
+	private Set<NPCLink> links;
 
 	/**
 	 * Called when a player type a command that starts with "/ecp npc"
@@ -275,7 +275,7 @@ public class CitizensDependency extends Dependency implements Listener {
 			e.printStackTrace();
 		}
 
-		NPCLinks.remove(link);
+		links.remove(link);
 	}
 
 	/**
@@ -284,7 +284,7 @@ public class CitizensDependency extends Dependency implements Listener {
 	 * @return The found link with the npc id passed to the method
 	 */
 	private NPCLink getNPCLinkById(Integer npcId) {
-		for (NPCLink npcLink : NPCLinks) {
+		for (NPCLink npcLink : links) {
 			if (Objects.equals(npcLink.getNPCId(), npcId))
 				return npcLink;
 		}
@@ -296,7 +296,7 @@ public class CitizensDependency extends Dependency implements Listener {
 	 * Reload all links from the configuration
 	 */
 	private void reloadLinks() {
-		NPCLinks.clear();
+		links.clear();
 
 		for (String linkId : this.configuration.getKeys(false)) {
 			int npcId = Integer.parseInt(linkId);
@@ -304,7 +304,7 @@ public class CitizensDependency extends Dependency implements Listener {
 			int delay = this.configuration.getInt(linkId + ".delay");
 
 			int enderchestNumber = this.configuration.contains(linkId + ".chestNumber") ? this.configuration.getInt(linkId + ".chestNumber") : -1;
-			NPCLinks.add(new NPCLink(npcId, type, delay, enderchestNumber));
+			links.add(new NPCLink(npcId, type, delay, enderchestNumber));
 		}
 	}
 
@@ -474,7 +474,7 @@ public class CitizensDependency extends Dependency implements Listener {
 		this.configuration = YamlConfiguration.loadConfiguration(file);
 
 		this.playersChatEditMode = new HashSet<>();
-		this.NPCLinks = new HashSet<>();
+		this.links = new HashSet<>();
 
 		Bukkit.getPluginManager().registerEvents(this, EnderContainers.getInstance());
 		this.reloadLinks();

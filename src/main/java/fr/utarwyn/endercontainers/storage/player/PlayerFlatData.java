@@ -5,8 +5,10 @@ import fr.utarwyn.endercontainers.storage.FlatFile;
 import fr.utarwyn.endercontainers.util.ItemSerializer;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
 /**
  * Storage wrapper for player data (flatfile)
@@ -23,12 +25,20 @@ public class PlayerFlatData extends PlayerData {
 
 	@Override
 	protected void load() {
-		this.flatFile = new FlatFile("data/" + this.getMinimalUUID() + ".yml");
+		try {
+			this.flatFile = new FlatFile("data/" + this.getMinimalUUID() + ".yml");
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Cannot load the data file of the user" + this.getUUID(), e);
+		}
 	}
 
 	@Override
 	protected void save() {
-		this.flatFile.save();
+		try {
+			this.flatFile.save();
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Cannot save the data file of the user " + this.getUUID(), e);
+		}
 	}
 
 	@Override

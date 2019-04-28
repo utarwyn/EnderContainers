@@ -35,24 +35,24 @@ public class InfoCommand extends AbstractBackupCommand {
 
 		PluginMsg.pluginBar(sender);
 		sender.sendMessage(" ");
-		sender.sendMessage(" §7  " + Locale.backupLabelName + ": §r" + backup.getName() + " §7(" + backup.getType() + ")");
-		sender.sendMessage(" §7  " + Locale.backupLabelDate + ": §r" + DATE_FORMAT.format(backup.getDate()));
-		sender.sendMessage(" §7  " + Locale.backupLabelBy + ": §e" + backup.getCreatedBy());
+		sender.sendMessage(" " + ChatColor.GRAY + "  " + Locale.backupLabelName + ": §r" + backup.getName() + " §7(" + backup.getType() + ")");
+		sender.sendMessage(" " + ChatColor.GRAY + "  " + Locale.backupLabelDate + ": §r" + DATE_FORMAT.format(backup.getDate()));
+		sender.sendMessage(" " + ChatColor.GRAY + "  " + Locale.backupLabelBy + ": §e" + backup.getCreatedBy());
 		sender.sendMessage(" ");
-		sender.sendMessage(" §8  " + Locale.backupLabelLoadCmd + ": §d/ecp backup load " + name);
-		sender.sendMessage(" §8  " + Locale.backupLabelRmCmd + ": §c/ecp backup remove " + name);
+		sender.sendMessage(" " + ChatColor.DARK_GRAY + "  " + Locale.backupLabelLoadCmd + ": §d/ecp backup load " + name);
+		sender.sendMessage(" " + ChatColor.DARK_GRAY + "  " + Locale.backupLabelRmCmd + ": §c/ecp backup remove " + name);
 		sender.sendMessage(" ");
 		PluginMsg.endBar(sender);
 	}
 
 	@Override
 	public void performPlayer(Player player) {
-
+		// No behavior only for players for this command
 	}
 
 	@Override
 	public void performConsole(CommandSender sender) {
-
+		// No behavior only for the console for this command
 	}
 
 }

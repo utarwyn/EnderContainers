@@ -6,13 +6,13 @@ import java.util.List;
 
 public class Parameter {
 
-	public final static Parameter INT = new Parameter(new ParameterIntChecker());
+	public static final Parameter INT = new Parameter(new ParameterIntChecker());
 
-	public final static Parameter FLOAT = new Parameter(new ParameterFloatChecker());
+	public static final Parameter FLOAT = new Parameter(new ParameterFloatChecker());
 
-	public final static Parameter DOUBLE = new Parameter(new ParameterDoubleChecker());
+	public static final Parameter DOUBLE = new Parameter(new ParameterDoubleChecker());
 
-	public final static Parameter STRING = new Parameter(null);
+	public static final Parameter STRING = new Parameter(null);
 
 	private ParameterChecker checker;
 

@@ -51,6 +51,7 @@ public class EnderChestMenu extends AbstractMenu {
 
 	@Override
 	public void prepare() {
+		// No preparation needed for this menu
 	}
 
 	@Override
@@ -76,10 +77,11 @@ public class EnderChestMenu extends AbstractMenu {
 		if (EnderContainers.getInstance().isEnabled()) {
 			Bukkit.getScheduler().runTaskAsynchronously(EnderContainers.getInstance(), this.enderChest::save);
 
-			if (Config.globalSound)
+			if (Config.globalSound) {
 				EUtil.playSound(player.getLocation(), "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
-			else
+			} else {
 				EUtil.playSound(player, "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
+			}
 		} else {
 			// Do the save synchronously because the plugin is disabling...
 			this.enderChest.save();
@@ -93,8 +95,9 @@ public class EnderChestMenu extends AbstractMenu {
 			assert chest != null;
 
 			player.openInventory(chest);
-		} else
+		} else {
 			super.open(player);
+		}
 	}
 
 }

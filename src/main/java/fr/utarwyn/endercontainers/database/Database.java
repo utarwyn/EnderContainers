@@ -42,9 +42,9 @@ public class Database implements AutoCloseable {
 	private String password;
 
 	/**
-	 * Database used to store data
+	 * Name of the database used to store data
 	 */
-	private String database;
+	private String name;
 
 	/**
 	 * Source object used to perform requests to the database
@@ -57,14 +57,14 @@ public class Database implements AutoCloseable {
 	 * @param port Port of the MySQL server
 	 * @param user Username to connect to the database
 	 * @param password Password to connect to the database
-	 * @param database The name of the database
+	 * @param name The name of the database
 	 */
-	Database(String host, int port, String user, String password, String database) {
+	Database(String host, int port, String user, String password, String name) {
 		this.host = host;
 		this.port = port;
 		this.user = user;
 		this.password = password;
-		this.database = database;
+		this.name = name;
 
 		try {
 			this.createPool();
@@ -88,7 +88,7 @@ public class Database implements AutoCloseable {
 	public void emptyTable(String tableName) throws SQLException {
 		try (Connection connection = this.source.getConnection();
 			 Statement statement = connection.createStatement()) {
-			statement.executeUpdate("USE `" + this.database + "`");
+			statement.executeUpdate("USE `" + this.name + "`");
 			statement.executeUpdate("SET SQL_SAFE_UPDATES = 0;");
 			statement.executeUpdate("truncate `" + tableName + "`");
 			statement.executeUpdate("SET SQL_SAFE_UPDATES = 1;");
@@ -102,7 +102,7 @@ public class Database implements AutoCloseable {
 	public void dropTable(String tableName) throws SQLException {
 		try (Connection connection = this.source.getConnection();
 			 Statement statement = connection.createStatement()) {
-			statement.executeUpdate("USE `" + this.database + "`");
+			statement.executeUpdate("USE `" + this.name + "`");
 			statement.executeUpdate("DROP TABLE `" + tableName + "`");
 		}
 	}
@@ -126,7 +126,7 @@ public class Database implements AutoCloseable {
 		try (Connection connection = this.source.getConnection()) {
 			String version = connection.getMetaData().getDatabaseProductVersion();
 
-			if (version.indexOf("-") > 0) {
+			if (version.indexOf('-') > -1) {
 				version = version.split("-")[0];
 			}
 
@@ -242,7 +242,7 @@ public class Database implements AutoCloseable {
 	private void createPool() throws SQLException {
 		source = new BasicDataSource();
 		source.setDriverClassName("com.mysql.jdbc.Driver");
-		source.setUrl("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database);
+		source.setUrl("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.name);
 		source.setUsername(this.user);
 		source.setPassword(this.password);
 

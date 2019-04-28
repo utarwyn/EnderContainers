@@ -54,7 +54,7 @@ public abstract class PlayerData extends StorageWrapper {
 		return this.uuid.toString().replaceAll("-", "");
 	}
 
-	protected boolean equals(Object... params) {
+	protected boolean hasParams(Object... params) {
 		return params.length == 1 && this.uuid.equals(params[0]);
 	}
 

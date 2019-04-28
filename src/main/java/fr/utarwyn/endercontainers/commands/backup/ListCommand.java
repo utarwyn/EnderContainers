@@ -23,14 +23,15 @@ public class ListCommand extends AbstractBackupCommand {
 	public void perform(CommandSender sender) {
 		List<Backup> backups = this.manager.getBackups();
 
-		if (backups.size() > 0) {
+		if (!backups.isEmpty()) {
 			PluginMsg.pluginBar(sender);
 			sender.sendMessage(" ");
 
-			for (Backup backup : backups)
+			for (Backup backup : backups) {
 				sender.sendMessage(
 						" §r §7 Backup §b" + backup.getName() + "§7. Created by §e" + backup.getCreatedBy() + "§7."
 				);
+			}
 
 			sender.sendMessage(" ");
 			sender.sendMessage(" §r §7" + Locale.backupInfo.replace("%command%", "/ecp backup info <name>"));
@@ -43,11 +44,11 @@ public class ListCommand extends AbstractBackupCommand {
 
 	@Override
 	public void performPlayer(Player player) {
-
+		// No behavior only for players for this command
 	}
 
 	@Override
 	public void performConsole(CommandSender sender) {
-
+		// No behavior only for the console for this command
 	}
 }

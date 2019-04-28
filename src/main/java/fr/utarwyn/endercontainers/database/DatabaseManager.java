@@ -59,7 +59,7 @@ public class DatabaseManager extends AbstractManager {
 		if (this.database.isConnected()) {
 			this.logger.info("MySQL enabled and ready. Connected to database " + Config.mysqlHost + ":" + Config.mysqlPort);
 			if (Config.debug) {
-				this.logger.info("Connection time: " + (System.currentTimeMillis() - begin) + "ms");
+				this.logger.info(String.format("Connection time: %dms", System.currentTimeMillis() - begin));
 			}
 
 			this.init();
@@ -77,8 +77,8 @@ public class DatabaseManager extends AbstractManager {
 	protected void unload() {
 		try {
 			this.database.close();
-		} catch (SQLException ex) {
-			this.logger.log(Level.SEVERE, "Cannot close the database connection.", ex);
+		} catch (SQLException e) {
+			this.logger.log(Level.SEVERE, "Cannot close the database connection.", e);
 		}
 	}
 
@@ -218,8 +218,13 @@ public class DatabaseManager extends AbstractManager {
 	 * @return True if the backup was successfully removed.
 	 */
 	public boolean removeBackup(String name) {
-		return this.database.delete("`name` = ?").from(formatTable(BACKUP_TABLE))
-				.attributes(name).execute();
+		try {
+			return this.database.delete("`name` = ?").from(formatTable(BACKUP_TABLE))
+					.attributes(name).execute();
+		} catch (SQLException e) {
+			this.logger.log(Level.SEVERE, "Cannot delete backup " + name + " from the database", e);
+			return false;
+		}
 	}
 
 	/**
@@ -233,13 +238,13 @@ public class DatabaseManager extends AbstractManager {
 			if (!tables.contains(formatTable(CHEST_TABLE))) {
 				database.request("CREATE TABLE `" + formatTable(CHEST_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `num` TINYINT(2) NOT NULL DEFAULT '0', `owner` VARCHAR(36) NULL, `contents` MEDIUMTEXT NULL, `rows` INT(1) NOT NULL DEFAULT 0, `last_locking_time` TIMESTAMP NULL, PRIMARY KEY (`id`), INDEX `USER KEY` (`num`, `owner`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
 				if (Config.debug) {
-					this.logger.info("Table `" + formatTable(CHEST_TABLE) + "` created in the database.");
+					this.logger.info(String.format("Table `%s` created in the database.", formatTable(CHEST_TABLE)));
 				}
 			}
 			if (!tables.contains(formatTable(BACKUP_TABLE))) {
 				database.request("CREATE TABLE `" + formatTable(BACKUP_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255) NOT NULL, `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `type` VARCHAR(60) NULL, `data` MEDIUMTEXT NULL, `created_by` VARCHAR(60) NULL, PRIMARY KEY (`id`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
 				if (Config.debug) {
-					this.logger.info("Table `" + formatTable(BACKUP_TABLE) + "` created in the database.");
+					this.logger.info(String.format("Table `%s` created in the database.", formatTable(BACKUP_TABLE)));
 				}
 			}
 		} catch (SQLException e) {

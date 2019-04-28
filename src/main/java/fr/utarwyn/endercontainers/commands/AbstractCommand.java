@@ -135,7 +135,7 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 	}
 
 	@Override
-	public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalStateException {
+	public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
 		List<String> customCompletions = new ArrayList<>();
 
 		// Check sub-commands completions first
@@ -178,7 +178,6 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 				String lastWord = args[args.length - 1];
 				List<String> completions = param.getTabCompletions();
 
-
 				if (completions != null) {
 					// Don't forget to sort all completions :)
 					Iterator<String> completionsIterator = completions.iterator();
@@ -197,8 +196,9 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 						if (StringUtil.startsWithIgnoreCase(completion, lastWord))
 							matchedCompletions.add(completion);
 					}
-				} else
+				} else {
 					customCompletions.addAll(super.tabComplete(sender, alias, args));
+				}
 			}
 		}
 
@@ -303,7 +303,7 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 		if (this.parameters.get(idx).equalsTo(Parameter.STRING))
 			return (T) arg;
 
-		return (T) this.parseArg(arg);
+		return this.parseArg(arg);
 	}
 
 	@SuppressWarnings("unchecked")

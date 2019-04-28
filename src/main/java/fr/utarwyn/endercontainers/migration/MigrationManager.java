@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Manages, loads and runs migrations for the plugin
@@ -64,7 +65,8 @@ public class MigrationManager extends AbstractManager {
 			this.logger.info("If you have any error after the restart, please contact the plugin's author!");
 		}
 
-		this.writeVersion(Migration.getPluginVersion());
+		// Write the current version of the plugin in the "version" file
+		this.writeVersion(EnderContainers.getInstance().getDescription().getVersion());
 	}
 
 	/**
@@ -72,7 +74,7 @@ public class MigrationManager extends AbstractManager {
 	 */
 	@Override
 	protected void unload() {
-
+		// Nothing to do when unloading this manager...
 	}
 
 	/**
@@ -102,13 +104,14 @@ public class MigrationManager extends AbstractManager {
 		}
 
 		// Otherwise use only the general migration class
-		if (migrationClazz == null)
+		if (migrationClazz == null) {
 			migrationClazz = clazz;
+		}
 
 		try {
 			this.migrations.add(migrationClazz.newInstance());
 		} catch (InstantiationException | IllegalAccessException e) {
-			e.printStackTrace();
+			this.logger.log(Level.SEVERE, "Cannot instanciate the migration class " + clazz.getName(), e);
 		}
 	}
 
@@ -155,7 +158,7 @@ public class MigrationManager extends AbstractManager {
 			pw.print(version);
 			pw.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			this.logger.log(Level.SEVERE, "Cannot write the file \"version\"", e);
 		}
 	}
 

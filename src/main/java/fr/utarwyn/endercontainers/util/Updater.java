@@ -27,17 +27,17 @@ public class Updater {
 	/**
 	 * Stores the Spigot ressource ID to check for update
 	 */
-	private final static int RESSOURCE_ID = 4750;
+	private static final int RESSOURCE_ID = 4750;
 
 	/**
 	 * URL used to get the current version of the plugin
 	 */
-	private final static String VERSION_URL = "https://api.spiget.org/v2/resources/" + RESSOURCE_ID + "/versions?size=1&sort=-releaseDate";
+	private static final String VERSION_URL = "https://api.spiget.org/v2/resources/" + RESSOURCE_ID + "/versions?size=1&sort=-releaseDate";
 
 	/**
 	 * URL used to get the last update description of the plugin
 	 */
-	private final static String DESCRIPTION_URL = "https://api.spiget.org/v2/resources/" + RESSOURCE_ID + "/updates?size=1&sort=-date";
+	private static final String DESCRIPTION_URL = "https://api.spiget.org/v2/resources/" + RESSOURCE_ID + "/updates?size=1&sort=-date";
 
 	/**
 	 * Stores if the plugin is up to date or not.
@@ -109,8 +109,9 @@ public class Updater {
 			this.upToDate = !this.compareVersion(this.getLocalVersion(), lastVersion);
 			this.newestVersion = lastVersion;
 
-			if (!this.upToDate)
+			if (!this.upToDate) {
 				this.searchUpdateTitle();
+			}
 		} catch (ParseException | IOException e) {
 			e.printStackTrace();
 		}
@@ -166,8 +167,9 @@ public class Updater {
 	 * @return Instance of this manager
 	 */
 	public static Updater getInstance() {
-		if (instance == null)
+		if (instance == null) {
 			instance = new Updater();
+		}
 
 		return instance;
 	}

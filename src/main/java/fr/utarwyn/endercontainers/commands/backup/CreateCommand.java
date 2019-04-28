@@ -34,12 +34,12 @@ public class CreateCommand extends AbstractBackupCommand {
 
 	@Override
 	public void performPlayer(Player player) {
-
+		// No behavior only for players for this command
 	}
 
 	@Override
 	public void performConsole(CommandSender sender) {
-
+		// No behavior only for the console for this command
 	}
 
 }

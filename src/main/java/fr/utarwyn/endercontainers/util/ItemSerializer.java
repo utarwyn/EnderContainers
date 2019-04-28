@@ -14,7 +14,7 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,13 +49,13 @@ public class ItemSerializer {
 	 * @return The ItemStacks formatted to string.
 	 */
 	private static String experimentalSerialization(Map<Integer, ItemStack> items) {
-		StringBuilder serialization = new StringBuilder(new String((items.size() + ";").getBytes(), Charset.forName("UTF-8")));
+		StringBuilder serialization = new StringBuilder(new String((items.size() + ";").getBytes(), StandardCharsets.UTF_8));
 
-		for (Integer slot : items.keySet()) {
-			ItemStack is = items.get(slot);
+		for (Map.Entry<Integer, ItemStack> entry : items.entrySet()) {
+			ItemStack is = entry.getValue();
 
 			if (is != null) {
-				StringBuilder serializedItemStack = new StringBuilder(new String("".getBytes(), Charset.forName("UTF-8")));
+				StringBuilder serializedItemStack = new StringBuilder(new String("".getBytes(), StandardCharsets.UTF_8));
 
 				// Item type
 				String isType = String.valueOf(is.getType());
@@ -77,21 +77,25 @@ public class ItemSerializer {
 				Map<Enchantment, Integer> isEnch = is.getEnchantments();
 
 				if (isEnch.size() > 0) {
-					for (Map.Entry<Enchantment, Integer> entry : isEnch.entrySet()) {
-						serializedItemStack
-								.append(":e@").append(CompatibilityHelper.enchantmentToString(entry.getKey()))
-								.append("@").append(entry.getValue());
+					for (Map.Entry<Enchantment, Integer> enchEntry : isEnch.entrySet()) {
+						serializedItemStack.append(":e@")
+								.append(CompatibilityHelper.enchantmentToString(enchEntry.getKey()))
+								.append("@").append(enchEntry.getValue());
 					}
 				}
 
 				// Display name
 				if (is.getItemMeta().getDisplayName() != null) {
-					String[] itemDisplayName = new String(is.getItemMeta().getDisplayName().getBytes(Charset.forName("UTF-8")), Charset.forName("UTF-8")).split(" ");
+					String[] itemDisplayName = new String(
+							is.getItemMeta().getDisplayName().getBytes(StandardCharsets.UTF_8),
+							StandardCharsets.UTF_8
+					).split(" ");
+
 					serializedItemStack.append(":n@");
 
-					for (String anItemDisplayName : itemDisplayName)
+					for (String anItemDisplayName : itemDisplayName) {
 						serializedItemStack.append(escapeItemDisplayName(anItemDisplayName)).append("=");
-
+					}
 				}
 
 				// Item descriptions
@@ -105,7 +109,7 @@ public class ItemSerializer {
 				}
 
 				// Slot where the itemstack is stored
-				serialization.append(slot).append("#").append(serializedItemStack).append(";");
+				serialization.append(entry.getKey()).append("#").append(serializedItemStack).append(";");
 			}
 		}
 
@@ -149,7 +153,7 @@ public class ItemSerializer {
 		// Parse every item in the string
 		for (int i = 1; i < serializedBlocks.length; i++) {
 			String[] serializedBlock = serializedBlocks[i].split("(?<!\\\\)#");
-			int stackPosition = Integer.valueOf(serializedBlock[0]);
+			int stackPosition = Integer.parseInt(serializedBlock[0]);
 
 			ItemStack is = null;
 			boolean createdItemStack = false;
@@ -164,7 +168,7 @@ public class ItemSerializer {
 
 					// Material ids is an old way to store items, now we use material names (more reliable).
 					if (StringUtils.isNumeric(value)) {
-						material = CompatibilityHelper.materialFromId(Integer.valueOf(value));
+						material = CompatibilityHelper.materialFromId(Integer.parseInt(value));
 					} else {
 						material = CompatibilityHelper.matchMaterial(value);
 					}
@@ -182,7 +186,7 @@ public class ItemSerializer {
 					} else
 						// Itemstack amount
 						if (itemAttribute[0].equals("a") && createdItemStack) {
-							is.setAmount(Integer.valueOf(itemAttribute[1]));
+							is.setAmount(Integer.parseInt(itemAttribute[1]));
 						} else
 							// Enchantments
 							if (itemAttribute[0].equals("e") && createdItemStack) {

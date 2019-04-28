@@ -154,7 +154,7 @@ public class EnderChest {
 	 * @return True if the chest is unused
 	 */
 	boolean isUnused() {
-		return this.getOwnerPlayer() == null && this.container.getViewers().size() == 0;
+		return this.getOwnerPlayer() == null && this.container.getViewers().isEmpty();
 	}
 
 	/**
@@ -266,12 +266,12 @@ public class EnderChest {
 	 * @return The accessibility generated or null if the player is not connected
 	 */
 	private Boolean genereateAccessibility() {
-		Player owner = this.getOwnerPlayer();
+		Player player = this.getOwnerPlayer();
 
 		if (this.isDefault()) return true;
-		if (owner == null) return null;
+		if (player == null) return null;
 
-		return EUtil.playerHasPerm(owner, "open." + this.getNum());
+		return EUtil.playerHasPerm(player, "open." + this.getNum());
 	}
 
 	/**

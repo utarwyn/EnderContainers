@@ -22,6 +22,7 @@ public class FactionsV2Hook implements DependencyListener {
 		// Init checking variables
 		Faction playerFac = mplayer.getFaction();
 		Faction currentFac = BoardColl.get().getFactionAt(PS.valueOf(block));
+		if (currentFac == null) return true;
 
 		boolean canOpen = false;
 		boolean playerFacIsReal = this.isRealFaction(playerFac);
@@ -30,21 +31,24 @@ public class FactionsV2Hook implements DependencyListener {
 
 		// Check factions custom permissions (and for all cases!)
 		if (playerFacIsReal && currentFacIsReal) {
-			if (currentFac == playerFac && playerFac.isPermitted(MPerm.getPermContainer(), mplayer.getRole()))
+			if (currentFac == playerFac && playerFac.isPermitted(MPerm.getPermContainer(), mplayer.getRole())) {
 				canOpen = true;
-			else if (currentFac != playerFac && currentFac.isPermitted(MPerm.getPermContainer(), currentFac.getRelationTo(playerFac)))
+			} else if (currentFac != playerFac && currentFac.isPermitted(MPerm.getPermContainer(), currentFac.getRelationTo(playerFac))) {
 				canOpen = true;
+			}
 
 			// Get relational color between factions
 			facColor = playerFac.getColorTo(currentFac);
-		} else
+		} else {
 			canOpen = !currentFacIsReal;
+		}
 
 		// Prevent to access to the enderchest if needed!
 		if (!canOpen) {
 			// Sending the message only in a specific case!
-			if (sendMessage)
+			if (sendMessage) {
 				PluginMsg.errorSMessage(player, Locale.accessDeniedFactions.replace("%faction%", facColor + currentFac.getName() + ChatColor.RED));
+			}
 
 			return false;
 		}

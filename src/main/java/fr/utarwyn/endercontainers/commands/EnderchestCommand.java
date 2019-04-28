@@ -25,7 +25,7 @@ public class EnderchestCommand extends AbstractCommand {
 
 	@Override
 	public void perform(CommandSender sender) {
-
+		// No global behavior for this command
 	}
 
 	@Override

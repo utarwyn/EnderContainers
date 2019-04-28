@@ -5,6 +5,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -89,7 +90,7 @@ public abstract class YamlLinker {
 				this.logger.severe(">> Are you sure that value '" + configuration.get(configKey) + "' is good?");
 				this.logger.severe("");
 
-				e.printStackTrace();
+				this.logger.log(Level.SEVERE, "Cannot parse the yaml file", e);
 
 				EnderContainers.getInstance().getPluginLoader().disablePlugin(EnderContainers.getInstance());
 				return false;

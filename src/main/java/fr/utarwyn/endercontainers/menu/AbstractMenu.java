@@ -78,8 +78,7 @@ public abstract class AbstractMenu implements InventoryHolder {
 	 */
 	public int getFilledSlotsNb() {
 		Map<Integer, ItemStack> copy = new HashMap<>(this.items);
-
-		copy.entrySet().removeIf((entry) -> entry.getValue() == null);
+		copy.entrySet().removeIf(entry -> entry.getValue() == null);
 		return copy.size();
 	}
 
@@ -108,8 +107,9 @@ public abstract class AbstractMenu implements InventoryHolder {
 	public void setRows(int rows) {
 		this.rows = rows;
 
-		if (this.inventory != null && this.inventory.getViewers().size() == 0)
+		if (this.inventory != null && this.inventory.getViewers().isEmpty()) {
 			this.inventory = null;
+		}
 	}
 
 	/**
@@ -205,14 +205,14 @@ public abstract class AbstractMenu implements InventoryHolder {
 			this.inventory = Bukkit.createInventory(this, size, this.title);
 		}
 
-		if (this.inventory.getViewers().size() == 0)
-			for (Integer index : items.keySet()) {
-				if (index < 0 || index >= this.inventory.getSize())
+		if (this.inventory.getViewers().isEmpty()) {
+			for (Map.Entry<Integer, ItemStack> entry : this.items.entrySet()) {
+				if (entry.getKey() < 0 || entry.getKey() >= this.inventory.getSize())
 					continue;
 
-				ItemStack i = items.get(index);
-				this.inventory.setItem(index, i);
+				this.inventory.setItem(entry.getKey(), entry.getValue());
 			}
+		}
 
 		return this.inventory;
 	}

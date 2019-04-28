@@ -107,7 +107,7 @@ public class SelectRequest implements IRequest {
 		this.limit(1);
 
 		List<DatabaseSet> sets = this.findAll();
-		return (sets == null || sets.size() == 0) ? null : sets.get(0);
+		return (sets == null || sets.isEmpty()) ? null : sets.get(0);
 	}
 
 	public List<DatabaseSet> findAll() throws SQLException {

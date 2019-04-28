@@ -27,7 +27,7 @@ public class FlatFile {
 	 * Constructs a new flat file object
 	 * @param path Path where the config file is located (under the plugin's data folder)
 	 */
-	public FlatFile(String path) {
+	public FlatFile(String path) throws IOException {
 		this.load(path);
 	}
 
@@ -42,34 +42,31 @@ public class FlatFile {
 	/**
 	 * Save the configuration in memory into the flat file on the disk
 	 */
-	public void save() {
-		if (this.configuration == null || this.file == null)
+	public void save() throws IOException {
+		if (this.configuration == null || this.file == null) {
 			throw new NullPointerException("File or configuration seems to be null!");
-
-		try {
-			this.configuration.save(this.file);
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
+
+		this.configuration.save(this.file);
 	}
 
 	/**
 	 * Load a .yml file into memory and load the configuration object
 	 * @param path Path where the config file is located (under the plugin's data folder)
 	 */
-	private void load(String path) {
+	private void load(String path) throws IOException {
 		this.file = new File(EnderContainers.getInstance().getDataFolder(), path);
 
 		// Create the flat configuration file if doesn't exists.
 		if (!file.exists()) {
-			if (!file.getParentFile().exists())
-				if (!file.getParentFile().mkdirs())
+			if (!file.getParentFile().exists()) {
+				if (!file.getParentFile().mkdirs()) {
 					return;
+				}
+			}
 
-			try {
-				if (!file.createNewFile()) return;
-			} catch (IOException e) {
-				e.printStackTrace();
+			if (!file.createNewFile()) {
+				throw new IOException("cannot create the file");
 			}
 		}
 

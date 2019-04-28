@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -66,13 +67,11 @@ public abstract class StorageWrapper {
 	protected abstract void save();
 
 	/**
-	 * Used to get a specific storage with generic params which can be recognized
-	 * by all storages wrappers (initialized with these params too).
-	 *
+	 * Allow us to know if a specific storage wrapper has the same params as another one.
 	 * @param params Generic params to perform the comparison
 	 * @return true if all params match with the stored params in wrapper
 	 */
-	protected abstract boolean equals(Object... params);
+	protected abstract boolean hasParams(Object... params);
 
 	/**
 	 * Allows to get is the storage is unused or not.
@@ -96,7 +95,7 @@ public abstract class StorageWrapper {
 			cacheMap.put(clazz, new ArrayList<>());
 
 		for (StorageWrapper storageWrapper : cacheMap.get(clazz))
-			if (storageWrapper.equals(params) && clazz.isInstance(storageWrapper))
+			if (storageWrapper.hasParams(params) && clazz.isInstance(storageWrapper))
 				return clazz.cast(storageWrapper);
 
 		// Class not in cache yet? OMG
@@ -109,13 +108,15 @@ public abstract class StorageWrapper {
 			try {
 				usedDataClazz = (Class<? extends StorageWrapper>) Class.forName(dataClazzName);
 			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				logger.log(Level.SEVERE, "Cannot resolving the storage wrapper class", e);
 			}
 
 			classCacheMap.put(clazz, usedDataClazz);
 		} else {
 			usedDataClazz = classCacheMap.get(clazz);
 		}
+
+		if (usedDataClazz == null) return null;
 
 		try {
 			Constructor cstr = usedDataClazz.getDeclaredConstructors()[0];
@@ -135,7 +136,7 @@ public abstract class StorageWrapper {
 
 			return null;
 		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, "Cannot instanciate the storage wrapper class", e);
 		}
 
 		return null;
@@ -158,7 +159,7 @@ public abstract class StorageWrapper {
 	public static void unload(Class<? extends StorageWrapper> clazz, Object... params) {
 		if (!cacheMap.containsKey(clazz)) return;
 
-		cacheMap.get(clazz).removeIf(storageWrapper -> storageWrapper.equals(params));
+		cacheMap.get(clazz).removeIf(storageWrapper -> storageWrapper.hasParams(params));
 
 		if (params.length == 0 || cacheMap.get(clazz).size() == 0) {
 			classCacheMap.remove(clazz);

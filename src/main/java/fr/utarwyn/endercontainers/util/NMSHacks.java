@@ -32,6 +32,11 @@ public class NMSHacks {
 
 	}
 
+	static {
+		craftbukkitPackage = Bukkit.getServer().getClass().getPackage().getName() + ".";
+		nmsPackage = craftbukkitPackage.replace("org.bukkit.craftbukkit", "net.minecraft.server");
+	}
+
 	/**
 	 * Main method of the class, returns a Player object for an offline player.
 	 * @param playerName Playername used to load the offline player data
@@ -49,7 +54,7 @@ public class NMSHacks {
 
 			Class<?> class_GameProfile = null;
 			if (useGameProfile) {
-				class_GameProfile = getUtilNMSClass("GameProfile");
+				class_GameProfile = getGameProfileClass();
 			}
 
 			Class<?> class_PlayerInteractManager = getNMSClass("PlayerInteractManager");
@@ -130,29 +135,9 @@ public class NMSHacks {
 		return method_getServer.invoke(null); //Forgot about this: reflection's javadocs say that if it is a static method, then parse null to the "obj" argument.
 	}
 
-	private static String getCraftbukkitPackage() {
-		if (craftbukkitPackage != null) {
-			return craftbukkitPackage;
-		}
-
-		return craftbukkitPackage = Bukkit.getServer().getClass().getPackage().getName() + ".";
-	}
-
-	private static String getNMSPackage() {
-		if (nmsPackage != null) {
-			return nmsPackage;
-		}
-
-		return nmsPackage = getCraftbukkitPackage().replace("org.bukkit.craftbukkit", "net.minecraft.server");
-	}
-
-	private static String getUtilNMSPackage() {
-		return "com.mojang.authlib.";
-	}
-
-	private static Class<?> getUtilNMSClass(String className) {
+	private static Class<?> getGameProfileClass() {
 		try {
-			return Class.forName(getUtilNMSPackage() + className);
+			return Class.forName("com.mojang.authlib.GameProfile");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			return null;
@@ -161,7 +146,7 @@ public class NMSHacks {
 
 	private static Class<?> getNMSClass(String className) {
 		try {
-			return Class.forName(getNMSPackage() + className);
+			return Class.forName(nmsPackage + className);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			return null;

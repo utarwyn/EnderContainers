@@ -144,10 +144,8 @@ public class DatabaseSet {
 		StringBuilder s = new StringBuilder("{DatabaseSet #" + this.hashCode() + " (");
 
 		int i = 0;
-		for (String key : this.set.keySet()) {
-			Object obj = this.set.get(key);
-
-			s.append(key).append("=").append(obj);
+		for (Map.Entry<String, Object> entry : this.set.entrySet()) {
+			s.append(entry.getKey()).append("=").append(entry.getValue());
 			s.append((i < this.set.size() - 1) ? " " : "");
 
 			i++;

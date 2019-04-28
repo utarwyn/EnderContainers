@@ -18,7 +18,7 @@ public abstract class BackupsData extends StorageWrapper {
 	List<Backup> backups;
 
 	@Override
-	protected boolean equals(Object... params) {
+	protected boolean hasParams(Object... params) {
 		return true;
 	}
 

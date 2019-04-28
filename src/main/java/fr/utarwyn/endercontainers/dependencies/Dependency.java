@@ -70,8 +70,7 @@ public abstract class Dependency implements DependencyListener {
 	 * @return Version of the plugin used for the dependency!
 	 */
 	protected String getPluginVersion() {
-		Plugin plugin = this.getPlugin();
-		return plugin != null ? plugin.getDescription().getVersion() : null;
+		return this.plugin != null ? this.plugin.getDescription().getVersion() : null;
 	}
 
 }

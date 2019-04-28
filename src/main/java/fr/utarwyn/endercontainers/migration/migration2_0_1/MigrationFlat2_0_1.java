@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 
 public class MigrationFlat2_0_1 extends Migration2_0_1 {
 
@@ -20,20 +21,22 @@ public class MigrationFlat2_0_1 extends Migration2_0_1 {
 		for (File chestFile : chestFiles) {
 			conf = YamlConfiguration.loadConfiguration(chestFile);
 
-			if (!conf.isConfigurationSection("enderchests"))
+			if (!conf.isConfigurationSection("enderchests")) {
 				continue;
+			}
 
 			for (String key : conf.getConfigurationSection("enderchests").getKeys(false)) {
 				contents = conf.getString("enderchests." + key + ".contents");
 
-				if (!isBase64Encoded(contents))
+				if (!isBase64Encoded(contents)) {
 					conf.set("enderchests." + key + ".contents", ItemSerializer.base64Serialization(ItemSerializer.experimentalDeserialization(contents)));
+				}
 			}
 
 			try {
 				conf.save(chestFile);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.log(Level.SEVERE, "Cannot save the player's enderchests file", e);
 			}
 		}
 

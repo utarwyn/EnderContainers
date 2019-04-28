@@ -2,9 +2,7 @@ package fr.utarwyn.endercontainers;
 
 import org.bukkit.event.Listener;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -34,14 +32,10 @@ public abstract class AbstractManager implements Listener {
 		this.logger = this.plugin.getLogger();
 
 		// Now we register all listeners (and the manager too)
-		List<Listener> listenerList = new ArrayList<>();
-
-		Collections.addAll(listenerList, listeners);
-		listenerList.add(this);
-
-		for (Listener listener : listenerList)
+		this.registerListener(this);
+		for (Listener listener : listeners) {
 			this.registerListener(listener);
-
+		}
 
 		// We start the initialization of the manager
 		this.load();
@@ -50,7 +44,7 @@ public abstract class AbstractManager implements Listener {
 		try {
 			Managers.registerManager(this.getClass(), this);
 		} catch (Exception e) {
-			e.printStackTrace();
+			this.logger.log(Level.SEVERE, "Cannot register the manager " + this.getClass().getName(), e);
 		}
 	}
 

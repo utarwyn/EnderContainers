@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 /**
  * Storage wrapper for backups (flatfile)
@@ -25,16 +26,21 @@ public class BackupsFlatData extends BackupsData {
 	private FlatFile flatFile;
 
 	BackupsFlatData() {
-		this.flatFile = new FlatFile("backups.yml");
 		this.backups = new ArrayList<>();
-
 		this.load();
 	}
 
 	@Override
 	protected void load() {
-		if (!this.flatFile.getConfiguration().isConfigurationSection("backups"))
-			this.flatFile.getConfiguration().set("backups", new ArrayList<>());
+		try {
+			this.flatFile = new FlatFile("backups.yml");
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Cannot load the backups file", e);
+		}
+
+		if (!this.flatFile.getConfiguration().isConfigurationSection(CONF_PREFIX)) {
+			this.flatFile.getConfiguration().set(CONF_PREFIX, new ArrayList<>());
+		}
 
 		YamlConfiguration config = this.flatFile.getConfiguration();
 
@@ -54,7 +60,11 @@ public class BackupsFlatData extends BackupsData {
 
 	@Override
 	protected void save() {
-		this.flatFile.save();
+		try {
+			this.flatFile.save();
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Cannot save the backups file", e);
+		}
 	}
 
 	@Override
@@ -124,7 +134,7 @@ public class BackupsFlatData extends BackupsData {
 				try {
 					Files.copy(fileFrom.toPath(), fileTo.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.log(Level.SEVERE, String.format("Cannot copy file %s to %s", fileFrom.toPath(), fileTo.toPath()), e);
 					return false;
 				}
 			}

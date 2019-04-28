@@ -6,7 +6,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
 
 /**
  * Locale class. Reflets the custom locale .yml file
@@ -136,7 +137,7 @@ public class Locale extends YamlLinker {
 			String message = String.valueOf(value);
 
 			if (bukkitVersion.contains("v1_7") || bukkitVersion.contains("v1_8"))
-				message = new String(message.getBytes(), Charset.forName("UTF-8"));
+				message = new String(message.getBytes(), StandardCharsets.UTF_8);
 
 			return ChatColor.translateAlternateColorCodes('&', message);
 		}
@@ -164,23 +165,21 @@ public class Locale extends YamlLinker {
 				if (!file.createNewFile()) return false;
 
 				InputStream in = plugin.getResource("locale.yml");
-				InputStreamReader isr = new InputStreamReader(in, "UTF8");
+				if (in == null) return false;
 
-				FileOutputStream out = new FileOutputStream(file);
-				OutputStreamWriter osw = new OutputStreamWriter(out, "UTF8");
+				try (InputStreamReader isr = new InputStreamReader(in, StandardCharsets.UTF_8);
+					 FileOutputStream out = new FileOutputStream(file);
+					 OutputStreamWriter osw = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
+					char[] tempbytes = new char[512];
+					int readbytes = isr.read(tempbytes, 0, 512);
 
-				char[] tempbytes = new char[512];
-				int readbytes = isr.read(tempbytes, 0, 512);
-
-				while (readbytes > -1) {
-					osw.write(tempbytes, 0, readbytes);
-					readbytes = isr.read(tempbytes, 0, 512);
+					while (readbytes > -1) {
+						osw.write(tempbytes, 0, readbytes);
+						readbytes = isr.read(tempbytes, 0, 512);
+					}
 				}
-
-				osw.close();
-				isr.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				this.logger.log(Level.SEVERE, "Cannot write the initial locale file on the disk", e);
 			}
 		}
 

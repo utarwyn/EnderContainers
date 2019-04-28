@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Class which manage all the dependencies of the plugin.
@@ -85,22 +86,24 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	 * Load each dependency if the needed plugin is enabled.
 	 */
 	private void loadDependencies() {
-		Map<String, Class<? extends Dependency>> dependencies = new HashMap<>();
+		Map<String, Class<? extends Dependency>> dependencyClasses = new HashMap<>();
 
 		// Prepare all dependencies here
-		dependencies.put("Citizens", CitizensDependency.class); // deprecated
-		dependencies.put("Essentials", EssentialsDependency.class);
-		dependencies.put("Factions", FactionsDependency.class);
-		dependencies.put("PlotSquared", PlotSquaredDependency.class);
-		dependencies.put("WorldGuard", WorldGuardDependency.class);
+		dependencyClasses.put("Citizens", CitizensDependency.class); // deprecated
+		dependencyClasses.put("Essentials", EssentialsDependency.class);
+		dependencyClasses.put("Factions", FactionsDependency.class);
+		dependencyClasses.put("PlotSquared", PlotSquaredDependency.class);
+		dependencyClasses.put("WorldGuard", WorldGuardDependency.class);
 
 		// And register them if the plugin is loaded on the server.
-		for (Map.Entry<String, Class<? extends Dependency>> dependency : dependencies.entrySet()) {
-			if (this.pluginManager.isPluginEnabled(dependency.getKey())) {
+		for (Map.Entry<String, Class<? extends Dependency>> dependency : dependencyClasses.entrySet()) {
+			String name = dependency.getKey();
+
+			if (this.pluginManager.isPluginEnabled(name)) {
 				try {
-					this.registerDependency(dependency.getKey(), dependency.getValue().newInstance());
+					this.registerDependency(name, dependency.getValue().newInstance());
 				} catch (InstantiationException | IllegalAccessException e) {
-					e.printStackTrace();
+					this.logger.log(Level.SEVERE, "Cannot instanciate the dependency " + name, e);
 				}
 			}
 		}
