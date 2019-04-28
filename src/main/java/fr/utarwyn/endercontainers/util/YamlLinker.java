@@ -5,6 +5,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
+import java.util.logging.Logger;
 
 /**
  * Represents a link to a particular Yaml config.
@@ -20,11 +21,17 @@ import java.lang.reflect.Field;
 public abstract class YamlLinker {
 
 	/**
+	 * The plugin logger
+	 */
+	protected Logger logger;
+
+	/**
 	 * Initialize the config from the file.
 	 * @param plugin Bukkit plugin used to locate the config file.
 	 * @return True if the initialization phase succeed.
 	 */
 	public boolean initialize(JavaPlugin plugin) {
+		this.logger = plugin.getLogger();
 		return false;
 	}
 
@@ -73,14 +80,14 @@ public abstract class YamlLinker {
 
 				field.set(null, parseValue(configKey, value));
 			} catch (Exception e) {
-				Log.error("");
-				Log.error(">> --------------- <<");
-				Log.error(">> CRITICAL ERROR! <<");
-				Log.error(">> --------------- <<");
-				Log.error("");
-				Log.error(">> Error when loading Yaml for class " + this.getClass().getSimpleName() + "! Yaml value " + configKey.toUpperCase() + " cannot be parsed!");
-				Log.error(">> Are you sure that value '" + configuration.get(configKey) + "' is good?");
-				Log.error("");
+				this.logger.severe("");
+				this.logger.severe(">> --------------- <<");
+				this.logger.severe(">> CRITICAL ERROR! <<");
+				this.logger.severe(">> --------------- <<");
+				this.logger.severe("");
+				this.logger.severe(">> Error when loading Yaml for class " + this.getClass().getSimpleName() + "! Yaml value " + configKey.toUpperCase() + " cannot be parsed!");
+				this.logger.severe(">> Are you sure that value '" + configuration.get(configKey) + "' is good?");
+				this.logger.severe("");
 
 				e.printStackTrace();
 

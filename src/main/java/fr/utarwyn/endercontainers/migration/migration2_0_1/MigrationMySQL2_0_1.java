@@ -5,12 +5,13 @@ import fr.utarwyn.endercontainers.database.Database;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
 import fr.utarwyn.endercontainers.util.ItemSerializer;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class MigrationMySQL2_0_1 extends Migration2_0_1 {
 
 	@Override
-	void reconfigureChestsContent() {
+	void reconfigureChestsContent() throws SQLException {
 		Database database = getDatabase();
 		if (database == null) return;
 

@@ -3,7 +3,6 @@ package fr.utarwyn.endercontainers.migration;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.database.Database;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
-import fr.utarwyn.endercontainers.util.Log;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.*;
@@ -11,6 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -41,6 +41,11 @@ public abstract class Migration {
 	private String dataVersion;
 
 	/**
+	 * The plugin logger
+	 */
+	protected Logger logger;
+
+	/**
 	 * Constructs a new migration
 	 * @param fromVers Old version of the plugin for detections
 	 * @param toVers New version of the plugin for detections
@@ -48,13 +53,22 @@ public abstract class Migration {
 	public Migration(String fromVers, String toVers) {
 		this.fromVers = fromVers;
 		this.toVers = toVers;
+		this.logger = EnderContainers.getInstance().getLogger();
+	}
+
+	String getFromVers() {
+		return this.fromVers;
+	}
+
+	String getToVers() {
+		return this.toVers;
 	}
 
 	/**
 	 * Calculates if the migration has to be runned or not
 	 * @return True if the migration has to be runned
 	 */
-	public boolean hasToBePerformed() {
+	boolean hasToBePerformed() {
 		Pattern pFrom = Pattern.compile(this.fromVers);
 		Pattern pTo = Pattern.compile(this.toVers);
 
@@ -103,33 +117,17 @@ public abstract class Migration {
 	void prepare() {
 		File backupFolder = this.getBackupFolder();
 
-		Log.log(" ", true);
-		Log.log("|----------------------------------|", true);
-		Log.log(String.format("| Migration from %5s to %5s    |", this.fromVers, this.toVers), true);
-		Log.log("|----------------------------------|", true);
-		Log.log(" ", true);
-		Log.log("Backuping data files into the \"EnderContainers/" + backupFolder.getName() + "/\" folder...", true);
-		Log.log(" ", true);
+		// Anounce the creation of a backup folder for the migration
+		this.logger.info(" ");
+		this.logger.info("|----------------------------------|");
+		this.logger.info(String.format("| Migration from %5s to %5s    |", this.fromVers, this.toVers));
+		this.logger.info("|----------------------------------|");
+		this.logger.info(" ");
+		this.logger.info("Backuping data files into the \"EnderContainers/" + backupFolder.getName() + "/\" folder...");
+		this.logger.info(" ");
 
 		// Create the backup folder
 		Migration.recursiveCopy(this.getDataFolder(), backupFolder);
-	}
-
-	/**
-	 * Announces the migration
-	 */
-	void announce() {
-		Log.log("ALERT! A migration have to be applied before continue using the plugin!", true);
-		Log.log("Migration detected from version " + this.fromVers + " to version " + this.toVers + "!", true);
-		Log.log("Starting migration...", true);
-	}
-
-	/**
-	 * Ends the migration
-	 */
-	void end() {
-		Log.log("", true);
-		Log.log("Migration from " + this.fromVers + " to " + this.toVers + " finished!", true);
 	}
 
 	/**
@@ -253,6 +251,7 @@ public abstract class Migration {
 	 *
 	 * @return The database object
 	 */
+	// TODO: 28/04/2019 OMG, remove this method because its very ugly!
 	protected static Database getDatabase() {
 		if (database != null)
 			return database;
@@ -283,6 +282,7 @@ public abstract class Migration {
 	 * creates tables if don't exist.
 	 * </p>
 	 */
+	// TODO: 28/04/2019 OMG, remove this method because its very ugly!
 	protected static void recreateMySQLTables() {
 		DatabaseManager manager = EnderContainers.getInstance().getInstance(DatabaseManager.class);
 		if (!manager.isReady()) return;

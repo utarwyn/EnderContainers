@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers.migration.migration2_0_3;
 
 import fr.utarwyn.endercontainers.migration.Migration;
-import fr.utarwyn.endercontainers.util.Log;
 
 public class Migration2_0_3 extends Migration {
 
@@ -14,7 +13,7 @@ public class Migration2_0_3 extends Migration {
 		/* ------------------------- */
 		/*  Update configuration...  */
 		/* ------------------------- */
-		Log.log("Update old configuration...", true);
+		this.logger.info("Update old configuration...");
 		this.updateConfiguration();
 	}
 

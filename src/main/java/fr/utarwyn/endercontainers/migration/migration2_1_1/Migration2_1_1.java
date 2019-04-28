@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers.migration.migration2_1_1;
 
 import fr.utarwyn.endercontainers.migration.Migration;
-import fr.utarwyn.endercontainers.util.Log;
 
 public class Migration2_1_1 extends Migration {
 
@@ -14,7 +13,7 @@ public class Migration2_1_1 extends Migration {
 		/* ------------------- */
 		/*  Update locales...  */
 		/* ------------------- */
-		Log.log("Update locales...", true);
+		this.logger.info("Update locales...");
 		this.updateLocales();
 	}
 

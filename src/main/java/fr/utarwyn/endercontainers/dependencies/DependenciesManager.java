@@ -4,7 +4,6 @@ import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.dependencies.faction.FactionsDependency;
 import fr.utarwyn.endercontainers.dependencies.worldguard.WorldGuardDependency;
-import fr.utarwyn.endercontainers.util.Log;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -45,7 +44,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	@Override
 	public void load() {
 		this.dependencies = new ArrayList<>();
-		this.pluginManager = this.getPlugin().getServer().getPluginManager();
+		this.pluginManager = this.plugin.getServer().getPluginManager();
 
 		this.loadDependencies();
 		this.logLoadedDependencies();
@@ -111,21 +110,21 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	 * This method logs all information about loaded dependencies.
 	 */
 	private void logLoadedDependencies() {
-		Log.log("-----------[Dependencies]-----------", true);
+		this.logger.info("-----------[Dependencies]-----------");
 
 		for (Dependency dependency : this.dependencies) {
-			Log.log("  Use " + dependency.getName() + " (v" + dependency.getPluginVersion() +
-					") as a dependency!", true);
+			this.logger.info("  Use " + dependency.getName() +
+					" (v" + dependency.getPluginVersion() + ") as a dependency!");
 		}
 
 		int size = this.dependencies.size();
 		if (size > 0) {
-			Log.log("  " + size + " dependenc" + (size > 1 ? "ies" : "y") + " loaded!", true);
+			this.logger.info("  " + size + " dependenc" + (size > 1 ? "ies" : "y") + " loaded!");
 		} else {
-			Log.log("  No dependency found.", true);
+			this.logger.info("  No dependency found.");
 		}
 
-		Log.log("------------------------------------", true);
+		this.logger.info("------------------------------------");
 	}
 
 	/**

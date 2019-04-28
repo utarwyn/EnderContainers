@@ -3,11 +3,9 @@ package fr.utarwyn.endercontainers.migration;
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
-import fr.utarwyn.endercontainers.migration.migration2_0.Migration2_0;
 import fr.utarwyn.endercontainers.migration.migration2_0_1.Migration2_0_1;
 import fr.utarwyn.endercontainers.migration.migration2_0_3.Migration2_0_3;
 import fr.utarwyn.endercontainers.migration.migration2_1_1.Migration2_1_1;
-import fr.utarwyn.endercontainers.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,26 +49,19 @@ public class MigrationManager extends AbstractManager {
 	@Override
 	public void load() {
 		this.migrations = new ArrayList<>();
-		this.loadMigration(Migration2_0.class);
 		this.loadMigration(Migration2_0_1.class);
 		this.loadMigration(Migration2_0_3.class);
 		this.loadMigration(Migration2_1_1.class);
 
-		for (Migration migration : this.migrations)
-			if (migration.hasToBePerformed()) {
-				migration.announce();
-
-				migration.prepare();
-				migration.perform();
-				migration.end();
-
-				this.migrationDone = true;
-				break;
+		for (Migration migration : this.migrations) {
+			if (!this.migrationDone && migration.hasToBePerformed()) {
+				this.performMigration(migration);
 			}
+		}
 
 		if (this.migrationDone) {
-			Log.log("Please restart the server to enable the plugin!", true);
-			Log.log("If you have any error after the restart, please contact the plugin's author!", true);
+			this.logger.info("Please restart the server to enable the plugin!");
+			this.logger.info("If you have any error after the restart, please contact the plugin's author!");
 		}
 
 		this.writeVersion(Migration.getPluginVersion());
@@ -82,6 +73,14 @@ public class MigrationManager extends AbstractManager {
 	@Override
 	protected void unload() {
 
+	}
+
+	/**
+	 * Returns if the manager have applied a migration or not
+	 * @return True if a migration have been applied
+	 */
+	public boolean hasDoneMigration() {
+		return this.migrationDone;
 	}
 
 	/**
@@ -114,11 +113,30 @@ public class MigrationManager extends AbstractManager {
 	}
 
 	/**
-	 * Returns if the manager have applied a migration or not
-	 * @return True if a migration have been applied
+	 * Perform a specific migration!
+	 * @param migration Migration to perform
 	 */
-	public boolean hasDoneMigration() {
-		return this.migrationDone;
+	private void performMigration(Migration migration) {
+		// Announce it in the console
+		this.logger.warning("ALERT! A migration have to be applied before continue using the plugin!");
+		this.logger.info(String.format(
+				"Migration detected from version %s to version %s!",
+				migration.getFromVers(), migration.getToVers()
+		));
+		this.logger.info("Starting migration...");
+
+		// Prepare and perform the migration!
+		migration.prepare();
+		migration.perform();
+
+		// End message
+		this.logger.info("");
+		this.logger.info(String.format(
+				"Migration from %s to %s has been performed!",
+				migration.getFromVers(), migration.getToVers()
+		));
+
+		this.migrationDone = true;
 	}
 
 	/**

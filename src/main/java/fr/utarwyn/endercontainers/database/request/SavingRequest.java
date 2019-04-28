@@ -70,13 +70,8 @@ public class SavingRequest implements IRequest {
 		return this;
 	}
 
-	public boolean execute() {
-		try {
-			return this.database.execUpdateStatement(this);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return false;
+	public boolean execute() throws SQLException {
+		return this.database.execUpdateStatement(this);
 	}
 
 	@Override

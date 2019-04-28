@@ -5,6 +5,7 @@ import org.bukkit.event.Listener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Abtsract base class for creating an EnderContainers manager
@@ -19,12 +20,18 @@ public abstract class AbstractManager implements Listener {
 	protected EnderContainers plugin;
 
 	/**
+	 * Stores the plugin loader
+	 */
+	protected Logger logger;
+
+	/**
 	 * Constructs the manager
 	 * @param plugin Main class of the plugin
 	 * @param listeners List of listeners to automatically load during the initialization of the manager
 	 */
 	public AbstractManager(EnderContainers plugin, Listener ... listeners) {
 		this.plugin = plugin;
+		this.logger = this.plugin.getLogger();
 
 		// Now we register all listeners (and the manager too)
 		List<Listener> listenerList = new ArrayList<>();

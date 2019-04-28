@@ -149,7 +149,10 @@ public class Locale extends YamlLinker {
 	 * @param plugin Bukkit plugin used to locate and init the locale file.
 	 * @return True if the initialization phase succeed.
 	 */
+	@Override
 	public boolean initialize(JavaPlugin plugin) {
+		super.initialize(plugin);
+
 		// Create custom locale .yml file if not exists
 		File localeFolder = new File(plugin.getDataFolder(), "locales/");
 		File file = new File(localeFolder, Config.locale + ".yml");

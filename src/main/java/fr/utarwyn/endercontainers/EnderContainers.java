@@ -38,8 +38,9 @@ public class EnderContainers extends JavaPlugin {
 		instance = this;
 
 		// Load main configuration ...
-		if (!Config.get().initialize(this))
+		if (!Config.get().initialize(this)) {
 			return;
+		}
 
 		// Load needed managers ...
 		new DependenciesManager();
@@ -58,8 +59,9 @@ public class EnderContainers extends JavaPlugin {
 		new HologramManager();
 
 		// Load plugin locale ...
-		if (!Locale.get().initialize(this))
+		if (!Locale.get().initialize(this)) {
 			return;
+		}
 
 		// Load commands ...
 		AbstractCommand.register(new MainCommand());

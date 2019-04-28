@@ -31,42 +31,42 @@ public class CompatibilityHelper {
 
 	static {
 		MATERIAL_BY_IDS = new ConcurrentHashMap<>();
-		ENCHANT_BY_IDS = new HashMap<Integer, String>() {{
-			put(0, "PROTECTION_ENVIRONMENTAL");
-			put(1, "PROTECTION_FIRE");
-			put(2, "PROTECTION_FALL");
-			put(3, "PROTECTION_EXPLOSIONS");
-			put(4, "PROTECTION_PROJECTILE");
-			put(5, "OXYGEN");
-			put(6, "WATER_WORKER");
-			put(7, "THORNS");
-			put(8, "DEPTH_STRIDER");
-			put(9, "FROST_WALKER");
-			put(10, "BINDING_CURSE");
-			put(16, "DAMAGE_ALL");
-			put(17, "DAMAGE_UNDEAD");
-			put(18, "DAMAGE_ARTHROPODS");
-			put(19, "KNOCKBACK");
-			put(20, "FIRE_ASPECT");
-			put(21, "LOOT_BONUS_MOBS");
-			put(22, "SWEEPING_EDGE");
-			put(32, "DIG_SPEED");
-			put(33, "SILK_TOUCH");
-			put(34, "DURABILITY");
-			put(35, "LOOT_BONUS_BLOCKS");
-			put(48, "ARROW_DAMAGE");
-			put(49, "ARROW_KNOCKBACK");
-			put(50, "ARROW_FIRE");
-			put(51, "ARROW_INFINITE");
-			put(61, "LUCK");
-			put(62, "LURE");
-			put(65, "LOYALTY");
-			put(66, "IMPALING");
-			put(67, "RIPTIDE");
-			put(68, "CHANNELING");
-			put(70, "MENDING");
-			put(71, "VANISHING_CURSE");
-		}};
+		ENCHANT_BY_IDS = new HashMap<>();
+
+		ENCHANT_BY_IDS.put(0, "PROTECTION_ENVIRONMENTAL");
+		ENCHANT_BY_IDS.put(1, "PROTECTION_FIRE");
+		ENCHANT_BY_IDS.put(2, "PROTECTION_FALL");
+		ENCHANT_BY_IDS.put(3, "PROTECTION_EXPLOSIONS");
+		ENCHANT_BY_IDS.put(4, "PROTECTION_PROJECTILE");
+		ENCHANT_BY_IDS.put(5, "OXYGEN");
+		ENCHANT_BY_IDS.put(6, "WATER_WORKER");
+		ENCHANT_BY_IDS.put(7, "THORNS");
+		ENCHANT_BY_IDS.put(8, "DEPTH_STRIDER");
+		ENCHANT_BY_IDS.put(9, "FROST_WALKER");
+		ENCHANT_BY_IDS.put(10, "BINDING_CURSE");
+		ENCHANT_BY_IDS.put(16, "DAMAGE_ALL");
+		ENCHANT_BY_IDS.put(17, "DAMAGE_UNDEAD");
+		ENCHANT_BY_IDS.put(18, "DAMAGE_ARTHROPODS");
+		ENCHANT_BY_IDS.put(19, "KNOCKBACK");
+		ENCHANT_BY_IDS.put(20, "FIRE_ASPECT");
+		ENCHANT_BY_IDS.put(21, "LOOT_BONUS_MOBS");
+		ENCHANT_BY_IDS.put(22, "SWEEPING_EDGE");
+		ENCHANT_BY_IDS.put(32, "DIG_SPEED");
+		ENCHANT_BY_IDS.put(33, "SILK_TOUCH");
+		ENCHANT_BY_IDS.put(34, "DURABILITY");
+		ENCHANT_BY_IDS.put(35, "LOOT_BONUS_BLOCKS");
+		ENCHANT_BY_IDS.put(48, "ARROW_DAMAGE");
+		ENCHANT_BY_IDS.put(49, "ARROW_KNOCKBACK");
+		ENCHANT_BY_IDS.put(50, "ARROW_FIRE");
+		ENCHANT_BY_IDS.put(51, "ARROW_INFINITE");
+		ENCHANT_BY_IDS.put(61, "LUCK");
+		ENCHANT_BY_IDS.put(62, "LURE");
+		ENCHANT_BY_IDS.put(65, "LOYALTY");
+		ENCHANT_BY_IDS.put(66, "IMPALING");
+		ENCHANT_BY_IDS.put(67, "RIPTIDE");
+		ENCHANT_BY_IDS.put(68, "CHANNELING");
+		ENCHANT_BY_IDS.put(70, "MENDING");
+		ENCHANT_BY_IDS.put(71, "VANISHING_CURSE");
 	}
 
 	public static Material matchMaterial(String name) {

@@ -163,28 +163,18 @@ public class DatabaseSet {
 	 * @param resultSet Result from the SQL Connection object
 	 * @return Converted data into database sets
 	 */
-	static List<DatabaseSet> resultSetToDatabaseSet(ResultSet resultSet) {
+	static List<DatabaseSet> resultSetToDatabaseSet(ResultSet resultSet) throws SQLException {
 		List<DatabaseSet> result = new ArrayList<>();
+		int columns = resultSet.getMetaData().getColumnCount();
 
-		try {
-			int columns = resultSet.getMetaData().getColumnCount();
+		while (resultSet.next()) {
+			DatabaseSet set = new DatabaseSet();
 
-			while (resultSet.next()) {
-				DatabaseSet set = new DatabaseSet();
-
-				for (int i = 0; i < columns; i++)
-					set.setObject(resultSet.getMetaData().getColumnName(i + 1), resultSet.getObject(i + 1));
-
-				result.add(set);
+			for (int i = 0; i < columns; i++) {
+				set.setObject(resultSet.getMetaData().getColumnName(i + 1), resultSet.getObject(i + 1));
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (resultSet != null) resultSet.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+
+			result.add(set);
 		}
 
 		return result;

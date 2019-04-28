@@ -1,11 +1,9 @@
 package fr.utarwyn.endercontainers.database;
 
-import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.database.request.DeleteRequest;
 import fr.utarwyn.endercontainers.database.request.IRequest;
 import fr.utarwyn.endercontainers.database.request.SavingRequest;
 import fr.utarwyn.endercontainers.database.request.SelectRequest;
-import fr.utarwyn.endercontainers.util.Log;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.*;
@@ -21,7 +19,7 @@ import java.util.List;
  * @since 1.0.5
  * @author Utarwyn
  */
-public class Database {
+public class Database implements AutoCloseable {
 
 	/**
 	 * Host of the MySQL server
@@ -54,11 +52,6 @@ public class Database {
 	private BasicDataSource source;
 
 	/**
-	 * An instance of the MySQL dumper
-	 */
-	private MysqlDumper dumper;
-
-	/**
 	 * Constructor used to create a MySQL database object
 	 * @param host Host of the MySQL server
 	 * @param port Port of the MySQL server
@@ -73,7 +66,11 @@ public class Database {
 		this.password = password;
 		this.database = database;
 
-		this.createPool();
+		try {
+			this.createPool();
+		} catch (SQLException ex) {
+			this.source = null;
+		}
 	}
 
 	/**
@@ -81,44 +78,20 @@ public class Database {
 	 * @return True if connected.
 	 */
 	public boolean isConnected() {
-		try {
-			return (this.source != null && !this.source.isClosed());
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	/**
-	 * Get the dumper linked to this database. Null if the connection cannot be established.
-	 * @return The MySQL dumper
-	 */
-	public MysqlDumper getDumper() {
-		return this.dumper;
+		return this.source != null && !this.source.isClosed();
 	}
 
 	/**
 	 * Drop all data from a specific table passed in parameter
 	 * @param tableName The name of the table to empty
 	 */
-	public void emptyTable(String tableName) {
-		Statement s = null;
-		Connection conn = null;
-
-		try {
-			conn = getConnection();
-			assert conn != null;
-			s = conn.createStatement();
-
-			s.executeUpdate("USE " + this.database);
-			s.executeUpdate("SET SQL_SAFE_UPDATES=0;");
-			s.executeUpdate("truncate " + tableName);
-			s.executeUpdate("SET SQL_SAFE_UPDATES=1;");
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			closeConnection(conn);
-			closeStatement(s);
+	public void emptyTable(String tableName) throws SQLException {
+		try (Connection connection = this.source.getConnection();
+			 Statement statement = connection.createStatement()) {
+			statement.executeUpdate("USE `" + this.database + "`");
+			statement.executeUpdate("SET SQL_SAFE_UPDATES = 0;");
+			statement.executeUpdate("truncate `" + tableName + "`");
+			statement.executeUpdate("SET SQL_SAFE_UPDATES = 1;");
 		}
 	}
 
@@ -126,44 +99,32 @@ public class Database {
 	 * Drop a specific table passed in parameter
 	 * @param tableName The name of the table to drop
 	 */
-	public void dropTable(String tableName) {
-		Statement s = null;
-		Connection conn = null;
-
-		try {
-			conn = getConnection();
-			assert conn != null;
-			s = conn.createStatement();
-
-			s.executeUpdate("USE `" + this.database + "`");
-			s.executeUpdate("DROP TABLE `" + tableName + "`");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			closeConnection(conn);
-			closeStatement(s);
+	public void dropTable(String tableName) throws SQLException {
+		try (Connection connection = this.source.getConnection();
+			 Statement statement = connection.createStatement()) {
+			statement.executeUpdate("USE `" + this.database + "`");
+			statement.executeUpdate("DROP TABLE `" + tableName + "`");
 		}
 	}
 
 	/**
-	 * Closes the connection to the MySQL server
-	 * @throws SQLException Exception throwed if the connection cannot be closed.
+	 * Closes the connection to the SQL server
+	 * @throws SQLException throwed if the connection cannot be closed.
 	 */
+	@Override
 	public void close() throws SQLException {
-		this.source.close();
+		if (this.isConnected()) {
+			this.source.close();
+		}
 	}
 
 	/**
 	 * Returns the version description of the connected SQL server
 	 * @return Version of the database server
 	 */
-	public Double getServerVersion() {
-		Connection conn = null;
-		String version;
-
-		try {
-			conn = getConnection();
-			version = isConnected() ? conn.getMetaData().getDatabaseProductVersion() : "0.0";
+	public Double getServerVersion() throws SQLException {
+		try (Connection connection = this.source.getConnection()) {
+			String version = connection.getMetaData().getDatabaseProductVersion();
 
 			if (version.indexOf("-") > 0) {
 				version = version.split("-")[0];
@@ -171,11 +132,6 @@ public class Database {
 
 			int pointIndex = version.lastIndexOf('.') == -1 ? version.length() - 1 : version.lastIndexOf('.');
 			return Double.valueOf(version.substring(0, pointIndex));
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
-		} finally {
-			closeConnection(conn);
 		}
 	}
 
@@ -183,21 +139,14 @@ public class Database {
 	 * Returns the list of all tables created in the database
 	 * @return List of tables.
 	 */
-	public List<String> getTables() {
-		Connection conn = null;
+	public List<String> getTables() throws SQLException {
 		List<String> tables = new ArrayList<>();
 
-		try {
-			conn = getConnection();
-			ResultSet result = conn.getMetaData().getTables(null, null, "%", null);
-
+		try (Connection conn = this.source.getConnection();
+			 ResultSet result = conn.getMetaData().getTables(null, null, "%", null)) {
 			while (result.next()) {
 				tables.add(result.getString(3));
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			closeConnection(conn);
 		}
 
 		return tables;
@@ -234,20 +183,10 @@ public class Database {
 	 * Send a custom request into the database.
 	 * @param request The special request to execute!
 	 */
-	public void request(String request) {
-		Connection conn = null;
-		Statement s = null;
-
-		try {
-			conn = getConnection();
-			s = conn.createStatement();
-			Log.log("Executing request '" + request + "'");
-			s.executeUpdate(request);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			closeStatement(s);
-			closeConnection(conn);
+	public void request(String request) throws SQLException {
+		try (Connection connection = this.source.getConnection();
+			 Statement statement = connection.createStatement()) {
+			statement.executeUpdate(request);
 		}
 	}
 
@@ -260,17 +199,19 @@ public class Database {
 	 * @throws SQLException if a SQL exception has been thrown during the process
 	 */
 	public List<DatabaseSet> execQueryStatement(SelectRequest request) throws SQLException {
-		Connection conn = this.getConnection();
-		if (conn == null) return null;
-
 		Object[] attributes = request.getAttributes();
-		PreparedStatement st = conn.prepareStatement(request.getRequest());
 
-		for (int i = 1; i <= attributes.length; i++) {
-			st.setObject(i, attributes[i - 1]);
+		try (Connection connection = this.source.getConnection();
+			 PreparedStatement st = connection.prepareStatement(request.getRequest())) {
+
+			for (int i = 1; i <= attributes.length; i++) {
+				st.setObject(i, attributes[i - 1]);
+			}
+
+			try (ResultSet resultSet = st.executeQuery()) {
+				return DatabaseSet.resultSetToDatabaseSet(resultSet);
+			}
 		}
-
-		return DatabaseSet.resultSetToDatabaseSet(st.executeQuery());
 	}
 
 	/**
@@ -282,30 +223,15 @@ public class Database {
 	 * @throws SQLException if a SQL exception has been thrown during the process
 	 */
 	public boolean execUpdateStatement(IRequest request) throws SQLException {
-		Connection conn = this.getConnection();
-		if (conn == null) return false;
-
-		// Si la connexion est en lecture seule, on interdit l'écriture dans la base.
 		Object[] attributes = request.getAttributes();
-		PreparedStatement st = conn.prepareStatement(request.getRequest());
 
-		for (int i = 1; i <= attributes.length; i++) {
-			st.setObject(i, attributes[i - 1]);
-		}
+		try (Connection connection = this.source.getConnection();
+			 PreparedStatement statement = connection.prepareStatement(request.getRequest())) {
+			for (int i = 1; i <= attributes.length; i++) {
+				statement.setObject(i, attributes[i - 1]);
+			}
 
-		return st.executeUpdate() > 0;
-	}
-
-	/**
-	 * Returns the connection created by the source pool object.
-	 * @return The MySQL Connection object.
-	 */
-	Connection getConnection() {
-		try {
-			return (this.source != null) ? this.source.getConnection() : null;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
+			return statement.executeUpdate() > 0;
 		}
 	}
 
@@ -313,57 +239,19 @@ public class Database {
 	 * Initialize the external pool SQL object
 	 * (the object executes all requests in an optimized and intelligent thread)
 	 */
-	private void createPool() {
-		try {
-			source = new BasicDataSource();
-			source.setDriverClassName("com.mysql.jdbc.Driver");
-			source.setUrl("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database);
-			source.setUsername(this.user);
-			source.setPassword(this.password);
+	private void createPool() throws SQLException {
+		source = new BasicDataSource();
+		source.setDriverClassName("com.mysql.jdbc.Driver");
+		source.setUrl("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database);
+		source.setUsername(this.user);
+		source.setPassword(this.password);
 
-			source.setInitialSize(1);
-			source.setMaxOpenPreparedStatements(8);
-			source.setMaxTotal(8);
+		source.setInitialSize(1);
+		source.setMaxOpenPreparedStatements(8);
+		source.setMaxTotal(8);
 
-			// Connection test
-			Connection conn = source.getConnection();
-			conn.close();
-
-			// Initialize the dumper linked to this database
-			this.dumper = new MysqlDumper(this);
-		} catch (Exception e) {
-			this.source = null;
-			Log.error("Mysql error: unable to connect to the database at " + this.host + ":" + this.port + ". Please verify your credentials.");
-
-			Config.mysql = false;
-			Config.enabled = true;
-		}
-	}
-
-	/**
-	 * Method used to close a statement without to manage the exception each times.
-	 * @param statement The statement to properly close
-	 */
-	private void closeStatement(Statement statement) {
-		try {
-			if (statement != null)
-				statement.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Method used to close a MySQL connection without to manage the exception each times.
-	 * @param conn The connection to properly close
-	 */
-	private void closeConnection(Connection conn) {
-		try {
-			if (conn != null)
-				conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		// Connection test
+		source.getConnection().close();
 	}
 
 }

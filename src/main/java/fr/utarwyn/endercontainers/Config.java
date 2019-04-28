@@ -96,7 +96,10 @@ public class Config extends YamlLinker {
 	@Configurable(key = "others.globalSound")
 	public static boolean globalSound;
 
+	@Override
 	public boolean initialize(JavaPlugin plugin) {
+		super.initialize(plugin);
+
 		// Create config.yml file if not exists
 		if (!new File(plugin.getDataFolder(), "config.yml").exists())
 			plugin.saveDefaultConfig();

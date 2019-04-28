@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Allows to manage storage using different technologies with same methods.
@@ -30,12 +31,18 @@ public abstract class StorageWrapper {
 	private static Map<Class<? extends StorageWrapper>, List<StorageWrapper>> cacheMap;
 
 	/**
-	 * The MySQL manager used by storages using MySQL
+	 * The SQL manager used to store data in a storage
 	 */
 	private static DatabaseManager databaseManager;
 
+	/**
+	 * The Plugin logger
+	 */
+	protected static Logger logger;
+
 	static {
 		databaseManager = EnderContainers.getInstance().getInstance(DatabaseManager.class);
+		logger = EnderContainers.getInstance().getLogger();
 		classCacheMap = new HashMap<>();
 		cacheMap = new HashMap<>();
 	}
@@ -97,7 +104,7 @@ public abstract class StorageWrapper {
 		Class<? extends StorageWrapper> usedDataClazz = null;
 
 		if (!classCacheMap.containsKey(clazz)) {
-			String dataClazzName = (databaseManager.isReady()) ? clazz.getName().replace("Data", "MySQLData") : clazz.getName().replace("Data", "FlatData");
+			String dataClazzName = (databaseManager.isReady()) ? clazz.getName().replace("Data", "SQLData") : clazz.getName().replace("Data", "FlatData");
 
 			try {
 				usedDataClazz = (Class<? extends StorageWrapper>) Class.forName(dataClazzName);

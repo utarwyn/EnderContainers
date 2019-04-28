@@ -5,29 +5,28 @@ import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.util.ItemSerializer;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 /**
  * Storage wrapper for player data (MySQL)
  * @since 2.0.0
  * @author Utarwyn
  */
-public class PlayerMySQLData extends PlayerData {
+public class PlayerSQLData extends PlayerData {
 
 	private List<DatabaseSet> enderchestsDataset;
 
-	PlayerMySQLData(UUID uuid) {
+	PlayerSQLData(UUID uuid) {
 		super(uuid);
 	}
 
 	@Override
 	protected void load() {
 		this.enderchestsDataset = getDatabaseManager().getEnderchestsOf(this.getUUID());
-		if (this.enderchestsDataset == null)
-			this.enderchestsDataset = new ArrayList<>();
 	}
 
 	@Override
@@ -65,11 +64,14 @@ public class PlayerMySQLData extends PlayerData {
 
 		String contents = ItemSerializer.serialize(enderChest.getContents());
 
-		getDatabaseManager().saveEnderchest(
-				insert,
-				enderChest.getOwner(), enderChest.getNum(), enderChest.getRows(),
-				contents
-		);
+		try {
+			getDatabaseManager().saveEnderchest(insert, enderChest.getOwner(),
+					enderChest.getNum(), enderChest.getRows(), contents);
+		} catch (SQLException e) {
+			logger.log(Level.SEVERE,
+					"Cannot save the enderchest for user " + enderChest.getOwner() + " in the database", e);
+			return;
+		}
 
 		// If this is a new enderchest, we need to store it in memory.
 		if (insert) {

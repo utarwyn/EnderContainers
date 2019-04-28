@@ -102,22 +102,16 @@ public class SelectRequest implements IRequest {
 		return this;
 	}
 
-	public DatabaseSet find() {
-		// Pour optimiser la requête, on limite le nombre de résultat à 1
+	public DatabaseSet find() throws SQLException {
+		// We set the results limit at 1 to optimize the request
 		this.limit(1);
 
 		List<DatabaseSet> sets = this.findAll();
 		return (sets == null || sets.size() == 0) ? null : sets.get(0);
 	}
 
-	public List<DatabaseSet> findAll() {
-		try {
-			return this.database.execQueryStatement(this);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return null;
+	public List<DatabaseSet> findAll() throws SQLException {
+		return this.database.execQueryStatement(this);
 	}
 
 	@Override

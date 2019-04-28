@@ -5,18 +5,20 @@ import fr.utarwyn.endercontainers.database.DatabaseSet;
 import org.apache.commons.lang.StringUtils;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Storage wrapper for backups (MySQL)
  * @since 2.0.0
  * @author Utarwyn
  */
-public class BackupsMySQLData extends BackupsData {
+public class BackupsSQLData extends BackupsData {
 
-	BackupsMySQLData() {
+	BackupsSQLData() {
 		this.backups = new ArrayList<>();
 		this.load();
 	}
@@ -37,12 +39,16 @@ public class BackupsMySQLData extends BackupsData {
 
 	@Override
 	public boolean saveNewBackup(Backup backup) {
-		getDatabaseManager().saveBackup(
-				backup.getName(), backup.getDate().getTime(), backup.getType(),
-				this.getEnderchestsStringData(), backup.getCreatedBy()
-		);
-
-		return true;
+		try {
+			getDatabaseManager().saveBackup(
+					backup.getName(), backup.getDate().getTime(), backup.getType(),
+					this.getEnderchestsStringData(), backup.getCreatedBy()
+			);
+			return true;
+		} catch (SQLException e) {
+			logger.log(Level.SEVERE, "Cannot save the backup " + backup.getName(), e);
+			return false;
+		}
 	}
 
 	@Override
@@ -55,9 +61,14 @@ public class BackupsMySQLData extends BackupsData {
 		DatabaseSet backupSet = getDatabaseManager().getBackup(backup.getName());
 		if (backupSet == null) return false;
 
-		getDatabaseManager().emptyChestTable();
-		getDatabaseManager().saveEnderchestSets(this.getEnderchestsFromString(backupSet.getString("data")));
-		return true;
+		try {
+			getDatabaseManager().emptyChestTable();
+			getDatabaseManager().saveEnderchestSets(this.getEnderchestsFromString(backupSet.getString("data")));
+			return true;
+		} catch (SQLException e) {
+			logger.log(Level.SEVERE, "Cannot replace enderchests in the database", e);
+			return false;
+		}
 	}
 
 	@Override
@@ -77,11 +88,11 @@ public class BackupsMySQLData extends BackupsData {
 
 			dataElementList.add(
 					set.getInteger("id") + ":"
-					+ set.getInteger("num") + ":"
-					+ Base64Coder.encodeString(set.getString("owner")) + ":"
-					+ Base64Coder.encodeString(set.getString("contents")) + ":"
-					+ set.getInteger("rows") + ":"
-					+ set.getTimestamp("last_locking_time").getTime()
+							+ set.getInteger("num") + ":"
+							+ Base64Coder.encodeString(set.getString("owner")) + ":"
+							+ Base64Coder.encodeString(set.getString("contents")) + ":"
+							+ set.getInteger("rows") + ":"
+							+ set.getTimestamp("last_locking_time").getTime()
 			);
 		}
 

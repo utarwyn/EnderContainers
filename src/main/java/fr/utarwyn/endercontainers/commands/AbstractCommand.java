@@ -5,7 +5,6 @@ import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.commands.parameter.Parameter;
 import fr.utarwyn.endercontainers.commands.parameter.ParameterChecker;
 import fr.utarwyn.endercontainers.util.Locale;
-import fr.utarwyn.endercontainers.util.Log;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
@@ -17,6 +16,7 @@ import org.bukkit.util.StringUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Represents a SuperJukebox's command, that's all!
@@ -315,7 +315,7 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 		return (T) arg;
 	}
 
-	// TODO Separate all this code in a different file!
+	// TODO Separate all this code in a different file (a CommandManager for example)!
 
 	/**
 	 * Register an abstract command directly inside the server's command map.
@@ -370,7 +370,8 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 				}
 			}
 		} catch (Exception ex) {
-			Log.warn("Cannot unregister the command " + command.getName() +  " from the server!", ex);
+			EnderContainers.getInstance().getLogger().log(Level.SEVERE,
+					"Cannot unregister the command " + command.getName() +  " from the server!", ex);
 		}
 	}
 
@@ -389,7 +390,8 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 				commandMap = (SimpleCommandMap) fMap.get(server);
 				fMap.setAccessible(false);
 			} catch (Exception ex) {
-				Log.warn("Cannot fetch the command map from the server!", ex);
+				EnderContainers.getInstance().getLogger().log(Level.SEVERE,
+						"Cannot fetch the command map from the server!", ex);
 				return null;
 			}
 		}

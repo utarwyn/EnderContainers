@@ -1,8 +1,8 @@
 package fr.utarwyn.endercontainers.migration.migration2_0_1;
 
 import fr.utarwyn.endercontainers.migration.Migration;
-import fr.utarwyn.endercontainers.util.Log;
 
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 public abstract class Migration2_0_1 extends Migration {
@@ -18,17 +18,21 @@ public abstract class Migration2_0_1 extends Migration {
 		/* ------------------------- */
 		/*  Update configuration...  */
 		/* ------------------------- */
-		Log.log("Update old configuration...", true);
+		this.logger.info("Update old configuration...");
 		if (!this.updateConfiguration()) return;
 
 		/* ---------------------------- */
 		/*  Reconfigure chests data...  */
 		/* ---------------------------- */
-		Log.log("Reconfigure chests content...", true);
-		this.reconfigureChestsContent();
+		this.logger.info("Reconfigure chests content...");
+		try {
+			this.reconfigureChestsContent();
+		} catch (Exception e) {
+			this.logger.log(Level.SEVERE, "Cannot reconfigure chests content", e);
+		}
 	}
 
-	abstract void reconfigureChestsContent();
+	abstract void reconfigureChestsContent() throws Exception;
 
 	boolean isBase64Encoded(String data) {
 		return BASE64_PATTERN.matcher(data).matches();
