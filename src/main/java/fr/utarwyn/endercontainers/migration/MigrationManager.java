@@ -1,8 +1,8 @@
 package fr.utarwyn.endercontainers.migration;
 
 import fr.utarwyn.endercontainers.AbstractManager;
-import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.migration.migration2_0_1.Migration2_0_1;
 import fr.utarwyn.endercontainers.migration.migration2_0_3.Migration2_0_3;
 import fr.utarwyn.endercontainers.migration.migration2_1_1.Migration2_1_1;
@@ -94,7 +94,7 @@ public class MigrationManager extends AbstractManager {
 	 */
 	private void loadMigration(Class<? extends Migration> clazz) {
 		Class<? extends Migration> migrationClazz;
-		String storagePath = Config.mysql ? "MySQL" : "Flat";
+		String storagePath = Files.getConfiguration().isMysql() ? "MySQL" : "Flat";
 
 		// Try to load the storage specific migration class
 		try {

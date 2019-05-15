@@ -86,16 +86,15 @@ public class Updater {
 
 		if (this.upToDate) {
 			logger.info("You are using the newest version of the plugin (" + this.getLocalVersion() + ").");
-			return;
+		} else {
+			logger.warning("  ");
+			logger.warning("-----------[Plugin Update!]---------");
+			logger.warning("    Your version: " + this.getLocalVersion());
+			logger.warning("    Newest version: " + this.newestVersion);
+			logger.warning("  ");
+			logger.warning("    Update message: " + this.updateTitle);
+			logger.warning("------------------------------------");
 		}
-
-		logger.warning("  ");
-		logger.warning("-----------[Plugin Update!]---------");
-		logger.warning("    Your version: " + this.getLocalVersion());
-		logger.warning("    Newest version: " + this.newestVersion);
-		logger.warning("  ");
-		logger.warning("    Update message: " + this.updateTitle);
-		logger.warning("------------------------------------");
 	}
 
 	/**

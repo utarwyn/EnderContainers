@@ -1,13 +1,12 @@
 package fr.utarwyn.endercontainers.menu;
 
-import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.compatibility.ServerVersion;
+import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.EUtil;
-import fr.utarwyn.endercontainers.util.Locale;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -69,7 +68,9 @@ public class EnderChestHubMenu extends AbstractMenu {
 	 * @param owner The player who owns enderchests in the menu
 	 */
 	public EnderChestHubMenu(UUID owner) {
-		super(Locale.menuMainTitle.replace("%player%", Objects.requireNonNull(UUIDFetcher.getName(owner))));
+		super(Files.getLocale().getMenuMainTitle().replace(
+				"%player%", Objects.requireNonNull(UUIDFetcher.getName(owner))
+		));
 
 		this.owner = owner;
 		this.manager = EnderContainers.getInstance().getInstance(EnderChestManager.class);
@@ -88,12 +89,12 @@ public class EnderChestHubMenu extends AbstractMenu {
 
 		SkullMeta prevSkullMeta = (SkullMeta) PREV_PAGE_ITEM.getItemMeta();
 		prevSkullMeta.setOwner("MHF_ArrowLeft");
-		prevSkullMeta.setDisplayName(ChatColor.RED + Locale.menuPreviousPage);
+		prevSkullMeta.setDisplayName(ChatColor.RED + Files.getLocale().getMenuPreviousPage());
 		PREV_PAGE_ITEM.setItemMeta(prevSkullMeta);
 
 		SkullMeta nextSkullMeta = (SkullMeta) NEXT_PAGE_ITEM.getItemMeta();
 		nextSkullMeta.setOwner("MHF_ArrowRight");
-		nextSkullMeta.setDisplayName(ChatColor.RED + Locale.menuNextPage);
+		nextSkullMeta.setDisplayName(ChatColor.RED + Files.getLocale().getMenuNextPage());
 		NEXT_PAGE_ITEM.setItemMeta(nextSkullMeta);
 	}
 
@@ -101,7 +102,8 @@ public class EnderChestHubMenu extends AbstractMenu {
 	public void prepare() {
 		// Calculate the number of enderchests to display in the inventory
 		int min = this.getFirstChestIndex();
-		int nb = Math.min(min + PER_PAGE + 2, Config.maxEnderchests);
+		int max = Files.getConfiguration().getMaxEnderchests();
+		int nb = Math.min(min + PER_PAGE + 2, max);
 
 		// Clear any previous items
 		this.clear();
@@ -112,10 +114,9 @@ public class EnderChestHubMenu extends AbstractMenu {
 			// Reload chest's metas before.
 			ec.reloadMeta();
 
-			if (!ec.isAccessible() && Config.onlyShowAccessibleEnderchests)
-				continue;
-
-			this.setItem(num - min, this.getItemStackOf(ec));
+			if (ec.isAccessible() || !Files.getConfiguration().isOnlyShowAccessibleEnderchests()) {
+				this.setItem(num - min, this.getItemStackOf(ec));
+			}
 		}
 
 		// Adding previous page item (if the user is not on the first page)
@@ -128,7 +129,7 @@ public class EnderChestHubMenu extends AbstractMenu {
 		int nbForNext = min + PER_PAGE;
 		if (this.page == 1) nbForNext += 2;
 
-		if (nbForNext < Config.maxEnderchests) {
+		if (nbForNext < max) {
 			this.removeItemAt(53);
 			this.setItem(53, NEXT_PAGE_ITEM);
 		}
@@ -197,16 +198,20 @@ public class EnderChestHubMenu extends AbstractMenu {
 
 		// Update lore with the chest's status
 		// TODO: maybe allow users to integrally personalize the description!
-		if (!accessible)
-			lore.add(Locale.menuChestLocked);
-		if (ec.isFull())
-			lore.add(Locale.menuChestFull);
-		else if (ec.isEmpty())
-			lore.add(Locale.menuChestEmpty);
+		if (!accessible) {
+			lore.add(Files.getLocale().getMenuChestLocked());
+		}
+		if (ec.isFull()) {
+			lore.add(Files.getLocale().getMenuChestFull());
+		} else if (ec.isEmpty()) {
+			lore.add(Files.getLocale().getMenuChestEmpty());
+		}
 
 		// Update itemstack metadata
-		meta.setDisplayName(this.formatPaneTitle(ec, Locale.menuPaneTitle));
-		meta.setLore(lore);
+		if (meta != null) {
+			meta.setDisplayName(this.formatPaneTitle(ec, Files.getLocale().getMenuPaneTitle()));
+			meta.setLore(lore);
+		}
 
 		itemStack.setItemMeta(meta);
 		return itemStack;

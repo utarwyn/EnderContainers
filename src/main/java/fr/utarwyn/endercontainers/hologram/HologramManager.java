@@ -1,11 +1,10 @@
 package fr.utarwyn.endercontainers.hologram;
 
 import fr.utarwyn.endercontainers.AbstractManager;
-import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
-import fr.utarwyn.endercontainers.dependencies.DependenciesManager;
+import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
-import fr.utarwyn.endercontainers.util.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -57,10 +56,10 @@ public class HologramManager extends AbstractManager implements Runnable {
 	 */
 	@Override
 	public void load() {
-		this.chestManager = EnderContainers.getInstance().getInstance(EnderChestManager.class);
-		this.dependenciesManager = EnderContainers.getInstance().getInstance(DependenciesManager.class);
+		this.chestManager = this.plugin.getInstance(EnderChestManager.class);
+		this.dependenciesManager = this.plugin.getInstance(DependenciesManager.class);
 
-		this.task = Bukkit.getScheduler().runTaskTimer(EnderContainers.getInstance(), this, 20L, 5L);
+		this.task = this.plugin.getServer().getScheduler().runTaskTimer(EnderContainers.getInstance(), this, 20L, 5L);
 		this.holograms = new HashMap<>();
 	}
 
@@ -74,8 +73,9 @@ public class HologramManager extends AbstractManager implements Runnable {
 			this.task = null;
 		}
 
-		for (Hologram hologram : this.holograms.values())
+		for (Hologram hologram : this.holograms.values()) {
 			hologram.destroy();
+		}
 	}
 
 	/**
@@ -83,10 +83,10 @@ public class HologramManager extends AbstractManager implements Runnable {
 	 */
 	@Override
 	public void run() {
-		if (!Config.blockNametag) return;
+		if (!Files.getConfiguration().isBlockNametag()) return;
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (Config.disabledWorlds.contains(player.getWorld().getName())) continue;
+			if (Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName())) continue;
 
 			UUID uuid = player.getUniqueId();
 			Block b = player.getTargetBlock(null, 6);
@@ -100,17 +100,15 @@ public class HologramManager extends AbstractManager implements Runnable {
 
 				int copEcs = this.chestManager.getEnderchestsNbOf(uuid);
 
-				String title = Locale.chestNametag
+				String title = Files.getLocale().getChestNametag()
 						.replace("%enderchests%", String.valueOf(copEcs))
-						.replace("%maxenderchests%", String.valueOf(Config.maxEnderchests))
+						.replace("%maxenderchests%", String.valueOf(Files.getConfiguration().getMaxEnderchests()))
 						.replaceAll("%plurial%", ((copEcs > 1) ? "s" : ""));
 
 				this.holograms.put(player.getUniqueId(), new Hologram(player, title, b.getLocation()));
-			} else {
-				if (this.holograms.containsKey(uuid)) {
-					this.holograms.get(uuid).destroy();
-					this.holograms.remove(uuid);
-				}
+			} else if (this.holograms.containsKey(uuid)) {
+				this.holograms.get(uuid).destroy();
+				this.holograms.remove(uuid);
 			}
 		}
 

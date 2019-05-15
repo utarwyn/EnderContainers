@@ -1,6 +1,6 @@
 package fr.utarwyn.endercontainers.migration.migration2_0_1;
 
-import fr.utarwyn.endercontainers.Config;
+import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.database.Database;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
 import fr.utarwyn.endercontainers.util.ItemSerializer;
@@ -15,7 +15,7 @@ public class MigrationMySQL2_0_1 extends Migration2_0_1 {
 		Database database = getDatabase();
 		if (database == null) return;
 
-		String chestsTable = Config.mysqlTablePrefix + "enderchests";
+		String chestsTable = Files.getConfiguration().getMysqlTablePrefix() + "enderchests";
 		List<DatabaseSet> chests = database.select().from(chestsTable).findAll();
 
 		String contents;

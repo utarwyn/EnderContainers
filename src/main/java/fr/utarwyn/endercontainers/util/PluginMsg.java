@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.util;
 
-import fr.utarwyn.endercontainers.Config;
+import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.configuration.Files;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -26,7 +27,7 @@ public class PluginMsg {
 	 * @param message Error message to send
 	 */
 	public static void errorMessage(CommandSender sender, String message) {
-		sender.sendMessage(Config.PREFIX + ChatColor.RED + message);
+		sender.sendMessage(EnderContainers.PREFIX + ChatColor.RED + message);
 	}
 
 	/**
@@ -43,10 +44,11 @@ public class PluginMsg {
 	 * @param sender The sender
 	 */
 	public static void accessDenied(CommandSender sender) {
-		if (sender instanceof Player)
-			errorMessage(sender, Locale.nopermPlayer);
-		else
-			errorMessage(sender, Locale.nopermConsole);
+		if (sender instanceof Player) {
+			errorMessage(sender, Files.getLocale().getNopermPlayer());
+		} else {
+			errorMessage(sender, Files.getLocale().getNopermConsole());
+		}
 	}
 
 	/**

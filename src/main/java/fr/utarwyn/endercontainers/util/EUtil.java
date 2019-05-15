@@ -152,15 +152,6 @@ public class EUtil {
 	}
 
 	/**
-	 * Gets the formatted server version
-	 * @return The server version as a string
-	 */
-	public static String getServerVersion() {
-		String packageName = EnderContainers.getInstance().getServer().getClass().getPackage().getName();
-		return packageName.substring(packageName.lastIndexOf('.') + 1);
-	}
-
-	/**
 	 * Shortcut used to create an asynchronous Java thread
 	 * @param runnable Runnable to run asynchronously
 	 */

@@ -1,8 +1,8 @@
 package fr.utarwyn.endercontainers.database;
 
 import fr.utarwyn.endercontainers.AbstractManager;
-import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.configuration.Files;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -46,7 +46,7 @@ public class DatabaseManager extends AbstractManager {
 	@Override
 	public void load() {
 		// MySQL is enabled or not?
-		if (!Config.mysql) {
+		if (!Files.getConfiguration().isMysql()) {
 			this.logger.info("MySQL disabled. Using flat system to store data.");
 			return;
 		}
@@ -54,19 +54,27 @@ public class DatabaseManager extends AbstractManager {
 		long begin = System.currentTimeMillis();
 
 		// Connect to the MySQL server ...
-		this.database = new Database(Config.mysqlHost, Config.mysqlPort, Config.mysqlUser, Config.mysqlPassword, Config.mysqlDatabase);
+		String host = Files.getConfiguration().getMysqlHost();
+		int port = Files.getConfiguration().getMysqlPort();
+
+		this.database = new Database(
+				host, port,
+				Files.getConfiguration().getMysqlUser(),
+				Files.getConfiguration().getMysqlPassword(),
+				Files.getConfiguration().getMysqlDatabase()
+		);
 
 		if (this.database.isConnected()) {
-			this.logger.info("MySQL enabled and ready. Connected to database " + Config.mysqlHost + ":" + Config.mysqlPort);
-			if (Config.debug) {
-				this.logger.info(String.format("Connection time: %dms", System.currentTimeMillis() - begin));
+			this.logger.log(Level.INFO,"MySQL enabled and ready. Connected to database {0}:{1}", new Object[]{ host, port });
+
+			if (Files.getConfiguration().isDebug()) {
+				this.logger.log(Level.INFO, "Connection time: {0}ms", System.currentTimeMillis() - begin);
 			}
 
 			this.init();
 		} else {
 			this.logger.severe("Unable to connect to your database. Please verify your credentials.");
 			this.logger.warning("SQL supports disabled because of an error during the connection.");
-			Config.mysql = false;
 		}
 	}
 
@@ -237,13 +245,13 @@ public class DatabaseManager extends AbstractManager {
 
 			if (!tables.contains(formatTable(CHEST_TABLE))) {
 				database.request("CREATE TABLE `" + formatTable(CHEST_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `num` TINYINT(2) NOT NULL DEFAULT '0', `owner` VARCHAR(36) NULL, `contents` MEDIUMTEXT NULL, `rows` INT(1) NOT NULL DEFAULT 0, `last_locking_time` TIMESTAMP NULL, PRIMARY KEY (`id`), INDEX `USER KEY` (`num`, `owner`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
-				if (Config.debug) {
+				if (Files.getConfiguration().isDebug()) {
 					this.logger.info(String.format("Table `%s` created in the database.", formatTable(CHEST_TABLE)));
 				}
 			}
 			if (!tables.contains(formatTable(BACKUP_TABLE))) {
 				database.request("CREATE TABLE `" + formatTable(BACKUP_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255) NOT NULL, `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `type` VARCHAR(60) NULL, `data` MEDIUMTEXT NULL, `created_by` VARCHAR(60) NULL, PRIMARY KEY (`id`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
-				if (Config.debug) {
+				if (Files.getConfiguration().isDebug()) {
 					this.logger.info(String.format("Table `%s` created in the database.", formatTable(BACKUP_TABLE)));
 				}
 			}
@@ -258,7 +266,7 @@ public class DatabaseManager extends AbstractManager {
 	 * @return The formatted name of the table
 	 */
 	private String formatTable(String table) {
-		return Config.mysqlTablePrefix + table;
+		return Files.getConfiguration().getMysqlTablePrefix() + table;
 	}
 
 	/**

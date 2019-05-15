@@ -1,7 +1,7 @@
 package fr.utarwyn.endercontainers.util;
 
-import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
+import fr.utarwyn.endercontainers.configuration.Files;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -27,17 +27,29 @@ import java.util.Map;
  */
 public class ItemSerializer {
 
-	private ItemSerializer() {}
+	private ItemSerializer() {
+		// Not implemented
+	}
 
+	/**
+	 * Build a string with a map of ItemStacks.
+	 * @param items Map of ItemStacks to convert.
+	 * @return The ItemStacks formatted to string.
+	 */
 	public static String serialize(Map<Integer, ItemStack> items) {
-		if (Config.useExperimentalSavingSystem)
+		if (Files.getConfiguration().isUseExperimentalSavingSystem())
 			return ItemSerializer.experimentalSerialization(items);
 		else
 			return ItemSerializer.base64Serialization(items);
 	}
 
+	/**
+	 * Restore the map of ItemStacks from a formatted string.
+	 * @param data String to parse.
+	 * @return Generated map of Itemstacks.
+	 */
 	public static HashMap<Integer, ItemStack> deserialize(String data) {
-		if (Config.useExperimentalSavingSystem)
+		if (Files.getConfiguration().isUseExperimentalSavingSystem())
 			return ItemSerializer.experimentalDeserialization(data);
 		else
 			return ItemSerializer.base64Deserialization(data);

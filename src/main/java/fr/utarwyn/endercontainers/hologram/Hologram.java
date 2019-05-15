@@ -12,8 +12,7 @@ import java.lang.reflect.Method;
 /**
  * This class is used to display a text above an enderchest block
  * if the option blockNametag was set to true.
- * This class uses packets and it's compatible from 1.8.X to 1.12.X.
- * (Tested and approved)
+ * This class uses packets and it's compatible from 1.8 to 1.13.
  *
  * @since 2.0.0
  * @author Utarwyn

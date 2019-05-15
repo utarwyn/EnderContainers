@@ -31,16 +31,16 @@ public abstract class AbstractManager implements Listener {
 		this.plugin = plugin;
 		this.logger = this.plugin.getLogger();
 
-		// Now we register all listeners (and the manager too)
+		// A manager is also a listener, so we need to register it and all listeners in arguments.
 		this.registerListener(this);
 		for (Listener listener : listeners) {
 			this.registerListener(listener);
 		}
 
-		// We start the initialization of the manager
+		// Now we just have to load this manager ...
 		this.load();
 
-		// Register the manager for the plugin
+		// ... and register it to access trough all the plugin.
 		try {
 			Managers.registerManager(this.getClass(), this);
 		} catch (Exception e) {
@@ -54,14 +54,6 @@ public abstract class AbstractManager implements Listener {
 	 */
 	protected void registerListener(Listener listener) {
 		this.plugin.getServer().getPluginManager().registerEvents(listener, this.plugin);
-	}
-
-	/**
-	 * Returns the main class of the plugin. Only a shortcut.
-	 * @return Main class
-	 */
-	public EnderContainers getPlugin() {
-		return this.plugin;
 	}
 
 	/**

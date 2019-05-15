@@ -1,15 +1,15 @@
 package fr.utarwyn.endercontainers;
 
 import fr.utarwyn.endercontainers.backup.BackupManager;
-import fr.utarwyn.endercontainers.commands.AbstractCommand;
-import fr.utarwyn.endercontainers.commands.EnderchestCommand;
-import fr.utarwyn.endercontainers.commands.MainCommand;
+import fr.utarwyn.endercontainers.command.AbstractCommand;
+import fr.utarwyn.endercontainers.command.EnderchestCommand;
+import fr.utarwyn.endercontainers.command.MainCommand;
+import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
-import fr.utarwyn.endercontainers.dependencies.DependenciesManager;
+import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.hologram.HologramManager;
 import fr.utarwyn.endercontainers.migration.MigrationManager;
-import fr.utarwyn.endercontainers.util.Locale;
 import fr.utarwyn.endercontainers.util.Updater;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,6 +26,21 @@ import java.util.logging.Level;
 public class EnderContainers extends JavaPlugin {
 
 	/**
+	 * Download link of the plugin
+	 */
+	public static final String DOWNLOAD_LINK = "http://bit.ly/2A8Xv8S";
+
+	/**
+	 * The plugin prefix
+	 */
+	public static final String PREFIX = "§8[§6EnderContainers§8] §7";
+
+	/**
+	 * Prefix for all permissions of the plugin
+	 */
+	public static final String PERM_PREFIX = "endercontainers.";
+
+	/**
 	 * The Endercontainers instance
 	 */
 	private static EnderContainers instance;
@@ -37,12 +52,13 @@ public class EnderContainers extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 
-		// Load main configuration ...
-		if (!Config.get().initialize(this)) {
+		// Load the plugin's configuration
+		if (!Files.initConfiguration(this)) {
+			this.getLogger().log(Level.SEVERE, "Cannot load the plugin's configuration. Please check the above log. Plugin loading failed.");
 			return;
 		}
 
-		// Load needed managers ...
+		// Now we have to load needed managers for the migration system
 		new DependenciesManager();
 		new DatabaseManager();
 
@@ -59,7 +75,8 @@ public class EnderContainers extends JavaPlugin {
 		new HologramManager();
 
 		// Load plugin locale ...
-		if (!Locale.get().initialize(this)) {
+		if (!Files.initLocale(this)) {
+			this.getLogger().log(Level.SEVERE, "Cannot load the plugin's locale. Please check the above log. Plugin loading failed.");
 			return;
 		}
 
@@ -68,8 +85,9 @@ public class EnderContainers extends JavaPlugin {
 		AbstractCommand.register(new EnderchestCommand());
 
 		// Check for update if needed ...
-		if (Config.updateChecker)
+		if (Files.getConfiguration().isUpdateChecker()) {
 			Updater.getInstance().notifyUpToDate();
+		}
 
 		// Load metrics (bStats) ...
 		new Metrics(this);

@@ -1,10 +1,9 @@
 package fr.utarwyn.endercontainers.menu;
 
-import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.util.EUtil;
-import fr.utarwyn.endercontainers.util.Locale;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -33,7 +32,7 @@ public class EnderChestMenu extends AbstractMenu {
 	public EnderChestMenu(EnderChest enderChest) {
 		super(
 				enderChest.getRows(),
-				Locale.menuChestTitle
+				Files.getLocale().getMenuChestTitle()
 						.replace("%player%", Objects.requireNonNull(UUIDFetcher.getName(enderChest.getOwner())))
 						.replace("%num%", String.valueOf(enderChest.getNum() + 1))
 		);
@@ -57,7 +56,7 @@ public class EnderChestMenu extends AbstractMenu {
 	@Override
 	public int getFilledSlotsNb() {
 		// Use the default enderchest to calculate the filled slots.
-		if (this.enderChest.getNum() == 0 && Config.useVanillaEnderchest) {
+		if (this.enderChest.getNum() == 0 && Files.getConfiguration().isUseVanillaEnderchest()) {
 			Inventory chest = EUtil.getVanillaEnderchestOf(this.enderChest.getOwner());
 			assert chest != null;
 
@@ -77,7 +76,7 @@ public class EnderChestMenu extends AbstractMenu {
 		if (EnderContainers.getInstance().isEnabled()) {
 			Bukkit.getScheduler().runTaskAsynchronously(EnderContainers.getInstance(), this.enderChest::save);
 
-			if (Config.globalSound) {
+			if (Files.getConfiguration().isGlobalSound()) {
 				EUtil.playSound(player.getLocation(), "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
 			} else {
 				EUtil.playSound(player, "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
@@ -90,7 +89,7 @@ public class EnderChestMenu extends AbstractMenu {
 
 	@Override
 	public void open(Player player) {
-		if (this.enderChest.getNum() == 0 && Config.useVanillaEnderchest) {
+		if (this.enderChest.getNum() == 0 && Files.getConfiguration().isUseVanillaEnderchest()) {
 			Inventory chest = EUtil.getVanillaEnderchestOf(this.enderChest.getOwner());
 			assert chest != null;
 

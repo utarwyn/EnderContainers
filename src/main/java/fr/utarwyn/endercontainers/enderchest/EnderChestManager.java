@@ -1,8 +1,8 @@
 package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.AbstractManager;
-import fr.utarwyn.endercontainers.Config;
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.menu.EnderChestHubMenu;
 import fr.utarwyn.endercontainers.menu.Menus;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
@@ -89,7 +89,7 @@ public class EnderChestManager extends AbstractManager {
 	public int getEnderchestsNbOf(UUID owner) {
 		int nb = 0;
 
-		for (int i = 0; i < Config.maxEnderchests; i++) {
+		for (int i = 0; i < Files.getConfiguration().getMaxEnderchests(); i++) {
 			EnderChest ec = this.getEnderChest(owner, i);
 			// Reload chest information before display the hologram.
 			ec.reloadMeta();

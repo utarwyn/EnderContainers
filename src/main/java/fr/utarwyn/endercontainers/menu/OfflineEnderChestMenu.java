@@ -1,6 +1,6 @@
 package fr.utarwyn.endercontainers.menu;
 
-import fr.utarwyn.endercontainers.Config;
+import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -55,8 +55,9 @@ public class OfflineEnderChestMenu extends EnderChestMenu {
 
 	@Override
 	public void open(Player player) {
-		if (this.enderChest.getNum() == 0 && Config.useVanillaEnderchest)
+		if (this.enderChest.getNum() == 0 && Files.getConfiguration().isUseVanillaEnderchest()) {
 			openedMenus.put(player.getUniqueId(), this.enderChest);
+		}
 
 		super.open(player);
 	}

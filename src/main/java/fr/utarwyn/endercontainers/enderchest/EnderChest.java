@@ -1,6 +1,6 @@
 package fr.utarwyn.endercontainers.enderchest;
 
-import fr.utarwyn.endercontainers.Config;
+import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.menu.EnderChestMenu;
 import fr.utarwyn.endercontainers.menu.OfflineEnderChestMenu;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
@@ -118,7 +118,7 @@ public class EnderChest {
 	 * @return True if the chest is unlocked for everyone
 	 */
 	public boolean isDefault() {
-		return this.num < Config.defaultEnderchests;
+		return this.num < Files.getConfiguration().getDefaultEnderchests();
 	}
 
 	/**
@@ -248,7 +248,7 @@ public class EnderChest {
 		// No player connected for this chest, use the cache instead.
 		if (player == null) return null;
 		// Use the vanilla chest!
-		if (this.num == 0 && Config.useVanillaEnderchest) return 3;
+		if (this.num == 0 && Files.getConfiguration().isUseVanillaEnderchest()) return 3;
 
 		for (int row = 6; row > 0; row--)
 			if (EUtil.playerHasPerm(player, "slot" + this.num + ".row" + row) || EUtil.playerHasPerm(player, "slots.row" + row))

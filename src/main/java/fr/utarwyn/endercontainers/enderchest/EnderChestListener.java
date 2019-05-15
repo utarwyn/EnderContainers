@@ -1,7 +1,8 @@
 package fr.utarwyn.endercontainers.enderchest;
 
-import fr.utarwyn.endercontainers.Config;
-import fr.utarwyn.endercontainers.dependencies.DependenciesManager;
+import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.menu.OfflineEnderChestMenu;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
@@ -43,7 +44,7 @@ public class EnderChestListener implements Listener {
 	 */
 	EnderChestListener(EnderChestManager manager) {
 		this.manager = manager;
-		this.dependenciesManager = manager.getPlugin().getInstance(DependenciesManager.class);
+		this.dependenciesManager = EnderContainers.getInstance().getInstance(DependenciesManager.class);
 	}
 
 	/**
@@ -64,7 +65,7 @@ public class EnderChestListener implements Listener {
 				return;
 
 			// Plugin not enabled or world disabled in config?
-			if (!Config.enabled || Config.disabledWorlds.contains(player.getWorld().getName()))
+			if (!Files.getConfiguration().isEnabled() || Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName()))
 				return;
 
 			e.setCancelled(true);
@@ -77,10 +78,11 @@ public class EnderChestListener implements Listener {
 			EUtil.runAsync(() -> this.manager.openHubMenuFor(player));
 
 			// Play sound (not in async mode)!
-			if (Config.globalSound)
+			if (Files.getConfiguration().isGlobalSound()) {
 				EUtil.playSound(block.getLocation(), "CHEST_OPEN", "BLOCK_CHEST_OPEN");
-			else
+			} else {
 				EUtil.playSound(player, "CHEST_OPEN", "BLOCK_CHEST_OPEN");
+			}
 		}
 	}
 
@@ -94,8 +96,8 @@ public class EnderChestListener implements Listener {
 
 		// Send update message to the player is he has the permission.
 		if (EUtil.playerHasPerm(player, "update") && !Updater.getInstance().isUpToDate()) {
-			player.sendMessage(Config.PREFIX+ "§aThere is a newer version available: §2§l" + Updater.getInstance().getNewestVersion() + "§a.");
-			player.sendMessage(Config.PREFIX + "Download it here: §f§n" + Config.DOWNLOAD_LINK);
+			player.sendMessage(EnderContainers.PREFIX+ "§aThere is a newer version available: §2§l" + Updater.getInstance().getNewestVersion() + "§a.");
+			player.sendMessage(EnderContainers.PREFIX + "Download it here: §f§n" + EnderContainers.DOWNLOAD_LINK);
 			EUtil.playSound(player, "NOTE_PLING", "BLOCK_NOTE_PLING");
 		}
 	}
@@ -126,8 +128,8 @@ public class EnderChestListener implements Listener {
 		Inventory inventory = event.getInventory();
 
 		// Play the closing sound when we use the default enderchest!
-		if (inventory.getType().equals(InventoryType.ENDER_CHEST) && Config.useVanillaEnderchest) {
-			if (Config.globalSound)
+		if (inventory.getType().equals(InventoryType.ENDER_CHEST) && Files.getConfiguration().isUseVanillaEnderchest()) {
+			if (Files.getConfiguration().isGlobalSound())
 				EUtil.playSound(player.getLocation(), "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
 			else
 				EUtil.playSound(player, "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
