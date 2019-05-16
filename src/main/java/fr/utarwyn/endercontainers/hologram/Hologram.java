@@ -61,6 +61,11 @@ class Hologram {
 	private static Class<?> chatBaseComponentClass;
 
 	/**
+	 * EntityTypes class for 1.14 holograms
+	 */
+	private static Class<?> entityTypesClass;
+
+	/**
 	 * Constructor of the ArmorStand class
 	 */
 	private static Constructor<?> armorStandConstructor;
@@ -102,11 +107,20 @@ class Hologram {
 			craftWorld = Class.forName("org.bukkit.craftbukkit." + version + ".CraftWorld");
 			packetClass = Class.forName("net.minecraft.server." + version + ".PacketPlayOutSpawnEntityLiving");
 			entityLivingClass = Class.forName("net.minecraft.server." + version + ".EntityLiving");
-			armorStandConstructor = armorStandClass.getConstructor(worldClass);
+
+			// In 1.14+ versions, ArmorStand constructor has changed,
+			// we have to pass the type of entity to spawn in arguments.
+			if (ServerVersion.is(ServerVersion.V1_14)) {
+				entityTypesClass = Class.forName("net.minecraft.server." + version + ".EntityTypes");
+				armorStandConstructor = armorStandClass.getConstructor(entityTypesClass, worldClass);
+			} else {
+				armorStandConstructor = armorStandClass.getConstructor(worldClass);
+			}
+
 			destroyPacketConstructor = destroyPacketClass.getConstructor(int[].class);
 
-			// Two classes used to format messages for holograms (only with the 1.13 version)
-			if (ServerVersion.is(ServerVersion.V1_13)) {
+			// Two classes used to format messages for holograms (needed in 1.13+ versions)
+			if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
 				chatMessageClass = Class.forName("org.bukkit.craftbukkit." + version + ".util.CraftChatMessage");
 				chatBaseComponentClass = Class.forName("net.minecraft.server." + version + ".IChatBaseComponent");
 			}
@@ -196,9 +210,17 @@ class Hologram {
 			Object craftWorldObj = craftWorld.cast(w);
 
 			Method getHandleMethod = craftWorldObj.getClass().getMethod("getHandle");
-			Object entityObject = armorStandConstructor.newInstance(getHandleMethod.invoke(craftWorldObj));
+			Object entityObject;
 
-			if (ServerVersion.is(ServerVersion.V1_13)) {
+			// In 1.14+ versions, we need to specify a type to create an instance of an ArmorStand.
+			if (ServerVersion.is(ServerVersion.V1_14)) {
+				Object armorStandType = entityTypesClass.getField("ARMOR_STAND").get(null);
+				entityObject = armorStandConstructor.newInstance(armorStandType, getHandleMethod.invoke(craftWorldObj));
+			} else {
+				entityObject = armorStandConstructor.newInstance(getHandleMethod.invoke(craftWorldObj));
+			}
+
+			if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
 				Method fromStringOrNullMethod = chatMessageClass.getMethod("fromStringOrNull", String.class);
 				Object chatComponent = fromStringOrNullMethod.invoke(null, text);
 

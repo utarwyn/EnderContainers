@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.menu;
 
+import fr.utarwyn.endercontainers.util.EUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -87,7 +88,16 @@ public abstract class AbstractMenu implements InventoryHolder {
 	 * @param player Player that will receive the container
 	 */
 	public void open(Player player) {
-		player.openInventory(this.getInventory());
+		Inventory inventory = this.getInventory();
+
+		/* We need to open the menu in the main Thread of the server in 1.14 version!
+		   And this is much more performant to do like this. */
+		// TODO So, we have to rewrite completly threads mangement in the plugin, its very ugly for now!
+		if (Bukkit.isPrimaryThread()) {
+			player.openInventory(inventory);
+		} else {
+			EUtil.runSync(() -> player.openInventory(inventory));
+		}
 	}
 
 	/**

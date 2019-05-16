@@ -84,7 +84,9 @@ public class DatabaseManager extends AbstractManager {
 	@Override
 	protected void unload() {
 		try {
-			this.database.close();
+			if (this.database != null) {
+				this.database.close();
+			}
 		} catch (SQLException e) {
 			this.logger.log(Level.SEVERE, "Cannot close the database connection.", e);
 		}

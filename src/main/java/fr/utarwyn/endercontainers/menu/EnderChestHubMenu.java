@@ -78,7 +78,7 @@ public class EnderChestHubMenu extends AbstractMenu {
 	}
 
 	static {
-		if (ServerVersion.is(ServerVersion.V1_13)) {
+		if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
 			SKULL_MATERIAL = Material.PLAYER_HEAD;
 		} else {
 			SKULL_MATERIAL = CompatibilityHelper.matchMaterial("SKULL_ITEM");
@@ -186,7 +186,7 @@ public class EnderChestHubMenu extends AbstractMenu {
 		ItemStack itemStack;
 
 		// TODO: maybe add an option to personalize the material here (instead of a glass pane)?
-		if (ServerVersion.is(ServerVersion.V1_13)) {
+		if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
 			itemStack = new ItemStack(CompatibilityHelper.matchMaterial(dyeColor.name() + "_STAINED_GLASS_PANE"));
 		} else {
 			itemStack = new ItemStack(CompatibilityHelper.matchMaterial("STAINED_GLASS_PANE"), 1, dyeColor.getWoolData());

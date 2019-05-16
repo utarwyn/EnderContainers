@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static fr.utarwyn.endercontainers.compatibility.ServerVersion.V1_13;
+import static fr.utarwyn.endercontainers.compatibility.ServerVersion.V1_12;
 
 /**
  * Helper class to solve compatibility problems.
@@ -74,7 +74,7 @@ public class CompatibilityHelper {
 
 		Material material = Material.matchMaterial(name);
 
-		if (material == null && ServerVersion.is(V1_13)) {
+		if (material == null && ServerVersion.isNewerThan(V1_12)) {
 			material = Material.matchMaterial(name, true);
 		}
 
@@ -89,9 +89,9 @@ public class CompatibilityHelper {
 			return MATERIAL_BY_IDS.get(id);
 		}
 
-		if (ServerVersion.isOlderThan(V1_13)) {
+		if (ServerVersion.isOlderThan(ServerVersion.V1_13)) {
 			// We have to use Java reflection here because the method does not
-			// exist in the version 1.13 of the Bukkit API.
+			// exist in 1.13+ versions of the Bukkit API.
 			try {
 				Method getMethod = Material.class.getMethod("getMaterial", Integer.class);
 				foundMaterial = (Material) getMethod.invoke(null, id);
@@ -117,7 +117,7 @@ public class CompatibilityHelper {
 	}
 
 	public static String enchantmentToString(Enchantment enchantment) {
-		if (ServerVersion.is(V1_13)) {
+		if (ServerVersion.isNewerThan(V1_12)) {
 			// New method to save en enchantment!
 			NamespacedKey key = enchantment.getKey();
 			return key.getNamespace() + "!" + key.getKey();
@@ -129,7 +129,7 @@ public class CompatibilityHelper {
 
 	public static Enchantment enchantmentFromString(String value) {
 		if (!StringUtils.isNumeric(value)) { // Name or NamespacedKey
-			if (ServerVersion.is(V1_13) && value.contains("!")) {
+			if (ServerVersion.isNewerThan(V1_12) && value.contains("!")) {
 				// New method to get en enchantment!
 				String[] parts = value.split("!");
 				return Enchantment.getByKey(new NamespacedKey(parts[0], parts[1]));
