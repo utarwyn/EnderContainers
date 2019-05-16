@@ -1,9 +1,7 @@
 package fr.utarwyn.endercontainers;
 
 import fr.utarwyn.endercontainers.backup.BackupManager;
-import fr.utarwyn.endercontainers.command.AbstractCommand;
-import fr.utarwyn.endercontainers.command.EnderchestCommand;
-import fr.utarwyn.endercontainers.command.MainCommand;
+import fr.utarwyn.endercontainers.command.CommandManager;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
@@ -36,11 +34,6 @@ public class EnderContainers extends JavaPlugin {
 	public static final String PREFIX = "§8[§6EnderContainers§8] §7";
 
 	/**
-	 * Prefix for all permissions of the plugin
-	 */
-	public static final String PERM_PREFIX = "endercontainers.";
-
-	/**
 	 * The Endercontainers instance
 	 */
 	private static EnderContainers instance;
@@ -59,30 +52,27 @@ public class EnderContainers extends JavaPlugin {
 		}
 
 		// Now we have to load needed managers for the migration system
-		new DependenciesManager();
-		new DatabaseManager();
+		Managers.registerManager(this, DependenciesManager.class);
+		Managers.registerManager(this, DatabaseManager.class);
 
 		// Load the migration manager and stop the plugin if a migration have been done.
-		MigrationManager mm = new MigrationManager();
-		if (mm.hasDoneMigration()) {
+		MigrationManager mm = Managers.registerManager(this, MigrationManager.class);
+		if (mm != null && mm.hasDoneMigration()) {
 			this.getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
 
 		// Load others managers ...
-		new EnderChestManager();
-		new BackupManager();
-		new HologramManager();
+		Managers.registerManager(this, EnderChestManager.class);
+		Managers.registerManager(this, BackupManager.class);
+		Managers.registerManager(this, HologramManager.class);
+		Managers.registerManager(this, CommandManager.class);
 
 		// Load plugin locale ...
 		if (!Files.initLocale(this)) {
 			this.getLogger().log(Level.SEVERE, "Cannot load the plugin's locale. Please check the above log. Plugin loading failed.");
 			return;
 		}
-
-		// Load commands ...
-		AbstractCommand.register(new MainCommand());
-		AbstractCommand.register(new EnderchestCommand());
 
 		// Check for update if needed ...
 		if (Files.getConfiguration().isUpdateChecker()) {
@@ -98,7 +88,6 @@ public class EnderContainers extends JavaPlugin {
 	 */
 	@Override
 	public void onDisable() {
-		// Unload all managers
 		Managers.unloadAll();
 	}
 
@@ -119,11 +108,12 @@ public class EnderContainers extends JavaPlugin {
 	 * @param <T> Generic type which represents the manager object
 	 * @return Registered manager if found otherwise null
 	 */
-	public final <T> T getInstance(Class<T> clazz) {
+	public final <T extends AbstractManager> T getManager(Class<T> clazz) {
 		T inst = Managers.getInstance(clazz);
 
-		if (inst == null)
+		if (inst == null) {
 			this.getLogger().log(Level.WARNING, clazz + " instance is null!");
+		}
 
 		return inst;
 	}

@@ -44,7 +44,7 @@ public class EnderChestListener implements Listener {
 	 */
 	EnderChestListener(EnderChestManager manager) {
 		this.manager = manager;
-		this.dependenciesManager = EnderContainers.getInstance().getInstance(DependenciesManager.class);
+		this.dependenciesManager = EnderContainers.getInstance().getManager(DependenciesManager.class);
 	}
 
 	/**

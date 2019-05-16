@@ -42,7 +42,7 @@ public abstract class StorageWrapper {
 	protected static Logger logger;
 
 	static {
-		databaseManager = EnderContainers.getInstance().getInstance(DatabaseManager.class);
+		databaseManager = EnderContainers.getInstance().getManager(DatabaseManager.class);
 		logger = EnderContainers.getInstance().getLogger();
 		classCacheMap = new HashMap<>();
 		cacheMap = new HashMap<>();

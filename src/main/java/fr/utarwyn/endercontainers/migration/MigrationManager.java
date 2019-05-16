@@ -38,14 +38,7 @@ public class MigrationManager extends AbstractManager {
 	private boolean migrationDone;
 
 	/**
-	 * Constructor of the manager
-	 */
-	public MigrationManager() {
-		super(EnderContainers.getInstance());
-	}
-
-	/**
-	 * Called when the manager initializes
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void load() {
@@ -67,14 +60,6 @@ public class MigrationManager extends AbstractManager {
 
 		// Write the current version of the plugin in the "version" file
 		this.writeVersion(EnderContainers.getInstance().getDescription().getVersion());
-	}
-
-	/**
-	 * Called when the manager unloads
-	 */
-	@Override
-	protected void unload() {
-		// Nothing to do when unloading this manager...
 	}
 
 	/**

@@ -217,7 +217,7 @@ public abstract class Migration {
 		if (database != null)
 			return database;
 
-		DatabaseManager manager = EnderContainers.getInstance().getInstance(DatabaseManager.class);
+		DatabaseManager manager = EnderContainers.getInstance().getManager(DatabaseManager.class);
 		if (!manager.isReady()) return null;
 
 		// Not very clear but its necessary to modify tables like we want

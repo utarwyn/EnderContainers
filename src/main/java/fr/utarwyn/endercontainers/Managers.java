@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers;
 
 import java.util.HashMap;
+import java.util.logging.Level;
 
 /**
  * Class used to manage managers (manager-ception).
@@ -16,31 +17,25 @@ public class Managers {
 
 	/**
 	 * Register a specific manager in the memory
-	 * @param clazz Class of the manager
-	 * @param instance Instance of the manager (Object)
-	 * @throws Exception If the manager is already registered
+	 * @param clazz Class of the manager to load for the plugin
+	 * @return Instance of the registered manager. Null if the manager is already registered.
 	 */
-	static void registerManager(Class<? extends AbstractManager> clazz, AbstractManager instance) throws Exception {
-		if (instances.containsKey(clazz))
-			throw new Exception("Manager " + clazz + " duplicated! " + instance);
+	static <T extends AbstractManager> T registerManager(EnderContainers plugin, Class<T> clazz) {
+		if (!instances.containsKey(clazz)) {
+			try {
+				T instance = clazz.newInstance();
 
-		instances.put(clazz, instance);
-	}
+				instances.put(clazz, instance);
 
-	/**
-	 * Gets an instance of a manager by its class
-	 * @param clazz Class of the manager to get
-	 * @param <T> Class type of the manager
-	 * @return Manager if found otherwise null
-	 */
-	@SuppressWarnings("unchecked")
-	protected static <T> T getInstance(Class<T> clazz) {
-		AbstractManager instance = instances.get(clazz);
+				instance.setPlugin(plugin);
+				instance.initialize();
+				instance.load();
 
-		if (instance == null)
-			return null;
-		if (clazz.isInstance(instance))
-			return (T) instance;
+				return instance;
+			} catch (InstantiationException | IllegalAccessException e) {
+				plugin.getLogger().log(Level.SEVERE, "Cannot register the manager " + clazz.getName(), e);
+			}
+		}
 
 		return null;
 	}
@@ -58,9 +53,28 @@ public class Managers {
 	/**
 	 * Unload all managers
 	 */
-	public static void unloadAll() {
-		for (AbstractManager manager : instances.values())
+	static void unloadAll() {
+		for (AbstractManager manager : instances.values()) {
 			manager.unload();
+		}
+	}
+
+	/**
+	 * Gets an instance of a manager by its class
+	 * @param clazz Class of the manager to get
+	 * @param <T> Class type of the manager
+	 * @return Manager if found otherwise null
+	 */
+	@SuppressWarnings("unchecked")
+	protected static <T extends AbstractManager> T getInstance(Class<T> clazz) {
+		AbstractManager instance = instances.get(clazz);
+
+		if (instance == null)
+			return null;
+		if (clazz.isInstance(instance))
+			return (T) instance;
+
+		return null;
 	}
 
 	/**

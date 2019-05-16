@@ -12,7 +12,7 @@ public class UpdateCommand extends AbstractCommand {
 	public UpdateCommand() {
 		super("update");
 
-		this.setPermission(EnderContainers.PERM_PREFIX + "update");
+		this.setPermission("update");
 	}
 
 	@Override

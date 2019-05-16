@@ -13,7 +13,7 @@ public class BackupCommand extends AbstractCommand {
 	public BackupCommand() {
 		super("backup");
 
-		BackupManager manager = EnderContainers.getInstance().getInstance(BackupManager.class);
+		BackupManager manager = EnderContainers.getInstance().getManager(BackupManager.class);
 
 		this.addSubCommand(new ListCommand(manager));
 		this.addSubCommand(new InfoCommand(manager));

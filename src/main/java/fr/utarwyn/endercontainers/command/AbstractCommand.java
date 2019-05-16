@@ -6,19 +6,15 @@ import fr.utarwyn.endercontainers.command.parameter.ParameterChecker;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.ChatColor;
-import org.bukkit.Server;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.util.StringUtil;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.*;
-import java.util.logging.Level;
 
 /**
- * Represents a SuperJukebox's command, that's all!
+ * Represents a EnderContainers's command, that's all!
  *
  * @author Utarwyn
  * @since 1.0.0
@@ -26,9 +22,9 @@ import java.util.logging.Level;
 public abstract class AbstractCommand extends Command implements TabCompleter, CommandExecutor, Listener {
 
 	/**
-	 * The Bukkit command map retrieved with reflection
+	 * Prefix for all command permissions of the plugin
 	 */
-	private static CommandMap commandMap;
+	private static final String PERM_PREFIX = "endercontainers.";
 
 	/**
 	 * Permission needed to type the command (for a player)
@@ -233,8 +229,13 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 		this.permission = permission;
 	}
 
+	/**
+	 * Check if a player has the permission to perform the command.
+	 * @param player Player to check
+	 * @return true if the player have the access
+	 */
 	private boolean hasRequiredPermission(Player player) {
-		return this.permission == null || player.hasPermission(this.permission);
+		return this.permission == null || player.hasPermission(PERM_PREFIX + this.permission);
 	}
 
 	public void setParameters(Parameter... parameters) {
@@ -299,8 +300,9 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 
 		String arg = this.args.get(idx);
 
-		if (this.parameters.get(idx).equalsTo(Parameter.STRING))
+		if (this.parameters.get(idx).equalsTo(Parameter.STRING)) {
 			return (T) arg;
+		}
 
 		return this.parseArg(arg);
 	}
@@ -312,90 +314,6 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 		else if (ParameterChecker.isFloat(arg)) return (T) new Float(arg);
 
 		return (T) arg;
-	}
-
-	// TODO Separate all this code in a different file (a CommandManager for example)!
-
-	/**
-	 * Register an abstract command directly inside the server's command map.
-	 * This method is called by the AsbtractCommand class.
-	 *
-	 * @param command Object to register inside the Bukkit server
-	 */
-	public static void register(AbstractCommand command) {
-		CommandMap commandMap = getCommandMap();
-
-		if (commandMap != null) {
-			commandMap.register("endercontainers", command);
-		}
-	}
-
-	/**
-	 * Unregister an exisiting command registered from another plugin.
-	 * This method also removes all aliases of the command.
-	 *
-	 * @param command Command to unregister completely from the server.
-	 */
-	public static void unregister(PluginCommand command) {
-		CommandMap commandMap = getCommandMap();
-
-		if (commandMap == null) {
-			return;
-		}
-
-		try {
-			Field fKownCmds;
-			HashMap<String, Command> knownCmds;
-
-			try {
-				fKownCmds = commandMap.getClass().getDeclaredField("knownCommands");
-			} catch (NoSuchFieldException ex) {
-				fKownCmds = null;
-			}
-
-			if (fKownCmds != null) { // Old versions
-				fKownCmds.setAccessible(true);
-			 	knownCmds = (HashMap<String, Command>) fKownCmds.get(commandMap);
-				fKownCmds.setAccessible(false);
-			} else { // For 1.13 servers
-				Method m = commandMap.getClass().getDeclaredMethod("getKnownCommands");
-				knownCmds = (HashMap<String, Command>) m.invoke(commandMap);
-			}
-
-			knownCmds.remove(command.getName());
-			for (String alias : command.getAliases()){
-				if(knownCmds.containsKey(alias) && knownCmds.get(alias).toString().contains(command.getName())){
-					knownCmds.remove(alias);
-				}
-			}
-		} catch (Exception ex) {
-			EnderContainers.getInstance().getLogger().log(Level.SEVERE,
-					"Cannot unregister the command " + command.getName() +  " from the server!", ex);
-		}
-	}
-
-	/**
-	 * This method returns the command map of the server!
-	 * @return The Bukkit internal Command map
-	 */
-	private static CommandMap getCommandMap() {
-		// Get the command map of the server first!
-		if (commandMap == null) {
-			try {
-				Server server = EnderContainers.getInstance().getServer();
-				Field fMap = server.getClass().getDeclaredField("commandMap");
-
-				fMap.setAccessible(true);
-				commandMap = (SimpleCommandMap) fMap.get(server);
-				fMap.setAccessible(false);
-			} catch (Exception ex) {
-				EnderContainers.getInstance().getLogger().log(Level.SEVERE,
-						"Cannot fetch the command map from the server!", ex);
-				return null;
-			}
-		}
-
-		return commandMap;
 	}
 
 }

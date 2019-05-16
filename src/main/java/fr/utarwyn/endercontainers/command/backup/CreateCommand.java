@@ -1,6 +1,5 @@
 package fr.utarwyn.endercontainers.command.backup;
 
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.command.parameter.Parameter;
 import fr.utarwyn.endercontainers.configuration.Files;
@@ -14,7 +13,7 @@ public class CreateCommand extends AbstractBackupCommand {
 	public CreateCommand(BackupManager manager) {
 		super("create", manager, "new");
 
-		this.setPermission(EnderContainers.PERM_PREFIX + "backup.create");
+		this.setPermission("backup.create");
 		this.addParameter(Parameter.STRING);
 	}
 

@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers.dependency;
 
 import fr.utarwyn.endercontainers.AbstractManager;
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.dependency.faction.FactionsDependency;
 import fr.utarwyn.endercontainers.dependency.worldguard.WorldGuardDependency;
 import org.bukkit.block.Block;
@@ -33,14 +32,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	private List<Dependency> dependencies;
 
 	/**
-	 * Constructor of the class. That's all.
-	 */
-	public DependenciesManager() {
-		super(EnderContainers.getInstance());
-	}
-
-	/**
-	 * Called when the manager is initializing
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void load() {
@@ -52,7 +44,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
 	}
 
 	/**
-	 * Called when the manager is unloading
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void unload() {

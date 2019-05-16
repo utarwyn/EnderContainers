@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.dependency;
 
-import fr.utarwyn.endercontainers.command.AbstractCommand;
+import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.command.CommandManager;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.command.PluginCommand;
@@ -21,7 +22,7 @@ public class EssentialsDependency extends Dependency {
 
 			// Server administrators can keep up the Essentials command by adding it to the list of overridden commands.
 			if (pluginCommand != null && !overriddenCmds.contains("enderchest")) {
-				AbstractCommand.unregister(pluginCommand);
+				EnderContainers.getInstance().getManager(CommandManager.class).unregister(pluginCommand);
 			}
 		}
 	}

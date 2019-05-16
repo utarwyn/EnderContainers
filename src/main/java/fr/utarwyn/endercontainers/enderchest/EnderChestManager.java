@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.AbstractManager;
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.menu.EnderChestHubMenu;
 import fr.utarwyn.endercontainers.menu.Menus;
@@ -32,15 +31,15 @@ public class EnderChestManager extends AbstractManager {
 	private EnderChestPurgeTask purgeTask;
 
 	/**
-	 * Construct the enderchest manager
+	 * {@inheritDoc}
 	 */
-	public EnderChestManager() {
-		super(EnderContainers.getInstance());
+	@Override
+	public void initialize() {
 		this.registerListener(new EnderChestListener(this));
 	}
 
 	/**
-	 * Called when the manager is initializing
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void load() {
@@ -50,7 +49,7 @@ public class EnderChestManager extends AbstractManager {
 	}
 
 	/**
-	 * Called when the manager is unloading
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void unload() {

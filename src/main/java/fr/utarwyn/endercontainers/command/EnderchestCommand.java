@@ -17,7 +17,7 @@ public class EnderchestCommand extends AbstractCommand {
 	public EnderchestCommand() {
 		super("enderchest", "ec", "endchest");
 
-		this.manager = EnderContainers.getInstance().getInstance(EnderChestManager.class);
+		this.manager = EnderContainers.getInstance().getManager(EnderChestManager.class);
 
 		this.addParameter(Parameter.INT.optional());
 	}

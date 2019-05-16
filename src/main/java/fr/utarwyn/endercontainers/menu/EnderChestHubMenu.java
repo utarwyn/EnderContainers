@@ -73,7 +73,7 @@ public class EnderChestHubMenu extends AbstractMenu {
 		));
 
 		this.owner = owner;
-		this.manager = EnderContainers.getInstance().getInstance(EnderChestManager.class);
+		this.manager = EnderContainers.getInstance().getManager(EnderChestManager.class);
 		this.page = 1;
 	}
 

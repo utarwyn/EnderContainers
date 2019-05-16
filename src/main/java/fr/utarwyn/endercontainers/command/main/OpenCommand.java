@@ -21,9 +21,9 @@ public class OpenCommand extends AbstractCommand {
 	public OpenCommand() {
 		super("open");
 
-		this.manager = EnderContainers.getInstance().getInstance(EnderChestManager.class);
+		this.manager = EnderContainers.getInstance().getManager(EnderChestManager.class);
 
-		this.setPermission(EnderContainers.PERM_PREFIX + "openchests");
+		this.setPermission("openchests");
 		this.addParameter(Parameter.STRING.withPlayersCompletion());
 	}
 

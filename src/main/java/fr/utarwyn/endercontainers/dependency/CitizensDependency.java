@@ -160,7 +160,7 @@ public class CitizensDependency extends Dependency implements Listener {
 		if (link == null) return false;
 
 		if (this.manager == null)
-			this.manager = EnderContainers.getInstance().getInstance(EnderChestManager.class);
+			this.manager = EnderContainers.getInstance().getManager(EnderChestManager.class);
 
 		switch (link.getType()) {
 			case "main":

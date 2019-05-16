@@ -14,7 +14,7 @@ public class RemoveCommand extends AbstractBackupCommand {
 	public RemoveCommand(BackupManager manager) {
 		super("remove", manager, "rm");
 
-		this.setPermission(EnderContainers.PERM_PREFIX + "backup.remove");
+		this.setPermission("backup.remove");
 		this.addParameter(Parameter.STRING);
 	}
 

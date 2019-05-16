@@ -14,7 +14,7 @@ public class ReloadCommand extends AbstractCommand {
 	public ReloadCommand() {
 		super("reload", "rl");
 
-		this.setPermission(EnderContainers.PERM_PREFIX + "reload");
+		this.setPermission("reload");
 	}
 
 	@Override

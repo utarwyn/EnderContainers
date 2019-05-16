@@ -1,6 +1,5 @@
 package fr.utarwyn.endercontainers.command.backup;
 
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.command.parameter.Parameter;
@@ -20,7 +19,7 @@ public class InfoCommand extends AbstractBackupCommand {
 	public InfoCommand(BackupManager manager) {
 		super("info", manager);
 
-		this.setPermission(EnderContainers.PERM_PREFIX + "backup.info");
+		this.setPermission("backup.info");
 		this.addParameter(Parameter.STRING);
 	}
 

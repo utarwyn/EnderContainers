@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers.database;
 
 import fr.utarwyn.endercontainers.AbstractManager;
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.configuration.Files;
 
 import java.sql.SQLException;
@@ -34,14 +33,7 @@ public class DatabaseManager extends AbstractManager {
 	private Database database;
 
 	/**
-	 * Used to construct the MySQL manager
-	 */
-	public DatabaseManager() {
-		super(EnderContainers.getInstance());
-	}
-
-	/**
-	 * Called when the manager is initializing
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void load() {
@@ -65,7 +57,8 @@ public class DatabaseManager extends AbstractManager {
 		);
 
 		if (this.database.isConnected()) {
-			this.logger.log(Level.INFO,"MySQL enabled and ready. Connected to database {0}:{1}", new Object[]{ host, port });
+			this.logger.log(Level.INFO,"MySQL enabled and ready. Connected to database {0}:{1}",
+					new Object[]{ host, String.valueOf(port) });
 
 			if (Files.getConfiguration().isDebug()) {
 				this.logger.log(Level.INFO, "Connection time: {0}ms", System.currentTimeMillis() - begin);
@@ -79,7 +72,7 @@ public class DatabaseManager extends AbstractManager {
 	}
 
 	/**
-	 * Called when the manager is unloading
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void unload() {

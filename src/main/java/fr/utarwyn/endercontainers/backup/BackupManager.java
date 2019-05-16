@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers.backup;
 
 import fr.utarwyn.endercontainers.AbstractManager;
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
@@ -29,14 +28,7 @@ public class BackupManager extends AbstractManager {
 	private BackupsData backupsStorage;
 
 	/**
-	 * Construct the manager
-	 */
-	public BackupManager() {
-		super(EnderContainers.getInstance());
-	}
-
-	/**
-	 * Called when the manager is initializing
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void load() {
@@ -47,7 +39,7 @@ public class BackupManager extends AbstractManager {
 	}
 
 	/**
-	 * Called when the manager is unloading
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void unload() {

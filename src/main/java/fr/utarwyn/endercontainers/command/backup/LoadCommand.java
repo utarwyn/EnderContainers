@@ -14,7 +14,7 @@ public class LoadCommand extends AbstractBackupCommand {
 	public LoadCommand(BackupManager manager) {
 		super("load", manager, "apply");
 
-		this.setPermission(EnderContainers.PERM_PREFIX + "backup.load");
+		this.setPermission("backup.load");
 		this.addParameter(Parameter.STRING);
 	}
 
