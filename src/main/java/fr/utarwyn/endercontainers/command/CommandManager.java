@@ -25,11 +25,9 @@ public class CommandManager extends AbstractManager {
 	private CommandMap cachedCommandMap;
 
 	/**
-	 * {@inheritDoc}
+     * Register and initialize needed commands for the plugin.
 	 */
-	@Override
-	public void initialize() {
-		// Commands are only registered at the start of the plugin. (not at internal reloads)
+    public void registerCommands() {
 		try {
 			this.register(EnderchestCommand.class);
 			this.register(MainCommand.class);

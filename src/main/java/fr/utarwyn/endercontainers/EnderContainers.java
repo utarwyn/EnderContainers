@@ -12,6 +12,7 @@ import fr.utarwyn.endercontainers.util.Updater;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Objects;
 import java.util.logging.Level;
 
 /**
@@ -51,7 +52,8 @@ public class EnderContainers extends JavaPlugin {
 			return;
 		}
 
-		// Now we have to load needed managers for the migration system
+        // Now we have to load core managers of the plugin
+        Managers.registerManager(this, CommandManager.class);
 		Managers.registerManager(this, DependenciesManager.class);
 		Managers.registerManager(this, DatabaseManager.class);
 
@@ -66,7 +68,6 @@ public class EnderContainers extends JavaPlugin {
 		Managers.registerManager(this, EnderChestManager.class);
 		Managers.registerManager(this, BackupManager.class);
 		Managers.registerManager(this, HologramManager.class);
-		Managers.registerManager(this, CommandManager.class);
 
 		// Load plugin locale ...
 		if (!Files.initLocale(this)) {
@@ -78,6 +79,9 @@ public class EnderContainers extends JavaPlugin {
 		if (Files.getConfiguration().isUpdateChecker()) {
 			Updater.getInstance().notifyUpToDate();
 		}
+
+        // Load commands ...
+        Objects.requireNonNull(Managers.getInstance(CommandManager.class)).registerCommands();
 
 		// Load metrics (bStats) ...
 		new Metrics(this);
