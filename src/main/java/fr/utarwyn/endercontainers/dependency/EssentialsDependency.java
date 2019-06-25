@@ -12,24 +12,24 @@ import java.util.List;
 
 public class EssentialsDependency extends Dependency {
 
-	@Override
-	public void onEnable() {
-		// Remove the essentials /enderchest command from the server!
-		Plugin essentialsPlugin = this.getPlugin();
-		if (essentialsPlugin != null) {
-			List<String> overriddenCmds = essentialsPlugin.getConfig().getStringList("overridden-commands");
-			PluginCommand pluginCommand = Bukkit.getPluginCommand("essentials:enderchest");
+    @Override
+    public void onEnable() {
+        // Remove the essentials /enderchest command from the server!
+        Plugin essentialsPlugin = this.getPlugin();
+        if (essentialsPlugin != null) {
+            List<String> overriddenCmds = essentialsPlugin.getConfig().getStringList("overridden-commands");
+            PluginCommand pluginCommand = Bukkit.getPluginCommand("essentials:enderchest");
 
-			// Server administrators can keep up the Essentials command by adding it to the list of overridden commands.
-			if (pluginCommand != null && !overriddenCmds.contains("enderchest")) {
-				EnderContainers.getInstance().getManager(CommandManager.class).unregister(pluginCommand);
-			}
-		}
-	}
+            // Server administrators can keep up the Essentials command by adding it to the list of overridden commands.
+            if (pluginCommand != null && !overriddenCmds.contains("enderchest")) {
+                EnderContainers.getInstance().getManager(CommandManager.class).unregister(pluginCommand);
+            }
+        }
+    }
 
-	@Override
-	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
-		return true;
-	}
+    @Override
+    public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
+        return true;
+    }
 
 }

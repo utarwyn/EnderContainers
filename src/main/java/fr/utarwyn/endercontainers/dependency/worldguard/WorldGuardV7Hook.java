@@ -14,30 +14,31 @@ import org.bukkit.plugin.Plugin;
 
 /**
  * Dependency used to interact with the WorldGuard V7+ plugin
- * @since 2.2.0
+ *
  * @author Utarwyn
+ * @since 2.2.0
  */
 public class WorldGuardV7Hook implements DependencyListener {
 
-	private WorldGuardPlugin worldGuardPlugin;
+    private WorldGuardPlugin worldGuardPlugin;
 
-	WorldGuardV7Hook(Plugin plugin) {
-		this.worldGuardPlugin = (WorldGuardPlugin) plugin;
-	}
+    WorldGuardV7Hook(Plugin plugin) {
+        this.worldGuardPlugin = (WorldGuardPlugin) plugin;
+    }
 
-	@Override
-	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
-		// OP? Ok, you can do whatever you want...
-		if (player.isOp()) return true;
+    @Override
+    public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
+        // OP? Ok, you can do whatever you want...
+        if (player.isOp()) return true;
 
-		// Retreive the WorldGuard Player instance, create a region query and adapt the block location.
-		LocalPlayer localPlayer = this.worldGuardPlugin.wrapPlayer(player);
-		RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
-		Location location = BukkitAdapter.adapt(block.getLocation());
+        // Retreive the WorldGuard Player instance, create a region query and adapt the block location.
+        LocalPlayer localPlayer = this.worldGuardPlugin.wrapPlayer(player);
+        RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+        Location location = BukkitAdapter.adapt(block.getLocation());
 
-		// Check for denied flags at the chest's location!
-		return query.testBuild(location, localPlayer, Flags.INTERACT, Flags.USE);
+        // Check for denied flags at the chest's location!
+        return query.testBuild(location, localPlayer, Flags.INTERACT, Flags.USE);
 
-	}
+    }
 
 }

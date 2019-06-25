@@ -23,266 +23,269 @@ import java.util.UUID;
 
 /**
  * Represents the menu with the list of all enderchests.
- * @since 2.0.0
+ *
  * @author Utarwyn
+ * @since 2.0.0
  */
 public class EnderChestHubMenu extends AbstractMenu {
 
-	/**
-	 * Static fields which represents the maximum number of items per page
-	 */
-	private static final int PER_PAGE = 52;
+    /**
+     * Static fields which represents the maximum number of items per page
+     */
+    private static final int PER_PAGE = 52;
 
-	/**
-	 * Bukkit skull material
-	 */
-	private static final Material SKULL_MATERIAL;
+    /**
+     * Bukkit skull material
+     */
+    private static final Material SKULL_MATERIAL;
 
-	/**
-	 * Represents the item to go to the previous page
-	 */
-	private static final ItemStack PREV_PAGE_ITEM;
+    /**
+     * Represents the item to go to the previous page
+     */
+    private static final ItemStack PREV_PAGE_ITEM;
 
-	/**
-	 * Represents the item to go to the next page
-	 */
-	private static final ItemStack NEXT_PAGE_ITEM;
+    /**
+     * Represents the item to go to the next page
+     */
+    private static final ItemStack NEXT_PAGE_ITEM;
 
-	/**
-	 * The enderchest manager
-	 */
-	private EnderChestManager manager;
+    static {
+        if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
+            SKULL_MATERIAL = Material.PLAYER_HEAD;
+        } else {
+            SKULL_MATERIAL = CompatibilityHelper.matchMaterial("SKULL_ITEM");
+        }
 
-	/**
-	 * The owner of all enderchests in the menu
-	 */
-	private UUID owner;
+        PREV_PAGE_ITEM = new ItemStack(SKULL_MATERIAL, 1, (short) 3);
+        NEXT_PAGE_ITEM = new ItemStack(SKULL_MATERIAL, 1, (short) 3);
 
-	/**
-	 * Current page for the player who has opened the menu
-	 */
-	private int page;
+        SkullMeta prevSkullMeta = (SkullMeta) PREV_PAGE_ITEM.getItemMeta();
+        prevSkullMeta.setOwner("MHF_ArrowLeft");
+        prevSkullMeta.setDisplayName(ChatColor.RED + Files.getLocale().getMenuPreviousPage());
+        PREV_PAGE_ITEM.setItemMeta(prevSkullMeta);
 
-	/**
-	 * Construct the Hub menu for a player
-	 * @param owner The player who owns enderchests in the menu
-	 */
-	public EnderChestHubMenu(UUID owner) {
-		super(Files.getLocale().getMenuMainTitle().replace(
-				"%player%", Objects.requireNonNull(UUIDFetcher.getName(owner))
-		));
+        SkullMeta nextSkullMeta = (SkullMeta) NEXT_PAGE_ITEM.getItemMeta();
+        nextSkullMeta.setOwner("MHF_ArrowRight");
+        nextSkullMeta.setDisplayName(ChatColor.RED + Files.getLocale().getMenuNextPage());
+        NEXT_PAGE_ITEM.setItemMeta(nextSkullMeta);
+    }
 
-		this.owner = owner;
-		this.manager = EnderContainers.getInstance().getManager(EnderChestManager.class);
-		this.page = 1;
-	}
+    /**
+     * The enderchest manager
+     */
+    private EnderChestManager manager;
+    /**
+     * The owner of all enderchests in the menu
+     */
+    private UUID owner;
+    /**
+     * Current page for the player who has opened the menu
+     */
+    private int page;
 
-	static {
-		if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
-			SKULL_MATERIAL = Material.PLAYER_HEAD;
-		} else {
-			SKULL_MATERIAL = CompatibilityHelper.matchMaterial("SKULL_ITEM");
-		}
+    /**
+     * Construct the Hub menu for a player
+     *
+     * @param owner The player who owns enderchests in the menu
+     */
+    public EnderChestHubMenu(UUID owner) {
+        super(Files.getLocale().getMenuMainTitle().replace(
+                "%player%", Objects.requireNonNull(UUIDFetcher.getName(owner))
+        ));
 
-		PREV_PAGE_ITEM = new ItemStack(SKULL_MATERIAL, 1, (short) 3);
-		NEXT_PAGE_ITEM = new ItemStack(SKULL_MATERIAL, 1, (short) 3);
+        this.owner = owner;
+        this.manager = EnderContainers.getInstance().getManager(EnderChestManager.class);
+        this.page = 1;
+    }
 
-		SkullMeta prevSkullMeta = (SkullMeta) PREV_PAGE_ITEM.getItemMeta();
-		prevSkullMeta.setOwner("MHF_ArrowLeft");
-		prevSkullMeta.setDisplayName(ChatColor.RED + Files.getLocale().getMenuPreviousPage());
-		PREV_PAGE_ITEM.setItemMeta(prevSkullMeta);
+    @Override
+    public void prepare() {
+        // Calculate the number of enderchests to display in the inventory
+        int min = this.getFirstChestIndex();
+        int max = Files.getConfiguration().getMaxEnderchests();
+        int nb = Math.min(min + PER_PAGE + 2, max);
 
-		SkullMeta nextSkullMeta = (SkullMeta) NEXT_PAGE_ITEM.getItemMeta();
-		nextSkullMeta.setOwner("MHF_ArrowRight");
-		nextSkullMeta.setDisplayName(ChatColor.RED + Files.getLocale().getMenuNextPage());
-		NEXT_PAGE_ITEM.setItemMeta(nextSkullMeta);
-	}
+        // Clear any previous items
+        this.clear();
 
-	@Override
-	public void prepare() {
-		// Calculate the number of enderchests to display in the inventory
-		int min = this.getFirstChestIndex();
-		int max = Files.getConfiguration().getMaxEnderchests();
-		int nb = Math.min(min + PER_PAGE + 2, max);
+        // Adding chest items
+        for (int num = min; num < nb; num++) {
+            EnderChest ec = this.manager.getEnderChest(this.owner, num);
+            // Reload chest's metas before.
+            ec.reloadMeta();
 
-		// Clear any previous items
-		this.clear();
+            if (ec.isAccessible() || !Files.getConfiguration().isOnlyShowAccessibleEnderchests()) {
+                this.setItem(num - min, this.getItemStackOf(ec));
+            }
+        }
 
-		// Adding chest items
-		for (int num = min; num < nb; num++) {
-			EnderChest ec = this.manager.getEnderChest(this.owner, num);
-			// Reload chest's metas before.
-			ec.reloadMeta();
+        // Adding previous page item (if the user is not on the first page)
+        if (this.page > 1) {
+            this.removeItemAt(52);
+            this.setItem(52, PREV_PAGE_ITEM);
+            this.removeItemAt(53);
+        }
+        // Adding next page item (if there is more chests than the current page can display)
+        int nbForNext = min + PER_PAGE;
+        if (this.page == 1) nbForNext += 2;
 
-			if (ec.isAccessible() || !Files.getConfiguration().isOnlyShowAccessibleEnderchests()) {
-				this.setItem(num - min, this.getItemStackOf(ec));
-			}
-		}
+        if (nbForNext < max) {
+            this.removeItemAt(53);
+            this.setItem(53, NEXT_PAGE_ITEM);
+        }
+    }
 
-		// Adding previous page item (if the user is not on the first page)
-		if (this.page > 1) {
-			this.removeItemAt(52);
-			this.setItem(52, PREV_PAGE_ITEM);
-			this.removeItemAt(53);
-		}
-		// Adding next page item (if there is more chests than the current page can display)
-		int nbForNext = min + PER_PAGE;
-		if (this.page == 1) nbForNext += 2;
+    @Override
+    public boolean onClick(Player player, int slot) {
+        EUtil.runSync(() -> {
+            // Check for previous/next page
+            if (slot >= PER_PAGE && this.getItemAt(slot).getType() == SKULL_MATERIAL) {
+                if (slot == PER_PAGE) this.page--;
+                else if (slot == PER_PAGE + 1) this.page++;
 
-		if (nbForNext < max) {
-			this.removeItemAt(53);
-			this.setItem(53, NEXT_PAGE_ITEM);
-		}
-	}
+                this.prepare();
+                this.updateInventory();
+                return;
+            }
 
-	@Override
-	public boolean onClick(Player player, int slot) {
-		EUtil.runSync(() -> {
-			// Check for previous/next page
-			if (slot >= PER_PAGE && this.getItemAt(slot).getType() == SKULL_MATERIAL) {
-				if (slot == PER_PAGE) this.page--;
-				else if (slot == PER_PAGE + 1) this.page++;
+            // Check for a chest (with the slot and the index of the first chest in the menu)
+            EnderChest chest = this.manager.getEnderChest(this.owner, this.getFirstChestIndex() + slot);
 
-				this.prepare();
-				this.updateInventory();
-				return;
-			}
+            // Reload the chest's metas before opening it.
+            // It allows to check if the player has kept his permission
+            // while he opened the Hub menu.
+            chest.reloadMeta();
 
-			// Check for a chest (with the slot and the index of the first chest in the menu)
-			EnderChest chest = this.manager.getEnderChest(this.owner, this.getFirstChestIndex() + slot);
+            if (chest.isAccessible()) {
+                chest.openContainerFor(player);
+                EUtil.playSound(player, "CLICK", "UI_BUTTON_CLICK");
+            } else {
+                EUtil.playSound(player, "ANVIL_BREAK", "BLOCK_ANVIL_BREAK");
+            }
+        });
 
-			// Reload the chest's metas before opening it.
-			// It allows to check if the player has kept his permission
-			// while he opened the Hub menu.
-			chest.reloadMeta();
+        return true;
+    }
 
-			if (chest.isAccessible()) {
-				chest.openContainerFor(player);
-				EUtil.playSound(player, "CLICK", "UI_BUTTON_CLICK");
-			} else {
-				EUtil.playSound(player, "ANVIL_BREAK", "BLOCK_ANVIL_BREAK");
-			}
-		});
+    @Override
+    public void onClose(Player player) {
+        this.destroy();
+    }
 
-		return true;
-	}
+    /**
+     * Generate an itemstack with informations of an enderchest
+     * (capacity, accessibility, number, etc.)
+     *
+     * @param ec The enderchest processed
+     * @return The itemstack generated
+     */
+    private ItemStack getItemStackOf(EnderChest ec) {
+        boolean accessible = ec.isAccessible();
+        DyeColor dyeColor = ec.isAccessible() ? this.getDyePercentageColor(ec.getFillPercentage()) : DyeColor.BLACK;
 
-	@Override
-	public void onClose(Player player) {
-		this.destroy();
-	}
+        ItemStack itemStack;
 
-	/**
-	 * Generate an itemstack with informations of an enderchest
-	 * (capacity, accessibility, number, etc.)
-	 *
-	 * @param ec The enderchest processed
-	 * @return The itemstack generated
-	 */
-	private ItemStack getItemStackOf(EnderChest ec) {
-		boolean accessible = ec.isAccessible();
-		DyeColor dyeColor = ec.isAccessible() ? this.getDyePercentageColor(ec.getFillPercentage()) : DyeColor.BLACK;
+        // TODO: maybe add an option to personalize the material here (instead of a glass pane)?
+        if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
+            itemStack = new ItemStack(CompatibilityHelper.matchMaterial(dyeColor.name() + "_STAINED_GLASS_PANE"));
+        } else {
+            itemStack = new ItemStack(CompatibilityHelper.matchMaterial("STAINED_GLASS_PANE"), 1, dyeColor.getWoolData());
+        }
 
-		ItemStack itemStack;
+        ItemMeta meta = itemStack.getItemMeta();
 
-		// TODO: maybe add an option to personalize the material here (instead of a glass pane)?
-		if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
-			itemStack = new ItemStack(CompatibilityHelper.matchMaterial(dyeColor.name() + "_STAINED_GLASS_PANE"));
-		} else {
-			itemStack = new ItemStack(CompatibilityHelper.matchMaterial("STAINED_GLASS_PANE"), 1, dyeColor.getWoolData());
-		}
+        List<String> lore = new ArrayList<>();
 
-		ItemMeta meta = itemStack.getItemMeta();
+        // Update lore with the chest's status
+        // TODO: maybe allow users to integrally personalize the description!
+        if (!accessible) {
+            lore.add(Files.getLocale().getMenuChestLocked());
+        }
+        if (ec.isFull()) {
+            lore.add(Files.getLocale().getMenuChestFull());
+        } else if (ec.isEmpty()) {
+            lore.add(Files.getLocale().getMenuChestEmpty());
+        }
 
-		List<String> lore = new ArrayList<>();
+        // Update itemstack metadata
+        if (meta != null) {
+            meta.setDisplayName(this.formatPaneTitle(ec, Files.getLocale().getMenuPaneTitle()));
+            meta.setLore(lore);
+        }
 
-		// Update lore with the chest's status
-		// TODO: maybe allow users to integrally personalize the description!
-		if (!accessible) {
-			lore.add(Files.getLocale().getMenuChestLocked());
-		}
-		if (ec.isFull()) {
-			lore.add(Files.getLocale().getMenuChestFull());
-		} else if (ec.isEmpty()) {
-			lore.add(Files.getLocale().getMenuChestEmpty());
-		}
+        itemStack.setItemMeta(meta);
+        return itemStack;
+    }
 
-		// Update itemstack metadata
-		if (meta != null) {
-			meta.setDisplayName(this.formatPaneTitle(ec, Files.getLocale().getMenuPaneTitle()));
-			meta.setLore(lore);
-		}
+    /**
+     * Format the pane title from the configuration to have info about an enderchest.
+     *
+     * @param chest Enderchest represented by the pane
+     * @param title Original title got from the configuration
+     * @return Formatted title ready to be displayed in the menu
+     */
+    private String formatPaneTitle(EnderChest chest, String title) {
+        ChatColor fillingColor = this.getPercentageColor(chest.getFillPercentage());
+        ChatColor accessibilityColor = chest.isAccessible() ? ChatColor.GREEN : ChatColor.RED;
 
-		itemStack.setItemMeta(meta);
-		return itemStack;
-	}
+        // Adding the color before all text
+        title = accessibilityColor + title;
 
-	/**
-	 * Format the pane title from the configuration to have info about an enderchest.
-	 *
-	 * @param chest Enderchest represented by the pane
-	 * @param title Original title got from the configuration
-	 * @return Formatted title ready to be displayed in the menu
-	 */
-	private String formatPaneTitle(EnderChest chest, String title) {
-		ChatColor fillingColor = this.getPercentageColor(chest.getFillPercentage());
-		ChatColor accessibilityColor = chest.isAccessible() ? ChatColor.GREEN : ChatColor.RED;
+        // Separate all placeholders to improve performance
+        if (title.contains("%num%")) {
+            title = title.replace("%num%", String.valueOf(chest.getNum() + 1));
+        }
 
-		// Adding the color before all text
-		title = accessibilityColor + title;
+        if (title.contains("%counter%")) {
+            title = title.replace("%counter%", fillingColor + "(" + chest.getSize() + "/" + chest.getMaxSize() + ")" + accessibilityColor);
+        }
 
-		// Separate all placeholders to improve performance
-		if (title.contains("%num%")) {
-			title = title.replace("%num%", String.valueOf(chest.getNum() + 1));
-		}
+        if (title.contains("%percent%")) {
+            title = title.replace("%percent%", fillingColor + "(" + String.format("%.0f", chest.getFillPercentage() * 100) + "%)" + accessibilityColor);
+        }
 
-		if (title.contains("%counter%")) {
-			title = title.replace("%counter%", fillingColor + "(" + chest.getSize() + "/" + chest.getMaxSize() + ")" + accessibilityColor);
-		}
+        // TODO: items number placeholder?
 
-		if (title.contains("%percent%")) {
-			title = title.replace("%percent%", fillingColor + "(" + String.format("%.0f", chest.getFillPercentage() * 100) + "%)" + accessibilityColor);
-		}
+        return title;
+    }
 
-		// TODO: items number placeholder?
+    /**
+     * Get the color in terms of a percentage between 0 and 1
+     *
+     * @param perc The percentage
+     * @return The chat color generated
+     */
+    private ChatColor getPercentageColor(double perc) {
+        if (perc >= 1)
+            return ChatColor.DARK_RED;
+        if (perc >= .5)
+            return ChatColor.GOLD;
 
-		return title;
-	}
+        return ChatColor.GREEN;
+    }
 
-	/**
-	 * Get the color in terms of a percentage between 0 and 1
-	 * @param perc The percentage
-	 * @return The chat color generated
-	 */
-	private ChatColor getPercentageColor(double perc) {
-		if (perc >= 1)
-			return ChatColor.DARK_RED;
-		if (perc >= .5)
-			return ChatColor.GOLD;
+    /**
+     * Get the dye color in terms of a percentage between 0 and 1
+     *
+     * @param perc The percentage
+     * @return The dye color used for the itemstack
+     */
+    private DyeColor getDyePercentageColor(double perc) {
+        if (perc >= 1)
+            return DyeColor.RED;
+        if (perc >= .5)
+            return DyeColor.ORANGE;
 
-		return ChatColor.GREEN;
-	}
+        return DyeColor.LIME;
+    }
 
-	/**
-	 * Get the dye color in terms of a percentage between 0 and 1
-	 * @param perc The percentage
-	 * @return The dye color used for the itemstack
-	 */
-	private DyeColor getDyePercentageColor(double perc) {
-		if (perc >= 1)
-			return DyeColor.RED;
-		if (perc >= .5)
-			return DyeColor.ORANGE;
-
-		return DyeColor.LIME;
-	}
-
-	/**
-	 * Calculate the minimum chest's number in terms of the current page
-	 * @return The first chest's index for the current page
-	 */
-	private int getFirstChestIndex() {
-		return this.page == 1 ? 0 : Math.max(0, (this.page - 1) * PER_PAGE + 1);
-	}
+    /**
+     * Calculate the minimum chest's number in terms of the current page
+     *
+     * @return The first chest's index for the current page
+     */
+    private int getFirstChestIndex() {
+        return this.page == 1 ? 0 : Math.max(0, (this.page - 1) * PER_PAGE + 1);
+    }
 
 }

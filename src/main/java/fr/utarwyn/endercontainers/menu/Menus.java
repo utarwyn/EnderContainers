@@ -19,120 +19,124 @@ import java.util.concurrent.ConcurrentHashMap;
  * Used as a listener too, this class makes the creation
  * of menus a very simple action.
  *
- * @since 2.0.0
  * @author Utarwyn
+ * @since 2.0.0
  */
 public class Menus implements Listener {
 
-	/**
-	 * Collection of all menus
-	 */
-	private static Set<AbstractMenu> menuSet;
+    /**
+     * Collection of all menus
+     */
+    private static Set<AbstractMenu> menuSet;
 
-	/**
-	 * No constructor, its an utility class
-	 */
-	private Menus() { }
+    /**
+     * No constructor, its an utility class
+     */
+    private Menus() {
+    }
 
-	/**
-	 * Register an AbstractMenu
-	 * @param menu Menu to register
-	 */
-	static void registerMenu(AbstractMenu menu) {
-		if (menuSet == null) {
-			menuSet = ConcurrentHashMap.newKeySet();
-			Bukkit.getPluginManager().registerEvents(new Menus(), EnderContainers.getInstance());
-		}
+    /**
+     * Register an AbstractMenu
+     *
+     * @param menu Menu to register
+     */
+    static void registerMenu(AbstractMenu menu) {
+        if (menuSet == null) {
+            menuSet = ConcurrentHashMap.newKeySet();
+            Bukkit.getPluginManager().registerEvents(new Menus(), EnderContainers.getInstance());
+        }
 
-		menuSet.add(menu);
-	}
+        menuSet.add(menu);
+    }
 
-	/**
-	 * Unregister an AbstractMenu to liberate memory
-	 * @param menu Menu to unregister
-	 */
-	static void unregisterMenu(AbstractMenu menu) {
-		if (menuSet != null) {
-			menuSet.remove(menu);
-		}
-	}
+    /**
+     * Unregister an AbstractMenu to liberate memory
+     *
+     * @param menu Menu to unregister
+     */
+    static void unregisterMenu(AbstractMenu menu) {
+        if (menuSet != null) {
+            menuSet.remove(menu);
+        }
+    }
 
-	/**
-	 * Called when a player click in an inventory.
-	 * Used to detect an interaction with one of registered menus.
-	 *
-	 * @param event The inventory click event
-	 */
-	@EventHandler
-	public void onInventoryClick(InventoryClickEvent event) {
-		// Only detect clicks inside the top inventory of the view!
-		Inventory inventory = event.getView().getTopInventory();
+    /**
+     * Close all registered menus for everyone connected on the server
+     */
+    public static void closeAll() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Inventory openInv = player.getOpenInventory().getTopInventory();
+            if (InventoryType.ENDER_CHEST.equals(openInv.getType())) {
+                player.closeInventory();
+                continue;
+            }
 
-		if (event.getRawSlot() < inventory.getSize()) {
-			AbstractMenu menu = this.getMenuFromInventory(inventory);
-			Player player = (Player) event.getWhoClicked();
+            if (menuSet != null) {
+                for (AbstractMenu menu : menuSet) {
+                    if (openInv.getHolder() == menu) {
+                        menu.updateItems();
+                        menu.onClose(player);
 
-			if (menu == null || event.getSlot() < 0)
-				return;
-			if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
-				return;
+                        player.closeInventory();
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
-			event.setCancelled(menu.onClick(player, event.getSlot()));
-		}
-	}
+    /**
+     * Called when a player click in an inventory.
+     * Used to detect an interaction with one of registered menus.
+     *
+     * @param event The inventory click event
+     */
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        // Only detect clicks inside the top inventory of the view!
+        Inventory inventory = event.getView().getTopInventory();
 
-	/**
-	 * Called when a player close an inventory.
-	 * Used to detect a closure of one of registered menus.
-	 *
-	 * @param event The inventory close event
-	 */
-	@EventHandler
-	public void onInventoryClose(InventoryCloseEvent event) {
-		AbstractMenu menu = this.getMenuFromInventory(event.getInventory());
-		Player player = (Player) event.getPlayer();
-		if (menu == null) return;
+        if (event.getRawSlot() < inventory.getSize()) {
+            AbstractMenu menu = this.getMenuFromInventory(inventory);
+            Player player = (Player) event.getWhoClicked();
 
-		menu.updateItems();
-		menu.onClose(player);
-	}
+            if (menu == null || event.getSlot() < 0)
+                return;
+            if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
+                return;
 
-	/**
-	 * Gets a registered menu linked to a given inventory
-	 * @param inventory Inventory to check
-	 * @return Menu if found, otherwise null
-	 */
-	private AbstractMenu getMenuFromInventory(Inventory inventory) {
-		for (AbstractMenu menu : menuSet)
-			if (menu == inventory.getHolder())
-				return menu;
+            event.setCancelled(menu.onClick(player, event.getSlot()));
+        }
+    }
 
-		return null;
-	}
+    /**
+     * Called when a player close an inventory.
+     * Used to detect a closure of one of registered menus.
+     *
+     * @param event The inventory close event
+     */
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        AbstractMenu menu = this.getMenuFromInventory(event.getInventory());
+        Player player = (Player) event.getPlayer();
+        if (menu == null) return;
 
-	/**
-	 * Close all registered menus for everyone connected on the server
-	 */
-	public static void closeAll() {
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			Inventory openInv = player.getOpenInventory().getTopInventory();
-			if (InventoryType.ENDER_CHEST.equals(openInv.getType())) {
-				player.closeInventory();
-				continue;
-			}
+        menu.updateItems();
+        menu.onClose(player);
+    }
 
-			if (menuSet != null) {
-				for (AbstractMenu menu : menuSet) {
-					if (openInv.getHolder() == menu) {
-						menu.updateItems();
-						menu.onClose(player);
+    /**
+     * Gets a registered menu linked to a given inventory
+     *
+     * @param inventory Inventory to check
+     * @return Menu if found, otherwise null
+     */
+    private AbstractMenu getMenuFromInventory(Inventory inventory) {
+        for (AbstractMenu menu : menuSet)
+            if (menu == inventory.getHolder())
+                return menu;
 
-						player.closeInventory();
-						break;
-					}
-				}
-			}
-		}
-	}
+        return null;
+    }
 
 }

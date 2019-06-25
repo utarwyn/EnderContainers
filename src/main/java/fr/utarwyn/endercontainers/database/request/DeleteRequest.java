@@ -7,53 +7,54 @@ import java.sql.SQLException;
 
 /**
  * A delete request
- * @since 2.2.0
+ *
  * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @since 2.2.0
  */
 public class DeleteRequest implements IRequest {
 
-	private Database database;
+    private Database database;
 
-	private String table;
+    private String table;
 
-	private String[] conditions;
+    private String[] conditions;
 
-	private Object[] attributes;
+    private Object[] attributes;
 
-	public DeleteRequest(Database database, String... conditions) {
-		this.database = database;
-		this.conditions = conditions;
-		this.attributes = new Object[0];
-	}
+    public DeleteRequest(Database database, String... conditions) {
+        this.database = database;
+        this.conditions = conditions;
+        this.attributes = new Object[0];
+    }
 
-	public Object[] getAttributes() {
-		return this.attributes;
-	}
+    public Object[] getAttributes() {
+        return this.attributes;
+    }
 
-	public DeleteRequest from(String table) {
-		this.table = table;
-		return this;
-	}
+    public DeleteRequest from(String table) {
+        this.table = table;
+        return this;
+    }
 
-	public DeleteRequest attributes(Object... attributes) {
-		this.attributes = attributes;
-		return this;
-	}
+    public DeleteRequest attributes(Object... attributes) {
+        this.attributes = attributes;
+        return this;
+    }
 
-	public boolean execute() throws SQLException {
-		return this.database.execUpdateStatement(this);
-	}
+    public boolean execute() throws SQLException {
+        return this.database.execUpdateStatement(this);
+    }
 
-	@Override
-	public String getRequest() {
-		// Table does not have to be null at this point!
-		if (this.table == null) {
-			throw new NullPointerException("From table seems to be null!");
-		}
+    @Override
+    public String getRequest() {
+        // Table does not have to be null at this point!
+        if (this.table == null) {
+            throw new NullPointerException("From table seems to be null!");
+        }
 
-		// Create the request string
-		return "DELETE FROM `" + this.table + "` WHERE " +
-				StringUtils.join(this.conditions, " AND ");
-	}
+        // Create the request string
+        return "DELETE FROM `" + this.table + "` WHERE " +
+                StringUtils.join(this.conditions, " AND ");
+    }
 
 }

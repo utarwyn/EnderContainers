@@ -6,73 +6,73 @@ import java.util.List;
 
 public class Parameter {
 
-	public static final Parameter INT = new Parameter(new ParameterIntChecker());
+    public static final Parameter INT = new Parameter(new ParameterIntChecker());
 
-	public static final Parameter FLOAT = new Parameter(new ParameterFloatChecker());
+    public static final Parameter FLOAT = new Parameter(new ParameterFloatChecker());
 
-	public static final Parameter DOUBLE = new Parameter(new ParameterDoubleChecker());
+    public static final Parameter DOUBLE = new Parameter(new ParameterDoubleChecker());
 
-	public static final Parameter STRING = new Parameter(null);
+    public static final Parameter STRING = new Parameter(null);
 
-	private ParameterChecker checker;
+    private ParameterChecker checker;
 
-	private List<Object> tabCompletions;
+    private List<Object> tabCompletions;
 
-	private boolean optional;
+    private boolean optional;
 
-	private Parameter(ParameterChecker checker) {
-		this(checker, new ArrayList<>());
-	}
+    private Parameter(ParameterChecker checker) {
+        this(checker, new ArrayList<>());
+    }
 
-	private Parameter(ParameterChecker checker, List<Object> tabCompletions) {
-		this.checker = checker;
-		this.tabCompletions = tabCompletions;
-	}
+    private Parameter(ParameterChecker checker, List<Object> tabCompletions) {
+        this.checker = checker;
+        this.tabCompletions = tabCompletions;
+    }
 
-	public List<String> getTabCompletions() {
-		List<String> completions = new ArrayList<>();
+    public static Parameter withCustomChecker(ParameterChecker checker) {
+        if (checker == null)
+            throw new NullPointerException("The parameter checker cannot be null!");
 
-		if (this.tabCompletions == null) return null;
+        return new Parameter(checker);
+    }
 
-		for (Object obj : this.tabCompletions)
-			if (obj != null) {
-				completions.add(obj.toString());
-			}
+    public List<String> getTabCompletions() {
+        List<String> completions = new ArrayList<>();
 
-		return completions;
-	}
+        if (this.tabCompletions == null) return null;
 
-	public boolean isOptional() {
-		return this.optional;
-	}
+        for (Object obj : this.tabCompletions)
+            if (obj != null) {
+                completions.add(obj.toString());
+            }
 
-	public Parameter withTabCompletions(Object... tabCompletions) {
-		return new Parameter(this.checker, Arrays.asList(tabCompletions));
-	}
+        return completions;
+    }
 
-	public Parameter optional() {
-		Parameter parameter = new Parameter(this.checker, this.tabCompletions);
-		parameter.optional = true;
-		return parameter;
-	}
+    public boolean isOptional() {
+        return this.optional;
+    }
 
-	public Parameter withPlayersCompletion() {
-		return new Parameter(this.checker, null);
-	}
+    public Parameter withTabCompletions(Object... tabCompletions) {
+        return new Parameter(this.checker, Arrays.asList(tabCompletions));
+    }
 
-	public boolean check(String value) {
-		return this.checker == null || this.checker.checkParam(value);
-	}
+    public Parameter optional() {
+        Parameter parameter = new Parameter(this.checker, this.tabCompletions);
+        parameter.optional = true;
+        return parameter;
+    }
 
-	public boolean equalsTo(Parameter parameter) {
-		return this.checker == parameter.checker;
-	}
+    public Parameter withPlayersCompletion() {
+        return new Parameter(this.checker, null);
+    }
 
-	public static Parameter withCustomChecker(ParameterChecker checker) {
-		if (checker == null)
-			throw new NullPointerException("The parameter checker cannot be null!");
+    public boolean check(String value) {
+        return this.checker == null || this.checker.checkParam(value);
+    }
 
-		return new Parameter(checker);
-	}
+    public boolean equalsTo(Parameter parameter) {
+        return this.checker == parameter.checker;
+    }
 
 }

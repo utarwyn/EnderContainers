@@ -37,6 +37,59 @@ public class YamlNewConfiguration extends YamlConfiguration {
 	}
 
 	/**
+	 * Creates a new {@link YamlNewConfiguration}, loading from the given file.
+	 * <p>
+	 * Any errors loading the Configuration will be logged and then ignored.
+	 * If the specified input is not a valid config, a blank config will be
+	 * returned.
+	 * <p>
+	 * The encoding used may follow the system dependent default.
+	 *
+	 * @param file Input file
+	 * @return Resulting configuration
+	 * @throws IllegalArgumentException Thrown if file is null
+	 */
+	public static YamlNewConfiguration loadConfiguration(File file) {
+		Validate.notNull(file, "File cannot be null");
+
+		YamlNewConfiguration config = new YamlNewConfiguration();
+
+		try {
+			config.load(file);
+		} catch (FileNotFoundException ignored) {
+		} catch (IOException | InvalidConfigurationException ex) {
+			Bukkit.getLogger().log(Level.SEVERE, "Cannot load " + file, ex);
+		}
+
+		return config;
+	}
+
+	/**
+	 * Creates a new {@link YamlNewConfiguration}, loading from the given reader.
+	 * <p>
+	 * Any errors loading the Configuration will be logged and then ignored.
+	 * If the specified input is not a valid config, a blank config will be
+	 * returned.
+	 *
+	 * @param reader input
+	 * @return resulting configuration
+	 * @throws IllegalArgumentException Thrown if stream is null
+	 */
+	public static YamlNewConfiguration loadConfiguration(Reader reader) {
+		Validate.notNull(reader, "Stream cannot be null");
+
+		YamlNewConfiguration config = new YamlNewConfiguration();
+
+		try {
+			config.load(reader);
+		} catch (IOException | InvalidConfigurationException ex) {
+			Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", ex);
+		}
+
+		return config;
+	}
+
+	/**
 	 * Save the configuration into a string object
 	 * and supports configuration comments!
 	 *
@@ -218,59 +271,6 @@ public class YamlNewConfiguration extends YamlConfiguration {
 			else if (section.contains(key))
 				thisSection.set(key, section.get(key));
 		}
-	}
-
-	/**
-	 * Creates a new {@link YamlNewConfiguration}, loading from the given file.
-	 * <p>
-	 * Any errors loading the Configuration will be logged and then ignored.
-	 * If the specified input is not a valid config, a blank config will be
-	 * returned.
-	 * <p>
-	 * The encoding used may follow the system dependent default.
-	 *
-	 * @param file Input file
-	 * @return Resulting configuration
-	 * @throws IllegalArgumentException Thrown if file is null
-	 */
-	public static YamlNewConfiguration loadConfiguration(File file) {
-		Validate.notNull(file, "File cannot be null");
-
-		YamlNewConfiguration config = new YamlNewConfiguration();
-
-		try {
-			config.load(file);
-		} catch (FileNotFoundException ignored) {
-		} catch (IOException | InvalidConfigurationException ex) {
-			Bukkit.getLogger().log(Level.SEVERE, "Cannot load " + file, ex);
-		}
-
-		return config;
-	}
-
-	/**
-	 * Creates a new {@link YamlNewConfiguration}, loading from the given reader.
-	 * <p>
-	 * Any errors loading the Configuration will be logged and then ignored.
-	 * If the specified input is not a valid config, a blank config will be
-	 * returned.
-	 *
-	 * @param reader input
-	 * @return resulting configuration
-	 * @throws IllegalArgumentException Thrown if stream is null
-	 */
-	public static YamlNewConfiguration loadConfiguration(Reader reader) {
-		Validate.notNull(reader, "Stream cannot be null");
-
-		YamlNewConfiguration config = new YamlNewConfiguration();
-
-		try {
-			config.load(reader);
-		} catch (IOException | InvalidConfigurationException ex) {
-			Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", ex);
-		}
-
-		return config;
 	}
 
 }

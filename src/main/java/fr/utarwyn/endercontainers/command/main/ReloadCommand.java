@@ -11,43 +11,43 @@ import org.bukkit.entity.Player;
 
 public class ReloadCommand extends AbstractCommand {
 
-	public ReloadCommand() {
-		super("reload", "rl");
+    public ReloadCommand() {
+        super("reload", "rl");
 
-		this.setPermission("reload");
-	}
+        this.setPermission("reload");
+    }
 
-	@Override
-	public void perform(CommandSender sender) {
-		if (!Files.getConfiguration().reload()) {
-			sender.sendMessage(EnderContainers.PREFIX + "§cError when reloading config! See the console for more info!");
-			sender.sendMessage(EnderContainers.PREFIX + "§8Plugin now disabled.");
+    @Override
+    public void perform(CommandSender sender) {
+        if (!Files.getConfiguration().reload()) {
+            sender.sendMessage(EnderContainers.PREFIX + "§cError when reloading config! See the console for more info!");
+            sender.sendMessage(EnderContainers.PREFIX + "§8Plugin now disabled.");
 
-			Bukkit.getPluginManager().disablePlugin(EnderContainers.getInstance());
-			return;
-		}
+            Bukkit.getPluginManager().disablePlugin(EnderContainers.getInstance());
+            return;
+        }
 
-		if (!Files.getLocale().reload()) {
-			sender.sendMessage(EnderContainers.PREFIX + "§cError when reloading plugin locale! See the console for more info!");
-			sender.sendMessage(EnderContainers.PREFIX + "§8Plugin now disabled.");
+        if (!Files.getLocale().reload()) {
+            sender.sendMessage(EnderContainers.PREFIX + "§cError when reloading plugin locale! See the console for more info!");
+            sender.sendMessage(EnderContainers.PREFIX + "§8Plugin now disabled.");
 
-			Bukkit.getPluginManager().disablePlugin(EnderContainers.getInstance());
-			return;
-		}
+            Bukkit.getPluginManager().disablePlugin(EnderContainers.getInstance());
+            return;
+        }
 
-		Managers.reloadAll();
+        Managers.reloadAll();
 
-		this.sendTo(sender, ChatColor.GREEN + Files.getLocale().getConfigReloaded());
-	}
+        this.sendTo(sender, ChatColor.GREEN + Files.getLocale().getConfigReloaded());
+    }
 
-	@Override
-	public void performPlayer(Player player) {
-		// No behavior only for players for this command
-	}
+    @Override
+    public void performPlayer(Player player) {
+        // No behavior only for players for this command
+    }
 
-	@Override
-	public void performConsole(CommandSender sender) {
-		// No behavior only for the console for this command
-	}
+    @Override
+    public void performConsole(CommandSender sender) {
+        // No behavior only for the console for this command
+    }
 
 }

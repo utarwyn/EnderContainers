@@ -10,36 +10,36 @@ import java.util.logging.Level;
 
 public class MigrationFlat2_0_1 extends Migration2_0_1 {
 
-	@Override
-	void reconfigureChestsContent() {
-		List<File> chestFiles = this.getChestFiles();
-		if (chestFiles == null) return;
+    @Override
+    void reconfigureChestsContent() {
+        List<File> chestFiles = this.getChestFiles();
+        if (chestFiles == null) return;
 
-		YamlConfiguration conf;
-		String contents;
+        YamlConfiguration conf;
+        String contents;
 
-		for (File chestFile : chestFiles) {
-			conf = YamlConfiguration.loadConfiguration(chestFile);
+        for (File chestFile : chestFiles) {
+            conf = YamlConfiguration.loadConfiguration(chestFile);
 
-			if (!conf.isConfigurationSection("enderchests")) {
-				continue;
-			}
+            if (!conf.isConfigurationSection("enderchests")) {
+                continue;
+            }
 
-			for (String key : conf.getConfigurationSection("enderchests").getKeys(false)) {
-				contents = conf.getString("enderchests." + key + ".contents");
+            for (String key : conf.getConfigurationSection("enderchests").getKeys(false)) {
+                contents = conf.getString("enderchests." + key + ".contents");
 
-				if (!isBase64Encoded(contents)) {
-					conf.set("enderchests." + key + ".contents", ItemSerializer.base64Serialization(ItemSerializer.experimentalDeserialization(contents)));
-				}
-			}
+                if (!isBase64Encoded(contents)) {
+                    conf.set("enderchests." + key + ".contents", ItemSerializer.base64Serialization(ItemSerializer.experimentalDeserialization(contents)));
+                }
+            }
 
-			try {
-				conf.save(chestFile);
-			} catch (IOException e) {
-				logger.log(Level.SEVERE, "Cannot save the player's enderchests file", e);
-			}
-		}
+            try {
+                conf.save(chestFile);
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Cannot save the player's enderchests file", e);
+            }
+        }
 
-	}
+    }
 
 }

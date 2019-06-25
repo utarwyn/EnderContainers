@@ -12,8 +12,9 @@ import java.util.logging.Level;
 
 /**
  * Class to manage the MySQL connection.
- * @since 1.0.5
+ *
  * @author Utarwyn
+ * @since 1.0.5
  */
 public class DatabaseManager extends AbstractManager {
 
@@ -31,6 +32,20 @@ public class DatabaseManager extends AbstractManager {
 	 * The database object to perform requests
 	 */
 	private Database database;
+
+	/**
+	 * Escape a list of fields to be sure that all requests are
+	 * compliants with all SQL servers.
+	 *
+	 * @param fields Fields to wrap with quotes (to escape)
+	 * @return Escaped fields, columns or table names
+	 */
+	public static String[] escapeFieldArray(String[] fields) {
+		for (int i = 0; i < fields.length; i++) {
+			fields[i] = '`' + fields[i] + '`';
+		}
+		return fields;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -57,8 +72,8 @@ public class DatabaseManager extends AbstractManager {
 		);
 
 		if (this.database.isConnected()) {
-			this.logger.log(Level.INFO,"MySQL enabled and ready. Connected to database {0}:{1}",
-					new Object[]{ host, String.valueOf(port) });
+			this.logger.log(Level.INFO, "MySQL enabled and ready. Connected to database {0}:{1}",
+					new Object[]{host, String.valueOf(port)});
 
 			if (Files.getConfiguration().isDebug()) {
 				this.logger.log(Level.INFO, "Connection time: {0}ms", System.currentTimeMillis() - begin);
@@ -87,6 +102,7 @@ public class DatabaseManager extends AbstractManager {
 
 	/**
 	 * Allow to know if the database is ready to perform statement or not.
+	 *
 	 * @return True if the database is connected and ready.
 	 */
 	public boolean isReady() {
@@ -95,10 +111,11 @@ public class DatabaseManager extends AbstractManager {
 
 	/**
 	 * Save an enderchest in the database
-	 * @param insert True if the chest data has to be inserted (and not updated)
-	 * @param owner The owner of the chest
-	 * @param num The num of the chest
-	 * @param rows The number of rows of the chest
+	 *
+	 * @param insert   True if the chest data has to be inserted (and not updated)
+	 * @param owner    The owner of the chest
+	 * @param num      The num of the chest
+	 * @param rows     The number of rows of the chest
 	 * @param contents All contents of the chest
 	 */
 	public void saveEnderchest(boolean insert, UUID owner, int num, int rows, String contents) throws SQLException {
@@ -121,6 +138,7 @@ public class DatabaseManager extends AbstractManager {
 
 	/**
 	 * List of database rows which contains all saved chests
+	 *
 	 * @return The list of saved enderchests
 	 */
 	public List<DatabaseSet> getAllEnderchests() {
@@ -134,6 +152,7 @@ public class DatabaseManager extends AbstractManager {
 
 	/**
 	 * Returns all enderchests stored in database of a specific player (UUID here)
+	 *
 	 * @param owner The owner of chests
 	 * @return The list of all chests for a player
 	 */
@@ -159,6 +178,7 @@ public class DatabaseManager extends AbstractManager {
 
 	/**
 	 * Save a list of enderchests in the database.
+	 *
 	 * @param chestSets The list of enderchests to save
 	 */
 	public void saveEnderchestSets(List<DatabaseSet> chestSets) throws SQLException {
@@ -172,6 +192,7 @@ public class DatabaseManager extends AbstractManager {
 
 	/**
 	 * List of database rows which contains all saved backups
+	 *
 	 * @return The list of saved backups
 	 */
 	public List<DatabaseSet> getBackups() {
@@ -185,6 +206,7 @@ public class DatabaseManager extends AbstractManager {
 
 	/**
 	 * Returns a MySQL row data with a name of a backup
+	 *
 	 * @param name Name of a backup to get
 	 * @return The found backup (or null if not found)
 	 */
@@ -202,10 +224,11 @@ public class DatabaseManager extends AbstractManager {
 
 	/**
 	 * Save a backup in the database
-	 * @param name Name of the backup
-	 * @param date Date of the backup
-	 * @param type Type of the backup
-	 * @param data Creation date of the backup
+	 *
+	 * @param name      Name of the backup
+	 * @param date      Date of the backup
+	 * @param type      Type of the backup
+	 * @param data      Creation date of the backup
 	 * @param createdBy Entity who created the backup (console or player)
 	 */
 	public void saveBackup(String name, long date, String type, String data, String createdBy) throws SQLException {
@@ -217,6 +240,7 @@ public class DatabaseManager extends AbstractManager {
 
 	/**
 	 * Remove a backup by its name
+	 *
 	 * @param name Name of the backup to remove
 	 * @return True if the backup was successfully removed.
 	 */
@@ -257,25 +281,12 @@ public class DatabaseManager extends AbstractManager {
 
 	/**
 	 * Format a table's name with the prefix.
+	 *
 	 * @param table The name of the table to format
 	 * @return The formatted name of the table
 	 */
 	private String formatTable(String table) {
 		return Files.getConfiguration().getMysqlTablePrefix() + table;
-	}
-
-	/**
-	 * Escape a list of fields to be sure that all requests are
-	 * compliants with all SQL servers.
-	 *
-	 * @param fields Fields to wrap with quotes (to escape)
-	 * @return Escaped fields, columns or table names
-	 */
-	public static String[] escapeFieldArray(String[] fields) {
-		for (int i = 0; i < fields.length; i++) {
-			fields[i] = '`' + fields[i] + '`';
-		}
-		return fields;
 	}
 
 }

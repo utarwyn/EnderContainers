@@ -11,34 +11,34 @@ import org.bukkit.entity.Player;
 
 public class RemoveCommand extends AbstractBackupCommand {
 
-	public RemoveCommand(BackupManager manager) {
-		super("remove", manager, "rm");
+    public RemoveCommand(BackupManager manager) {
+        super("remove", manager, "rm");
 
-		this.setPermission("backup.remove");
-		this.addParameter(Parameter.STRING);
-	}
+        this.setPermission("backup.remove");
+        this.addParameter(Parameter.STRING);
+    }
 
-	@Override
-	public void perform(CommandSender sender) {
-		String name = this.readArg();
+    @Override
+    public void perform(CommandSender sender) {
+        String name = this.readArg();
 
-		EUtil.runAsync(() -> {
-			if (this.manager.removeBackup(name)) {
-				sender.sendMessage(EnderContainers.PREFIX + Files.getLocale().getBackupRemoved().replace("%backup%", name));
-			} else {
-				sender.sendMessage(EnderContainers.PREFIX + ChatColor.RED + Files.getLocale().getBackupUnknown().replace("%backup%", name));
-			}
-		});
-	}
+        EUtil.runAsync(() -> {
+            if (this.manager.removeBackup(name)) {
+                sender.sendMessage(EnderContainers.PREFIX + Files.getLocale().getBackupRemoved().replace("%backup%", name));
+            } else {
+                sender.sendMessage(EnderContainers.PREFIX + ChatColor.RED + Files.getLocale().getBackupUnknown().replace("%backup%", name));
+            }
+        });
+    }
 
-	@Override
-	public void performPlayer(Player player) {
-		// No behavior only for players for this command
-	}
+    @Override
+    public void performPlayer(Player player) {
+        // No behavior only for players for this command
+    }
 
-	@Override
-	public void performConsole(CommandSender sender) {
-		// No behavior only for the console for this command
-	}
+    @Override
+    public void performConsole(CommandSender sender) {
+        // No behavior only for the console for this command
+    }
 
 }

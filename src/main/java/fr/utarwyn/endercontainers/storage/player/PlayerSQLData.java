@@ -13,77 +13,78 @@ import java.util.logging.Level;
 
 /**
  * Storage wrapper for player data (MySQL)
- * @since 2.0.0
+ *
  * @author Utarwyn
+ * @since 2.0.0
  */
 public class PlayerSQLData extends PlayerData {
 
-	private List<DatabaseSet> enderchestsDataset;
+    private List<DatabaseSet> enderchestsDataset;
 
-	PlayerSQLData(UUID uuid) {
-		super(uuid);
-	}
+    PlayerSQLData(UUID uuid) {
+        super(uuid);
+    }
 
-	@Override
-	protected void load() {
-		this.enderchestsDataset = getDatabaseManager().getEnderchestsOf(this.getUUID());
-	}
+    @Override
+    protected void load() {
+        this.enderchestsDataset = getDatabaseManager().getEnderchestsOf(this.getUUID());
+    }
 
-	@Override
-	protected void save() {
+    @Override
+    protected void save() {
 
-	}
+    }
 
-	@Override
-	public HashMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
-		for (DatabaseSet chestSet : this.enderchestsDataset)
-			if (chestSet.getInteger("num") == enderChest.getNum())
-				return ItemSerializer.deserialize(chestSet.getString("contents"));
+    @Override
+    public HashMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
+        for (DatabaseSet chestSet : this.enderchestsDataset)
+            if (chestSet.getInteger("num") == enderChest.getNum())
+                return ItemSerializer.deserialize(chestSet.getString("contents"));
 
-		return new HashMap<>();
-	}
+        return new HashMap<>();
+    }
 
-	@Override
-	public int getEnderchestRows(EnderChest enderChest) {
-		for (DatabaseSet chestSet : this.enderchestsDataset)
-			if (chestSet.getInteger("num") == enderChest.getNum())
-				return chestSet.getInteger("rows");
+    @Override
+    public int getEnderchestRows(EnderChest enderChest) {
+        for (DatabaseSet chestSet : this.enderchestsDataset)
+            if (chestSet.getInteger("num") == enderChest.getNum())
+                return chestSet.getInteger("rows");
 
-		return 3;
-	}
+        return 3;
+    }
 
-	@Override
-	public void saveEnderchest(EnderChest enderChest) {
-		boolean insert = true;
+    @Override
+    public void saveEnderchest(EnderChest enderChest) {
+        boolean insert = true;
 
-		for (DatabaseSet set : this.enderchestsDataset)
-			if (set.getInteger("num") == enderChest.getNum() && set.getString("owner").equals(enderChest.getOwner().toString())) {
-				insert = false;
-				break;
-			}
+        for (DatabaseSet set : this.enderchestsDataset)
+            if (set.getInteger("num") == enderChest.getNum() && set.getString("owner").equals(enderChest.getOwner().toString())) {
+                insert = false;
+                break;
+            }
 
-		String contents = ItemSerializer.serialize(enderChest.getContents());
+        String contents = ItemSerializer.serialize(enderChest.getContents());
 
-		try {
-			getDatabaseManager().saveEnderchest(insert, enderChest.getOwner(),
-					enderChest.getNum(), enderChest.getRows(), contents);
-		} catch (SQLException e) {
-			logger.log(Level.SEVERE,
-					"Cannot save the enderchest for user " + enderChest.getOwner() + " in the database", e);
-			return;
-		}
+        try {
+            getDatabaseManager().saveEnderchest(insert, enderChest.getOwner(),
+                    enderChest.getNum(), enderChest.getRows(), contents);
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE,
+                    "Cannot save the enderchest for user " + enderChest.getOwner() + " in the database", e);
+            return;
+        }
 
-		// If this is a new enderchest, we need to store it in memory.
-		if (insert) {
-			DatabaseSet set = new DatabaseSet();
-			set.setObject("num", enderChest.getNum());
-			set.setObject("owner", enderChest.getOwner().toString());
-			set.setObject("contents", contents);
-			set.setObject("rows", enderChest.getRows());
+        // If this is a new enderchest, we need to store it in memory.
+        if (insert) {
+            DatabaseSet set = new DatabaseSet();
+            set.setObject("num", enderChest.getNum());
+            set.setObject("owner", enderChest.getOwner().toString());
+            set.setObject("contents", contents);
+            set.setObject("rows", enderChest.getRows());
 
-			this.enderchestsDataset.add(set);
-		}
-	}
+            this.enderchestsDataset.add(set);
+        }
+    }
 
 }
 

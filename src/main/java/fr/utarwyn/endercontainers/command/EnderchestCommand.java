@@ -12,58 +12,58 @@ import org.bukkit.entity.Player;
 
 public class EnderchestCommand extends AbstractCommand {
 
-	private EnderChestManager manager;
+    private EnderChestManager manager;
 
-	public EnderchestCommand() {
-		super("enderchest", "ec", "endchest");
+    public EnderchestCommand() {
+        super("enderchest", "ec", "endchest");
 
-		this.manager = EnderContainers.getInstance().getManager(EnderChestManager.class);
+        this.manager = EnderContainers.getInstance().getManager(EnderChestManager.class);
 
-		this.addParameter(Parameter.INT.optional());
-	}
+        this.addParameter(Parameter.INT.optional());
+    }
 
-	@Override
-	public void perform(CommandSender sender) {
-		// No global behavior for this command
-	}
+    @Override
+    public void perform(CommandSender sender) {
+        // No global behavior for this command
+    }
 
-	@Override
-	public void performPlayer(Player player) {
-		if (Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName())) {
-			PluginMsg.errorMessage(player, Files.getLocale().getPluginWorldDisabled());
-			return;
-		}
+    @Override
+    public void performPlayer(Player player) {
+        if (Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName())) {
+            PluginMsg.errorMessage(player, Files.getLocale().getPluginWorldDisabled());
+            return;
+        }
 
-		Integer argument = this.readArgOrDefault(null);
-		int chestNumber = (argument != null) ? argument - 1 : -1;
+        Integer argument = this.readArgOrDefault(null);
+        int chestNumber = (argument != null) ? argument - 1 : -1;
 
-		if (argument != null && (chestNumber < 0 || chestNumber >= Files.getConfiguration().getMaxEnderchests())) {
-			PluginMsg.accessDenied(player);
-			return;
-		}
+        if (argument != null && (chestNumber < 0 || chestNumber >= Files.getConfiguration().getMaxEnderchests())) {
+            PluginMsg.accessDenied(player);
+            return;
+        }
 
-		EUtil.runAsync(() -> {
-			if (argument == null) {
-				if (EUtil.playerHasPerm(player, "cmd.enderchests")) {
-					this.manager.openHubMenuFor(player);
-				} else {
-					PluginMsg.accessDenied(player);
-				}
-			} else {
-				if (EUtil.playerHasPerm(player, "cmd.enderchests") || EUtil.playerHasPerm(player, "cmd.enderchest." + chestNumber)) {
-					if (!this.manager.openEnderchestFor(player, chestNumber)) {
-						this.sendTo(player, ChatColor.RED + Files.getLocale().getNopermOpenChest());
-					}
-				} else {
-					PluginMsg.accessDenied(player);
-				}
-			}
-		});
-	}
+        EUtil.runAsync(() -> {
+            if (argument == null) {
+                if (EUtil.playerHasPerm(player, "cmd.enderchests")) {
+                    this.manager.openHubMenuFor(player);
+                } else {
+                    PluginMsg.accessDenied(player);
+                }
+            } else {
+                if (EUtil.playerHasPerm(player, "cmd.enderchests") || EUtil.playerHasPerm(player, "cmd.enderchest." + chestNumber)) {
+                    if (!this.manager.openEnderchestFor(player, chestNumber)) {
+                        this.sendTo(player, ChatColor.RED + Files.getLocale().getNopermOpenChest());
+                    }
+                } else {
+                    PluginMsg.accessDenied(player);
+                }
+            }
+        });
+    }
 
-	@Override
-	public void performConsole(CommandSender sender) {
-		PluginMsg.errorMessage(sender, Files.getLocale().getNopermConsole());
-	}
+    @Override
+    public void performConsole(CommandSender sender) {
+        PluginMsg.errorMessage(sender, Files.getLocale().getNopermConsole());
+    }
 
 }

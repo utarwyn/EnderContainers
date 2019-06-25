@@ -15,51 +15,53 @@ import java.util.UUID;
  * Because we need to save manually the data on the disk
  * to save correctly the enderchest.
  *
+ * @author Utarwyn
  * @see fr.utarwyn.endercontainers.enderchest.EnderChestListener#onInventoryClose(InventoryCloseEvent)
  * @since 2.0.0
- * @author Utarwyn
  */
 public class OfflineEnderChestMenu extends EnderChestMenu {
 
-	/**
-	 * Map which stores the opened menus to perform
-	 * because its the only way to know which menu is opened
-	 * by online players because we cant add a custom holder
-	 * for a Bukkit enderchest inventory.
-	 *
-	 * @see fr.utarwyn.endercontainers.enderchest.EnderChestListener#onInventoryClose(InventoryCloseEvent)
-	 */
-	private static Map<UUID, EnderChest> openedMenus;
+    /**
+     * Map which stores the opened menus to perform
+     * because its the only way to know which menu is opened
+     * by online players because we cant add a custom holder
+     * for a Bukkit enderchest inventory.
+     *
+     * @see fr.utarwyn.endercontainers.enderchest.EnderChestListener#onInventoryClose(InventoryCloseEvent)
+     */
+    private static Map<UUID, EnderChest> openedMenus;
 
-	/**
-	 * Constructs the offline chest menu
-	 * @param enderChest Enderchest to link with this menu
-	 */
-	public OfflineEnderChestMenu(EnderChest enderChest) {
-		super(enderChest);
-	}
+    static {
+        openedMenus = new HashMap<>();
+    }
 
-	static {
-		openedMenus = new HashMap<>();
-	}
+    /**
+     * Constructs the offline chest menu
+     *
+     * @param enderChest Enderchest to link with this menu
+     */
+    public OfflineEnderChestMenu(EnderChest enderChest) {
+        super(enderChest);
+    }
 
-	/**
-	 * Returns which enderchest is opened by a specific player
-	 * and remove it from the cache to avoid memory leaks.
-	 * @param player Player who closes the inventory
-	 * @return Enderchest opened by the given player
-	 */
-	public static EnderChest getOpenedChestFor(Player player) {
-		return openedMenus.remove(player.getUniqueId());
-	}
+    /**
+     * Returns which enderchest is opened by a specific player
+     * and remove it from the cache to avoid memory leaks.
+     *
+     * @param player Player who closes the inventory
+     * @return Enderchest opened by the given player
+     */
+    public static EnderChest getOpenedChestFor(Player player) {
+        return openedMenus.remove(player.getUniqueId());
+    }
 
-	@Override
-	public void open(Player player) {
-		if (this.enderChest.getNum() == 0 && Files.getConfiguration().isUseVanillaEnderchest()) {
-			openedMenus.put(player.getUniqueId(), this.enderChest);
-		}
+    @Override
+    public void open(Player player) {
+        if (this.enderChest.getNum() == 0 && Files.getConfiguration().isUseVanillaEnderchest()) {
+            openedMenus.put(player.getUniqueId(), this.enderChest);
+        }
 
-		super.open(player);
-	}
+        super.open(player);
+    }
 
 }

@@ -12,39 +12,39 @@ import org.bukkit.entity.Player;
 
 public class FactionsV1Hook implements DependencyListener {
 
-	@Override
-	public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
-		FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
+    @Override
+    public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
+        FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
 
-		// Bypass the check?
-		if (fPlayer == null) return false;
-		if (fPlayer.isAdminBypassing()) return true;
+        // Bypass the check?
+        if (fPlayer == null) return false;
+        if (fPlayer.isAdminBypassing()) return true;
 
-		// Init checking variables
-		Faction playerFac = fPlayer.getFaction();
-		Faction currentFac = Board.getInstance().getFactionAt(new FLocation(block));
+        // Init checking variables
+        Faction playerFac = fPlayer.getFaction();
+        Faction currentFac = Board.getInstance().getFactionAt(new FLocation(block));
 
-		boolean canOpen;
-		boolean playerFacIsReal = this.isRealFaction(playerFac);
-		boolean currentFacIsReal = this.isRealFaction(currentFac);
+        boolean canOpen;
+        boolean playerFacIsReal = this.isRealFaction(playerFac);
+        boolean currentFacIsReal = this.isRealFaction(currentFac);
 
-		// Check faction custom permissions (do not support relationals perms)
-		if (playerFacIsReal && currentFacIsReal)
-			canOpen = (currentFac == playerFac && playerFac.getAccess(fPlayer, PermissableAction.CONTAINER) != Access.DENY);
-		else {
-			canOpen = !currentFacIsReal;
+        // Check faction custom permissions (do not support relationals perms)
+        if (playerFacIsReal && currentFacIsReal)
+            canOpen = (currentFac == playerFac && playerFac.getAccess(fPlayer, PermissableAction.CONTAINER) != Access.DENY);
+        else {
+            canOpen = !currentFacIsReal;
 
-			// Send message only when needed (to not interfere with Factions!)!
-			if (!canOpen && sendMessage)
-				PluginMsg.errorSMessage(player, Files.getLocale().getAccessDeniedFactions()
-						.replace("%faction%", currentFac.getTag() + ChatColor.RED));
-		}
+            // Send message only when needed (to not interfere with Factions!)!
+            if (!canOpen && sendMessage)
+                PluginMsg.errorSMessage(player, Files.getLocale().getAccessDeniedFactions()
+                        .replace("%faction%", currentFac.getTag() + ChatColor.RED));
+        }
 
-		return canOpen;
-	}
+        return canOpen;
+    }
 
-	private boolean isRealFaction(Faction faction) {
-		return faction != null && !faction.isWilderness() && !faction.isWarZone() && !faction.isSafeZone();
-	}
+    private boolean isRealFaction(Faction faction) {
+        return faction != null && !faction.isWilderness() && !faction.isWarZone() && !faction.isSafeZone();
+    }
 
 }

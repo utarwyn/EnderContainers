@@ -17,260 +17,264 @@ import java.util.regex.Pattern;
 
 /**
  * Represents a migration which can be executed
- * @since 2.0.0
+ *
  * @author Utarwyn
+ * @since 2.0.0
  */
 public abstract class Migration {
 
-	/**
-	 * Database object used for MySQL migrations
-	 */
-	private static Database database;
+    /**
+     * Database object used for MySQL migrations
+     */
+    private static Database database;
+    /**
+     * The plugin logger
+     */
+    protected Logger logger;
+    /**
+     * Old version of the plugin that the migration needs to be runned
+     */
+    private String fromVers;
+    /**
+     * New version of the plugin that the migration needs to be runned
+     */
+    private String toVers;
+    /**
+     * Current version of the plugin (stored inside the description file)
+     */
+    private String pluginVersion;
+    /**
+     * Version of stored data of the plugin
+     */
+    private String dataVersion;
 
-	/**
-	 * Old version of the plugin that the migration needs to be runned
-	 */
-	private String fromVers;
+    /**
+     * Constructs a new migration
+     *
+     * @param fromVers Old version of the plugin for detections
+     * @param toVers   New version of the plugin for detections
+     */
+    public Migration(String fromVers, String toVers) {
+        this.fromVers = fromVers;
+        this.toVers = toVers;
+        this.pluginVersion = EnderContainers.getInstance().getDescription().getVersion();
+        this.logger = EnderContainers.getInstance().getLogger();
+    }
 
-	/**
-	 * New version of the plugin that the migration needs to be runned
-	 */
-	private String toVers;
+    /**
+     * Gets the database object for MySQL migrations.
+     * <p>
+     * This method devious the normal access of the database object
+     * to have a global access to the database.
+     * (Because migrations normally do special requests to upgrade tables)
+     * </p>
+     *
+     * @return The database object
+     */
+    // TODO: 28/04/2019 OMG, remove this method because its very ugly!
+    protected static Database getDatabase() {
+        if (database != null)
+            return database;
 
-	/**
-	 * Current version of the plugin (stored inside the description file)
-	 */
-	private String pluginVersion;
+        DatabaseManager manager = EnderContainers.getInstance().getManager(DatabaseManager.class);
+        if (!manager.isReady()) return null;
 
-	/**
-	 * Version of stored data of the plugin
-	 */
-	private String dataVersion;
+        // Not very clear but its necessary to modify tables like we want
+        try {
+            Field f = manager.getClass().getDeclaredField("database");
 
-	/**
-	 * The plugin logger
-	 */
-	protected Logger logger;
+            f.setAccessible(true);
+            database = (Database) f.get(manager);
+            f.setAccessible(false);
 
-	/**
-	 * Constructs a new migration
-	 * @param fromVers Old version of the plugin for detections
-	 * @param toVers New version of the plugin for detections
-	 */
-	public Migration(String fromVers, String toVers) {
-		this.fromVers = fromVers;
-		this.toVers = toVers;
-		this.pluginVersion = EnderContainers.getInstance().getDescription().getVersion();
-		this.logger = EnderContainers.getInstance().getLogger();
-	}
+            return database;
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-	String getFromVers() {
-		return this.fromVers;
-	}
+    /**
+     * Do a recursive copy from a folder to another folder
+     *
+     * @param fSource Source folder
+     * @param fDest   Destination folder
+     */
+    private static void recursiveCopy(File fSource, File fDest) throws IOException {
+        if (fSource.isDirectory()) {
+            if (!fDest.exists() && !fDest.mkdirs()) {
+                return;
+            }
 
-	String getToVers() {
-		return this.toVers;
-	}
+            // Create list of files and directories on the current source
+            String[] fList = fSource.list();
 
-	/**
-	 * Calculates if the migration has to be runned or not
-	 * @return True if the migration has to be runned
-	 */
-	boolean hasToBePerformed() {
-		Pattern pFrom = Pattern.compile(this.fromVers);
-		Pattern pTo = Pattern.compile(this.toVers);
+            if (fList != null) {
+                for (String aFList : fList) {
+                    File dest = new File(fDest, aFList);
+                    File source = new File(fSource, aFList);
 
-		return pFrom.matcher(this.getDataVersion()).find() && pTo.matcher(this.pluginVersion).find();
-	}
+                    if (!aFList.equals(fDest.getName())) {
+                        recursiveCopy(source, dest);
+                    }
+                }
+            }
+        } else {
+            // Found a file. Copy it into the destination, which is already created in 'if' condition above
+            try (FileInputStream inputStream = new FileInputStream(fSource);
+                 FileOutputStream outputStream = new FileOutputStream(fDest)) {
+                byte[] buffer = new byte[2048];
+                int iBytesReads;
 
-	/**
-	 * Gets the data folder of the plugin
-	 * @return Data folder of the plugin
-	 */
-	private File getDataFolder() {
-		return EnderContainers.getInstance().getDataFolder();
-	}
+                while ((iBytesReads = inputStream.read(buffer)) >= 0) {
+                    outputStream.write(buffer, 0, iBytesReads);
+                }
+            }
+        }
+    }
 
-	/**
-	 * Prepares the migration
-	 */
-	void prepare() {
-		File backupFolder = this.getBackupFolder();
+    String getFromVers() {
+        return this.fromVers;
+    }
 
-		// Anounce the creation of a backup folder for the migration
-		this.logger.info(" ");
-		this.logger.info("|----------------------------------|");
-		this.logger.info(String.format("| Migration from %5s to %5s    |", this.fromVers, this.toVers));
-		this.logger.info("|----------------------------------|");
-		this.logger.info(" ");
-		this.logger.info("Backuping data files into the \"EnderContainers/" + backupFolder.getName() + "/\" folder...");
-		this.logger.info(" ");
+    String getToVers() {
+        return this.toVers;
+    }
 
-		// Create the backup folder
-		try {
-			Migration.recursiveCopy(this.getDataFolder(), backupFolder);
-		} catch (IOException e) {
-			this.logger.log(Level.SEVERE, "Cannot copy all data to the backup folder", e);
-		}
-	}
+    /**
+     * Calculates if the migration has to be runned or not
+     *
+     * @return True if the migration has to be runned
+     */
+    boolean hasToBePerformed() {
+        Pattern pFrom = Pattern.compile(this.fromVers);
+        Pattern pTo = Pattern.compile(this.toVers);
 
-	/**
-	 * Called to perform the migration
-	 */
-	public abstract void perform();
+        return pFrom.matcher(this.getDataVersion()).find() && pTo.matcher(this.pluginVersion).find();
+    }
 
-	/**
-	 * Updates the configuration with the old configuration.
-	 * This method keeps configuration comments in the Yaml file!
-	 * @return True if the configuration has been updated
-	 */
-	protected boolean updateConfiguration() {
-		File confFile = new File(this.getDataFolder(), "config.yml");
-		YamlConfiguration config = YamlConfiguration.loadConfiguration(confFile);
+    /**
+     * Gets the data folder of the plugin
+     *
+     * @return Data folder of the plugin
+     */
+    private File getDataFolder() {
+        return EnderContainers.getInstance().getDataFolder();
+    }
 
-		EnderContainers.getInstance().saveResource("config.yml", true);
-		YamlNewConfiguration newConfig = YamlNewConfiguration.loadConfiguration(confFile);
+    /**
+     * Prepares the migration
+     */
+    void prepare() {
+        File backupFolder = this.getBackupFolder();
 
-		newConfig.applyConfiguration(config);
+        // Anounce the creation of a backup folder for the migration
+        this.logger.info(" ");
+        this.logger.info("|----------------------------------|");
+        this.logger.info(String.format("| Migration from %5s to %5s    |", this.fromVers, this.toVers));
+        this.logger.info("|----------------------------------|");
+        this.logger.info(" ");
+        this.logger.info("Backuping data files into the \"EnderContainers/" + backupFolder.getName() + "/\" folder...");
+        this.logger.info(" ");
 
-		try {
-			newConfig.save(confFile);
-		} catch (IOException e) {
-			this.logger.log(Level.SEVERE, "Cannot save the updated configuration on the disk", e);
-			return false;
-		}
+        // Create the backup folder
+        try {
+            Migration.recursiveCopy(this.getDataFolder(), backupFolder);
+        } catch (IOException e) {
+            this.logger.log(Level.SEVERE, "Cannot copy all data to the backup folder", e);
+        }
+    }
 
-		return true;
-	}
+    /**
+     * Called to perform the migration
+     */
+    public abstract void perform();
 
-	/**
-	 * Returns all files in which there are chests configurations
-	 * @return Enderchests files
-	 */
-	protected List<File> getChestFiles() {
-		// Get all normal chest files
-		List<File> files = new ArrayList<>(Arrays.asList(
-				Objects.requireNonNull(new File(this.getDataFolder(), "data/").listFiles())
-		));
+    /**
+     * Updates the configuration with the old configuration.
+     * This method keeps configuration comments in the Yaml file!
+     *
+     * @return True if the configuration has been updated
+     */
+    protected boolean updateConfiguration() {
+        File confFile = new File(this.getDataFolder(), "config.yml");
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(confFile);
 
-		// Add all backups chests
-		File globalBackupsFolder = new File(this.getDataFolder(), "backups/");
+        EnderContainers.getInstance().saveResource("config.yml", true);
+        YamlNewConfiguration newConfig = YamlNewConfiguration.loadConfiguration(confFile);
 
-		if (globalBackupsFolder.isDirectory()) {
-			for (File backupFolder : Objects.requireNonNull(globalBackupsFolder.listFiles())) {
-				if (backupFolder.isDirectory()) {
-					files.addAll(Arrays.asList(Objects.requireNonNull(backupFolder.listFiles())));
-				}
-			}
-		}
+        newConfig.applyConfiguration(config);
 
-		return files;
-	}
+        try {
+            newConfig.save(confFile);
+        } catch (IOException e) {
+            this.logger.log(Level.SEVERE, "Cannot save the updated configuration on the disk", e);
+            return false;
+        }
 
-	/**
-	 * Gets the File object of the backup folder for the migration
-	 * @return Backup folder for the migration
-	 */
-	private File getBackupFolder() {
-		return new File(this.getDataFolder(), "old_" + this.fromVers.replaceAll("\\*", "X").replaceAll("\\.", "_") + "/");
-	}
+        return true;
+    }
 
-	/**
-	 * Gets the current version of stored data
-	 * @return Version of stored data (for EnderContainers)
-	 */
-	private String getDataVersion() {
-		if (this.dataVersion != null) {
-			return this.dataVersion;
-		}
+    /**
+     * Returns all files in which there are chests configurations
+     *
+     * @return Enderchests files
+     */
+    protected List<File> getChestFiles() {
+        // Get all normal chest files
+        List<File> files = new ArrayList<>(Arrays.asList(
+                Objects.requireNonNull(new File(this.getDataFolder(), "data/").listFiles())
+        ));
 
-		// By default, gets the version from the version file in the data folder
-		File file = new File(EnderContainers.getInstance().getDataFolder(), MigrationManager.VERSION_FILE);
+        // Add all backups chests
+        File globalBackupsFolder = new File(this.getDataFolder(), "backups/");
 
-		if (file.exists()) {
-			try (FileInputStream inputStream = new FileInputStream(file); Scanner scanner = new Scanner(inputStream)) {
-				this.dataVersion = scanner.nextLine();
-				return this.dataVersion;
-			} catch (IOException e) {
-				this.logger.log(Level.SEVERE, "Cannot get the local version of the plugin!", e);
-				this.logger.warning("You can create a file \"version\" in the plugin folder " +
-						"with the version \"" + this.pluginVersion + "\" in it to fix this error.");
-			}
-		}
+        if (globalBackupsFolder.isDirectory()) {
+            for (File backupFolder : Objects.requireNonNull(globalBackupsFolder.listFiles())) {
+                if (backupFolder.isDirectory()) {
+                    files.addAll(Arrays.asList(Objects.requireNonNull(backupFolder.listFiles())));
+                }
+            }
+        }
 
-		// If no version found, use the saved one!
-		return this.pluginVersion;
-	}
+        return files;
+    }
 
-	/**
-	 * Gets the database object for MySQL migrations.
-	 * <p>
-	 * This method devious the normal access of the database object
-	 * to have a global access to the database.
-	 * (Because migrations normally do special requests to upgrade tables)
-	 * </p>
-	 *
-	 * @return The database object
-	 */
-	// TODO: 28/04/2019 OMG, remove this method because its very ugly!
-	protected static Database getDatabase() {
-		if (database != null)
-			return database;
+    /**
+     * Gets the File object of the backup folder for the migration
+     *
+     * @return Backup folder for the migration
+     */
+    private File getBackupFolder() {
+        return new File(this.getDataFolder(), "old_" + this.fromVers.replaceAll("\\*", "X").replaceAll("\\.", "_") + "/");
+    }
 
-		DatabaseManager manager = EnderContainers.getInstance().getManager(DatabaseManager.class);
-		if (!manager.isReady()) return null;
+    /**
+     * Gets the current version of stored data
+     *
+     * @return Version of stored data (for EnderContainers)
+     */
+    private String getDataVersion() {
+        if (this.dataVersion != null) {
+            return this.dataVersion;
+        }
 
-		// Not very clear but its necessary to modify tables like we want
-		try {
-			Field f = manager.getClass().getDeclaredField("database");
+        // By default, gets the version from the version file in the data folder
+        File file = new File(EnderContainers.getInstance().getDataFolder(), MigrationManager.VERSION_FILE);
 
-			f.setAccessible(true);
-			database = (Database) f.get(manager);
-			f.setAccessible(false);
+        if (file.exists()) {
+            try (FileInputStream inputStream = new FileInputStream(file); Scanner scanner = new Scanner(inputStream)) {
+                this.dataVersion = scanner.nextLine();
+                return this.dataVersion;
+            } catch (IOException e) {
+                this.logger.log(Level.SEVERE, "Cannot get the local version of the plugin!", e);
+                this.logger.warning("You can create a file \"version\" in the plugin folder " +
+                        "with the version \"" + this.pluginVersion + "\" in it to fix this error.");
+            }
+        }
 
-			return database;
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	/**
-	 * Do a recursive copy from a folder to another folder
-	 * @param fSource Source folder
-	 * @param fDest Destination folder
-	 */
-	private static void recursiveCopy(File fSource, File fDest) throws IOException {
-		if (fSource.isDirectory()) {
-			if (!fDest.exists() && !fDest.mkdirs()) {
-				return;
-			}
-
-			// Create list of files and directories on the current source
-			String[] fList = fSource.list();
-
-			if (fList != null) {
-				for (String aFList : fList) {
-					File dest = new File(fDest, aFList);
-					File source = new File(fSource, aFList);
-
-					if (!aFList.equals(fDest.getName())) {
-						recursiveCopy(source, dest);
-					}
-				}
-			}
-		} else {
-			// Found a file. Copy it into the destination, which is already created in 'if' condition above
-			try (FileInputStream inputStream = new FileInputStream(fSource);
-				 FileOutputStream outputStream = new FileOutputStream(fDest)) {
-				byte[] buffer = new byte[2048];
-				int iBytesReads;
-
-				while ((iBytesReads = inputStream.read(buffer)) >= 0) {
-					outputStream.write(buffer, 0, iBytesReads);
-				}
-			}
-		}
-	}
+        // If no version found, use the saved one!
+        return this.pluginVersion;
+    }
 
 }
