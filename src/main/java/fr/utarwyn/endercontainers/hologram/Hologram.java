@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.hologram;
 
+import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -8,6 +9,7 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.logging.Level;
 
 /**
  * This class is used to display a text above an enderchest block
@@ -149,7 +151,7 @@ class Hologram {
      *
      * @return True if the player is online
      */
-    public boolean isPlayerOnline() {
+    boolean isPlayerOnline() {
         return this.player != null && this.player.isOnline();
     }
 
@@ -158,7 +160,11 @@ class Hologram {
      * (Send the destroy packet to the player)
      */
     void destroy() {
-        this.sendPacket(this.destroyPacket);
+        try {
+            this.sendPacket(this.destroyPacket);
+        } catch (Exception e) {
+            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot destroy the hologram", e);
+        }
     }
 
     /**
@@ -167,18 +173,21 @@ class Hologram {
     private void spawn() {
         Location displayLoc = this.location.clone().add(.5, ABS - 1.25D, .5);
 
-        Object packet = this.getPacket(displayLoc.getWorld(), displayLoc.getX(), displayLoc.getY(), displayLoc.getZ(), this.title);
-
         try {
+            Object packet = this.getPacket(
+                    displayLoc.getWorld(),
+                    displayLoc.getX(), displayLoc.getY(), displayLoc.getZ(),
+                    this.title
+            );
+
             Field field = packetClass.getDeclaredField("a");
             field.setAccessible(true);
 
             this.destroyPacket = this.getDestroyPacket((int) field.get(packet));
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            this.sendPacket(packet);
+        } catch (Exception e) {
+            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot spawn the hologram", e);
         }
-
-        this.sendPacket(packet);
     }
 
     /**
@@ -187,13 +196,8 @@ class Hologram {
      * @param id The id of the entity to destroy
      * @return The destroy packet object
      */
-    private Object getDestroyPacket(int... id) {
-        try {
-            return destroyPacketConstructor.newInstance((Object) id);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    private Object getDestroyPacket(int... id) throws Exception {
+        return destroyPacketConstructor.newInstance((Object) id);
     }
 
     /**
@@ -206,55 +210,50 @@ class Hologram {
      * @param text Text to display
      * @return The spawn packet object
      */
-    private Object getPacket(World w, double x, double y, double z, String text) {
-        try {
-            Object craftWorldObj = craftWorld.cast(w);
+    private Object getPacket(World w, double x, double y, double z, String text) throws Exception {
+        Object craftWorldObj = craftWorld.cast(w);
 
-            Method getHandleMethod = craftWorldObj.getClass().getMethod("getHandle");
-            Object entityObject;
+        Method getHandleMethod = craftWorldObj.getClass().getMethod("getHandle");
+        Object entityObject;
 
-            // In 1.14+ versions, we need to specify a type to create an instance of an ArmorStand.
-            if (ServerVersion.is(ServerVersion.V1_14)) {
-                Object armorStandType = entityTypesClass.getField("ARMOR_STAND").get(null);
-                entityObject = armorStandConstructor.newInstance(armorStandType, getHandleMethod.invoke(craftWorldObj));
-            } else {
-                entityObject = armorStandConstructor.newInstance(getHandleMethod.invoke(craftWorldObj));
-            }
-
-            if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
-                Method fromStringOrNullMethod = chatMessageClass.getMethod("fromStringOrNull", String.class);
-                Object chatComponent = fromStringOrNullMethod.invoke(null, text);
-
-                Method setCustomName = entityObject.getClass().getMethod("setCustomName", chatBaseComponentClass);
-                setCustomName.invoke(entityObject, chatComponent);
-            } else {
-                Method setCustomName = entityObject.getClass().getMethod("setCustomName", String.class);
-                setCustomName.invoke(entityObject, text);
-            }
-
-            Method setCustomNameVisible = nmsEntity.getMethod("setCustomNameVisible", boolean.class);
-            setCustomNameVisible.invoke(entityObject, true);
-
-            if (ServerVersion.isOlderThan(ServerVersion.V1_10)) { // 1.8 / 1.9
-                Method setGravity = entityObject.getClass().getMethod("setGravity", boolean.class);
-                setGravity.invoke(entityObject, false);
-            } else {                          // 1.10+
-                Method setNoGravity = entityObject.getClass().getMethod("setNoGravity", boolean.class);
-                setNoGravity.invoke(entityObject, true);
-            }
-
-            Method setLocation = entityObject.getClass().getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
-            setLocation.invoke(entityObject, x, y, z, 0.0F, 0.0F);
-
-            Method setInvisible = entityObject.getClass().getMethod("setInvisible", boolean.class);
-            setInvisible.invoke(entityObject, true);
-
-            Constructor<?> cw = packetClass.getConstructor(entityLivingClass);
-            return cw.newInstance(entityObject);
-        } catch (Exception e) {
-            e.printStackTrace();
+        // In 1.14+ versions, we need to specify a type to create an instance of an ArmorStand.
+        if (ServerVersion.is(ServerVersion.V1_14)) {
+            Object armorStandType = entityTypesClass.getField("ARMOR_STAND").get(null);
+            entityObject = armorStandConstructor.newInstance(armorStandType, getHandleMethod.invoke(craftWorldObj));
+        } else {
+            entityObject = armorStandConstructor.newInstance(getHandleMethod.invoke(craftWorldObj));
         }
-        return null;
+
+        if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
+            Method fromStringOrNullMethod = chatMessageClass.getMethod("fromStringOrNull", String.class);
+            Object chatComponent = fromStringOrNullMethod.invoke(null, text);
+
+            Method setCustomName = entityObject.getClass().getMethod("setCustomName", chatBaseComponentClass);
+            setCustomName.invoke(entityObject, chatComponent);
+        } else {
+            Method setCustomName = entityObject.getClass().getMethod("setCustomName", String.class);
+            setCustomName.invoke(entityObject, text);
+        }
+
+        Method setCustomNameVisible = nmsEntity.getMethod("setCustomNameVisible", boolean.class);
+        setCustomNameVisible.invoke(entityObject, true);
+
+        if (ServerVersion.isOlderThan(ServerVersion.V1_10)) { // 1.8 / 1.9
+            Method setGravity = entityObject.getClass().getMethod("setGravity", boolean.class);
+            setGravity.invoke(entityObject, false);
+        } else {                          // 1.10+
+            Method setNoGravity = entityObject.getClass().getMethod("setNoGravity", boolean.class);
+            setNoGravity.invoke(entityObject, true);
+        }
+
+        Method setLocation = entityObject.getClass().getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
+        setLocation.invoke(entityObject, x, y, z, 0.0F, 0.0F);
+
+        Method setInvisible = entityObject.getClass().getMethod("setInvisible", boolean.class);
+        setInvisible.invoke(entityObject, true);
+
+        Constructor<?> cw = packetClass.getConstructor(entityLivingClass);
+        return cw.newInstance(entityObject);
     }
 
     /**
@@ -262,17 +261,13 @@ class Hologram {
      *
      * @param packet The packet to send
      */
-    private void sendPacket(Object packet) {
-        try {
-            Method getHandle = this.player.getClass().getMethod("getHandle");
-            Object entityPlayer = getHandle.invoke(this.player);
-            Object pConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
-            Method sendMethod = pConnection.getClass().getMethod("sendPacket", nmsPacket);
+    private void sendPacket(Object packet) throws Exception {
+        Method getHandle = this.player.getClass().getMethod("getHandle");
+        Object entityPlayer = getHandle.invoke(this.player);
+        Object pConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
+        Method sendMethod = pConnection.getClass().getMethod("sendPacket", nmsPacket);
 
-            sendMethod.invoke(pConnection, packet);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendMethod.invoke(pConnection, packet);
     }
 
 }

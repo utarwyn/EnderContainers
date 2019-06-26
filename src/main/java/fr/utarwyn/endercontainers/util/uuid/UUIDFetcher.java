@@ -2,11 +2,13 @@ package fr.utarwyn.endercontainers.util.uuid;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import fr.utarwyn.endercontainers.EnderContainers;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ref.SoftReference;
 import java.net.HttpURLConnection;
@@ -17,6 +19,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 
 /**
  * Allows to convert an UUID to a playername and vice-versa
@@ -209,8 +212,8 @@ public class UUIDFetcher {
             idCache.put(uuid, currentNameData.name);
 
             return currentNameData.name;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot retrieve the player name from the Mojang Api", e);
         }
 
         return null;

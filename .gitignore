@@ -1,12 +1,19 @@
-## Intellij IDEA ##
+# Eclipse
+.classpath
+.project
+.settings/
 
-.idea/*
-
-
-## Maven / JAVA ##
-
-out/
+# Intellij
+.idea/
 *.iml
-META-INF/*
-target/*
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+out/
+META-INF/
+target/
 dependency-reduced-pom.xml

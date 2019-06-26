@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.util;
 
+import fr.utarwyn.endercontainers.EnderContainers;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -7,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.UUID;
+import java.util.logging.Level;
 
 /**
  * Utility class used to load and save offline player data.
@@ -89,7 +91,7 @@ public class NMSHacks {
             return (Player) method_getBukkitEntity.invoke(entityPlayer);
         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException e) {
-            e.printStackTrace();
+            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot access the offline player profile", e);
             return null;
         }
     }
@@ -107,7 +109,7 @@ public class NMSHacks {
         try {
             return reflectWorldServer0();
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            e.printStackTrace();
+            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot reflect the world server", e);
             return null;
         }
     }
@@ -124,7 +126,7 @@ public class NMSHacks {
         try {
             return reflectMinecraftServerInstance();
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace();
+            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot reflect the Minecraft server instance", e);
             return null;
         }
     }
@@ -141,7 +143,7 @@ public class NMSHacks {
         try {
             return Class.forName("com.mojang.authlib.GameProfile");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot find the game profile class", e);
             return null;
         }
     }
@@ -150,7 +152,7 @@ public class NMSHacks {
         try {
             return Class.forName(nmsPackage + className);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot find a Minecraft server class", e);
             return null;
         }
     }

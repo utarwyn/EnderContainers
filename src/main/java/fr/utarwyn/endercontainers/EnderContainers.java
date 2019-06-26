@@ -117,7 +117,7 @@ public class EnderContainers extends JavaPlugin {
         T inst = Managers.getInstance(clazz);
 
         if (inst == null) {
-            this.getLogger().log(Level.WARNING, clazz + " instance is null!");
+            this.getLogger().log(Level.WARNING, "{0} instance is null!", clazz);
         }
 
         return inst;

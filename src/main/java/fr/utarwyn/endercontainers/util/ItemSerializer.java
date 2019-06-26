@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.util;
 
+import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.configuration.Files;
 import org.apache.commons.lang.StringUtils;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Class used to convert a list of items into string and vice-versa.
@@ -153,7 +155,7 @@ public class ItemSerializer {
             dataOutput.close();
             return Base64Coder.encodeLines(outputStream.toByteArray());
         } catch (IOException e) {
-            e.printStackTrace();
+            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot serialize the items list", e);
             return "";
         }
     }
@@ -278,7 +280,7 @@ public class ItemSerializer {
 
             dataInput.close();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot deserialize the items string", e);
         }
 
         return items;

@@ -17,6 +17,14 @@ public class Managers {
     private static HashMap<Class<? extends AbstractManager>, AbstractManager> instances = new HashMap<>();
 
     /**
+     * Managers constructor.
+     * It's an utility class, it does not have to be instanciated.
+     */
+    private Managers() {
+        // Not implemented
+    }
+
+    /**
      * Register a specific manager in the memory
      *
      * @param clazz Class of the manager to load for the plugin

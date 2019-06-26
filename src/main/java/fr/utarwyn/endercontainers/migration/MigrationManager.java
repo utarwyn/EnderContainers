@@ -110,10 +110,10 @@ public class MigrationManager extends AbstractManager {
     private void performMigration(Migration migration) {
         // Announce it in the console
         this.logger.warning("ALERT! A migration have to be applied before continue using the plugin!");
-        this.logger.info(String.format(
-                "Migration detected from version %s to version %s!",
-                migration.getFromVers(), migration.getToVers()
-        ));
+        this.logger.log(
+                Level.INFO, "Migration detected from version {0} to version {1}!",
+                new Object[]{migration.getFromVers(), migration.getToVers()}
+        );
         this.logger.info("Starting migration...");
 
         // Prepare and perform the migration!
@@ -122,10 +122,10 @@ public class MigrationManager extends AbstractManager {
 
         // End message
         this.logger.info("");
-        this.logger.info(String.format(
-                "Migration from %s to %s has been performed!",
-                migration.getFromVers(), migration.getToVers()
-        ));
+        this.logger.log(
+                Level.INFO, "Migration from {0} to {1} has been performed!",
+                new Object[]{migration.getFromVers(), migration.getToVers()}
+        );
 
         this.migrationDone = true;
     }

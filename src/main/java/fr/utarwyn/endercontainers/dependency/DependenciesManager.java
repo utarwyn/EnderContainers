@@ -108,13 +108,15 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
         this.logger.info("-----------[Dependencies]-----------");
 
         for (Dependency dependency : this.dependencies) {
-            this.logger.info("  Use " + dependency.getName() +
-                    " (v" + dependency.getPluginVersion() + ") as a dependency!");
+            this.logger.log(
+                    Level.INFO, "  Use {0} (v{1}) as a dependency!",
+                    new Object[]{dependency.getName(), dependency.getPluginVersion()}
+            );
         }
 
         int size = this.dependencies.size();
         if (size > 0) {
-            this.logger.info("  " + size + " dependenc" + (size > 1 ? "ies" : "y") + " loaded!");
+            this.logger.log(Level.INFO, "  {0} dependenc{1} loaded!", new Object[]{size, (size > 1 ? "ies" : "y")});
         } else {
             this.logger.info("  No dependency found.");
         }

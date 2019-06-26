@@ -28,7 +28,7 @@ public class WorldGuardV6Hook implements DependencyListener {
         // OP? Ok, you can do whatever you want...
         if (player.isOp()) return true;
 
-        // Retreive the WorldGuard Player instance and create a region query.
+        // Retrieve the WorldGuard Player instance and create a region query.
         LocalPlayer localPlayer = this.worldGuardPlugin.wrapPlayer(player);
         RegionQuery query = this.worldGuardPlugin.getRegionContainer().createQuery();
 

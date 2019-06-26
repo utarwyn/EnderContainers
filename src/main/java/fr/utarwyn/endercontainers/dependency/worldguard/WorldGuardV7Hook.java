@@ -31,7 +31,7 @@ public class WorldGuardV7Hook implements DependencyListener {
         // OP? Ok, you can do whatever you want...
         if (player.isOp()) return true;
 
-        // Retreive the WorldGuard Player instance, create a region query and adapt the block location.
+        // Retrieve the WorldGuard Player instance, create a region query and adapt the block location.
         LocalPlayer localPlayer = this.worldGuardPlugin.wrapPlayer(player);
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
         Location location = BukkitAdapter.adapt(block.getLocation());

@@ -89,7 +89,7 @@ public abstract class Migration {
 
             return database;
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot access the database manager", e);
             return null;
         }
     }
@@ -246,7 +246,7 @@ public abstract class Migration {
      * @return Backup folder for the migration
      */
     private File getBackupFolder() {
-        return new File(this.getDataFolder(), "old_" + this.fromVers.replaceAll("\\*", "X").replaceAll("\\.", "_") + "/");
+        return new File(this.getDataFolder(), "old_" + this.fromVers.replaceAll("\\*", "X").replaceAll("\\.", "_"));
     }
 
     /**

@@ -22,6 +22,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Dependency used to interact with the Citizens plugin
@@ -259,7 +260,7 @@ public class CitizensDependency extends Dependency implements Listener {
         try {
             this.configuration.save(this.configurationFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            getPlugin().getLogger().log(Level.SEVERE, "Cannot save the Citizens linker configuration file", e);
         }
 
         this.reloadLinks();
@@ -279,7 +280,7 @@ public class CitizensDependency extends Dependency implements Listener {
         try {
             this.configuration.save(this.configurationFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            getPlugin().getLogger().log(Level.SEVERE, "Cannot save the Citizens linker configuration file", e);
         }
 
         links.remove(link);
@@ -518,10 +519,11 @@ public class CitizensDependency extends Dependency implements Listener {
         File f = new File(EnderContainers.getInstance().getDataFolder(), "npcs.yml");
 
         try {
-            if (!f.exists() && !f.createNewFile())
+            if (!f.exists() && !f.createNewFile()) {
                 return null;
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            getPlugin().getLogger().log(Level.SEVERE, "Cannot create the Citizens linker configuration file", e);
         }
 
         this.configurationFile = f;
