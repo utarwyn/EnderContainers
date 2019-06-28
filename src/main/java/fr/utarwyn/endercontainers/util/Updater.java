@@ -25,18 +25,22 @@ public class Updater {
      * Stores the Spigot ressource ID to check for update
      */
     private static final int RESSOURCE_ID = 4750;
+
     /**
      * URL used to get the current version of the plugin
      */
     private static final String VERSION_URL = "https://api.spiget.org/v2/resources/" + RESSOURCE_ID + "/versions?size=1&sort=-releaseDate";
+
     /**
      * URL used to get the last update description of the plugin
      */
     private static final String DESCRIPTION_URL = "https://api.spiget.org/v2/resources/" + RESSOURCE_ID + "/updates?size=1&sort=-date";
+
     /**
      * Stores the instance of the Updater class (Singleton class)
      */
     private static Updater instance;
+
     /**
      * Stores if the plugin is up to date or not.
      */

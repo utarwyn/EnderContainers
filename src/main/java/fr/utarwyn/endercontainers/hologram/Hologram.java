@@ -108,9 +108,8 @@ class Hologram {
             }
 
             nmsPacket = Class.forName("net.minecraft.server." + version + ".Packet");
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
-            System.err.println("Error - Hologram classes not initialized!");
-            ex.printStackTrace();
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot initialize the hologram", e);
         }
     }
 

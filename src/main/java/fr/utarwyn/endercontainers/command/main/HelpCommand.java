@@ -19,7 +19,7 @@ public class HelpCommand extends AbstractCommand {
 
     @Override
     public void perform(CommandSender sender) {
-        int page = EUtil.clamp(this.readArgOrDefault(1), 1, PAGE_NUMBER);
+        int page = Math.max(1, Math.min(PAGE_NUMBER, this.readArgOrDefault(1)));
 
         PluginMsg.pluginBar(sender);
         sender.sendMessage(" ");

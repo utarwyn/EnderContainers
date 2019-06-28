@@ -81,7 +81,6 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
         Map<String, Class<? extends Dependency>> dependencyClasses = new HashMap<>();
 
         // Prepare all dependencies here
-        dependencyClasses.put("Citizens", CitizensDependency.class); // deprecated
         dependencyClasses.put("Essentials", EssentialsDependency.class);
         dependencyClasses.put("Factions", FactionsDependency.class);
         dependencyClasses.put("PlotSquared", PlotSquaredDependency.class);

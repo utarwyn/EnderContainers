@@ -45,18 +45,6 @@ public class EUtil {
     }
 
     /**
-     * Method to clamp a value
-     *
-     * @param val Value
-     * @param min Minimum
-     * @param max Maximum
-     * @return The clamped value
-     */
-    public static int clamp(int val, int min, int max) {
-        return Math.max(min, Math.min(max, val));
-    }
-
-    /**
      * Plays a sound at a specific location with support of 1.8 sound and 1.9+ sound.
      *
      * @param location Location where to play the sound
@@ -121,17 +109,6 @@ public class EUtil {
             offlinePlayer.getEnderChest().setContents(inv.getContents());
             offlinePlayer.saveData();
         }
-    }
-
-    /**
-     * Returns if a player with the given uuid is online or not
-     *
-     * @param uuid The UUID of the player to check
-     * @return True if the player is online
-     */
-    public static boolean isPlayerOnline(UUID uuid) {
-        Player player = Bukkit.getPlayer(uuid);
-        return player != null && player.isOnline();
     }
 
     /**

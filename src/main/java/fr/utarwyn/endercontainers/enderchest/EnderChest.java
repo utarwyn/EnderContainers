@@ -235,13 +235,14 @@ public class EnderChest {
         // Reload metas of the chest!
         this.reloadMeta();
 
-        // Load the container ...
-        if (EUtil.isPlayerOnline(this.owner))
-            // ... for an online player ...
+        // Load the container for an online/offline player.
+        Player player = Bukkit.getPlayer(this.owner);
+
+        if (player != null && player.isOnline()) {
             this.container = new EnderChestMenu(this);
-        else
-            // ... or for an offline player!
+        } else {
             this.container = new OfflineEnderChestMenu(this);
+        }
 
         // Load items in the container ...
         for (Map.Entry<Integer, ItemStack> entry : pData.getEnderchestContents(this).entrySet())
