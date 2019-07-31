@@ -3,7 +3,7 @@
 <h4 align="center">
 A modern Bukkit plugin to divide enderchest into multiple inventories.
 <br>
-Works with Bukkit/Spigot 1.8 to 1.13!
+Works with Bukkit/Spigot 1.8 to 1.14!
 </h4>
 
 <p align="center">
@@ -32,7 +32,7 @@ Works with Bukkit/Spigot 1.8 to 1.13!
     <img src="https://i.imgur.com/VCz4kFS.gif" alt="demo">
 </p>
 
-> :warning: Latest stable version available on Spigot is **NOT compatible** with **1.13 versions** of Minecraft yet. You **have to download an unstable development build** from this repo to get this support.
+> :warning: Latest stable version available on Spigot is **NOT compatible** with **1.13-1.14 versions** of Minecraft yet. You **have to download an unstable development build** from this repo to get this support.
 
 > :wave: Need help about the plugin? Go to the [official wiki](https://github.com/utarwyn/EnderContainers/wiki). \
 > You will found a guide to **install and configure it** very quickly and easily.
@@ -55,7 +55,7 @@ Works with Bukkit/Spigot 1.8 to 1.13!
  - Works with **Premium and offline servers**
  - Console commands support
  - **Light as possible**, can work for all sizes of server
- - Efficient commented code *(open-source of course)*
+ - Efficient commented code *(open-sourced of course)*
  - **No dependency needed!** :tada:
 
 

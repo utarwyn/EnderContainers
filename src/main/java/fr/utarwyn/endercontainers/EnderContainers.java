@@ -7,7 +7,6 @@ import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.hologram.HologramManager;
-import fr.utarwyn.endercontainers.migration.MigrationManager;
 import fr.utarwyn.endercontainers.util.Updater;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -55,44 +54,33 @@ public class EnderContainers extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
-        // Load the plugin's configuration
+        // Load config files
         if (!Files.initConfiguration(this)) {
             this.getLogger().log(Level.SEVERE, "Cannot load the plugin's configuration. Please check the above log. Plugin loading failed.");
             return;
         }
-
-        // Now we have to load core managers of the plugin
-        Managers.registerManager(this, CommandManager.class);
-        Managers.registerManager(this, DependenciesManager.class);
-        Managers.registerManager(this, DatabaseManager.class);
-
-        // Load the migration manager and stop the plugin if a migration have been done.
-        MigrationManager mm = Managers.registerManager(this, MigrationManager.class);
-        if (mm != null && mm.hasDoneMigration()) {
-            this.getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
-        // Load others managers ...
-        Managers.registerManager(this, EnderChestManager.class);
-        Managers.registerManager(this, BackupManager.class);
-        Managers.registerManager(this, HologramManager.class);
-
-        // Load plugin locale ...
         if (!Files.initLocale(this)) {
             this.getLogger().log(Level.SEVERE, "Cannot load the plugin's locale. Please check the above log. Plugin loading failed.");
             return;
         }
 
-        // Check for update if needed ...
+        // Load all managers
+        Managers.registerManager(this, CommandManager.class);
+        Managers.registerManager(this, DependenciesManager.class);
+        Managers.registerManager(this, DatabaseManager.class);
+        Managers.registerManager(this, EnderChestManager.class);
+        Managers.registerManager(this, BackupManager.class);
+        Managers.registerManager(this, HologramManager.class);
+
+        // Check for updates
         if (Files.getConfiguration().isUpdateChecker()) {
             Updater.getInstance().notifyUpToDate();
         }
 
-        // Load commands ...
+        // Registering commands
         Objects.requireNonNull(Managers.getInstance(CommandManager.class)).registerCommands();
 
-        // Load metrics (bStats) ...
+        // And load Metrics!
         new Metrics(this);
     }
 
