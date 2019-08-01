@@ -6,7 +6,6 @@ import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import com.github.intellectualsites.plotsquared.plot.object.PlotBlock;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.util.PluginMsg;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -20,6 +19,11 @@ import java.util.Optional;
  * @since 1.0.6
  */
 public class PlotSquaredDependency extends Dependency {
+
+    /**
+     * Material id of the enderchest block. Used by legacy servers.
+     */
+    private static final int ENDERCHEST_MATERIAL_ID = 130;
 
     /**
      * Called when a player wants to open its enderchest by interacting with an enderchest block
@@ -40,10 +44,9 @@ public class PlotSquaredDependency extends Dependency {
 
         if (flag.isPresent()) {
             boolean containsBlock = false;
-            PlotBlock enderchestBlock = PlotBlock.get(Material.ENDER_CHEST.getId(), (byte) 0);
 
             for (PlotBlock plotBlock : flag.get()) {
-                if (plotBlock.equals(enderchestBlock)) {
+                if (plotBlock.equalsAny(ENDERCHEST_MATERIAL_ID, "ENDER_CHEST")) {
                     containsBlock = true;
                     break;
                 }

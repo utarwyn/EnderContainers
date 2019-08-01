@@ -27,14 +27,17 @@ public abstract class AbstractMenu implements InventoryHolder {
      * All items in the menu
      */
     Map<Integer, ItemStack> items;
+
     /**
      * The number of rows of the menu
      */
     private int rows;
+
     /**
      * The title of the menu
      */
     private String title;
+
     /**
      * The generated inventory
      */
