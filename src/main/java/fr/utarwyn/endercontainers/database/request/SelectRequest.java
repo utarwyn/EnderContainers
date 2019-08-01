@@ -39,7 +39,7 @@ public class SelectRequest implements IRequest {
 
     public SelectRequest(Database db, String... fields) {
         this.database = db;
-        this.fields = DatabaseManager.escapeFieldArray(fields);
+        this.fields = DatabaseManager.espaceFields(fields);
         this.conditions = new String[0];
         this.orders = new String[0];
         this.groupsBy = new String[0];
@@ -59,17 +59,17 @@ public class SelectRequest implements IRequest {
     }
 
     public SelectRequest from(String... froms) {
-        this.froms = DatabaseManager.escapeFieldArray(froms);
+        this.froms = DatabaseManager.espaceFields(froms);
         return this;
     }
 
     public SelectRequest join(String table, String field1, String field2) {
-        this.joins.add(DatabaseManager.escapeFieldArray(new String[]{table, field1, field2}));
+        this.joins.add(DatabaseManager.espaceFields(new String[]{table, field1, field2}));
         return this;
     }
 
     public SelectRequest leftjoin(String table, String field1, String field2) {
-        this.leftJoins.add(DatabaseManager.escapeFieldArray(new String[]{table, field1, field2}));
+        this.leftJoins.add(DatabaseManager.espaceFields(new String[]{table, field1, field2}));
         return this;
     }
 

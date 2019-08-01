@@ -99,19 +99,6 @@ public class Database implements AutoCloseable {
     }
 
     /**
-     * Drop a specific table passed in parameter
-     *
-     * @param tableName The name of the table to drop
-     */
-    public void dropTable(String tableName) throws SQLException {
-        try (Connection connection = this.source.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.executeUpdate("USE `" + this.name + "`");
-            statement.executeUpdate("DROP TABLE `" + tableName + "`");
-        }
-    }
-
-    /**
      * Closes the connection to the SQL server
      *
      * @throws SQLException throwed if the connection cannot be closed.

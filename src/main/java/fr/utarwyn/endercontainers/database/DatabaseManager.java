@@ -6,6 +6,7 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -40,11 +41,8 @@ public class DatabaseManager extends AbstractManager {
      * @param fields Fields to wrap with quotes (to escape)
      * @return Escaped fields, columns or table names
      */
-    public static String[] escapeFieldArray(String[] fields) {
-        for (int i = 0; i < fields.length; i++) {
-            fields[i] = '`' + fields[i] + '`';
-        }
-        return fields;
+    public static String[] espaceFields(String[] fields) {
+        return Arrays.stream(fields).map(field -> '`' + field + '`').toArray(String[]::new);
     }
 
     /**

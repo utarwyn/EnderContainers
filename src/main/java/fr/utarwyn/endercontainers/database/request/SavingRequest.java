@@ -6,37 +6,67 @@ import org.apache.commons.lang.StringUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * A saving request
+ * A saving request.
+ * Can execute an INSERT or an UPDATE request on the database.
  *
  * @author Utarwyn <maxime.malgorn@laposte.net>
  * @since 2.2.0
  */
 public class SavingRequest implements IRequest {
 
+    /**
+     * Used database
+     */
     private Database database;
 
+    /**
+     * Columns to update with the request
+     */
     private String[] fields;
 
+    /**
+     * Table to update
+     */
     private String table;
 
+    /**
+     * Conditions of the request. Could be empty when inserting values.
+     */
     private String[] conditions;
 
+    /**
+     * Values to insert in the database
+     */
     private Object[] values;
 
+    /**
+     * List of securized SQL attributes
+     */
     private List<Object> attributes;
 
+    /**
+     * Could be set to true to perform a REPLACE request.
+     */
     private boolean replaceIfExists;
 
+    /**
+     * Construct the request with basic informations.
+     *
+     * @param database database which contains the table to update
+     * @param table    table to update
+     */
     public SavingRequest(Database database, String table) {
         this.database = database;
         this.table = table;
 
         this.fields = new String[0];
         this.conditions = new String[0];
+        this.values = new Object[0];
         this.attributes = new ArrayList<>();
     }
 
@@ -45,7 +75,7 @@ public class SavingRequest implements IRequest {
     }
 
     public SavingRequest fields(String... fields) {
-        this.fields = DatabaseManager.escapeFieldArray(fields);
+        this.fields = DatabaseManager.espaceFields(fields);
         return this;
     }
 
@@ -80,12 +110,15 @@ public class SavingRequest implements IRequest {
         StringBuilder request = new StringBuilder();
 
         // We do some verifications on object's attributes
-        if (this.table == null)
-            throw new NullPointerException("Table seems to be null!");
-        if (this.fields.length == 0 && this.conditions.length > 0)
-            throw new IllegalArgumentException("Bad fields or conditions number");
-        if (this.fields.length != this.values.length && (this.conditions.length > 0 || this.fields.length > 0))
+        if (this.table == null) {
+            throw new NullPointerException("Table seems to be null");
+        }
+        if (this.fields.length == 0 || this.values.length == 0) {
+            throw new IllegalArgumentException("You must add at least one field and one value");
+        }
+        if (this.fields.length != this.values.length) {
             throw new IllegalArgumentException("Number of fields and values seems to be different");
+        }
 
         // Now we just have to create a beautiful request
         if (this.conditions.length > 0) {
@@ -114,19 +147,15 @@ public class SavingRequest implements IRequest {
             }
 
             request.append(" VALUES ");
-            request.append("(").append(this.generateAttrValues(this.values)).append(")");
+            request.append("(").append(this.generateFakeParameters(this.values)).append(")");
         }
 
 
         return request.toString();
     }
 
-    private String generateAttrValues(Object[] values) {
-        String[] tab = new String[values.length];
-
-        for (int i = 0; i < tab.length; i++) tab[i] = "?";
-
-        return StringUtils.join(tab, ",");
+    private String generateFakeParameters(Object[] values) {
+        return StringUtils.join(Arrays.stream(values).map(v -> '?').toArray(), ",");
     }
 
 }
