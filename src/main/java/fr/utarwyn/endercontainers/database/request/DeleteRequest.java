@@ -49,7 +49,10 @@ public class DeleteRequest implements IRequest {
     public String getRequest() {
         // Table does not have to be null at this point!
         if (this.table == null) {
-            throw new NullPointerException("From table seems to be null!");
+            throw new NullPointerException("Table seems to be null");
+        }
+        if (this.conditions.length == 0) {
+            throw new IllegalArgumentException("You must use at least one condition");
         }
 
         // Create the request string

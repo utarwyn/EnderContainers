@@ -128,28 +128,18 @@ public class SavingRequest implements IRequest {
             for (String field : this.fields) {
                 request.append(" ").append(field).append(" = ?,");
             }
-
-            if (this.fields.length > 0) {
-                request.deleteCharAt(request.length() - 1);
-            }
+            request.deleteCharAt(request.length() - 1);
 
             request.append(" WHERE ").append(StringUtils.join(this.conditions, " AND "));
         } else {
-            String action = "INSERT";
-
-            if (this.replaceIfExists)
-                action = "REPLACE";
+            String action = this.replaceIfExists ? "REPLACE" : "INSERT";
 
             request.append(action).append(" INTO `").append(this.table).append('`');
-
-            if (this.fields.length > 0) {
-                request.append("(").append(StringUtils.join(this.fields, ",")).append(")");
-            }
+            request.append("(").append(StringUtils.join(this.fields, ",")).append(")");
 
             request.append(" VALUES ");
             request.append("(").append(this.generateFakeParameters(this.values)).append(")");
         }
-
 
         return request.toString();
     }

@@ -1,8 +1,13 @@
 package fr.utarwyn.endercontainers.database.request;
 
+import fr.utarwyn.endercontainers.database.Database;
 import org.junit.Test;
 
+import java.sql.SQLException;
+
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SavingRequestTest {
 
@@ -72,6 +77,21 @@ public class SavingRequestTest {
 
         assertThat(request1.getRequest()).startsWith("REPLACE INTO");
         assertThat(request2.getRequest()).startsWith("UPDATE"); // No replace with conditions
+    }
+
+    @Test
+    public void testExecute() {
+        Database database = mock(Database.class);
+        SavingRequest request = new SavingRequest(database, "test");
+
+        request.fields("amount").values(1).where("id = ?").attributes(4);
+
+        try {
+            when(database.execUpdateStatement(request)).thenReturn(true);
+            assertThat(request.execute()).isTrue();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
