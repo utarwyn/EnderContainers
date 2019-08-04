@@ -13,28 +13,28 @@ public class FactionsV2Hook implements DependencyListener {
 
     @Override
     public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
-        MPlayer mplayer = MPlayer.get(player);
+        MPlayer mPlayer = MPlayer.get(player);
 
         // Bypass the check?
-        if (mplayer == null) return false;
-        if (mplayer.isOverriding()) return true;
+        if (mPlayer == null) return false;
+        if (mPlayer.isOverriding()) return true;
 
         // Init checking variables
-        Faction playerFac = mplayer.getFaction();
+        Faction playerFac = mPlayer.getFaction();
         Faction currentFac = BoardColl.get().getFactionAt(PS.valueOf(block));
         if (currentFac == null) return true;
 
-        boolean canOpen = false;
+        boolean canOpen;
         boolean playerFacIsReal = this.isRealFaction(playerFac);
         boolean currentFacIsReal = this.isRealFaction(currentFac);
         ChatColor facColor = ChatColor.WHITE;
 
         // Check factions custom permissions (and for all cases!)
         if (playerFacIsReal && currentFacIsReal) {
-            if (currentFac == playerFac && playerFac.isPermitted(MPerm.getPermContainer(), mplayer.getRole())) {
-                canOpen = true;
-            } else if (currentFac != playerFac && currentFac.isPermitted(MPerm.getPermContainer(), currentFac.getRelationTo(playerFac))) {
-                canOpen = true;
+            if (currentFac == playerFac) {
+                canOpen = playerFac.isPermitted(MPerm.getPermContainer(), mPlayer.getRole());
+            } else {
+                canOpen = currentFac.isPermitted(MPerm.getPermContainer(), currentFac.getRelationTo(playerFac));
             }
 
             // Get relational color between factions
@@ -44,17 +44,13 @@ public class FactionsV2Hook implements DependencyListener {
         }
 
         // Prevent to access to the enderchest if needed!
-        if (!canOpen) {
-            // Sending the message only in a specific case!
-            if (sendMessage) {
-                PluginMsg.errorSMessage(player, Files.getLocale().getAccessDeniedFactions()
-                        .replace("%faction%", facColor + currentFac.getName() + ChatColor.RED));
-            }
-
-            return false;
+        // Sending the message only in a specific case!
+        if (!canOpen && sendMessage) {
+            PluginMsg.errorSMessage(player, Files.getLocale().getAccessDeniedFactions()
+                    .replace("%faction%", facColor + currentFac.getName() + ChatColor.RED));
         }
 
-        return true;
+        return canOpen;
     }
 
     private boolean isRealFaction(Faction faction) {

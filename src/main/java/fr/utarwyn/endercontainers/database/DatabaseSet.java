@@ -1,6 +1,5 @@
 package fr.utarwyn.endercontainers.database;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -80,45 +79,6 @@ public class DatabaseSet {
     }
 
     /**
-     * Returns a Boolean object for the row
-     *
-     * @param key The column used to get the value.
-     * @return The value stored in the selected column (key)
-     */
-    public Boolean getBoolean(String key) {
-        if (set.containsKey(key) && set.get(key) instanceof Boolean)
-            return (Boolean) set.get(key);
-        else
-            return null;
-    }
-
-    /**
-     * Returns a Float object for the row
-     *
-     * @param key The column used to get the value.
-     * @return The value stored in the selected column (key)
-     */
-    public Float getFloat(String key) {
-        if (set.containsKey(key) && set.get(key) instanceof Float)
-            return (Float) set.get(key);
-        else
-            return null;
-    }
-
-    /**
-     * Returns a Double object for the row
-     *
-     * @param key The column used to get the value.
-     * @return The value stored in the selected column (key)
-     */
-    public Double getDouble(String key) {
-        if (set.containsKey(key) && set.get(key) instanceof Double)
-            return (Double) set.get(key);
-        else
-            return null;
-    }
-
-    /**
      * Returns a Timestamp object for the row
      *
      * @param key The column used to get the value.
@@ -127,19 +87,6 @@ public class DatabaseSet {
     public Timestamp getTimestamp(String key) {
         if (set.containsKey(key) && set.get(key) instanceof Timestamp)
             return (Timestamp) set.get(key);
-        else
-            return null;
-    }
-
-    /**
-     * Returns a Date object for the row
-     *
-     * @param key The column used to get the value.
-     * @return The value stored in the selected column (key)
-     */
-    public Date getDate(String key) {
-        if (set.containsKey(key) && set.get(key) instanceof Date)
-            return (Date) set.get(key);
         else
             return null;
     }
