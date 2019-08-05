@@ -1,4 +1,4 @@
-[![Plugin's logo](https://www.spigotmc.org/attachments/logo-png.25339/)](https://www.spigotmc.org/resources/4750/)
+[![Plugin's logo](https://i.imgur.com/ewPsB9W.png)](https://www.spigotmc.org/resources/4750/)
 
 <h4 align="center">
 A modern Bukkit plugin to divide enderchest into multiple inventories.
@@ -13,18 +13,18 @@ Works with Bukkit/Spigot 1.8 to 1.14!
     <a href="https://sonarcloud.io/dashboard?id=fr.utarwyn%3AEnderContainers">
         <img src="https://sonarcloud.io/api/project_badges/measure?project=fr.utarwyn%3AEnderContainers&metric=alert_status" alt="SonarQube Quality gate">
     </a>
+    <a href="https://sonarcloud.io/component_measures?id=fr.utarwyn%3AEnderContainers&metric=Maintainability">
+        <img src="https://sonarcloud.io/api/project_badges/measure?project=fr.utarwyn%3AEnderContainers&metric=sqale_rating" alt="SonarQube maintainability">
+    </a>
+    <a href="https://sonarcloud.io/project/activity?custom_metrics=tests&graph=custom&id=fr.utarwyn%3AEnderContainers">
+        <img src="https://sonarcloud.io/api/project_badges/measure?project=fr.utarwyn%3AEnderContainers&metric=coverage" alt="SonarQube coverage">
+    </a>
+    <br>
     <a href="https://www.spigotmc.org/resources/4750/">
         <img src="https://img.shields.io/badge/dynamic/json.svg?label=Downloads&colorB=orange&query=$.downloads&uri=https%3A%2F%2Fapi.spiget.org%2Fv2%2Fresources%2F4750" alt="Downloads">
     </a>
      <a href="https://www.spigotmc.org/resources/4750/">
         <img src="https://img.shields.io/badge/dynamic/json.svg?label=Global%20rating&colorB=blue&query=$.rating.average&uri=https%3A%2F%2Fapi.spiget.org%2Fv2%2Fresources%2F4750" alt="Rating">
-    </a>
-    <br>
-    <a href="https://github.com/utarwyn/EnderContainers/commits/master">
-        <img src="https://img.shields.io/github/last-commit/utarwyn/endercontainers/master.svg" alt="Last commit">
-    </a>
-    <a href="https://github.com/utarwyn/EnderContainers/blob/master/LICENSE">
-        <img src="https://img.shields.io/github/license/utarwyn/endercontainers.svg" alt="License">
     </a>
 </p>
 
