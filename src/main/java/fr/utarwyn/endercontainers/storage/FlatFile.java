@@ -34,7 +34,7 @@ public class FlatFile {
     }
 
     /**
-     * Returns the configuration object
+     * Returns the configuration object.
      *
      * @return Bukkit configuration object
      */
@@ -63,14 +63,12 @@ public class FlatFile {
 
         // Create the flat configuration file if doesn't exists.
         if (!file.exists()) {
-            if (!file.getParentFile().exists()) {
-                if (!file.getParentFile().mkdirs()) {
-                    return;
-                }
+            if (!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
+                throw new IOException("cannot create the folder for file " + this.file);
             }
 
             if (!file.createNewFile()) {
-                throw new IOException("cannot create the file");
+                throw new IOException("cannot create the file " + this.file);
             }
         }
 

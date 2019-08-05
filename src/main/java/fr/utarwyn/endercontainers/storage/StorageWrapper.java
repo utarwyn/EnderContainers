@@ -25,14 +25,17 @@ public abstract class StorageWrapper {
      * The Plugin logger
      */
     protected static Logger logger;
+
     /**
      * Class cache used to improve performance to find classes using reflection
      */
     private static Map<Class<? extends StorageWrapper>, Class<? extends StorageWrapper>> classCacheMap;
+
     /**
      * Cache used to improve performance when a script searchs for a specific storage
      */
     private static Map<Class<? extends StorageWrapper>, List<StorageWrapper>> cacheMap;
+
     /**
      * The SQL manager used to store data in a storage
      */
@@ -138,7 +141,7 @@ public abstract class StorageWrapper {
 
         cacheMap.get(clazz).removeIf(storageWrapper -> storageWrapper.hasParams(params));
 
-        if (params.length == 0 || cacheMap.get(clazz).size() == 0) {
+        if (params.length == 0 || cacheMap.get(clazz).isEmpty()) {
             classCacheMap.remove(clazz);
             cacheMap.remove(clazz);
         }

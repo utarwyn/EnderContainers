@@ -19,18 +19,13 @@ import java.util.logging.Level;
 public class NMSHacks {
 
     /**
-     * Stores the main package of the craftbukkit server
-     */
-    private static String craftbukkitPackage;
-
-    /**
      * Stores the main package of the net minecraft server (NMS)
      */
-    private static String nmsPackage;
+    private static final String NMS_PACKAGE;
 
     static {
-        craftbukkitPackage = Bukkit.getServer().getClass().getPackage().getName() + ".";
-        nmsPackage = craftbukkitPackage.replace("org.bukkit.craftbukkit", "net.minecraft.server");
+        String craftbukkitPackage = Bukkit.getServer().getClass().getPackage().getName() + ".";
+        NMS_PACKAGE = craftbukkitPackage.replace("org.bukkit.craftbukkit", "net.minecraft.server");
     }
 
     /**
@@ -52,46 +47,51 @@ public class NMSHacks {
             boolean useGameProfile = isServerPost16();
             Object minecraftServer = getMinecraftServerInstance();
 
-            Class<?> class_EntityPlayer = getNMSClass("EntityPlayer");
-            Class<?> class_MinecraftServer = getNMSClass("MinecraftServer");
-            Class<?> class_World = getNMSClass("World");
+            Class<?> entityPlayerClass = getNMSClass("EntityPlayer");
+            Class<?> minecraftServerClass = getNMSClass("MinecraftServer");
+            Class<?> worldClass = getNMSClass("World");
+            Class<?> gameProfileClass = null;
 
-            Class<?> class_GameProfile = null;
             if (useGameProfile) {
-                class_GameProfile = getGameProfileClass();
+                gameProfileClass = getGameProfileClass();
             }
 
-            Class<?> class_PlayerInteractManager = getNMSClass("PlayerInteractManager");
+            Class<?> interactManagerClass = getNMSClass("PlayerInteractManager");
+            assert entityPlayerClass != null;
 
-            assert class_EntityPlayer != null;
-            Constructor<?> constructor_EntityPlayer = class_EntityPlayer.getDeclaredConstructor(class_MinecraftServer, getNMSClass("WorldServer"), useGameProfile ? class_GameProfile : String.class,
-                    class_PlayerInteractManager);
+            Constructor<?> entityPlayerCstr = entityPlayerClass.getDeclaredConstructor(
+                    minecraftServerClass, getNMSClass("WorldServer"),
+                    useGameProfile ? gameProfileClass : String.class, interactManagerClass
+            );
 
-            Constructor<?> constructor_GameProfile = null;
+            Constructor<?> gameProfileCstr = null;
             if (useGameProfile) {
-                assert class_GameProfile != null;
-                constructor_GameProfile = class_GameProfile.getDeclaredConstructor(UUID.class, String.class);
+                assert gameProfileClass != null;
+                gameProfileCstr = gameProfileClass.getDeclaredConstructor(UUID.class, String.class);
             }
 
-            assert class_PlayerInteractManager != null;
-            Constructor<?> constructor_PlayerInteractManager = class_PlayerInteractManager.getDeclaredConstructor(class_World);
+            assert interactManagerClass != null;
+            Constructor<?> interactManagerCstr = interactManagerClass.getDeclaredConstructor(worldClass);
 
             Object gameProfile = null;
             if (useGameProfile) {
-                gameProfile = constructor_GameProfile.newInstance(uuid, playerName);
+                gameProfile = gameProfileCstr.newInstance(uuid, playerName);
             }
 
-            Object playerInteractManager = constructor_PlayerInteractManager.newInstance(getWorldServer0());
+            Object playerInteractManager = interactManagerCstr.newInstance(getWorldServer0());
+            Object entityPlayer = entityPlayerCstr.newInstance(
+                    minecraftServer, getWorldServer0(),
+                    useGameProfile ? gameProfile : playerName,
+                    playerInteractManager
+            );
 
-            Object entityPlayer = constructor_EntityPlayer.newInstance(minecraftServer, getWorldServer0(), useGameProfile ? gameProfile : playerName,
-                    playerInteractManager);
+            Method getBukkitEntityMethod = entityPlayerClass.getDeclaredMethod("getBukkitEntity");
 
-            Method method_getBukkitEntity = class_EntityPlayer.getDeclaredMethod("getBukkitEntity");
-
-            return (Player) method_getBukkitEntity.invoke(entityPlayer);
-        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException e) {
-            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot access the offline player profile", e);
+            return (Player) getBukkitEntityMethod.invoke(entityPlayer);
+        } catch (NoSuchMethodException | InstantiationException
+                | IllegalAccessException | InvocationTargetException e) {
+            EnderContainers.getInstance().getLogger().log(
+                    Level.SEVERE, "Cannot access the offline player profile", e);
             return null;
         }
     }
@@ -100,7 +100,7 @@ public class NMSHacks {
         try {
             Bukkit.getServer().getServerIcon();
             return true;
-        } catch (Throwable t) {
+        } catch (Exception ex) {
             return false;
         }
     }
@@ -108,51 +108,57 @@ public class NMSHacks {
     private static Object getWorldServer0() {
         try {
             return reflectWorldServer0();
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot reflect the world server", e);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            EnderContainers.getInstance().getLogger().log(
+                    Level.SEVERE, "Cannot reflect the world server", e);
             return null;
         }
     }
 
-    private static Object reflectWorldServer0() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+    private static Object reflectWorldServer0() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Object serverInstance = getMinecraftServerInstance();
         assert serverInstance != null;
 
         // TODO This method does not work on 1.13.1 version anymore
-        return serverInstance.getClass().getMethod("getWorldServer", int.class).invoke(getMinecraftServerInstance(), 0); //Not a method inside DedicatedServer, use getMethod
+        // Not a method inside DedicatedServer, use getMethod
+        return serverInstance.getClass().getMethod("getWorldServer", int.class)
+                .invoke(getMinecraftServerInstance(), 0);
     }
 
     private static Object getMinecraftServerInstance() {
         try {
             return reflectMinecraftServerInstance();
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot reflect the Minecraft server instance", e);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            EnderContainers.getInstance().getLogger().log(
+                    Level.SEVERE, "Cannot reflect the Minecraft server instance", e);
             return null;
         }
     }
 
-    private static Object reflectMinecraftServerInstance() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        Class<?> class_DedicatedServer = getNMSClass("DedicatedServer");
-        assert class_DedicatedServer != null;
-        Method method_getServer = class_DedicatedServer.getMethod("getServer"); //Use getMethod instead of getDeclaredMethod, because the getServer method is declared in MinecraftServer, not DedicatedServer
+    private static Object reflectMinecraftServerInstance() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Class<?> dedicatedServerClass = getNMSClass("DedicatedServer");
+        assert dedicatedServerClass != null;
 
-        return method_getServer.invoke(null); //Forgot about this: reflection's javadocs say that if it is a static method, then parse null to the "obj" argument.
+        // Use getMethod instead of getDeclaredMethod, because the getServer method is declared in MinecraftServer, not DedicatedServer
+        return dedicatedServerClass.getMethod("getServer").invoke(null);
     }
 
     private static Class<?> getGameProfileClass() {
         try {
             return Class.forName("com.mojang.authlib.GameProfile");
         } catch (ClassNotFoundException e) {
-            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot find the game profile class", e);
+            EnderContainers.getInstance().getLogger().log(
+                    Level.SEVERE, "Cannot find the game profile class", e);
             return null;
         }
     }
 
     private static Class<?> getNMSClass(String className) {
         try {
-            return Class.forName(nmsPackage + className);
+            return Class.forName(NMS_PACKAGE + className);
         } catch (ClassNotFoundException e) {
-            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot find a Minecraft server class", e);
+            EnderContainers.getInstance().getLogger().log(
+                    Level.SEVERE, "Cannot find a Minecraft server class", e);
             return null;
         }
     }

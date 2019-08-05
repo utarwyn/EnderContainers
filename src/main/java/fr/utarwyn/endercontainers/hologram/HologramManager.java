@@ -81,23 +81,10 @@ public class HologramManager extends AbstractManager implements Runnable {
             if (Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName())) continue;
 
             UUID uuid = player.getUniqueId();
-            Block b = player.getTargetBlock(null, 6);
+            Block block = player.getTargetBlock(null, 6);
 
-            if (Material.ENDER_CHEST.equals(b.getType())) {
-                if (this.holograms.containsKey(uuid)) continue;
-
-                // Check player perms before displaying the hologram
-                if (!this.dependenciesManager.onBlockChestOpened(b, player, false))
-                    continue;
-
-                int copEcs = this.chestManager.getEnderchestsNbOf(uuid);
-
-                String title = Files.getLocale().getChestNametag()
-                        .replace("%enderchests%", String.valueOf(copEcs))
-                        .replace("%maxenderchests%", String.valueOf(Files.getConfiguration().getMaxEnderchests()))
-                        .replaceAll("%plurial%", ((copEcs > 1) ? "s" : ""));
-
-                this.holograms.put(player.getUniqueId(), new Hologram(player, title, b.getLocation()));
+            if (Material.ENDER_CHEST.equals(block.getType())) {
+                this.spawnHologramFor(player, block);
             } else if (this.holograms.containsKey(uuid)) {
                 this.holograms.get(uuid).destroy();
                 this.holograms.remove(uuid);
@@ -106,6 +93,25 @@ public class HologramManager extends AbstractManager implements Runnable {
 
         // Clear unused holograms
         this.holograms.entrySet().removeIf(entry -> !entry.getValue().isPlayerOnline());
+    }
+
+    /**
+     * Spawn an hologram for a specific player and a specific enderchest.
+     *
+     * @param player Player for which the hologram should spawn
+     * @param block  Enderchest for which the hologram have to appear
+     */
+    private void spawnHologramFor(Player player, Block block) {
+        if (!this.holograms.containsKey(player.getUniqueId()) && this.dependenciesManager.onBlockChestOpened(block, player, false)) {
+            int copEcs = this.chestManager.getEnderchestsNbOf(player.getUniqueId());
+
+            String title = Files.getLocale().getChestNametag()
+                    .replace("%enderchests%", String.valueOf(copEcs))
+                    .replace("%maxenderchests%", String.valueOf(Files.getConfiguration().getMaxEnderchests()))
+                    .replaceAll("%plurial%", ((copEcs > 1) ? "s" : ""));
+
+            this.holograms.put(player.getUniqueId(), new Hologram(player, title, block.getLocation()));
+        }
     }
 
 }

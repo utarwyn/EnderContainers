@@ -212,26 +212,21 @@ public abstract class AbstractMenu implements InventoryHolder {
             if (this.dynamicSize) {
                 int maxPos = 0;
 
-                for (Integer n : this.items.keySet())
-                    if (n > maxPos)
+                for (Integer n : this.items.keySet()) {
+                    if (n > maxPos) {
                         maxPos = n;
+                    }
+                }
 
                 size = ((int) Math.ceil((maxPos + 1) / 9.0D)) * 9;
-
-                if (size < 1) size = 1;
-                if (size > 54) size = 54;
+                size = Math.min(Math.max(size, 1), 54);
             }
 
             this.inventory = Bukkit.createInventory(this, size, this.title);
         }
 
         if (this.inventory.getViewers().isEmpty()) {
-            for (Map.Entry<Integer, ItemStack> entry : this.items.entrySet()) {
-                if (entry.getKey() < 0 || entry.getKey() >= this.inventory.getSize())
-                    continue;
-
-                this.inventory.setItem(entry.getKey(), entry.getValue());
-            }
+            this.updateInventory();
         }
 
         return this.inventory;

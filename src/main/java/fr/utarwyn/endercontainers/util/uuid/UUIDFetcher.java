@@ -77,6 +77,7 @@ public class UUIDFetcher {
      * Name used to temporary store data retrieved from the Mojang API
      */
     private String name;
+
     /**
      * Id used to temporary store data retrieved from the Mojang API
      */
@@ -89,16 +90,6 @@ public class UUIDFetcher {
     }
 
     /**
-     * Fetches the uuid asynchronously and passes it to the consumer
-     *
-     * @param name   The name
-     * @param action Do what you want to do with the uuid her
-     */
-    public static void getUUID(String name, Consumer<UUID> action) {
-        pool.execute(() -> action.accept(getUUID(name)));
-    }
-
-    /**
      * Fetches the uuid synchronously and returns it
      *
      * @param name The name
@@ -106,17 +97,6 @@ public class UUIDFetcher {
      */
     public static UUID getUUID(String name) {
         return getUUIDAt(name, System.currentTimeMillis());
-    }
-
-    /**
-     * Fetches the uuid synchronously for a specified name and time and passes the result to the consumer
-     *
-     * @param name      The name
-     * @param timestamp Time when the player had this name in milliseconds
-     * @param action    Do what you want to do with the uuid her
-     */
-    private static void getUUIDAt(String name, long timestamp, Consumer<UUID> action) {
-        pool.execute(() -> action.accept(getUUIDAt(name, timestamp)));
     }
 
     /**
@@ -227,7 +207,7 @@ public class UUIDFetcher {
      */
     private static class Cache<K, V> {
 
-        private long expireTime = 1000L * 60 * 5; //default 5 min
+        private long expireTime = 1000L * 60 * 5; // add 5 min by default
 
         private Map<K, CachedEntry<V>> map = new HashMap<>();
 

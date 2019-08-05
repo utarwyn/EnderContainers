@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -73,7 +73,7 @@ public abstract class PlayerData extends StorageWrapper {
      * @param enderChest Get this enderchest's contents
      * @return The map filled with the contents of the chest
      */
-    public abstract HashMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest);
+    public abstract Map<Integer, ItemStack> getEnderchestContents(EnderChest enderChest);
 
     /**
      * Returns the number of rows saved for an enderchest

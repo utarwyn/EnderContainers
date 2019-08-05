@@ -28,6 +28,11 @@ class Hologram {
     private static final double ABS = 0.23D;
 
     /**
+     * Static field used to get all classes of the internal Minecraft server
+     */
+    private static final String NMS_PACKAGE = "net.minecraft.server.";
+
+    /**
      * Reflection NMS Entity class
      */
     private static Class<?> nmsEntity;
@@ -81,19 +86,19 @@ class Hologram {
         String version = ServerVersion.getBukkitVersion();
 
         try {
-            Class<?> worldClass = Class.forName("net.minecraft.server." + version + ".World");
-            Class<?> armorStandClass = Class.forName("net.minecraft.server." + version + ".EntityArmorStand");
-            Class<?> destroyPacketClass = Class.forName("net.minecraft.server." + version + ".PacketPlayOutEntityDestroy");
+            Class<?> worldClass = Class.forName(NMS_PACKAGE + version + ".World");
+            Class<?> armorStandClass = Class.forName(NMS_PACKAGE + version + ".EntityArmorStand");
+            Class<?> destroyPacketClass = Class.forName(NMS_PACKAGE + version + ".PacketPlayOutEntityDestroy");
 
-            nmsEntity = Class.forName("net.minecraft.server." + version + ".Entity");
+            nmsEntity = Class.forName(NMS_PACKAGE + version + ".Entity");
             craftWorld = Class.forName("org.bukkit.craftbukkit." + version + ".CraftWorld");
-            packetClass = Class.forName("net.minecraft.server." + version + ".PacketPlayOutSpawnEntityLiving");
-            entityLivingClass = Class.forName("net.minecraft.server." + version + ".EntityLiving");
+            packetClass = Class.forName(NMS_PACKAGE + version + ".PacketPlayOutSpawnEntityLiving");
+            entityLivingClass = Class.forName(NMS_PACKAGE + version + ".EntityLiving");
 
             // In 1.14+ versions, ArmorStand constructor has changed,
             // we have to pass the type of entity to spawn in arguments.
             if (ServerVersion.is(ServerVersion.V1_14)) {
-                entityTypesClass = Class.forName("net.minecraft.server." + version + ".EntityTypes");
+                entityTypesClass = Class.forName(NMS_PACKAGE + version + ".EntityTypes");
                 armorStandConstructor = armorStandClass.getConstructor(entityTypesClass, worldClass);
             } else {
                 armorStandConstructor = armorStandClass.getConstructor(worldClass);
@@ -104,10 +109,10 @@ class Hologram {
             // Two classes used to format messages for holograms (needed in 1.13+ versions)
             if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
                 chatMessageClass = Class.forName("org.bukkit.craftbukkit." + version + ".util.CraftChatMessage");
-                chatBaseComponentClass = Class.forName("net.minecraft.server." + version + ".IChatBaseComponent");
+                chatBaseComponentClass = Class.forName(NMS_PACKAGE + version + ".IChatBaseComponent");
             }
 
-            nmsPacket = Class.forName("net.minecraft.server." + version + ".Packet");
+            nmsPacket = Class.forName(NMS_PACKAGE + version + ".Packet");
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
             EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot initialize the hologram", e);
         }

@@ -35,7 +35,7 @@ public class BackupsSQLData extends BackupsData {
 
     @Override
     protected void save() {
-
+        // There is no file to save when using SQL
     }
 
     @Override
@@ -84,8 +84,9 @@ public class BackupsSQLData extends BackupsData {
         List<String> dataElementList = new ArrayList<>();
 
         for (DatabaseSet set : sets) {
-            if (set.getTimestamp("last_locking_time") == null)
+            if (set.getTimestamp("last_locking_time") == null) {
                 set.setObject("last_locking_time", new Timestamp(0));
+            }
 
             dataElementList.add(
                     set.getInteger("id") + ":"
@@ -107,12 +108,12 @@ public class BackupsSQLData extends BackupsData {
         for (String backupData : data.split(";")) {
             String[] info = backupData.split(":");
 
-            int id = Integer.valueOf(info[0]);
-            int num = Integer.valueOf(info[1]);
+            int id = Integer.parseInt(info[0]);
+            int num = Integer.parseInt(info[1]);
             String owner = Base64Coder.decodeString(info[2]);
             String contents = Base64Coder.decodeString(info[3]);
-            int rows = Integer.valueOf(info[4]);
-            Timestamp lastLockingTime = new Timestamp(Long.valueOf(info[5]));
+            int rows = Integer.parseInt(info[4]);
+            Timestamp lastLockingTime = new Timestamp(Long.parseLong(info[5]));
 
             set = new DatabaseSet();
             set.setObject("id", id);

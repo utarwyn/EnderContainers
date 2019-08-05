@@ -53,7 +53,7 @@ public class ItemSerializer {
      * @param data String to parse.
      * @return Generated map of Itemstacks.
      */
-    public static HashMap<Integer, ItemStack> deserialize(String data) {
+    public static Map<Integer, ItemStack> deserialize(String data) {
         if (Files.getConfiguration().isUseExperimentalSavingSystem())
             return ItemSerializer.experimentalDeserialization(data);
         else
@@ -166,7 +166,7 @@ public class ItemSerializer {
      * @param data String to parse.
      * @return Generated map of Itemstacks.
      */
-    public static HashMap<Integer, ItemStack> experimentalDeserialization(String data) {
+    public static Map<Integer, ItemStack> experimentalDeserialization(String data) {
         String[] serializedBlocks = data.split("(?<!\\\\);");
         HashMap<Integer, ItemStack> items = new HashMap<>();
 
@@ -260,7 +260,7 @@ public class ItemSerializer {
      * @param data String to parse.
      * @return Generated map of Itemstacks.
      */
-    private static HashMap<Integer, ItemStack> base64Deserialization(String data) {
+    private static Map<Integer, ItemStack> base64Deserialization(String data) {
         HashMap<Integer, ItemStack> items = new HashMap<>();
 
         try {

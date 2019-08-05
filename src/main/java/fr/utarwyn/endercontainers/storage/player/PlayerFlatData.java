@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -43,7 +44,7 @@ public class PlayerFlatData extends PlayerData {
     }
 
     @Override
-    public HashMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
+    public Map<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
         String path = "enderchests." + enderChest.getNum() + ".contents";
 
         if (!this.flatFile.getConfiguration().contains(path))

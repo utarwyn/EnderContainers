@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -32,11 +33,11 @@ public class PlayerSQLData extends PlayerData {
 
     @Override
     protected void save() {
-
+        // There is no file to save when using SQL
     }
 
     @Override
-    public HashMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
+    public Map<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
         for (DatabaseSet chestSet : this.enderchestsDataset)
             if (chestSet.getInteger("num") == enderChest.getNum())
                 return ItemSerializer.deserialize(chestSet.getString("contents"));
