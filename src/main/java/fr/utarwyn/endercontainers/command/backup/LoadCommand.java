@@ -42,4 +42,5 @@ public class LoadCommand extends AbstractBackupCommand {
     public void performConsole(CommandSender sender) {
         // No behavior only for the console for this command
     }
+
 }

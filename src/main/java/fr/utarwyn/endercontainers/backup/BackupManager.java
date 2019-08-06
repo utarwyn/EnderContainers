@@ -7,8 +7,8 @@ import fr.utarwyn.endercontainers.storage.StorageWrapper;
 import fr.utarwyn.endercontainers.storage.backups.BackupsData;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Allows us to manage backups inside the plugin
@@ -53,21 +53,19 @@ public class BackupManager extends AbstractManager {
      * @return The list of backups
      */
     public List<Backup> getBackups() {
-        return new ArrayList<>(this.backups);
+        return this.backups;
     }
 
     /**
      * Returns a backup by its name
      *
-     * @param name Name used to do the research
-     * @return The backup found by its name or null if not found.
+     * @param name name used to do the research
+     * @return backup if it was found by its name
      */
-    public Backup getBackupByName(String name) {
-        for (Backup backup : this.backups)
-            if (backup.getName().equals(name))
-                return backup;
-
-        return null;
+    public Optional<Backup> getBackupByName(String name) {
+        return this.backups.stream()
+                .filter(backup -> backup.getName().equals(name))
+                .findAny();
     }
 
     /**
@@ -78,46 +76,57 @@ public class BackupManager extends AbstractManager {
      * @return True if the backup was created with success.
      */
     public boolean createBackup(String name, String creator) {
-        if (this.getBackupByName(name) != null) return false;
+        if (this.getBackupByName(name).isPresent()) {
+            return false;
+        }
+
         // Create a new backup
-        Backup backup = new Backup(name, new Timestamp(System.currentTimeMillis()), "all", creator);
+        Backup backup = new Backup(
+                name, new Timestamp(System.currentTimeMillis()),
+                "all", creator
+        );
 
         // Save the backup in the proper config
-        if (!this.backupsStorage.saveNewBackup(backup))
+        if (!this.backupsStorage.saveNewBackup(backup)) {
             return false;
-        // Execute the backup (save all enderchests)
-        if (!this.backupsStorage.executeStorage(backup))
-            return false;
+        }
 
-        // Register the backup in memory
-        this.backups.add(backup);
-        return true;
+        // Execute the backup (save all enderchests)
+        if (!this.backupsStorage.executeStorage(backup)) {
+            return false;
+        }
+
+        return this.backups.add(backup);
     }
 
     /**
      * Apply a backup indefinitly and erase all older enderchests
      *
-     * @param name The name of the backup which have to be applied
-     * @return True if the backup has been properly applied.
+     * @param name name of the backup which have to be applied
+     * @return true if the backup has been properly applied
      */
     public boolean applyBackup(String name) {
-        Backup backup = this.getBackupByName(name);
-        if (backup == null || !this.backupsStorage.applyBackup(backup))
-            return false;
+        Optional<Backup> backup = this.getBackupByName(name);
 
-        Managers.reload(EnderChestManager.class);
-        return true;
+        if (backup.isPresent() && this.backupsStorage.applyBackup(backup.get())) {
+            Managers.reload(EnderChestManager.class);
+            return true;
+        }
+
+        return false;
     }
 
     /**
      * Remove a backup from data & memory by its name.
      *
-     * @param name The name of the backup which have to be removed.
-     * @return True if the backup has been properly removed.
+     * @param name name of the backup which have to be removed
+     * @return true if the backup has been properly removed
      */
     public boolean removeBackup(String name) {
-        Backup backup = this.getBackupByName(name);
-        return backup != null && this.backupsStorage.removeBackup(backup) && this.backups.remove(backup);
+        Optional<Backup> backup = this.getBackupByName(name);
+        return backup.isPresent()
+                && this.backupsStorage.removeBackup(backup.get())
+                && this.backups.remove(backup.get());
     }
 
 }

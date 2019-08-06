@@ -11,6 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.text.DateFormat;
+import java.util.Optional;
 
 public class InfoCommand extends AbstractBackupCommand {
 
@@ -26,13 +27,15 @@ public class InfoCommand extends AbstractBackupCommand {
     @Override
     public void perform(CommandSender sender) {
         String name = this.readArg();
-        Backup backup = this.manager.getBackupByName(name);
+        Optional<Backup> optionalBackup = this.manager.getBackupByName(name);
         Locale locale = Files.getLocale();
 
-        if (backup == null) {
+        if (!optionalBackup.isPresent()) {
             this.sendTo(sender, ChatColor.RED + locale.getBackupUnknown().replace("%backup%", name));
             return;
         }
+
+        Backup backup = optionalBackup.get();
 
         PluginMsg.pluginBar(sender);
         sender.sendMessage(" ");
