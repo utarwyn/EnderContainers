@@ -109,8 +109,7 @@ public class BackupManager extends AbstractManager {
         Optional<Backup> backup = this.getBackupByName(name);
 
         if (backup.isPresent() && this.backupsStorage.applyBackup(backup.get())) {
-            Managers.reload(EnderChestManager.class);
-            return true;
+            return Managers.reload(EnderChestManager.class);
         }
 
         return false;

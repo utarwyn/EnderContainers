@@ -35,7 +35,7 @@ public abstract class YamlFile {
      * Fill all configurable attributes in this class with
      * the {@link Configurable Configurable} annotation.
      *
-     * @return True if all configuration values has been loaded.
+     * @return True if all configuration values have been loaded.
      */
     public boolean load() {
         // Gets the configuration file from

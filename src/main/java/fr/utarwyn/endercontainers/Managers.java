@@ -1,10 +1,11 @@
 package fr.utarwyn.endercontainers;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 /**
- * Class used to manage managers (manager-ception).
+ * Class used to manage managers.
  *
  * @author Utarwyn
  * @since 2.0.0
@@ -12,9 +13,9 @@ import java.util.logging.Level;
 public class Managers {
 
     /**
-     * Cache map for instances of managers
+     * Cache map for instances of managers.
      */
-    private static HashMap<Class<? extends AbstractManager>, AbstractManager> instances = new HashMap<>();
+    private static Map<Class<? extends AbstractManager>, AbstractManager> instances = new HashMap<>();
 
     /**
      * Managers constructor.
@@ -25,12 +26,21 @@ public class Managers {
     }
 
     /**
-     * Register a specific manager in the memory
+     * Gets managers instances.
      *
-     * @param clazz Class of the manager to load for the plugin
-     * @return Instance of the registered manager. Null if the manager is already registered.
+     * @return all managers instances
      */
-    static <T extends AbstractManager> T registerManager(EnderContainers plugin, Class<T> clazz) {
+    static Map<Class<? extends AbstractManager>, AbstractManager> getInstances() {
+        return instances;
+    }
+
+    /**
+     * Register a specific manager in the memory.
+     *
+     * @param clazz class of the manager to load for the plugin
+     * @return instance of the registered manager. Null if the manager is already registered.
+     */
+    static <T extends AbstractManager> T register(EnderContainers plugin, Class<T> clazz) {
         if (!instances.containsKey(clazz)) {
             try {
                 T instance = clazz.newInstance();
@@ -51,53 +61,53 @@ public class Managers {
     }
 
     /**
+     * Gets an instance of a manager by its class.
+     *
+     * @param clazz class of the manager to get
+     * @param <T>   class type of the manager
+     * @return manager if found otherwise null
+     */
+    @SuppressWarnings("unchecked")
+    protected static <T extends AbstractManager> T get(Class<T> clazz) {
+        AbstractManager instance = instances.get(clazz);
+
+        if (clazz.isInstance(instance)) {
+            return (T) instance;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Reload manager by its class.
+     *
+     * @param managerClazz class of the manager to reload
+     * @return true if the manager has been reloaded
+     */
+    public static boolean reload(Class<? extends AbstractManager> managerClazz) {
+        if (instances.containsKey(managerClazz)) {
+            AbstractManager manager = instances.get(managerClazz);
+
+            manager.unload();
+            manager.load();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Reload all managers
      */
     public static void reloadAll() {
-        for (AbstractManager manager : instances.values()) {
-            manager.unload();
-            manager.load();
-        }
+        instances.keySet().forEach(Managers::reload);
     }
 
     /**
      * Unload all managers
      */
     static void unloadAll() {
-        for (AbstractManager manager : instances.values()) {
-            manager.unload();
-        }
-    }
-
-    /**
-     * Gets an instance of a manager by its class
-     *
-     * @param clazz Class of the manager to get
-     * @param <T>   Class type of the manager
-     * @return Manager if found otherwise null
-     */
-    @SuppressWarnings("unchecked")
-    protected static <T extends AbstractManager> T getInstance(Class<T> clazz) {
-        AbstractManager instance = instances.get(clazz);
-
-        if (instance == null)
-            return null;
-        if (clazz.isInstance(instance))
-            return (T) instance;
-
-        return null;
-    }
-
-    /**
-     * Reload manager by its class
-     *
-     * @param managerClazz Class of the manager to reload
-     */
-    public static void reload(Class<? extends AbstractManager> managerClazz) {
-        if (!instances.containsKey(managerClazz)) return;
-
-        instances.get(managerClazz).unload();
-        instances.get(managerClazz).load();
+        instances.values().forEach(AbstractManager::unload);
     }
 
 }

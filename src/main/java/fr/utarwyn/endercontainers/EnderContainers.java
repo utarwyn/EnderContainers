@@ -65,12 +65,12 @@ public class EnderContainers extends JavaPlugin {
         }
 
         // Load all managers
-        Managers.registerManager(this, CommandManager.class);
-        Managers.registerManager(this, DependenciesManager.class);
-        Managers.registerManager(this, DatabaseManager.class);
-        Managers.registerManager(this, EnderChestManager.class);
-        Managers.registerManager(this, BackupManager.class);
-        Managers.registerManager(this, HologramManager.class);
+        Managers.register(this, CommandManager.class);
+        Managers.register(this, DependenciesManager.class);
+        Managers.register(this, DatabaseManager.class);
+        Managers.register(this, EnderChestManager.class);
+        Managers.register(this, BackupManager.class);
+        Managers.register(this, HologramManager.class);
 
         // Check for updates
         if (Files.getConfiguration().isUpdateChecker()) {
@@ -78,7 +78,7 @@ public class EnderContainers extends JavaPlugin {
         }
 
         // Registering commands
-        Objects.requireNonNull(Managers.getInstance(CommandManager.class)).registerCommands();
+        Objects.requireNonNull(Managers.get(CommandManager.class)).registerCommands();
 
         // And load Metrics!
         new Metrics(this);
@@ -102,7 +102,7 @@ public class EnderContainers extends JavaPlugin {
      * @return Registered manager if found otherwise null
      */
     public final <T extends AbstractManager> T getManager(Class<T> clazz) {
-        T inst = Managers.getInstance(clazz);
+        T inst = Managers.get(clazz);
 
         if (inst == null) {
             this.getLogger().log(Level.WARNING, "{0} instance is null!", clazz);
