@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.logging.Logger;
@@ -11,15 +10,11 @@ import static org.mockito.Mockito.*;
 
 public class ManagersTest {
 
-    private static AbstractManager mockedManager;
+    private AbstractManager manager;
 
-    @BeforeClass
-    public static void beforeClass() {
-        mockedManager = mock(AbstractManager.class);
-    }
-
-    @AfterClass
-    public static void afterClass() {
+    @Before
+    public void setUp() {
+        this.manager = mock(AbstractManager.class);
         Managers.getInstances().clear();
     }
 
@@ -32,12 +27,12 @@ public class ManagersTest {
         assertThat(Managers.getInstances()).isEmpty();
 
         // Verify a good registration
-        AbstractManager manager = Managers.register(plugin, mockedManager.getClass());
-        assertThat(manager).isNotNull();
+        AbstractManager manager1 = Managers.register(plugin, this.manager.getClass());
+        assertThat(manager1).isNotNull();
         assertThat(Managers.getInstances()).isNotEmpty().hasSize(1);
 
         // A manager cannot be registered two times
-        AbstractManager manager2 = Managers.register(plugin, mockedManager.getClass());
+        AbstractManager manager2 = Managers.register(plugin, this.manager.getClass());
         assertThat(manager2).isNull();
         assertThat(Managers.getInstances()).hasSize(1);
 
@@ -49,26 +44,24 @@ public class ManagersTest {
 
     @Test
     public void testGet() {
-        assertThat(Managers.get(mockedManager.getClass()))
-                .isNotNull()
-                .isInstanceOf(mockedManager.getClass());
+        Managers.getInstances().put(this.manager.getClass(), this.manager);
+
+        assertThat(Managers.get(this.manager.getClass())).isNotNull()
+                .isInstanceOf(this.manager.getClass());
 
         assertThat(Managers.get(AbstractManager.class)).isNull();
     }
 
     @Test
     public void testReload() {
-        assertThat(Managers.reload(mockedManager.getClass())).isTrue();
+        Managers.getInstances().put(this.manager.getClass(), this.manager);
+
+        assertThat(Managers.reload(this.manager.getClass())).isTrue();
         assertThat(Managers.reload(AbstractManager.class)).isFalse();
 
         // Check if methods "load" and "unload" are called on a manager
-        AbstractManager manager2 = mock(AbstractManager.class);
-        Managers.getInstances().put(manager2.getClass(), manager2);
-
-        Managers.reload(manager2.getClass());
-        verify(manager2, times(1)).load();
-        verify(manager2, times(1)).unload();
-        Managers.getInstances().remove(manager2.getClass());
+        verify(this.manager, times(1)).load();
+        verify(this.manager, times(1)).unload();
     }
 
 }
