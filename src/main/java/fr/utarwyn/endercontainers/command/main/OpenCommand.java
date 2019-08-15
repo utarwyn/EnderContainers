@@ -2,7 +2,7 @@ package fr.utarwyn.endercontainers.command.main;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.command.AbstractCommand;
-import fr.utarwyn.endercontainers.command.parameter.Parameter;
+import fr.utarwyn.endercontainers.command.Parameter;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.EUtil;
@@ -24,7 +24,7 @@ public class OpenCommand extends AbstractCommand {
         this.manager = EnderContainers.getInstance().getManager(EnderChestManager.class);
 
         this.setPermission("openchests");
-        this.addParameter(Parameter.STRING.withPlayersCompletion());
+        this.addParameter(Parameter.STRING().withPlayersCompletions());
     }
 
     @Override

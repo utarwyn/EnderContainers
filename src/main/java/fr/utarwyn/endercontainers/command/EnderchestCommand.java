@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers.command;
 
 import fr.utarwyn.endercontainers.EnderContainers;
-import fr.utarwyn.endercontainers.command.parameter.Parameter;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.EUtil;
@@ -19,7 +18,7 @@ public class EnderchestCommand extends AbstractCommand {
 
         this.manager = EnderContainers.getInstance().getManager(EnderChestManager.class);
 
-        this.addParameter(Parameter.INT.optional());
+        this.addParameter(Parameter.INT().optional());
     }
 
     @Override

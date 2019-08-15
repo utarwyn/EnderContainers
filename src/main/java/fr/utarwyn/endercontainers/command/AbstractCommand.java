@@ -1,8 +1,6 @@
 package fr.utarwyn.endercontainers.command;
 
 import fr.utarwyn.endercontainers.EnderContainers;
-import fr.utarwyn.endercontainers.command.parameter.Parameter;
-import fr.utarwyn.endercontainers.command.parameter.ParameterChecker;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.ChatColor;
@@ -14,7 +12,7 @@ import org.bukkit.util.StringUtil;
 import java.util.*;
 
 /**
- * Represents a EnderContainers's command, that's all!
+ * Represents a command of the plugin.
  *
  * @author Utarwyn
  * @since 1.0.0
@@ -89,14 +87,15 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
             return true;
         }
 
-        // Check also each parameter
+        // Check also each argument
         int i = 0;
         for (Parameter param : this.parameters) {
-            if (i < args.length && !param.check(args[i])) {
+            if (i < args.length && !param.checkValue(args[i])) {
                 sender.sendMessage(EnderContainers.PREFIX + ChatColor.RED +
                         Files.getLocale().getCmdInvalidParameter().replace("%param%", args[i]));
                 return true;
             }
+
             i++;
         }
 
@@ -158,20 +157,21 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
                 command = commandIterator.next();
                 cmdName = command.getName();
 
-                if (StringUtil.startsWithIgnoreCase(cmdName, lastWord))
+                if (StringUtil.startsWithIgnoreCase(cmdName, lastWord)) {
                     matchedCommands.add(cmdName);
+                }
             }
         }
 
         // Try to add into the list all completions for the current paramter
         int nbCurParam = args.length - 1;
         if (nbCurParam >= 0 && nbCurParam < parameters.size()) {
-            Parameter param = parameters.get(nbCurParam);
+            Parameter<?> param = parameters.get(nbCurParam);
             boolean hasAccess = !(sender instanceof Player) || this.hasRequiredPermission((Player) sender);
 
             if (param != null && hasAccess) {
                 String lastWord = args[args.length - 1];
-                List<String> completions = param.getTabCompletions();
+                List<String> completions = param.getCompletions();
 
                 if (completions != null) {
                     // Don't forget to sort all completions :)
@@ -188,8 +188,9 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 
                         completion = completionsIterator.next();
 
-                        if (StringUtil.startsWithIgnoreCase(completion, lastWord))
+                        if (StringUtil.startsWithIgnoreCase(completion, lastWord)) {
                             matchedCompletions.add(completion);
+                        }
                     }
                 } else {
                     customCompletions.addAll(super.tabComplete(sender, alias, args));
@@ -210,111 +211,74 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
         return this.tabComplete(commandSender, s, strings);
     }
 
-    public abstract void perform(CommandSender sender);
+    @Override
+    public void setPermission(String permission) {
+        this.permission = permission;
+    }
 
-    public abstract void performPlayer(Player player);
+    protected void addParameter(Parameter parameter) {
+        this.parameters.add(parameter);
+    }
 
-    public abstract void performConsole(CommandSender sender);
-
-    protected int getParametersLength() {
-        return this.parameters.size();
+    protected void addSubCommand(AbstractCommand command) {
+        this.subCommands.add(command);
     }
 
     protected void sendTo(CommandSender sender, String message) {
         sender.sendMessage(EnderContainers.PREFIX + message);
     }
 
-    @Override
-    public void setPermission(String permission) {
-        this.permission = permission;
+    protected <T> T readArg() {
+        return this.readArgAt(this.nextArg);
+    }
+
+    protected <T> T readArgOrDefault(T def) {
+        return this.readArgAtOrDefault(this.nextArg, def);
+    }
+
+    protected <T> T readArgAt(int idx) {
+        if (this.args.size() <= idx) {
+            throw new IllegalArgumentException(idx + " is not a valid arguments count! Registered arguments count: " + this.args.size());
+        }
+
+        return this.readArgument(idx);
+    }
+
+    protected <T> T readArgAtOrDefault(int idx, T def) {
+        return this.args.size() > idx ? this.readArgument(idx) : def;
     }
 
     /**
      * Check if a player has the permission to perform the command.
      *
-     * @param player Player to check
-     * @return true if the player have the access
+     * @param player player to check
+     * @return true if the player has the access
      */
     private boolean hasRequiredPermission(Player player) {
         return this.permission == null || player.hasPermission(PERM_PREFIX + this.permission);
     }
 
-    public void setParameters(Parameter... parameters) {
-        this.parameters = new ArrayList<>();
-        Collections.addAll(this.parameters, parameters);
-    }
-
-    public void addParameter(Parameter parameter) {
-        this.parameters.add(parameter);
-    }
-
+    /**
+     * Check if the argument count is good or not.
+     *
+     * @param n argument count used by the sender
+     * @return true if the argument count is correct
+     */
     private boolean checkArgLength(int n) {
-        if (n == this.parameters.size()) return true;
-
-        // Count optional parameters instead
-        int nb = 0;
-
-        for (Parameter param : this.parameters)
-            if (!param.isOptional())
-                nb++;
-
-        return n == nb;
+        return n >= this.parameters.stream().filter(Parameter::isNeeded).count();
     }
 
-    public void setSubCommands(AbstractCommand... commands) {
-        this.subCommands = new ArrayList<>();
-
-        for (AbstractCommand command : commands)
-            this.addSubCommand(command);
-    }
-
-    public void addSubCommand(AbstractCommand command) {
-        this.subCommands.add(command);
-    }
-
-    public <T> T readArg() {
-        return this.readArgAt(this.nextArg);
-    }
-
-    public <T> T readArgOrDefault(T def) {
-        return this.readArgAtOrDefault(this.nextArg, def);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T readArgAt(int idx) {
-        if (this.args.size() <= idx)
-            throw new IllegalArgumentException(idx + " is not a valid arguments count! Registered arguments count: " + this.args.size());
-
-        return this.readArgument(idx);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T readArgAtOrDefault(int idx, T def) {
-        if (this.args.size() <= idx) return def;
-
-        return this.readArgument(idx);
-    }
-
-    @SuppressWarnings("unchecked")
     private <T> T readArgument(int idx) {
         this.nextArg = idx + 1;
 
-        String arg = this.args.get(idx);
-
-        if (this.parameters.get(idx).equalsTo(Parameter.STRING)) {
-            return (T) arg;
-        }
-
-        return this.parseArg(arg);
+        Parameter<T> parameter = this.parameters.get(idx);
+        return parameter.convertValue(this.args.get(idx));
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> T parseArg(String arg) {
-        if (ParameterChecker.isInteger(arg)) return (T) new Integer(arg);
-        else if (ParameterChecker.isDouble(arg)) return (T) new Double(arg);
-        else if (ParameterChecker.isFloat(arg)) return (T) new Float(arg);
+    public abstract void perform(CommandSender sender);
 
-        return (T) arg;
-    }
+    public abstract void performPlayer(Player player);
+
+    public abstract void performConsole(CommandSender sender);
 
 }

@@ -2,7 +2,7 @@ package fr.utarwyn.endercontainers.command.backup;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.backup.BackupManager;
-import fr.utarwyn.endercontainers.command.parameter.Parameter;
+import fr.utarwyn.endercontainers.command.Parameter;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.util.EUtil;
 import org.bukkit.ChatColor;
@@ -15,7 +15,7 @@ public class RemoveCommand extends AbstractBackupCommand {
         super("remove", manager, "rm");
 
         this.setPermission("backup.remove");
-        this.addParameter(Parameter.STRING);
+        this.addParameter(Parameter.STRING());
     }
 
     @Override

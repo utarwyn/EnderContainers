@@ -1,7 +1,7 @@
 package fr.utarwyn.endercontainers.command.main;
 
 import fr.utarwyn.endercontainers.command.AbstractCommand;
-import fr.utarwyn.endercontainers.command.parameter.Parameter;
+import fr.utarwyn.endercontainers.command.Parameter;
 import fr.utarwyn.endercontainers.util.EUtil;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.command.CommandSender;
@@ -14,7 +14,7 @@ public class HelpCommand extends AbstractCommand {
     public HelpCommand() {
         super("help", "h", "?");
 
-        this.addParameter(Parameter.INT.optional());
+        this.addParameter(Parameter.INT().optional());
     }
 
     @Override
