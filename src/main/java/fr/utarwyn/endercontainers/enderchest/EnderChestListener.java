@@ -68,8 +68,9 @@ public class EnderChestListener implements Listener {
                 return;
 
             // Plugin not enabled or world disabled in config?
-            if (!Files.getConfiguration().isEnabled() || Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName()))
+            if (Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName())) {
                 return;
+            }
 
             e.setCancelled(true);
 

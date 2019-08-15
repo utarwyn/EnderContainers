@@ -37,8 +37,8 @@ public class SelectRequest implements IRequest {
 
     private List<String[]> leftJoins;
 
-    public SelectRequest(Database db, String... fields) {
-        this.database = db;
+    public SelectRequest(Database database, String... fields) {
+        this.database = database;
         this.fields = DatabaseManager.espaceFields(fields);
         this.conditions = new String[0];
         this.orders = new String[0];

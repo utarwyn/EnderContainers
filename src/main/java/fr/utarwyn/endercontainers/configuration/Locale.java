@@ -99,9 +99,6 @@ public class Locale extends YamlFile {
     @Configurable(key = "errors.noperm_player")
     private String nopermPlayer;
 
-    @Configurable(key = "errors.plugin_disabled")
-    private String pluginDisabled;
-
     @Configurable(key = "errors.plugin_world_disabled")
     private String pluginWorldDisabled;
 
@@ -280,10 +277,6 @@ public class Locale extends YamlFile {
 
     public String getNopermPlayer() {
         return this.nopermPlayer;
-    }
-
-    public String getPluginDisabled() {
-        return this.pluginDisabled;
     }
 
     public String getPluginWorldDisabled() {
