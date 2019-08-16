@@ -10,9 +10,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The hologram manager. It runs automatically a task to show/hide
@@ -41,7 +40,7 @@ public class HologramManager extends AbstractManager implements Runnable {
     /**
      * All stored holograms by owner
      */
-    private Map<UUID, Hologram> holograms;
+    private ConcurrentHashMap<UUID, Hologram> holograms;
 
     /**
      * {@inheritDoc}
@@ -52,7 +51,7 @@ public class HologramManager extends AbstractManager implements Runnable {
         this.dependenciesManager = this.plugin.getManager(DependenciesManager.class);
 
         this.task = this.plugin.getServer().getScheduler().runTaskTimer(this.plugin, this, 20L, 5L);
-        this.holograms = new HashMap<>();
+        this.holograms = new ConcurrentHashMap<>();
     }
 
     /**

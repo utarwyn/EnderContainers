@@ -10,8 +10,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Class used to create a custom enderchest
@@ -118,7 +118,7 @@ public class EnderChest {
      *
      * @return All contents of the enderchest
      */
-    public Map<Integer, ItemStack> getContents() {
+    public ConcurrentHashMap<Integer, ItemStack> getContents() {
         return this.container.getContents();
     }
 
@@ -245,7 +245,7 @@ public class EnderChest {
         }
 
         // Load items in the container ...
-        for (Map.Entry<Integer, ItemStack> entry : pData.getEnderchestContents(this).entrySet())
+        for (ConcurrentHashMap.Entry<Integer, ItemStack> entry : pData.getEnderchestContents(this).entrySet())
             this.container.setItem(entry.getKey(), entry.getValue());
     }
 

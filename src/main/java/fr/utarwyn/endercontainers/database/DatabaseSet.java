@@ -4,9 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Class used to manage a database row more easily than the ResultSet class
@@ -20,13 +19,13 @@ public class DatabaseSet {
      * Object which stores all data collected for a row
      * (String key -> Object value)
      */
-    private Map<String, Object> set;
+    private ConcurrentHashMap<String, Object> set;
 
     /**
      * Construct a new database row object
      */
     public DatabaseSet() {
-        this.set = new HashMap<>();
+        this.set = new ConcurrentHashMap<>();
     }
 
     /**
@@ -125,7 +124,7 @@ public class DatabaseSet {
         StringBuilder s = new StringBuilder("{DatabaseSet #" + this.hashCode() + " (");
 
         int i = 0;
-        for (Map.Entry<String, Object> entry : this.set.entrySet()) {
+        for (ConcurrentHashMap.Entry<String, Object> entry : this.set.entrySet()) {
             s.append(entry.getKey()).append("=").append(entry.getValue());
             s.append((i < this.set.size() - 1) ? " " : "");
 

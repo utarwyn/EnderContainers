@@ -6,9 +6,8 @@ import fr.utarwyn.endercontainers.database.DatabaseManager;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,12 +28,12 @@ public abstract class StorageWrapper {
     /**
      * Class cache used to improve performance to find classes using reflection
      */
-    private static Map<Class<? extends StorageWrapper>, Class<? extends StorageWrapper>> classCacheMap;
+    private static ConcurrentHashMap<Class<? extends StorageWrapper>, Class<? extends StorageWrapper>> classCacheMap;
 
     /**
      * Cache used to improve performance when a script searchs for a specific storage
      */
-    private static Map<Class<? extends StorageWrapper>, List<StorageWrapper>> cacheMap;
+    private static ConcurrentHashMap<Class<? extends StorageWrapper>, List<StorageWrapper>> cacheMap;
 
     /**
      * The SQL manager used to store data in a storage
@@ -44,8 +43,8 @@ public abstract class StorageWrapper {
     static {
         databaseManager = EnderContainers.getInstance().getManager(DatabaseManager.class);
         logger = EnderContainers.getInstance().getLogger();
-        classCacheMap = new HashMap<>();
-        cacheMap = new HashMap<>();
+        classCacheMap = new ConcurrentHashMap<>();
+        cacheMap = new ConcurrentHashMap<>();
     }
 
     /**

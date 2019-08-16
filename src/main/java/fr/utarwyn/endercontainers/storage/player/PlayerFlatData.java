@@ -6,9 +6,8 @@ import fr.utarwyn.endercontainers.util.ItemSerializer;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
@@ -44,11 +43,11 @@ public class PlayerFlatData extends PlayerData {
     }
 
     @Override
-    public Map<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
+    public ConcurrentHashMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
         String path = "enderchests." + enderChest.getNum() + ".contents";
 
         if (!this.flatFile.getConfiguration().contains(path))
-            return new HashMap<>();
+            return new ConcurrentHashMap<>();
 
         return ItemSerializer.deserialize(this.flatFile.getConfiguration().getString(path));
     }

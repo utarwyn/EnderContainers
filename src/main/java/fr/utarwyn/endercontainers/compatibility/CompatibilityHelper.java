@@ -8,8 +8,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -23,13 +21,13 @@ import static fr.utarwyn.endercontainers.compatibility.ServerVersion.V1_12;
  */
 public class CompatibilityHelper {
 
-    private static final Map<Integer, Material> MATERIAL_BY_IDS;
+    private static final ConcurrentHashMap<Integer, Material> MATERIAL_BY_IDS;
 
-    private static final Map<Integer, String> ENCHANT_BY_IDS;
+    private static final ConcurrentHashMap<Integer, String> ENCHANT_BY_IDS;
 
     static {
         MATERIAL_BY_IDS = new ConcurrentHashMap<>();
-        ENCHANT_BY_IDS = new HashMap<>();
+        ENCHANT_BY_IDS = new ConcurrentHashMap<>();
 
         ENCHANT_BY_IDS.put(0, "PROTECTION_ENVIRONMENTAL");
         ENCHANT_BY_IDS.put(1, "PROTECTION_FIRE");
