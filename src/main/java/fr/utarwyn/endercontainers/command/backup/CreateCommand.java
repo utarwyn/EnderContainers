@@ -6,7 +6,6 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.util.EUtil;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class CreateCommand extends AbstractBackupCommand {
 
@@ -14,7 +13,7 @@ public class CreateCommand extends AbstractBackupCommand {
         super("create", manager, "new");
 
         this.setPermission("backup.create");
-        this.addParameter(Parameter.STRING());
+        this.addParameter(Parameter.string());
     }
 
     @Override
@@ -30,16 +29,6 @@ public class CreateCommand extends AbstractBackupCommand {
                 PluginMsg.errorMessage(sender, Files.getLocale().getBackupExists().replace("%backup%", name));
             }
         });
-    }
-
-    @Override
-    public void performPlayer(Player player) {
-        // No behavior only for players for this command
-    }
-
-    @Override
-    public void performConsole(CommandSender sender) {
-        // No behavior only for the console for this command
     }
 
 }

@@ -5,7 +5,6 @@ import fr.utarwyn.endercontainers.command.AbstractCommand;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.util.Updater;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class UpdateCommand extends AbstractCommand {
 
@@ -23,16 +22,6 @@ public class UpdateCommand extends AbstractCommand {
         } else {
             sender.sendMessage(EnderContainers.PREFIX + "§7" + Files.getLocale().getNoUpdate());
         }
-    }
-
-    @Override
-    public void performPlayer(Player player) {
-        // No behavior only for players for this command
-    }
-
-    @Override
-    public void performConsole(CommandSender sender) {
-        // No behavior only for the console for this command
     }
 
 }

@@ -8,7 +8,6 @@ import fr.utarwyn.endercontainers.configuration.Locale;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.text.DateFormat;
 import java.util.Optional;
@@ -21,7 +20,7 @@ public class InfoCommand extends AbstractBackupCommand {
         super("info", manager);
 
         this.setPermission("backup.info");
-        this.addParameter(Parameter.STRING());
+        this.addParameter(Parameter.string());
     }
 
     @Override
@@ -47,16 +46,6 @@ public class InfoCommand extends AbstractBackupCommand {
         sender.sendMessage(" " + ChatColor.DARK_GRAY + "  " + locale.getBackupLabelRmCmd() + ": §c/ecp backup remove " + name);
         sender.sendMessage(" ");
         PluginMsg.endBar(sender);
-    }
-
-    @Override
-    public void performPlayer(Player player) {
-        // No behavior only for players for this command
-    }
-
-    @Override
-    public void performConsole(CommandSender sender) {
-        // No behavior only for the console for this command
     }
 
 }

@@ -5,7 +5,6 @@ import fr.utarwyn.endercontainers.command.Parameter;
 import fr.utarwyn.endercontainers.util.EUtil;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class HelpCommand extends AbstractCommand {
 
@@ -14,7 +13,7 @@ public class HelpCommand extends AbstractCommand {
     public HelpCommand() {
         super("help", "h", "?");
 
-        this.addParameter(Parameter.INT().optional());
+        this.addParameter(Parameter.integer().optional());
     }
 
     @Override
@@ -44,16 +43,6 @@ public class HelpCommand extends AbstractCommand {
         sender.sendMessage(" ");
         sender.sendMessage(" §r §8✿ Plugin's help (" + page + "/" + PAGE_NUMBER + ")");
         PluginMsg.endBar(sender);
-    }
-
-    @Override
-    public void performPlayer(Player player) {
-        // No behavior only for players for this command
-    }
-
-    @Override
-    public void performConsole(CommandSender sender) {
-        // No behavior only for the console for this command
     }
 
     /**

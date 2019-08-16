@@ -6,7 +6,6 @@ import fr.utarwyn.endercontainers.command.AbstractCommand;
 import fr.utarwyn.endercontainers.command.backup.*;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class BackupCommand extends AbstractCommand {
 
@@ -27,13 +26,4 @@ public class BackupCommand extends AbstractCommand {
         this.sendTo(sender, ChatColor.RED + "Sub-commands available: " + ChatColor.GOLD + "list,info,create,load,remove");
     }
 
-    @Override
-    public void performPlayer(Player player) {
-        // No behavior only for players for this command
-    }
-
-    @Override
-    public void performConsole(CommandSender sender) {
-        // No behavior only for the console for this command
-    }
 }
