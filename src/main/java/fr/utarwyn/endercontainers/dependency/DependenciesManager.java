@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.dependency;
 
 import fr.utarwyn.endercontainers.AbstractManager;
+import fr.utarwyn.endercontainers.dependency.faction.FactionsDependency;
 import fr.utarwyn.endercontainers.dependency.worldguard.WorldGuardDependency;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -82,6 +83,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
         dependencyClasses.put("Essentials", EssentialsDependency.class);
         dependencyClasses.put("PlotSquared", PlotSquaredDependency.class);
         dependencyClasses.put("WorldGuard", WorldGuardDependency.class);
+        dependencyClasses.put("Factions", FactionsDependency.class);
 
         // And register them if the plugin is loaded on the server.
         for (ConcurrentHashMap.Entry<String, Class<? extends Dependency>> dependency : dependencyClasses.entrySet()) {
