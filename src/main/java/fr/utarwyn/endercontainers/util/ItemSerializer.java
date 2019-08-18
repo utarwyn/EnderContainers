@@ -17,9 +17,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
@@ -40,7 +40,7 @@ public class ItemSerializer {
      * @param items Map of ItemStacks to convert.
      * @return The ItemStacks formatted to string.
      */
-    public static String serialize(Map<Integer, ItemStack> items) {
+    public static String serialize(ConcurrentHashMap<Integer, ItemStack> items) {
         if (Files.getConfiguration().isUseExperimentalSavingSystem())
             return ItemSerializer.experimentalSerialization(items);
         else
@@ -53,7 +53,7 @@ public class ItemSerializer {
      * @param data String to parse.
      * @return Generated map of Itemstacks.
      */
-    public static Map<Integer, ItemStack> deserialize(String data) {
+    public static ConcurrentHashMap<Integer, ItemStack> deserialize(String data) {
         if (Files.getConfiguration().isUseExperimentalSavingSystem())
             return ItemSerializer.experimentalDeserialization(data);
         else
@@ -66,10 +66,10 @@ public class ItemSerializer {
      * @param items Map of ItemStacks to convert.
      * @return The ItemStacks formatted to string.
      */
-    private static String experimentalSerialization(Map<Integer, ItemStack> items) {
+    private static String experimentalSerialization(ConcurrentHashMap<Integer, ItemStack> items) {
         StringBuilder serialization = new StringBuilder(new String((items.size() + ";").getBytes(), StandardCharsets.UTF_8));
 
-        for (Map.Entry<Integer, ItemStack> entry : items.entrySet()) {
+        for (ConcurrentHashMap.Entry<Integer, ItemStack> entry : items.entrySet()) {
             ItemStack is = entry.getValue();
 
             if (is != null) {
@@ -95,7 +95,7 @@ public class ItemSerializer {
                 Map<Enchantment, Integer> isEnch = is.getEnchantments();
 
                 if (isEnch.size() > 0) {
-                    for (Map.Entry<Enchantment, Integer> enchEntry : isEnch.entrySet()) {
+                    for (ConcurrentHashMap.Entry<Enchantment, Integer> enchEntry : isEnch.entrySet()) {
                         serializedItemStack.append(":e@")
                                 .append(CompatibilityHelper.enchantmentToString(enchEntry.getKey()))
                                 .append("@").append(enchEntry.getValue());
@@ -140,14 +140,14 @@ public class ItemSerializer {
      * @param items Map of ItemStacks to convert.
      * @return The ItemStacks formatted to string.
      */
-    public static String base64Serialization(Map<Integer, ItemStack> items) {
+    public static String base64Serialization(ConcurrentHashMap<Integer, ItemStack> items) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
 
             dataOutput.writeInt(items.size());
 
-            for (Map.Entry<Integer, ItemStack> entry : items.entrySet()) {
+            for (ConcurrentHashMap.Entry<Integer, ItemStack> entry : items.entrySet()) {
                 dataOutput.writeInt(entry.getKey());
                 dataOutput.writeObject(entry.getValue());
             }
@@ -166,9 +166,9 @@ public class ItemSerializer {
      * @param data String to parse.
      * @return Generated map of Itemstacks.
      */
-    public static Map<Integer, ItemStack> experimentalDeserialization(String data) {
+    public static ConcurrentHashMap<Integer, ItemStack> experimentalDeserialization(String data) {
         String[] serializedBlocks = data.split("(?<!\\\\);");
-        HashMap<Integer, ItemStack> items = new HashMap<>();
+        ConcurrentHashMap<Integer, ItemStack> items = new ConcurrentHashMap<>();
 
         // Parse every item in the string
         for (int i = 1; i < serializedBlocks.length; i++) {
@@ -202,7 +202,7 @@ public class ItemSerializer {
                 } else
                     // Item durability
                     if (itemAttribute[0].equals("d") && createdItemStack) {
-                        is.setDurability(Short.valueOf(itemAttribute[1]));
+                        is.setDurability(Short.parseShort(itemAttribute[1]));
                     } else
                         // Itemstack amount
                         if (itemAttribute[0].equals("a") && createdItemStack) {
@@ -260,8 +260,8 @@ public class ItemSerializer {
      * @param data String to parse.
      * @return Generated map of Itemstacks.
      */
-    private static Map<Integer, ItemStack> base64Deserialization(String data) {
-        HashMap<Integer, ItemStack> items = new HashMap<>();
+    private static ConcurrentHashMap<Integer, ItemStack> base64Deserialization(String data) {
+        ConcurrentHashMap<Integer, ItemStack> items = new ConcurrentHashMap<>();
 
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));

@@ -6,10 +6,9 @@ import fr.utarwyn.endercontainers.util.ItemSerializer;
 import org.bukkit.inventory.ItemStack;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
@@ -37,12 +36,12 @@ public class PlayerSQLData extends PlayerData {
     }
 
     @Override
-    public Map<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
+    public ConcurrentHashMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
         for (DatabaseSet chestSet : this.enderchestsDataset)
             if (chestSet.getInteger("num") == enderChest.getNum())
                 return ItemSerializer.deserialize(chestSet.getString("contents"));
 
-        return new HashMap<>();
+        return new ConcurrentHashMap<>();
     }
 
     @Override

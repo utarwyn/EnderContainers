@@ -8,9 +8,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
@@ -78,16 +77,16 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
      * Load each dependency if the needed plugin is enabled.
      */
     private void loadDependencies() {
-        Map<String, Class<? extends Dependency>> dependencyClasses = new HashMap<>();
+        ConcurrentHashMap<String, Class<? extends Dependency>> dependencyClasses = new ConcurrentHashMap<>();
 
         // Prepare all dependencies here
         dependencyClasses.put("Essentials", EssentialsDependency.class);
-        dependencyClasses.put("Factions", FactionsDependency.class);
         dependencyClasses.put("PlotSquared", PlotSquaredDependency.class);
         dependencyClasses.put("WorldGuard", WorldGuardDependency.class);
+        dependencyClasses.put("Factions", FactionsDependency.class);
 
         // And register them if the plugin is loaded on the server.
-        for (Map.Entry<String, Class<? extends Dependency>> dependency : dependencyClasses.entrySet()) {
+        for (ConcurrentHashMap.Entry<String, Class<? extends Dependency>> dependency : dependencyClasses.entrySet()) {
             String name = dependency.getKey();
 
             if (this.pluginManager.isPluginEnabled(name)) {

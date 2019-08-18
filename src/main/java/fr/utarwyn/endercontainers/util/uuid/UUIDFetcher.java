@@ -13,9 +13,8 @@ import java.io.InputStreamReader;
 import java.lang.ref.SoftReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -209,7 +208,7 @@ public class UUIDFetcher {
 
         private long expireTime = 1000L * 60 * 5; // add 5 min by default
 
-        private Map<K, CachedEntry<V>> map = new HashMap<>();
+        private ConcurrentHashMap<K, CachedEntry<V>> map = new ConcurrentHashMap<>();
 
         public boolean contains(K key) {
             return map.containsKey(key) && get(key) != null;

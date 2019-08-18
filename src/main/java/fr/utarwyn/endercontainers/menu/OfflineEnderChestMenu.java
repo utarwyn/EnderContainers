@@ -5,9 +5,8 @@ import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A derived class of the Enderchest menu to manage
@@ -29,10 +28,10 @@ public class OfflineEnderChestMenu extends EnderChestMenu {
      *
      * @see fr.utarwyn.endercontainers.enderchest.EnderChestListener#onInventoryClose(InventoryCloseEvent)
      */
-    private static Map<UUID, EnderChest> openedMenus;
+    private static ConcurrentHashMap<UUID, EnderChest> openedMenus;
 
     static {
-        openedMenus = new HashMap<>();
+        openedMenus = new ConcurrentHashMap<>();
     }
 
     /**
