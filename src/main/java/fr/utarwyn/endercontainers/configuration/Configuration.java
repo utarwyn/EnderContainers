@@ -15,9 +15,6 @@ import java.util.List;
 public class Configuration extends YamlFile {
 
     @Configurable
-    private boolean enabled;
-
-    @Configurable
     private boolean debug;
 
     @Configurable
@@ -82,10 +79,6 @@ public class Configuration extends YamlFile {
         }
 
         return this.plugin.getConfig();
-    }
-
-    public boolean isEnabled() {
-        return this.enabled;
     }
 
     public boolean isDebug() {

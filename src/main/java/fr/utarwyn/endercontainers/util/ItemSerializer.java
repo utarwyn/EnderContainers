@@ -140,7 +140,7 @@ public class ItemSerializer {
      * @param items Map of ItemStacks to convert.
      * @return The ItemStacks formatted to string.
      */
-    public static String base64Serialization(ConcurrentHashMap<Integer, ItemStack> items) {
+    private static String base64Serialization(ConcurrentHashMap<Integer, ItemStack> items) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
@@ -166,7 +166,7 @@ public class ItemSerializer {
      * @param data String to parse.
      * @return Generated map of Itemstacks.
      */
-    public static ConcurrentHashMap<Integer, ItemStack> experimentalDeserialization(String data) {
+    private static ConcurrentHashMap<Integer, ItemStack> experimentalDeserialization(String data) {
         String[] serializedBlocks = data.split("(?<!\\\\);");
         ConcurrentHashMap<Integer, ItemStack> items = new ConcurrentHashMap<>();
 

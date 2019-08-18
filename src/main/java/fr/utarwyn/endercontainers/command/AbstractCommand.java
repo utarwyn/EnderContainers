@@ -87,12 +87,6 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
             }
         }
 
-        // Plugin disabled?
-        if (!Files.getConfiguration().isEnabled()) {
-            PluginMsg.errorMessage(sender, Files.getLocale().getPluginDisabled());
-            return true;
-        }
-
         // Check argument count
         if (!this.checkArgLength(args.length)) {
             sender.sendMessage(EnderContainers.PREFIX + ChatColor.RED + Files.getLocale().getCmdWrongArgumentCount());

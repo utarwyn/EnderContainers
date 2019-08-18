@@ -4,10 +4,7 @@
 #   An enderchests plugin by Utarwyn    #
 # # # # # # # # # # # # # # # # # # # # #
 
-# Enable the plugin
-enabled: true
-
-# Enable debugging (use this only when you have a problem with the plugin)
+# Show additional information in console
 debug: false
 
 # The locale of the plugin
