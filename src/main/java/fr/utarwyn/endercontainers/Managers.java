@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
@@ -15,7 +14,7 @@ public class Managers {
     /**
      * Cache map for instances of managers.
      */
-    private static Map<Class<? extends AbstractManager>, AbstractManager> instances = new HashMap<>();
+    private static ConcurrentHashMap<Class<? extends AbstractManager>, AbstractManager> instances = new ConcurrentHashMap<>();
 
     /**
      * Managers constructor.
@@ -30,7 +29,7 @@ public class Managers {
      *
      * @return all managers instances
      */
-    static Map<Class<? extends AbstractManager>, AbstractManager> getInstances() {
+    static ConcurrentHashMap<Class<? extends AbstractManager>, AbstractManager> getInstances() {
         return instances;
     }
 

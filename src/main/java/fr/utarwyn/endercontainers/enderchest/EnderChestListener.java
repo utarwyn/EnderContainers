@@ -52,13 +52,13 @@ public class EnderChestListener implements Listener {
     /**
      * Method called when a player interacts with something in the world
      *
-     * @param e The interact event
+     * @param event The interact event
      */
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent e) {
-        if (!e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
-        Player player = e.getPlayer();
-        Block block = e.getClickedBlock();
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
+        Player player = event.getPlayer();
+        Block block = event.getClickedBlock();
 
         // Right click on an ender chest?
         if (block != null && block.getType().equals(Material.ENDER_CHEST)) {
@@ -72,7 +72,7 @@ public class EnderChestListener implements Listener {
                 return;
             }
 
-            e.setCancelled(true);
+            event.setCancelled(true);
 
             // Check dependencies
             if (!this.dependenciesManager.onBlockChestOpened(block, player, true))

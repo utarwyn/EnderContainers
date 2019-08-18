@@ -7,7 +7,6 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class ReloadCommand extends AbstractCommand {
 
@@ -38,16 +37,6 @@ public class ReloadCommand extends AbstractCommand {
         Managers.reloadAll();
 
         this.sendTo(sender, ChatColor.GREEN + Files.getLocale().getConfigReloaded());
-    }
-
-    @Override
-    public void performPlayer(Player player) {
-        // No behavior only for players for this command
-    }
-
-    @Override
-    public void performConsole(CommandSender sender) {
-        // No behavior only for the console for this command
     }
 
 }

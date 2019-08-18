@@ -20,9 +20,14 @@ public class Parameter<T> {
     private Function<String, T> converter;
 
     /**
-     * List of elements sent to users who want autocompletion on their argument
+     * List of elements sent to users who want auto-completion on their argument
      */
     private List<T> completions;
+
+    /**
+     * Stores if auto-completions should be custom or not
+     */
+    private boolean customCompletions;
 
     /**
      * Stores if this parameter is needed to perform a command
@@ -37,21 +42,31 @@ public class Parameter<T> {
     private Parameter(Function<String, T> converter) {
         this.completions = new ArrayList<>();
         this.converter = converter;
+        this.customCompletions = true;
         this.needed = true;
     }
 
     /**
      * An integer parameter
      */
-    public static Parameter<Integer> INT() {
-        return new Parameter<>(Integer::new);
+    public static Parameter<Integer> integer() {
+        return new Parameter<>(Integer::parseInt);
     }
 
     /**
      * A string parameter
      */
-    public static Parameter<String> STRING() {
+    public static Parameter<String> string() {
         return new Parameter<>(String::new);
+    }
+
+    /**
+     * Return true if this parameter uses custom auto-completion.
+     *
+     * @return true when using custom auto-completion
+     */
+    public boolean isCustomCompletions() {
+        return customCompletions;
     }
 
     /**
@@ -69,7 +84,7 @@ public class Parameter<T> {
      * @return this parameter
      */
     public Parameter<T> withPlayersCompletions() {
-        this.completions = null;
+        this.customCompletions = false;
         return this;
     }
 
@@ -82,6 +97,7 @@ public class Parameter<T> {
     @SafeVarargs
     public final Parameter<T> withCustomCompletions(T... completions) {
         this.completions = Arrays.asList(completions);
+        this.customCompletions = true;
         return this;
     }
 
@@ -116,11 +132,9 @@ public class Parameter<T> {
      * @return list of elements for the autocompletion
      */
     List<String> getCompletions() {
-        if (this.completions == null) {
-            return null;
-        } else {
-            return this.completions.stream().map(T::toString).collect(Collectors.toList());
-        }
+        return this.completions.stream()
+                .map(T::toString)
+                .collect(Collectors.toList());
     }
 
     /**

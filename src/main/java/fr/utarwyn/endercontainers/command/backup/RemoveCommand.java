@@ -7,7 +7,6 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.util.EUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class RemoveCommand extends AbstractBackupCommand {
 
@@ -15,7 +14,7 @@ public class RemoveCommand extends AbstractBackupCommand {
         super("remove", manager, "rm");
 
         this.setPermission("backup.remove");
-        this.addParameter(Parameter.STRING());
+        this.addParameter(Parameter.string());
     }
 
     @Override
@@ -29,16 +28,6 @@ public class RemoveCommand extends AbstractBackupCommand {
                 sender.sendMessage(EnderContainers.PREFIX + ChatColor.RED + Files.getLocale().getBackupUnknown().replace("%backup%", name));
             }
         });
-    }
-
-    @Override
-    public void performPlayer(Player player) {
-        // No behavior only for players for this command
-    }
-
-    @Override
-    public void performConsole(CommandSender sender) {
-        // No behavior only for the console for this command
     }
 
 }

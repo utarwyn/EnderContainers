@@ -9,7 +9,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.util.StringUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents a command of the plugin.
@@ -70,10 +74,18 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
         if (command == null || sender == null || !command.getName().equalsIgnoreCase(getName())) return false;
 
         // Have we sub-commands for this command?
-        if (args.length > 0)
-            for (AbstractCommand subCommand : this.subCommands)
-                if (subCommand.getName().equalsIgnoreCase(args[0]) || subCommand.getAliases().contains(args[0]))
-                    return subCommand.onCommand(sender, subCommand, label, Arrays.copyOfRange(args, 1, args.length));
+        if (args.length > 0) {
+            AbstractCommand subCommand = this.subCommands.stream()
+                    .filter(c -> c.getName().equalsIgnoreCase(args[0]) || c.getAliases().contains(args[0]))
+                    .findFirst().orElse(null);
+
+            if (subCommand != null) {
+                return subCommand.onCommand(
+                        sender, subCommand, label,
+                        Arrays.copyOfRange(args, 1, args.length)
+                );
+            }
+        }
 
         // Check argument count
         if (!this.checkArgLength(args.length)) {
@@ -124,75 +136,43 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        List<String> customCompletions = new ArrayList<>();
+        List<String> autocompletions = new ArrayList<>();
+
+        // No argument, no auto-completion.
+        if (args.length == 0) return autocompletions;
 
         // Check sub-commands completions first
-        if (args.length > 0)
-            for (AbstractCommand subCommand : this.subCommands)
-                if (subCommand.getName().equalsIgnoreCase(args[0]) || subCommand.getAliases().contains(args[0]))
-                    return subCommand.tabComplete(sender, alias, Arrays.copyOfRange(args, 1, args.length));
-
-        // Now check completions of this command
-        if (!this.subCommands.isEmpty() && args.length > 0) {
-            String lastWord = args[args.length - 1];
-            List<String> matchedCommands = new ArrayList<>();
-            Iterator<AbstractCommand> commandIterator = this.subCommands.iterator();
-
-            AbstractCommand command;
-            String cmdName;
-
-            while (true) {
-                if (!commandIterator.hasNext()) {
-                    matchedCommands.sort(String.CASE_INSENSITIVE_ORDER);
-                    customCompletions = matchedCommands;
-                    break;
-                }
-
-                command = commandIterator.next();
-                cmdName = command.getName();
-
-                if (StringUtil.startsWithIgnoreCase(cmdName, lastWord)) {
-                    matchedCommands.add(cmdName);
-                }
+        for (AbstractCommand subCommand : this.subCommands) {
+            if (subCommand.getName().equalsIgnoreCase(args[0]) || subCommand.getAliases().contains(args[0])) {
+                return subCommand.tabComplete(sender, alias, Arrays.copyOfRange(args, 1, args.length));
             }
         }
 
-        // Try to add into the list all completions for the current paramter
-        int nbCurParam = args.length - 1;
-        if (nbCurParam >= 0 && nbCurParam < parameters.size()) {
-            Parameter<?> param = parameters.get(nbCurParam);
+        int index = args.length - 1;
+        String lastWord = args[index];
+
+        // Add sub commands in auto-completion
+        if (!this.subCommands.isEmpty()) {
+            List<String> commandNames = this.subCommands.stream().map(AbstractCommand::getName).collect(Collectors.toList());
+            autocompletions.addAll(this.matchCompletions(lastWord, commandNames));
+        }
+
+        // Add parameters' auto-completion
+        if (index < parameters.size()) {
+            Parameter<?> param = parameters.get(index);
             boolean hasAccess = !(sender instanceof Player) || this.hasRequiredPermission((Player) sender);
 
-            if (param != null && hasAccess) {
-                String lastWord = args[args.length - 1];
-                List<String> completions = param.getCompletions();
-
-                if (completions != null) {
-                    // Don't forget to sort all completions :)
-                    Iterator<String> completionsIterator = completions.iterator();
-                    List<String> matchedCompletions = new ArrayList<>();
-                    String completion;
-
-                    while (true) {
-                        if (!completionsIterator.hasNext()) {
-                            matchedCompletions.sort(String.CASE_INSENSITIVE_ORDER);
-                            customCompletions.addAll(matchedCompletions);
-                            break;
-                        }
-
-                        completion = completionsIterator.next();
-
-                        if (StringUtil.startsWithIgnoreCase(completion, lastWord)) {
-                            matchedCompletions.add(completion);
-                        }
-                    }
+            if (hasAccess) {
+                if (param.isCustomCompletions()) {
+                    autocompletions.addAll(this.matchCompletions(lastWord, param.getCompletions()));
                 } else {
-                    customCompletions.addAll(super.tabComplete(sender, alias, args));
+                    // If the parameter does not have auto-completion, use the default one (player list)
+                    autocompletions.addAll(super.tabComplete(sender, alias, args));
                 }
             }
         }
 
-        return customCompletions;
+        return autocompletions;
     }
 
     @Override
@@ -208,6 +188,33 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
     @Override
     public void setPermission(String permission) {
         this.permission = permission;
+    }
+
+    /**
+     * Method called when an entity performed this command.
+     *
+     * @param sender entity whiches have performed the command
+     */
+    public void perform(CommandSender sender) {
+        // Not implemented by default
+    }
+
+    /**
+     * Method called when a player performed this command.
+     *
+     * @param player player whiches have performed the command
+     */
+    public void performPlayer(Player player) {
+        // Not implemented by default
+    }
+
+    /**
+     * Method called when the console performed this command.
+     *
+     * @param sender the server console as a sender
+     */
+    public void performConsole(CommandSender sender) {
+        // Not implemented by default
     }
 
     protected void addParameter(Parameter parameter) {
@@ -262,6 +269,13 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
         return n >= this.parameters.stream().filter(Parameter::isNeeded).count();
     }
 
+    /**
+     * Read an argument at a specific index.
+     *
+     * @param idx index where to read the argument
+     * @param <T> type of argument to read
+     * @return converted read value
+     */
     private <T> T readArgument(int idx) {
         this.nextArg = idx + 1;
 
@@ -269,10 +283,18 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
         return parameter.convertValue(this.args.get(idx));
     }
 
-    public abstract void perform(CommandSender sender);
-
-    public abstract void performPlayer(Player player);
-
-    public abstract void performConsole(CommandSender sender);
+    /**
+     * Extract from a list and sort auto-completions that begin with a sent argument.
+     *
+     * @param argument argument sent by a user
+     * @param completions list of initial auto-completions to check
+     * @return sorted list of extracted auto-completions
+     */
+    private List<String> matchCompletions(String argument, List<String> completions) {
+        return completions.stream()
+                .filter(completion -> StringUtil.startsWithIgnoreCase(completion, argument))
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .collect(Collectors.toList());
+    }
 
 }

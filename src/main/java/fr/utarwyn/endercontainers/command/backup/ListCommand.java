@@ -6,7 +6,6 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.List;
 
@@ -41,13 +40,4 @@ public class ListCommand extends AbstractBackupCommand {
         }
     }
 
-    @Override
-    public void performPlayer(Player player) {
-        // No behavior only for players for this command
-    }
-
-    @Override
-    public void performConsole(CommandSender sender) {
-        // No behavior only for the console for this command
-    }
 }

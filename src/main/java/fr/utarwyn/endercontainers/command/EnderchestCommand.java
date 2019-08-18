@@ -18,12 +18,7 @@ public class EnderchestCommand extends AbstractCommand {
 
         this.manager = EnderContainers.getInstance().getManager(EnderChestManager.class);
 
-        this.addParameter(Parameter.INT().optional());
-    }
-
-    @Override
-    public void perform(CommandSender sender) {
-        // No global behavior for this command
+        this.addParameter(Parameter.integer().optional());
     }
 
     @Override

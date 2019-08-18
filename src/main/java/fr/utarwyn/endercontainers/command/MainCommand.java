@@ -3,7 +3,6 @@ package fr.utarwyn.endercontainers.command;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.command.main.*;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class MainCommand extends AbstractCommand {
 
@@ -20,20 +19,13 @@ public class MainCommand extends AbstractCommand {
         this.addSubCommand(new UpdateCommand());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void perform(CommandSender sender) {
         this.sendTo(sender, "Created by §3Utarwyn§7. Version §e" + EnderContainers.getInstance().getDescription().getVersion() + "§7.");
         this.sendTo(sender, "To show plugin's help: §d/ecp help§7.");
-    }
-
-    @Override
-    public void performPlayer(Player player) {
-        // No behavior only for players for this command
-    }
-
-    @Override
-    public void performConsole(CommandSender sender) {
-        // No behavior only for the console for this command
     }
 
 }

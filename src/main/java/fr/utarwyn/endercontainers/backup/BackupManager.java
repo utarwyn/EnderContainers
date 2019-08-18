@@ -26,17 +26,17 @@ public class BackupManager extends AbstractManager {
     /**
      * Class which manage the external storage of backups
      */
-    private BackupsData backupsStorage;
+    private BackupsData storage;
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void load() {
-        this.backupsStorage = StorageWrapper.get(BackupsData.class);
-        assert this.backupsStorage != null;
+        this.storage = StorageWrapper.get(BackupsData.class);
+        assert this.storage != null;
 
-        this.backups = this.backupsStorage.getCachedBackups();
+        this.backups = this.storage.getCachedBackups();
     }
 
     /**
@@ -87,12 +87,12 @@ public class BackupManager extends AbstractManager {
         );
 
         // Save the backup in the proper config
-        if (!this.backupsStorage.saveNewBackup(backup)) {
+        if (!this.storage.saveNewBackup(backup)) {
             return false;
         }
 
         // Execute the backup (save all enderchests)
-        if (!this.backupsStorage.executeStorage(backup)) {
+        if (!this.storage.executeStorage(backup)) {
             return false;
         }
 
@@ -108,7 +108,7 @@ public class BackupManager extends AbstractManager {
     public boolean applyBackup(String name) {
         Optional<Backup> backup = this.getBackupByName(name);
 
-        if (backup.isPresent() && this.backupsStorage.applyBackup(backup.get())) {
+        if (backup.isPresent() && this.storage.applyBackup(backup.get())) {
             return Managers.reload(EnderChestManager.class);
         }
 
@@ -124,7 +124,7 @@ public class BackupManager extends AbstractManager {
     public boolean removeBackup(String name) {
         Optional<Backup> backup = this.getBackupByName(name);
         return backup.isPresent()
-                && this.backupsStorage.removeBackup(backup.get())
+                && this.storage.removeBackup(backup.get())
                 && this.backups.remove(backup.get());
     }
 

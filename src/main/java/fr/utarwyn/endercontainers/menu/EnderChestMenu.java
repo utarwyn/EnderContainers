@@ -10,8 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Represents an enderchest with all contents.
@@ -47,7 +47,7 @@ public class EnderChestMenu extends AbstractMenu {
      *
      * @return A map with all contents
      */
-    public Map<Integer, ItemStack> getContents() {
+    public ConcurrentHashMap<Integer, ItemStack> getContents() {
         return this.items;
     }
 
