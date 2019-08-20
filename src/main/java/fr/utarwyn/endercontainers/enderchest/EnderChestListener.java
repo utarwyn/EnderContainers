@@ -3,10 +3,10 @@ package fr.utarwyn.endercontainers.enderchest;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
-import fr.utarwyn.endercontainers.menu.OfflineEnderChestMenu;
+import fr.utarwyn.endercontainers.menu.enderchest.OfflineEnderChestMenu;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
-import fr.utarwyn.endercontainers.util.EUtil;
+import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.Updater;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -79,13 +79,13 @@ public class EnderChestListener implements Listener {
                 return;
 
             // Open the main menu for the player
-            EUtil.runAsync(() -> this.manager.openHubMenuFor(player));
+            MiscUtil.runAsync(() -> this.manager.openHubMenuFor(player));
 
             // Play sound (not in async mode)!
             if (Files.getConfiguration().isGlobalSound()) {
-                EUtil.playSound(block.getLocation(), "CHEST_OPEN", "BLOCK_CHEST_OPEN");
+                MiscUtil.playSound(block.getLocation(), "CHEST_OPEN", "BLOCK_CHEST_OPEN");
             } else {
-                EUtil.playSound(player, "CHEST_OPEN", "BLOCK_CHEST_OPEN");
+                MiscUtil.playSound(player, "CHEST_OPEN", "BLOCK_CHEST_OPEN");
             }
         }
     }
@@ -100,10 +100,10 @@ public class EnderChestListener implements Listener {
         Player player = event.getPlayer();
 
         // Send update message to the player is he has the permission.
-        if (EUtil.playerHasPerm(player, "update") && !Updater.getInstance().isUpToDate()) {
+        if (MiscUtil.playerHasPerm(player, "update") && !Updater.getInstance().isUpToDate()) {
             player.sendMessage(EnderContainers.PREFIX + "§aThere is a newer version available: §2§l" + Updater.getInstance().getNewestVersion() + "§a.");
             player.sendMessage(EnderContainers.PREFIX + "Download it here: §f§n" + EnderContainers.DOWNLOAD_LINK);
-            EUtil.playSound(player, "NOTE_PLING", "BLOCK_NOTE_PLING");
+            MiscUtil.playSound(player, "NOTE_PLING", "BLOCK_NOTE_PLING");
         }
     }
 
@@ -137,9 +137,9 @@ public class EnderChestListener implements Listener {
         // Play the closing sound when we use the default enderchest!
         if (inventory.getType().equals(InventoryType.ENDER_CHEST) && Files.getConfiguration().isUseVanillaEnderchest()) {
             if (Files.getConfiguration().isGlobalSound())
-                EUtil.playSound(player.getLocation(), "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
+                MiscUtil.playSound(player.getLocation(), "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
             else
-                EUtil.playSound(player, "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
+                MiscUtil.playSound(player, "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
         }
 
         /*
@@ -148,12 +148,12 @@ public class EnderChestListener implements Listener {
          * so we have to check when the inventory closes to
          * start the custom method.
          */
-        EUtil.runAsync(() -> {
+        MiscUtil.runAsync(() -> {
             if (inventory.getType().equals(InventoryType.ENDER_CHEST)) {
                 EnderChest chest = OfflineEnderChestMenu.getOpenedChestFor(player);
 
                 if (chest != null)
-                    EUtil.saveVanillaEnderchestOf(chest.getOwner(), inventory);
+                    MiscUtil.saveVanillaEnderchestOf(chest.getOwner(), inventory);
             }
         });
     }

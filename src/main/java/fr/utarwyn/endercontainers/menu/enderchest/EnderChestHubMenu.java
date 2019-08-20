@@ -1,4 +1,4 @@
-package fr.utarwyn.endercontainers.menu;
+package fr.utarwyn.endercontainers.menu.enderchest;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
@@ -6,7 +6,8 @@ import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
-import fr.utarwyn.endercontainers.util.EUtil;
+import fr.utarwyn.endercontainers.menu.AbstractMenu;
+import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -74,10 +75,12 @@ public class EnderChestHubMenu extends AbstractMenu {
      * The enderchest manager
      */
     private EnderChestManager manager;
+
     /**
      * The owner of all enderchests in the menu
      */
     private UUID owner;
+
     /**
      * Current page for the player who has opened the menu
      */
@@ -89,15 +92,16 @@ public class EnderChestHubMenu extends AbstractMenu {
      * @param owner The player who owns enderchests in the menu
      */
     public EnderChestHubMenu(UUID owner) {
-        super(Files.getLocale().getMenuMainTitle().replace(
-                "%player%", Objects.requireNonNull(UUIDFetcher.getName(owner))
-        ));
-
         this.owner = owner;
         this.manager = EnderContainers.getInstance().getManager(EnderChestManager.class);
         this.page = 1;
+
+        this.reloadInventory();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void prepare() {
         // Calculate the number of enderchests to display in the inventory
@@ -105,8 +109,7 @@ public class EnderChestHubMenu extends AbstractMenu {
         int max = Files.getConfiguration().getMaxEnderchests();
         int nb = Math.min(min + PER_PAGE + 2, max);
 
-        // Clear any previous items
-        this.clear();
+        this.inventory.clear();
 
         // Adding chest items
         for (int num = min; num < nb; num++) {
@@ -115,61 +118,85 @@ public class EnderChestHubMenu extends AbstractMenu {
             ec.reloadMeta();
 
             if (ec.isAccessible() || !Files.getConfiguration().isOnlyShowAccessibleEnderchests()) {
-                this.setItem(num - min, this.getItemStackOf(ec));
+                this.inventory.setItem(num - min, this.getItemStackOf(ec));
             }
         }
 
         // Adding previous page item (if the user is not on the first page)
         if (this.page > 1) {
-            this.removeItemAt(52);
-            this.setItem(52, PREV_PAGE_ITEM);
-            this.removeItemAt(53);
+            this.inventory.setItem(52, PREV_PAGE_ITEM);
+            this.inventory.setItem(53, null);
         }
+
         // Adding next page item (if there is more chests than the current page can display)
         int nbForNext = min + PER_PAGE;
         if (this.page == 1) nbForNext += 2;
 
         if (nbForNext < max) {
-            this.removeItemAt(53);
-            this.setItem(53, NEXT_PAGE_ITEM);
+            this.inventory.setItem(53, NEXT_PAGE_ITEM);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getRows() {
+        int count = Math.min(PER_PAGE, Files.getConfiguration().getMaxEnderchests());
+        return (int) Math.ceil(count / 9D);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getTitle() {
+        return Files.getLocale().getMenuMainTitle().replace(
+                "%player%", Objects.requireNonNull(UUIDFetcher.getName(owner))
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean onClick(Player player, int slot) {
-        EUtil.runSync(() -> {
-            // Check for previous/next page
-            if (slot >= PER_PAGE && this.getItemAt(slot).getType() == SKULL_MATERIAL) {
-                if (slot == PER_PAGE) this.page--;
-                else if (slot == PER_PAGE + 1) this.page++;
+        ItemStack item = Objects.requireNonNull(this.inventory.getItem(slot));
 
-                this.prepare();
-                this.updateInventory();
-                return;
-            }
+        // Check for previous/next page
+        if (slot >= PER_PAGE && item.getType() == SKULL_MATERIAL) {
+            if (slot == PER_PAGE) this.page--;
+            else if (slot == PER_PAGE + 1) this.page++;
 
-            // Check for a chest (with the slot and the index of the first chest in the menu)
-            EnderChest chest = this.manager.getEnderChest(this.owner, this.getFirstChestIndex() + slot);
+            this.reloadInventory();
+            this.open(player);
+            return true;
+        }
 
-            // Reload the chest's metas before opening it.
-            // It allows to check if the player has kept his permission
-            // while he opened the Hub menu.
-            chest.reloadMeta();
+        // Check for a chest (with the slot and the index of the first chest in the menu)
+        EnderChest chest = this.manager.getEnderChest(this.owner, this.getFirstChestIndex() + slot);
 
-            if (chest.isAccessible()) {
-                chest.openContainerFor(player);
-                EUtil.playSound(player, "CLICK", "UI_BUTTON_CLICK");
-            } else {
-                EUtil.playSound(player, "ANVIL_BREAK", "BLOCK_ANVIL_BREAK");
-            }
-        });
+        // Reload the chest's metas before opening it.
+        // It allows to check if the player has kept his permission
+        // while he opened the Hub menu.
+        chest.reloadMeta();
+
+        if (chest.isAccessible()) {
+            chest.openContainerFor(player);
+            MiscUtil.playSound(player, "CLICK", "UI_BUTTON_CLICK");
+        } else {
+            MiscUtil.playSound(player, "ANVIL_BREAK", "BLOCK_ANVIL_BREAK");
+        }
 
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onClose(Player player) {
-        this.destroy();
+        // Nothing to do here
     }
 
     /**
@@ -197,7 +224,7 @@ public class EnderChestHubMenu extends AbstractMenu {
         List<String> lore = new ArrayList<>();
 
         // Update lore with the chest's status
-        // TODO: maybe allow users to integrally personalize the description!
+        // TODO maybe allow users to integrally personalize the description!
         if (!accessible) {
             lore.add(Files.getLocale().getMenuChestLocked());
         }

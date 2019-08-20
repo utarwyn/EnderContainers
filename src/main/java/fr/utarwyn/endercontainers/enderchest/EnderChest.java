@@ -1,17 +1,19 @@
 package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.configuration.Files;
-import fr.utarwyn.endercontainers.menu.EnderChestMenu;
-import fr.utarwyn.endercontainers.menu.OfflineEnderChestMenu;
+import fr.utarwyn.endercontainers.menu.enderchest.EnderChestMenu;
+import fr.utarwyn.endercontainers.menu.enderchest.OfflineEnderChestMenu;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
-import fr.utarwyn.endercontainers.util.EUtil;
+import fr.utarwyn.endercontainers.util.MiscUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Class used to create a custom enderchest
@@ -32,12 +34,12 @@ public class EnderChest {
     private UUID owner;
 
     /**
-     * Menu whichs represents the chest generated at the creation of it.
+     * Menu whiches can contain contents of this enderchest
      */
     private EnderChestMenu container;
 
     /**
-     * The number of rows of the chest's menu.
+     * The number of rows of the chest's menu
      */
     private int rows;
 
@@ -69,7 +71,7 @@ public class EnderChest {
     }
 
     /**
-     * Returns the owner of the chest
+     * Returns the owner of the chest.
      *
      * @return UUID of the chest's owner
      */
@@ -114,12 +116,12 @@ public class EnderChest {
     }
 
     /**
-     * Returns all contents of the chest as a map
+     * Returns contents of this enderchest.
      *
-     * @return All contents of the enderchest
+     * @return content of the enderchest
      */
-    public ConcurrentHashMap<Integer, ItemStack> getContents() {
-        return this.container.getContents();
+    public ConcurrentMap<Integer, ItemStack> getContents() {
+        return this.getOwnerData().getEnderchestContents(this);
     }
 
     /**
@@ -167,16 +169,7 @@ public class EnderChest {
      * @see EnderChestPurgeTask Task which uses this method to clear unused data.
      */
     boolean isUnused() {
-        return this.getOwnerPlayer() == null && this.container.getViewers().isEmpty();
-    }
-
-    /**
-     * Destroys the container linked to this enderchest to liberate the memory.
-     */
-    void destroyContainer() {
-        if (this.container != null) {
-            this.container.destroy();
-        }
+        return this.getOwnerPlayer() == null && this.container.getInventory().getViewers().isEmpty();
     }
 
     /**
@@ -185,17 +178,19 @@ public class EnderChest {
      * @param player The player who wants to open the container
      */
     public void openContainerFor(Player player) {
-        this.container.open(player);
+        if (this.num == 0 && Files.getConfiguration().isUseVanillaEnderchest()) {
+            Inventory inventory = MiscUtil.getVanillaEnderchestOf(this.owner);
+            player.openInventory(Objects.requireNonNull(inventory));
+        } else {
+            this.container.open(player);
+        }
     }
 
     /**
      * Save the enderchest. This method has to be called asynchronously if possible!
      */
-    public void save() {
-        PlayerData pData = StorageWrapper.get(PlayerData.class, this.owner);
-        assert pData != null;
-
-        pData.saveEnderchest(this);
+    public void save(ConcurrentMap<Integer, ItemStack> contents) {
+        this.getOwnerData().saveEnderchest(this, contents);
     }
 
     /**
@@ -203,12 +198,13 @@ public class EnderChest {
      * (that means the number of rows and the accessibility of the chest)
      */
     public void reloadMeta() {
-        PlayerData pData = StorageWrapper.get(PlayerData.class, this.owner);
-        assert pData != null;
-
         // Detection of number of rows ...
         Integer rowsNb = this.generateRowsNb();
-        this.rows = rowsNb != null ? rowsNb : pData.getEnderchestRows(this);
+        if (rowsNb == null) {
+            rowsNb = this.getOwnerData().getEnderchestRows(this);
+        }
+
+        this.rows = rowsNb;
 
         // Load the accessibility of the enderchest ...
         Boolean accessibility = this.genereateAccessibility();
@@ -219,19 +215,12 @@ public class EnderChest {
          * and in this case, the chest have to be accessible.
          */
         this.accessible = accessibility != null ? accessibility : true;
-
-        // Reload the number of rows of the container
-        if (this.container != null) this.container.setRows(this.rows);
     }
 
     /**
      * Load the chest at the creation of it
      */
     private void load() {
-        // Load chest's owner data ...
-        PlayerData pData = StorageWrapper.get(PlayerData.class, this.owner);
-        assert pData != null;
-
         // Reload metas of the chest!
         this.reloadMeta();
 
@@ -243,10 +232,6 @@ public class EnderChest {
         } else {
             this.container = new OfflineEnderChestMenu(this);
         }
-
-        // Load items in the container ...
-        for (ConcurrentHashMap.Entry<Integer, ItemStack> entry : pData.getEnderchestContents(this).entrySet())
-            this.container.setItem(entry.getKey(), entry.getValue());
     }
 
     /**
@@ -266,7 +251,7 @@ public class EnderChest {
         if (this.num == 0 && Files.getConfiguration().isUseVanillaEnderchest()) return 3;
 
         for (int row = 6; row > 0; row--)
-            if (EUtil.playerHasPerm(player, "slot" + this.num + ".row" + row) || EUtil.playerHasPerm(player, "slots.row" + row))
+            if (MiscUtil.playerHasPerm(player, "slot" + this.num + ".row" + row) || MiscUtil.playerHasPerm(player, "slots.row" + row))
                 return row;
 
         return 3;
@@ -286,7 +271,7 @@ public class EnderChest {
         if (this.isDefault()) return true;
         if (player == null) return null;
 
-        return EUtil.playerHasPerm(player, "open." + this.getNum());
+        return MiscUtil.playerHasPerm(player, "open." + this.getNum());
     }
 
     /**
@@ -296,6 +281,15 @@ public class EnderChest {
      */
     private Player getOwnerPlayer() {
         return Bukkit.getPlayer(this.owner);
+    }
+
+    /**
+     * Get data of the owner of the chest.
+     *
+     * @return data of the chest's owner
+     */
+    private PlayerData getOwnerData() {
+        return Objects.requireNonNull(StorageWrapper.get(PlayerData.class, this.owner));
     }
 
 }

@@ -1,4 +1,4 @@
-package fr.utarwyn.endercontainers.menu;
+package fr.utarwyn.endercontainers.menu.enderchest;
 
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
@@ -56,8 +56,8 @@ public class OfflineEnderChestMenu extends EnderChestMenu {
 
     @Override
     public void open(Player player) {
-        if (this.enderChest.getNum() == 0 && Files.getConfiguration().isUseVanillaEnderchest()) {
-            openedMenus.put(player.getUniqueId(), this.enderChest);
+        if (this.chest.getNum() == 0 && Files.getConfiguration().isUseVanillaEnderchest()) {
+            openedMenus.put(player.getUniqueId(), this.chest);
         }
 
         super.open(player);

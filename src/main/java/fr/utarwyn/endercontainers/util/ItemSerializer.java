@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 
 /**
@@ -40,7 +41,7 @@ public class ItemSerializer {
      * @param items Map of ItemStacks to convert.
      * @return The ItemStacks formatted to string.
      */
-    public static String serialize(ConcurrentHashMap<Integer, ItemStack> items) {
+    public static String serialize(ConcurrentMap<Integer, ItemStack> items) {
         if (Files.getConfiguration().isUseExperimentalSavingSystem())
             return ItemSerializer.experimentalSerialization(items);
         else
@@ -53,7 +54,7 @@ public class ItemSerializer {
      * @param data String to parse.
      * @return Generated map of Itemstacks.
      */
-    public static ConcurrentHashMap<Integer, ItemStack> deserialize(String data) {
+    public static ConcurrentMap<Integer, ItemStack> deserialize(String data) {
         if (Files.getConfiguration().isUseExperimentalSavingSystem())
             return ItemSerializer.experimentalDeserialization(data);
         else
@@ -66,10 +67,10 @@ public class ItemSerializer {
      * @param items Map of ItemStacks to convert.
      * @return The ItemStacks formatted to string.
      */
-    private static String experimentalSerialization(ConcurrentHashMap<Integer, ItemStack> items) {
+    private static String experimentalSerialization(ConcurrentMap<Integer, ItemStack> items) {
         StringBuilder serialization = new StringBuilder(new String((items.size() + ";").getBytes(), StandardCharsets.UTF_8));
 
-        for (ConcurrentHashMap.Entry<Integer, ItemStack> entry : items.entrySet()) {
+        for (ConcurrentMap.Entry<Integer, ItemStack> entry : items.entrySet()) {
             ItemStack is = entry.getValue();
 
             if (is != null) {
@@ -140,14 +141,14 @@ public class ItemSerializer {
      * @param items Map of ItemStacks to convert.
      * @return The ItemStacks formatted to string.
      */
-    private static String base64Serialization(ConcurrentHashMap<Integer, ItemStack> items) {
+    private static String base64Serialization(ConcurrentMap<Integer, ItemStack> items) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
 
             dataOutput.writeInt(items.size());
 
-            for (ConcurrentHashMap.Entry<Integer, ItemStack> entry : items.entrySet()) {
+            for (ConcurrentMap.Entry<Integer, ItemStack> entry : items.entrySet()) {
                 dataOutput.writeInt(entry.getKey());
                 dataOutput.writeObject(entry.getValue());
             }
@@ -166,9 +167,9 @@ public class ItemSerializer {
      * @param data String to parse.
      * @return Generated map of Itemstacks.
      */
-    private static ConcurrentHashMap<Integer, ItemStack> experimentalDeserialization(String data) {
+    private static ConcurrentMap<Integer, ItemStack> experimentalDeserialization(String data) {
         String[] serializedBlocks = data.split("(?<!\\\\);");
-        ConcurrentHashMap<Integer, ItemStack> items = new ConcurrentHashMap<>();
+        ConcurrentMap<Integer, ItemStack> items = new ConcurrentHashMap<>();
 
         // Parse every item in the string
         for (int i = 1; i < serializedBlocks.length; i++) {
@@ -260,8 +261,8 @@ public class ItemSerializer {
      * @param data String to parse.
      * @return Generated map of Itemstacks.
      */
-    private static ConcurrentHashMap<Integer, ItemStack> base64Deserialization(String data) {
-        ConcurrentHashMap<Integer, ItemStack> items = new ConcurrentHashMap<>();
+    private static ConcurrentMap<Integer, ItemStack> base64Deserialization(String data) {
+        ConcurrentMap<Integer, ItemStack> items = new ConcurrentHashMap<>();
 
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));

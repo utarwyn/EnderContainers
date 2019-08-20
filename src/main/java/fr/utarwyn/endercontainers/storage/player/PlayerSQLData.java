@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 
 /**
@@ -36,7 +37,7 @@ public class PlayerSQLData extends PlayerData {
     }
 
     @Override
-    public ConcurrentHashMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
+    public ConcurrentMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
         for (DatabaseSet chestSet : this.enderchestsDataset)
             if (chestSet.getInteger("num") == enderChest.getNum())
                 return ItemSerializer.deserialize(chestSet.getString("contents"));
@@ -54,7 +55,7 @@ public class PlayerSQLData extends PlayerData {
     }
 
     @Override
-    public void saveEnderchest(EnderChest enderChest) {
+    public void saveEnderchest(EnderChest enderChest, ConcurrentMap<Integer, ItemStack> contents) {
         boolean insert = true;
 
         for (DatabaseSet set : this.enderchestsDataset)
@@ -63,11 +64,11 @@ public class PlayerSQLData extends PlayerData {
                 break;
             }
 
-        String contents = ItemSerializer.serialize(enderChest.getContents());
+        String serializedContents = ItemSerializer.serialize(contents);
 
         try {
             getDatabaseManager().saveEnderchest(insert, enderChest.getOwner(),
-                    enderChest.getNum(), enderChest.getRows(), contents);
+                    enderChest.getNum(), enderChest.getRows(), serializedContents);
         } catch (SQLException e) {
             logger.log(Level.SEVERE,
                     "Cannot save the enderchest for user " + enderChest.getOwner() + " in the database", e);
@@ -79,7 +80,7 @@ public class PlayerSQLData extends PlayerData {
             DatabaseSet set = new DatabaseSet();
             set.setObject("num", enderChest.getNum());
             set.setObject("owner", enderChest.getOwner().toString());
-            set.setObject("contents", contents);
+            set.setObject("contents", serializedContents);
             set.setObject("rows", enderChest.getRows());
 
             this.enderchestsDataset.add(set);

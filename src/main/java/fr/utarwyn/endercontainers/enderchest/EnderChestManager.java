@@ -1,15 +1,15 @@
 package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.AbstractManager;
+import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.configuration.Files;
-import fr.utarwyn.endercontainers.menu.EnderChestHubMenu;
-import fr.utarwyn.endercontainers.menu.Menus;
+import fr.utarwyn.endercontainers.menu.MenuManager;
+import fr.utarwyn.endercontainers.menu.enderchest.EnderChestHubMenu;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,7 +55,7 @@ public class EnderChestManager extends AbstractManager {
     @Override
     protected void unload() {
         // Close all menus
-        Menus.closeAll();
+        EnderContainers.getInstance().getManager(MenuManager.class).closeAll();
 
         // Last purge & stop the purge task
         this.purgeTask.run();
@@ -111,10 +111,7 @@ public class EnderChestManager extends AbstractManager {
      * @param viewer The player whom to send the menu
      */
     public void openHubMenuFor(UUID owner, Player viewer) {
-        EnderChestHubMenu hubMenu = new EnderChestHubMenu(owner);
-
-        hubMenu.prepare();
-        hubMenu.open(viewer);
+        new EnderChestHubMenu(owner).open(viewer);
     }
 
     /**
@@ -149,32 +146,14 @@ public class EnderChestManager extends AbstractManager {
      * Method called by the {@link EnderChestPurgeTask} to delete unused chest objects in memory
      */
     void deleteUnusedChests() {
-        Iterator<EnderChest> chestIterator = this.enderchests.iterator();
-
-        while (chestIterator.hasNext()) {
-            EnderChest chest = chestIterator.next();
-
-            if (chest.isUnused()) {
-                chest.destroyContainer();
-                chestIterator.remove();
-            }
-        }
+        this.enderchests.removeIf(EnderChest::isUnused);
     }
 
     /**
      * Purge all chests of a player from memory
      */
     void deleteChestsOf(Player player) {
-        Iterator<EnderChest> chestIterator = this.enderchests.iterator();
-
-        while (chestIterator.hasNext()) {
-            EnderChest chest = chestIterator.next();
-
-            if (chest.getOwner().equals(player.getUniqueId())) {
-                chest.destroyContainer();
-                chestIterator.remove();
-            }
-        }
+        this.enderchests.removeIf(chest -> chest.getOwner().equals(player.getUniqueId()));
     }
 
 }

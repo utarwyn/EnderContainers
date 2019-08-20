@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 
 /**
@@ -43,11 +44,12 @@ public class PlayerFlatData extends PlayerData {
     }
 
     @Override
-    public ConcurrentHashMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
+    public ConcurrentMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
         String path = "enderchests." + enderChest.getNum() + ".contents";
 
-        if (!this.flatFile.getConfiguration().contains(path))
+        if (!this.flatFile.getConfiguration().contains(path)) {
             return new ConcurrentHashMap<>();
+        }
 
         return ItemSerializer.deserialize(this.flatFile.getConfiguration().getString(path));
     }
@@ -59,12 +61,12 @@ public class PlayerFlatData extends PlayerData {
     }
 
     @Override
-    public void saveEnderchest(EnderChest enderChest) {
-        String path = "enderchests." + enderChest.getNum() + ".";
+    public void saveEnderchest(EnderChest chest, ConcurrentMap<Integer, ItemStack> contents) {
+        String path = "enderchests." + chest.getNum() + ".";
 
-        this.flatFile.getConfiguration().set(path + "rows", enderChest.getRows());
-        this.flatFile.getConfiguration().set(path + "position", enderChest.getNum());
-        this.flatFile.getConfiguration().set(path + "contents", ItemSerializer.serialize(enderChest.getContents()));
+        this.flatFile.getConfiguration().set(path + "rows", chest.getRows());
+        this.flatFile.getConfiguration().set(path + "position", chest.getNum());
+        this.flatFile.getConfiguration().set(path + "contents", ItemSerializer.serialize(contents));
         this.flatFile.getConfiguration().set(path + "lastlocking", System.currentTimeMillis() / 1000); // UNIX format
 
         this.save();

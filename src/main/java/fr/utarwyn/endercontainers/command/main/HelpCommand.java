@@ -2,7 +2,7 @@ package fr.utarwyn.endercontainers.command.main;
 
 import fr.utarwyn.endercontainers.command.AbstractCommand;
 import fr.utarwyn.endercontainers.command.Parameter;
-import fr.utarwyn.endercontainers.util.EUtil;
+import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.command.CommandSender;
 
@@ -62,7 +62,7 @@ public class HelpCommand extends AbstractCommand {
         for (int i = 0; i < command.length(); i++)
             hiddenCommand.append("-");
 
-        if (EUtil.senderHasPerm(sender, perm))
+        if (MiscUtil.senderHasPerm(sender, perm))
             message.append(command);
         else
             message.append(hiddenCommand);

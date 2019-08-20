@@ -8,40 +8,22 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.UUID;
 
 /**
- * Main utility class of the plugin.
- * All useful methods are here.
+ * Miscellaneous utility class of the plugin.
  *
  * @author Utarwyn
  * @since 2.0.0
  */
-public class EUtil {
+public class MiscUtil {
 
     /**
      * It's an utility class. It cannot be instanciated.
      */
-    private EUtil() {
-    }
-
-    /**
-     * Gets the content size of an inventory (filled slots)
-     *
-     * @param inv Inventory to analyze
-     * @return Number of filled slots in an inventory
-     */
-    public static int getInventorySize(Inventory inv) {
-        int r = 0;
-
-        for (ItemStack i : inv.getContents())
-            if (i != null)
-                r++;
-
-        return r;
+    private MiscUtil() {
     }
 
     /**
@@ -52,7 +34,7 @@ public class EUtil {
      * @param sound19  Sound string for 1.9 versions
      */
     public static void playSound(Location location, String sound18, String sound19) {
-        Sound sound = EUtil.generateSound(sound18, sound19);
+        Sound sound = MiscUtil.generateSound(sound18, sound19);
         if (sound == null) return;
 
         location.getWorld().playSound(location, sound, 1f, 1f);
@@ -67,7 +49,7 @@ public class EUtil {
      * @param sound19 Sound string for 1.9 versions
      */
     public static void playSound(Player player, String sound18, String sound19) {
-        Sound sound = EUtil.generateSound(sound18, sound19);
+        Sound sound = MiscUtil.generateSound(sound18, sound19);
         if (sound == null) return;
 
         player.playSound(player.getLocation(), sound, 1f, 1f);
@@ -201,9 +183,9 @@ public class EUtil {
     private static Sound generateSound(String sound18, String sound19) {
         Sound sound;
 
-        if (EUtil.soundExists(sound18))
+        if (MiscUtil.soundExists(sound18))
             sound = Sound.valueOf(sound18);   // 1.8
-        else if (EUtil.soundExists(sound19))
+        else if (MiscUtil.soundExists(sound19))
             sound = Sound.valueOf(sound19);   // 1.9+
         else
             return null;                      // Else? Not supported.

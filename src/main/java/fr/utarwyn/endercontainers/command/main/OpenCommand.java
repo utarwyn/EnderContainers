@@ -5,7 +5,7 @@ import fr.utarwyn.endercontainers.command.AbstractCommand;
 import fr.utarwyn.endercontainers.command.Parameter;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
-import fr.utarwyn.endercontainers.util.EUtil;
+import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.Bukkit;
@@ -36,7 +36,7 @@ public class OpenCommand extends AbstractCommand {
 
         String toInspect = this.readArg();
 
-        EUtil.runAsync(() -> {
+        MiscUtil.runAsync(() -> {
             Player playerToSpec = Bukkit.getPlayer(toInspect);
 
             if (playerToSpec == null || !playerToSpec.isOnline()) {

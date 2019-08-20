@@ -3,7 +3,7 @@ package fr.utarwyn.endercontainers.storage.backups;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.storage.FlatFile;
-import fr.utarwyn.endercontainers.util.EUtil;
+import fr.utarwyn.endercontainers.util.MiscUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -167,7 +167,7 @@ public class BackupsFlatData extends BackupsData {
     public boolean removeBackup(Backup backup) {
         File folder = BackupsFlatData.getBackupFolder(backup);
 
-        if (folder.exists() && !EUtil.deleteFolder(folder)) {
+        if (folder.exists() && !MiscUtil.deleteFolder(folder)) {
             return false;
         }
 

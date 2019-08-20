@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Storage wrapper to manage data of a specific player
@@ -73,7 +73,7 @@ public abstract class PlayerData extends StorageWrapper {
      * @param enderChest Get this enderchest's contents
      * @return The map filled with the contents of the chest
      */
-    public abstract ConcurrentHashMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest);
+    public abstract ConcurrentMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest);
 
     /**
      * Returns the number of rows saved for an enderchest
@@ -84,10 +84,11 @@ public abstract class PlayerData extends StorageWrapper {
     public abstract int getEnderchestRows(EnderChest enderChest);
 
     /**
-     * Save the enderchest
+     * Save the enderchest with its content.
      *
-     * @param enderChest Enderchest to save
+     * @param chest enderchest to save
+     * @param contents contents of its container
      */
-    public abstract void saveEnderchest(EnderChest enderChest);
+    public abstract void saveEnderchest(EnderChest chest, ConcurrentMap<Integer, ItemStack> contents);
 
 }

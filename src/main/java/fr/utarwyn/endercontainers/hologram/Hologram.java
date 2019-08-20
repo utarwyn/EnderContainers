@@ -14,7 +14,7 @@ import java.util.logging.Level;
 /**
  * This class is used to display a text above an enderchest block
  * if the option blockNametag was set to true.
- * This class uses packets and it's compatible from 1.8 to 1.13.
+ * This class uses packets and it's compatible from 1.8 to 1.14.
  *
  * @author Utarwyn
  * @since 2.0.0
@@ -122,14 +122,17 @@ class Hologram {
      * The title of the hologram (its content)
      */
     private String title;
+
     /**
      * The location where the hologram have to spawn
      */
     private Location location;
+
     /**
      * The player who has to receive the hologram
      */
     private Player player;
+
     /**
      * The destroy packet object generated at the creation of the hologram
      */
