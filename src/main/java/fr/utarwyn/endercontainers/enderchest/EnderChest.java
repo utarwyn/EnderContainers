@@ -2,7 +2,6 @@ package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.menu.enderchest.EnderChestMenu;
-import fr.utarwyn.endercontainers.menu.enderchest.OfflineEnderChestMenu;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import fr.utarwyn.endercontainers.util.MiscUtil;
@@ -225,13 +224,7 @@ public class EnderChest {
         this.reloadMeta();
 
         // Load the container for an online/offline player.
-        Player player = Bukkit.getPlayer(this.owner);
-
-        if (player != null && player.isOnline()) {
-            this.container = new EnderChestMenu(this);
-        } else {
-            this.container = new OfflineEnderChestMenu(this);
-        }
+        this.container = new EnderChestMenu(this);
     }
 
     /**

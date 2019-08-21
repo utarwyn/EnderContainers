@@ -3,7 +3,6 @@ package fr.utarwyn.endercontainers.enderchest;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
-import fr.utarwyn.endercontainers.menu.enderchest.OfflineEnderChestMenu;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import fr.utarwyn.endercontainers.util.MiscUtil;
@@ -148,14 +147,14 @@ public class EnderChestListener implements Listener {
          * so we have to check when the inventory closes to
          * start the custom method.
          */
-        MiscUtil.runAsync(() -> {
+        /* TODO MiscUtil.runAsync(() -> {
             if (inventory.getType().equals(InventoryType.ENDER_CHEST)) {
                 EnderChest chest = OfflineEnderChestMenu.getOpenedChestFor(player);
 
                 if (chest != null)
                     MiscUtil.saveVanillaEnderchestOf(chest.getOwner(), inventory);
             }
-        });
+        });*/
     }
 
 }

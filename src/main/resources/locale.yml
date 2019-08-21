@@ -10,15 +10,15 @@
 commands:
 
   backups:
-    created: '&aBackup created with the name &b%backup%&a.'
+    created: '&aBackup &b%backup%&a has been created.'
     creation_starting: 'Starting backup creation in the background...'
     exists: 'Backup &6%backup% &calready exists. Please choose another name.'
     info: '&6%command% &7to have more info about a backup.'
-    loaded: '&aHooray! Backup &b%backup%&a successfully loaded!'
+    loaded: '&aHooray! Backup &b%backup%&a has been loaded!'
     loading_starting: 'Starting backup loading in the background...'
-    removed: '&aBackup &b%backup%&a removed with all of its data.'
+    removed: '&aBackup &b%backup%&a has been removed with all its data.'
     unknown: 'Backup &6%backup%&c not found.'
-    zero: '&cNo backup. Use &6%command% option to create your first backup!'
+    zero: '&cNo backup found. Create your first backup now!'
 
     label_name: 'Name'
     label_date: 'Creation date'
