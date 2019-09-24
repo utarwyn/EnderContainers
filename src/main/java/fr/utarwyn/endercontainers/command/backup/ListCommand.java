@@ -36,7 +36,7 @@ public class ListCommand extends AbstractBackupCommand {
             sender.sendMessage(" §r §8♣ Backup list (page 1)");
             PluginMsg.endBar(sender);
         } else {
-            this.sendTo(sender, ChatColor.RED + Files.getLocale().getBackupZero().replace("%command%", "create"));
+            this.sendTo(sender, ChatColor.RED + Files.getLocale().getBackupZero());
         }
     }
 
