@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BackupTest {
 
     @Test
-    public void testBackupCreation() {
+    public void backupCreation() {
         String name = "test";
         Timestamp date = new Timestamp(1);
         String type = "all";

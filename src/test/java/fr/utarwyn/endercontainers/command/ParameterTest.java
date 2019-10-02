@@ -11,25 +11,25 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 public class ParameterTest {
 
     @Test
-    public void testStaticParameters() {
+    public void staticParameters() {
         assertThat(Parameter.integer()).isNotEqualTo(Parameter.integer());
         assertThat(Parameter.string()).isNotEqualTo(Parameter.string());
     }
 
     @Test
-    public void testIsNeeded() {
+    public void isNeeded() {
         Parameter<Integer> parameter = Parameter.integer();
         assertThat(parameter.isNeeded()).isTrue();
     }
 
     @Test
-    public void testIsCustomCompletions() {
+    public void isCustomCompletions() {
         Parameter<Integer> parameter = Parameter.integer();
         assertThat(parameter.isCustomCompletions()).isTrue();
     }
 
     @Test
-    public void testWithPlayersCompletions() {
+    public void withPlayersCompletions() {
         Parameter<String> parameter = Parameter.string();
 
         assertThat(parameter.isCustomCompletions()).isTrue();
@@ -39,7 +39,7 @@ public class ParameterTest {
     }
 
     @Test
-    public void testWithCustomCompletions() {
+    public void withCustomCompletions() {
         Parameter<String> parameter = Parameter.string();
         List<String> completions = Arrays.asList("eza", "123");
 
@@ -54,13 +54,13 @@ public class ParameterTest {
     }
 
     @Test
-    public void testOptional() {
+    public void optional() {
         Parameter<Integer> parameter = Parameter.integer();
         assertThat(parameter.optional().isNeeded()).isFalse();
     }
 
     @Test
-    public void testCheckValue() {
+    public void checkValue() {
         Parameter<Integer> parameter = Parameter.integer();
 
         assertThat(parameter.checkValue("123")).isTrue();
@@ -71,7 +71,7 @@ public class ParameterTest {
     }
 
     @Test
-    public void testConvertValue() {
+    public void convertValue() {
         Parameter<Integer> parameter = Parameter.integer();
 
         assertThat(parameter.convertValue("123")).isEqualTo(123);

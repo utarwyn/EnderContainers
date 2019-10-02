@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 public class SavingRequestTest {
 
     @Test
-    public void testFields() {
+    public void fields() {
         SavingRequest request1 = new SavingRequest(null, "test");
         request1.fields("id", "test").values(null, null);
 
@@ -28,7 +28,7 @@ public class SavingRequestTest {
     }
 
     @Test
-    public void testValues() {
+    public void values() {
         SavingRequest request1 = new SavingRequest(null, "test");
         request1.fields("field1", "field2", "field3").values(null, null, null);
 
@@ -40,7 +40,7 @@ public class SavingRequestTest {
     }
 
     @Test
-    public void testConditions() {
+    public void conditions() {
         SavingRequest request1 = new SavingRequest(null, "test");
         request1.fields("field").values("eza").where("field = ?");
 
@@ -56,7 +56,7 @@ public class SavingRequestTest {
     }
 
     @Test
-    public void testAttributes() {
+    public void attributes() {
         SavingRequest request1 = new SavingRequest(null, "test");
         request1.fields("field1", "field2").values("eza", 45);
 
@@ -68,7 +68,7 @@ public class SavingRequestTest {
     }
 
     @Test
-    public void testReplaceIfExists() {
+    public void replaceIfExists() {
         SavingRequest request1 = new SavingRequest(null, "test");
         request1.fields("field1", "field2").values("eza", 45).replaceIfExists();
 
@@ -80,7 +80,7 @@ public class SavingRequestTest {
     }
 
     @Test
-    public void testExecute() {
+    public void execute() {
         Database database = mock(Database.class);
         SavingRequest request = new SavingRequest(database, "test");
 
@@ -95,7 +95,7 @@ public class SavingRequestTest {
     }
 
     @Test
-    public void testIllegalParameters() {
+    public void illegalParameters() {
         SavingRequest request1 = new SavingRequest(null, null);
         SavingRequest request2 = new SavingRequest(null, "test");
         SavingRequest request3 = new SavingRequest(null, "test").fields("eza", "aze").values(2);

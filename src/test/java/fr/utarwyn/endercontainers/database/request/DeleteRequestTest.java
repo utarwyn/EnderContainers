@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 public class DeleteRequestTest {
 
     @Test
-    public void testConditions() {
+    public void conditions() {
         DeleteRequest request1 = new DeleteRequest(null, "`test` = ?");
         DeleteRequest request2 = new DeleteRequest(null, "`eaz` > 50", "`test` = ?");
 
@@ -24,13 +24,13 @@ public class DeleteRequestTest {
     }
 
     @Test
-    public void testFrom() {
+    public void from() {
         DeleteRequest request = new DeleteRequest(null, "`test` = ?").from("data");
         assertThat(request.getRequest()).startsWith("DELETE FROM `data`");
     }
 
     @Test
-    public void testAttributes() {
+    public void attributes() {
         DeleteRequest request1 = new DeleteRequest(null, "test");
         DeleteRequest request2 = new DeleteRequest(null, "field = ?", "eza > ?");
         request2.attributes(1234, 42.3);
@@ -40,7 +40,7 @@ public class DeleteRequestTest {
     }
 
     @Test
-    public void testExecute() {
+    public void execute() {
         Database database = mock(Database.class);
         DeleteRequest request = new DeleteRequest(database, "test = ?");
 
@@ -55,7 +55,7 @@ public class DeleteRequestTest {
     }
 
     @Test
-    public void testIllegalParameters() {
+    public void illegalParameters() {
         DeleteRequest request1 = new DeleteRequest(null, "null");
         DeleteRequest request2 = new DeleteRequest(null).from("table");
 

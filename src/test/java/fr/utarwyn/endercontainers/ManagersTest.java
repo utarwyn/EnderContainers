@@ -19,7 +19,7 @@ public class ManagersTest {
     }
 
     @Test
-    public void testRegister() {
+    public void register() {
         EnderContainers plugin = mock(EnderContainers.class);
         Logger logger = mock(Logger.class);
         when(plugin.getLogger()).thenReturn(logger);
@@ -43,7 +43,7 @@ public class ManagersTest {
     }
 
     @Test
-    public void testGet() {
+    public void get() {
         Managers.getInstances().put(this.manager.getClass(), this.manager);
 
         assertThat(Managers.get(this.manager.getClass())).isNotNull()
@@ -53,7 +53,7 @@ public class ManagersTest {
     }
 
     @Test
-    public void testReload() {
+    public void reload() {
         Managers.getInstances().put(this.manager.getClass(), this.manager);
 
         assertThat(Managers.reload(this.manager.getClass())).isTrue();

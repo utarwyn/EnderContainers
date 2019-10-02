@@ -25,7 +25,7 @@ public class AbstractManagerTest {
     }
 
     @Test
-    public void testRegisterListener() {
+    public void registerListener() {
         Server server = mock(Server.class);
         PluginManager pluginManager = mock(PluginManager.class);
 
@@ -41,7 +41,7 @@ public class AbstractManagerTest {
     }
 
     @Test
-    public void testSetPlugin() {
+    public void setPlugin() {
         Logger logger = mock(Logger.class);
         when(this.plugin.getLogger()).thenReturn(logger);
 
