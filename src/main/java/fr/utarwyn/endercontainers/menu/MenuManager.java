@@ -78,7 +78,7 @@ public class MenuManager extends AbstractManager {
                 menu.onClose(player);
             }
 
-            if (InventoryType.ENDER_CHEST.equals(inventory.getType()) || menu != null) {
+            if (InventoryType.ENDER_CHEST.equals(inventory.getType())) {
                 player.closeInventory();
             }
         }
