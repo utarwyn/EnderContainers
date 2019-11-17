@@ -39,7 +39,7 @@
         <factions.version>2.12.1</factions.version>
         <factions.legacy.version>1.6.9.5-U0.2.2</factions.legacy.version>
         <plotsquared.version>4.226</plotsquared.version>
-        <bstats.version>1.2</bstats.version>
+        <bstats.version>1.5</bstats.version>
         <junit.version>4.12</junit.version>
         <mockito.version>2.28.2</mockito.version>
         <assertj.version>3.11.1</assertj.version>
@@ -77,7 +77,7 @@
         </repository>
         <repository>
             <id>bstats-repo</id>
-            <url>http://repo.bstats.org/content/repositories/releases/</url>
+            <url>https://repo.codemc.org/repository/maven-public</url>
         </repository>
     </repositories>
 
