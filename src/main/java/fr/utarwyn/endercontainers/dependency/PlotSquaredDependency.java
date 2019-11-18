@@ -3,17 +3,18 @@ package fr.utarwyn.endercontainers.dependency;
 import com.github.intellectualsites.plotsquared.plot.flag.Flags;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
-import com.github.intellectualsites.plotsquared.plot.object.PlotBlock;
+import com.sk89q.worldedit.world.item.ItemType;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 /**
- * Dependency used to interact with the PlotSquared plugin
+ * Dependency used to interact with the PlotSquared plugin.
+ * Works only with PlotSquared 4.390+ and Bukkit 1.13+.
  *
  * @author Utarwyn
  * @since 1.0.6
@@ -21,9 +22,9 @@ import java.util.Optional;
 public class PlotSquaredDependency extends Dependency {
 
     /**
-     * Material id of the enderchest block. Used by legacy servers.
+     * Material name of the enderchest block.
      */
-    private static final int ENDERCHEST_MATERIAL_ID = 130;
+    private static final String ENDERCHEST_MATERIAL_NAME = "minecraft:enderchest_chest";
 
     /**
      * Called when a player wants to open its enderchest by interacting with an enderchest block
@@ -35,40 +36,21 @@ public class PlotSquaredDependency extends Dependency {
     @Override
     public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
         Location location = this.getP2Location(block.getLocation());
-        if (location == null) return true;
+        Plot plot = location != null ? location.getPlot() : null;
+        boolean canUse = player.isOp() || plot == null || this.canPlayerUseEnderchest(plot, player);
 
-        Plot plot = location.getPlot();
-        if (plot == null || player.isOp()) return true;
-
-        Optional<HashSet<PlotBlock>> flag = plot.getFlag(Flags.USE);
-
-        if (flag.isPresent()) {
-            boolean containsBlock = false;
-
-            for (PlotBlock plotBlock : flag.get()) {
-                if (plotBlock.equalsAny(ENDERCHEST_MATERIAL_ID, "ENDER_CHEST")) {
-                    containsBlock = true;
-                    break;
-                }
-            }
-
-            if (containsBlock && !plot.isAdded(player.getUniqueId())) {
-                if (sendMessage) {
-                    PluginMsg.errorSMessage(player, Files.getLocale().getAccessDeniedPlotSq());
-                }
-
-                return false;
-            }
+        if (!canUse && sendMessage) {
+            PluginMsg.errorSMessage(player, Files.getLocale().getAccessDeniedPlotSq());
         }
 
-        return true;
+        return canUse;
     }
 
     /**
      * Transform a Bukkit Location into a PlotSquared Location.
      *
      * @param location The location to transform.
-     * @return The Plot² formatted Location
+     * @return The PlotSquared formatted Location
      */
     private Location getP2Location(org.bukkit.Location location) {
         if (location.getWorld() != null) {
@@ -76,6 +58,21 @@ public class PlotSquaredDependency extends Dependency {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Detect if a player can use an enderchest in a specific plot.
+     *
+     * @param plot   place where the enderchest is
+     * @param player player who wants to interact with the enderchest
+     * @return true if the player can interact this plot
+     */
+    private boolean canPlayerUseEnderchest(Plot plot, Player player) {
+        Optional<Set<ItemType>> flag = plot.getFlag(Flags.USE);
+        boolean hasProtection = flag.isPresent() && flag.get().stream()
+                .anyMatch(type -> type.getId().equals(ENDERCHEST_MATERIAL_NAME));
+
+        return !hasProtection || plot.isAdded(player.getUniqueId());
     }
 
 }
