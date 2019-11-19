@@ -8,18 +8,21 @@ import org.bukkit.command.CommandSender;
 
 public class UpdateCommand extends AbstractCommand {
 
+    /**
+     * The updater used to check for a new plugin version
+     */
+    private Updater updater;
+
     public UpdateCommand() {
         super("update");
+        this.updater = EnderContainers.getInstance().getManager(Updater.class);
 
         this.setPermission("update");
     }
 
     @Override
     public void perform(CommandSender sender) {
-        if (!Updater.getInstance().isUpToDate()) {
-            sender.sendMessage(EnderContainers.PREFIX + "§aThere is a newer version available: §2§l" + Updater.getInstance().getNewestVersion() + "§a.");
-            sender.sendMessage(EnderContainers.PREFIX + "&7Click here to download it: " + EnderContainers.DOWNLOAD_LINK);
-        } else {
+        if (!this.updater.notifyPlayer(sender)) {
             sender.sendMessage(EnderContainers.PREFIX + "§7" + Files.getLocale().getNoUpdate());
         }
     }

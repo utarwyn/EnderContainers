@@ -99,10 +99,12 @@ public class EnderChestListener implements Listener {
         Player player = event.getPlayer();
 
         // Send update message to the player is he has the permission.
-        if (MiscUtil.playerHasPerm(player, "update") && !Updater.getInstance().isUpToDate()) {
-            player.sendMessage(EnderContainers.PREFIX + "§aThere is a newer version available: §2§l" + Updater.getInstance().getNewestVersion() + "§a.");
-            player.sendMessage(EnderContainers.PREFIX + "Download it here: §f§n" + EnderContainers.DOWNLOAD_LINK);
-            MiscUtil.playSound(player, "NOTE_PLING", "BLOCK_NOTE_PLING");
+        if (MiscUtil.playerHasPerm(player, "update")) {
+            Updater updater = EnderContainers.getInstance().getManager(Updater.class);
+
+            if (updater.notifyPlayer(player)) {
+                MiscUtil.playSound(player, "NOTE_PLING", "BLOCK_NOTE_PLING");
+            }
         }
     }
 

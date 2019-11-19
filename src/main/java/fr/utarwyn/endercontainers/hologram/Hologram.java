@@ -113,7 +113,7 @@ class Hologram {
             }
 
             nmsPacket = Class.forName(NMS_PACKAGE + version + ".Packet");
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+        } catch (ReflectiveOperationException e) {
             EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot initialize the hologram", e);
         }
     }
@@ -192,7 +192,7 @@ class Hologram {
 
             this.destroyPacket = this.getDestroyPacket((int) field.get(packet));
             this.sendPacket(packet);
-        } catch (Exception e) {
+        } catch (ReflectiveOperationException e) {
             EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot spawn the hologram", e);
         }
     }
@@ -203,7 +203,7 @@ class Hologram {
      * @param id The id of the entity to destroy
      * @return The destroy packet object
      */
-    private Object getDestroyPacket(int... id) throws Exception {
+    private Object getDestroyPacket(int... id) throws ReflectiveOperationException {
         return destroyPacketConstructor.newInstance((Object) id);
     }
 
@@ -217,7 +217,7 @@ class Hologram {
      * @param text Text to display
      * @return The spawn packet object
      */
-    private Object getPacket(World w, double x, double y, double z, String text) throws Exception {
+    private Object getPacket(World w, double x, double y, double z, String text) throws ReflectiveOperationException {
         Object craftWorldObj = craftWorld.cast(w);
 
         Method getHandleMethod = craftWorldObj.getClass().getMethod("getHandle");
@@ -268,7 +268,7 @@ class Hologram {
      *
      * @param packet The packet to send
      */
-    private void sendPacket(Object packet) throws Exception {
+    private void sendPacket(Object packet) throws ReflectiveOperationException {
         Method getHandle = this.player.getClass().getMethod("getHandle");
         Object entityPlayer = getHandle.invoke(this.player);
         Object pConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);

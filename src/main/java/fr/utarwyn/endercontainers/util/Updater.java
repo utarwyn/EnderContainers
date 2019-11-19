@@ -1,6 +1,8 @@
 package fr.utarwyn.endercontainers.util;
 
-import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.AbstractManager;
+import fr.utarwyn.endercontainers.configuration.Files;
+import org.bukkit.command.CommandSender;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -13,171 +15,181 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static fr.utarwyn.endercontainers.EnderContainers.PREFIX;
+
 /**
  * Class used to check if there is any update for the plugin.
  *
  * @author Utarwyn
  * @since 2.0.0
  */
-public class Updater {
+public class Updater extends AbstractManager implements Runnable {
 
     /**
-     * Stores the Spigot ressource ID to check for update
+     * URL to download the plugin
      */
-    private static final int RESSOURCE_ID = 4750;
+    private static final String DOWNLOAD_LINK = "https://bit.ly/2A8Xv8S";
+
+    /**
+     * URL to go to the plugin's official wiki
+     */
+    private static final String WIKI_LINK = "https://bit.ly/2D07g9a";
 
     /**
      * URL used to get the current version of the plugin
      */
-    private static final String VERSION_URL = "https://api.spiget.org/v2/resources/" + RESSOURCE_ID + "/versions?size=1&sort=-releaseDate";
+    private static final String VERSION_URL = "https://api.spiget.org/v2/resources/4750/versions?size=1&sort=-releaseDate";
 
     /**
-     * URL used to get the last update description of the plugin
+     * Decimal value of the current version of the plugin
      */
-    private static final String DESCRIPTION_URL = "https://api.spiget.org/v2/resources/" + RESSOURCE_ID + "/updates?size=1&sort=-date";
+    private long currentVersionValue;
 
     /**
-     * Stores the instance of the Updater class (Singleton class)
+     * Decimal value of the latest version of the plugin
      */
-    private static Updater instance;
+    private long latestVersionValue;
 
     /**
-     * Stores if the plugin is up to date or not.
+     * Current version of the plugin
      */
-    private boolean upToDate;
+    private String currentVersion;
 
     /**
-     * Stores the last version of the plugin
+     * Latest version of the plugin
      */
-    private String newestVersion;
+    private String latestVersion;
 
     /**
-     * Stores the last update title of the plugin (from Spigot)
+     * {@inheritDoc}
      */
-    private String updateTitle;
-
-    /**
-     * Utility class!
-     */
-    private Updater() {
-        this.upToDate = true;
-        checkForUpdate();
-    }
-
-    /**
-     * Gets the instance of the Updater
-     *
-     * @return Instance of this manager
-     */
-    public static Updater getInstance() {
-        if (instance == null) {
-            instance = new Updater();
-        }
-
-        return instance;
-    }
-
-    /**
-     * Returns if the plugin is up to date or not.
-     *
-     * @return True if the plugin is up to date otherwise false
-     */
-    public boolean isUpToDate() {
-        return this.upToDate;
-    }
-
-    /**
-     * Returns the newest version of the plugin
-     *
-     * @return Newest version of EnderContainers
-     */
-    public String getNewestVersion() {
-        return this.newestVersion;
-    }
-
-    /**
-     * Notify to the console if the plugin have to be updated or not.
-     */
-    public void notifyUpToDate() {
-        Logger logger = EnderContainers.getInstance().getLogger();
-
-        if (this.upToDate) {
-            logger.info("You are using the newest version of the plugin (" + this.getLocalVersion() + ").");
+    @Override
+    public void load() {
+        // Check for updates if enabled by the server administrator
+        if (Files.getConfiguration().isUpdateChecker()) {
+            this.plugin.getServer().getScheduler().runTask(this.plugin, this);
         } else {
-            logger.warning("  ");
-            logger.warning("-----------[Plugin Update!]---------");
-            logger.warning("    Your version: " + this.getLocalVersion());
-            logger.warning("    Newest version: " + this.newestVersion);
-            logger.warning("  ");
-            logger.warning("    Update message: " + this.updateTitle);
-            logger.warning("------------------------------------");
+            this.plugin.getLogger().warning("You have disabled update checking. Please be sure that the plugin is up to date.");
         }
     }
 
     /**
-     * Start the checking of a new version of the plugin
+     * {@inheritDoc}
      */
-    private void checkForUpdate() {
-        try {
-            JSONArray versionsArray = (JSONArray) JSONValue.parseWithException(new BufferedReader(new InputStreamReader(new URL(VERSION_URL).openStream())));
-            String lastVersion = ((JSONObject) versionsArray.get(versionsArray.size() - 1)).get("name").toString();
-
-            this.upToDate = !this.compareVersion(this.getLocalVersion(), lastVersion);
-            this.newestVersion = lastVersion;
-
-            if (!this.upToDate) {
-                this.searchUpdateTitle();
-            }
-        } catch (ParseException | IOException e) {
-            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot retrieve the local version of the plugin", e);
-        }
+    @Override
+    public void unload() {
+        this.latestVersion = null;
+        this.currentVersion = null;
+        this.latestVersionValue = 0;
+        this.currentVersionValue = 0;
     }
 
     /**
-     * Search for the last update title
-     */
-    private void searchUpdateTitle() {
-        try {
-            JSONArray versionsArray = (JSONArray) JSONValue.parseWithException(new BufferedReader(new InputStreamReader(new URL(DESCRIPTION_URL).openStream())));
-
-            this.updateTitle = ((JSONObject) versionsArray.get(versionsArray.size() - 1)).get("title").toString();
-        } catch (ParseException | IOException e) {
-            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot retrieve the title of the latest update", e);
-        }
-    }
-
-    /**
-     * Compare two versions (locale and remote)
+     * Notify a command sender if the plugin needs to be updated.
      *
-     * @param local  Local version of the plugin
-     * @param remote Remote version of the plugin
-     * @return True if the local version is before the remote version
+     * @param sender sender that has to be notified about an update
+     * @return true if the sender has been notified
      */
-    private boolean compareVersion(String local, String remote) {
-        // Parse the version to only keep the integer.
-        int localVer = Integer.parseInt(local.replaceAll("[^\\d]", "")) * 100;
-        int remoteVer = Integer.parseInt(remote.replaceAll("[^\\d]", "")) * 100;
+    public boolean notifyPlayer(CommandSender sender) {
+        boolean needUpdate = this.hasToBeUpdated();
 
-        // Manage sub-version character at the end of the version.
-        char localSubVer = local.charAt(local.length() - 1);
-        char remoteSubVer = remote.charAt(remote.length() - 1);
+        if (needUpdate) {
+            sender.sendMessage(PREFIX + "§eA new version is available for download! §7Follow instructions in your console to update the plugin.");
+        }
 
-        if (localSubVer >= 'a' && localSubVer <= 'z')
-            localVer += (localSubVer - 'a') + 1;
-        if (remoteSubVer >= 'a' && remoteSubVer <= 'z')
-            remoteVer += (remoteSubVer - 'a') + 1;
-
-        // Compare the two versions!
-        return localVer < remoteVer;
+        return needUpdate;
     }
 
     /**
-     * Return the local version of EnderContainers. Only a shortcut.
-     *
-     * @return Local version of the plugin.
+     * Detects the latest version of the plugin and stores it.
+     * Also notifies the console about the check.
      */
-    private String getLocalVersion() {
-        return EnderContainers.getInstance().getDescription().getVersion();
+    @Override
+    public void run() {
+        try {
+            this.retreiveVersions();
+            this.notifyConsole();
+        } catch (IOException | ParseException e) {
+            this.plugin.getLogger().log(Level.SEVERE, "Cannot retrieve the latest version of the plugin", e);
+        }
+    }
+
+    /**
+     * Notify the console if the plugin have to be updated or not.
+     */
+    private void notifyConsole() {
+        Logger logger = this.plugin.getLogger();
+
+        if (this.hasToBeUpdated()) {
+            logger.log(Level.WARNING, "**** PLUGIN UPDATE {0}", this.latestVersion);
+            logger.log(Level.WARNING, "Your server is using the version {0} of EnderContainers.", this.currentVersion);
+            logger.warning(" ");
+            logger.log(Level.WARNING, "  1. Download the new version here: {0}", DOWNLOAD_LINK);
+            logger.log(Level.WARNING, "  2. Then follow the upgrade guide {0} here: {1}", new String[]{this.latestVersion, WIKI_LINK});
+            logger.warning(" ");
+        } else if (this.isUsingDevelopmentBuild()) {
+            logger.warning("**** IMPORTANT!");
+            logger.warning("You are using a development build. This means that the plugin can be unstable.");
+            logger.warning("If you have an issue during its execution, please report it on the Github repository.");
+        } else {
+            logger.log(Level.INFO, "You are using the newest version of the plugin ({0}).", this.currentVersion);
+        }
+    }
+
+    /**
+     * Start the checking of the plugin's version.
+     *
+     * @throws IOException    throwed if the method cannot read the remote json
+     * @throws ParseException throwed if the remote json cannot be parsed as expected
+     */
+    private void retreiveVersions() throws IOException, ParseException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(VERSION_URL).openStream()));
+        JSONArray versions = (JSONArray) JSONValue.parseWithException(reader);
+        JSONObject version = (JSONObject) versions.get(versions.size() - 1);
+
+        this.currentVersion = this.plugin.getDescription().getVersion();
+        this.latestVersion = version.get("name").toString();
+
+        this.currentVersionValue = this.getVersionDecimalValue(this.currentVersion);
+        this.latestVersionValue = this.getVersionDecimalValue(this.latestVersion);
+    }
+
+    /**
+     * Parse a version string to get its decimal representation.
+     *
+     * @param version version to parse
+     * @return the decimal value of the version
+     */
+    private long getVersionDecimalValue(String version) {
+        int decimalValue = Integer.parseInt(version.replaceAll("[^\\d]", "")) * 100;
+
+        // Manage sub-version character at the end of the version
+        char subVersion = version.charAt(version.length() - 1);
+        if (subVersion >= 'a' && subVersion <= 'z') {
+            decimalValue += (subVersion - 'a') + 1;
+        }
+
+        return decimalValue;
+    }
+
+    /**
+     * Compares decimal values of current and latest versions to check
+     * if the plugin needs to be updated.
+     *
+     * @return true if the plugin needs to be updated
+     */
+    private boolean hasToBeUpdated() {
+        return this.currentVersionValue < this.latestVersionValue;
+    }
+
+    /**
+     * Compares decimal values of current and latest versions to check
+     * if the server runs a development build of the plugin.
+     *
+     * @return true if the plugin is a development build
+     */
+    private boolean isUsingDevelopmentBuild() {
+        return this.currentVersionValue > this.latestVersionValue;
     }
 
 }

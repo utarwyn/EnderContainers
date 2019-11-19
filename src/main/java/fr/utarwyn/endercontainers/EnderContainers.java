@@ -25,11 +25,6 @@ import java.util.logging.Level;
 public class EnderContainers extends JavaPlugin {
 
     /**
-     * Download link of the plugin
-     */
-    public static final String DOWNLOAD_LINK = "http://bit.ly/2A8Xv8S";
-
-    /**
      * The plugin prefix
      */
     public static final String PREFIX = "§8[§6EnderContainers§8] §7";
@@ -73,11 +68,7 @@ public class EnderContainers extends JavaPlugin {
         Managers.register(this, EnderChestManager.class);
         Managers.register(this, BackupManager.class);
         Managers.register(this, HologramManager.class);
-
-        // Check for updates
-        if (Files.getConfiguration().isUpdateChecker()) {
-            Updater.getInstance().notifyUpToDate();
-        }
+        Managers.register(this, Updater.class);
 
         // Registering commands
         Objects.requireNonNull(Managers.get(CommandManager.class)).registerCommands();
