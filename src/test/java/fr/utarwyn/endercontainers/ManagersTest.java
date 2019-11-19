@@ -9,6 +9,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -53,7 +54,13 @@ public class ManagersTest {
         assertThat(Managers.get(this.manager.getClass())).isNotNull()
                 .isInstanceOf(this.manager.getClass());
 
-        assertThat(Managers.get(AbstractManager.class)).isNull();
+        try {
+            Managers.get(AbstractManager.class);
+            fail("An exception should be thrown when trying to get an unregistered manager.");
+        } catch (NullPointerException e) {
+            assertThat(e).hasMessage("class fr.utarwyn.endercontainers.AbstractManager instance is null!")
+                    .hasNoCause();
+        }
     }
 
     @Test

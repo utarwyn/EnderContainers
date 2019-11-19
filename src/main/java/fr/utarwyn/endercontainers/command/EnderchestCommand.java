@@ -1,6 +1,6 @@
 package fr.utarwyn.endercontainers.command;
 
-import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.MiscUtil;
@@ -16,7 +16,7 @@ public class EnderchestCommand extends AbstractCommand {
     public EnderchestCommand() {
         super("enderchest", "ec", "endchest");
 
-        this.manager = EnderContainers.getInstance().getManager(EnderChestManager.class);
+        this.manager = Managers.get(EnderChestManager.class);
 
         this.addParameter(Parameter.integer().optional());
     }

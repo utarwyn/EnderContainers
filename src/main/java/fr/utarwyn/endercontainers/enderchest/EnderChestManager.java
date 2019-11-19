@@ -1,7 +1,7 @@
 package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.AbstractManager;
-import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.menu.MenuManager;
 import fr.utarwyn.endercontainers.menu.enderchest.EnderChestHubMenu;
@@ -55,7 +55,7 @@ public class EnderChestManager extends AbstractManager {
     @Override
     protected void unload() {
         // Close all menus
-        EnderContainers.getInstance().getManager(MenuManager.class).closeAll();
+        Managers.get(MenuManager.class).closeAll();
 
         // Last purge & stop the purge task
         this.purgeTask.run();

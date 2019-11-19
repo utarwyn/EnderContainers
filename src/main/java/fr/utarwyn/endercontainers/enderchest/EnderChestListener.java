@@ -1,6 +1,6 @@
 package fr.utarwyn.endercontainers.enderchest;
 
-import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
@@ -45,7 +45,7 @@ public class EnderChestListener implements Listener {
      */
     EnderChestListener(EnderChestManager manager) {
         this.manager = manager;
-        this.dependenciesManager = EnderContainers.getInstance().getManager(DependenciesManager.class);
+        this.dependenciesManager = Managers.get(DependenciesManager.class);
     }
 
     /**
@@ -99,12 +99,8 @@ public class EnderChestListener implements Listener {
         Player player = event.getPlayer();
 
         // Send update message to the player is he has the permission.
-        if (MiscUtil.playerHasPerm(player, "update")) {
-            Updater updater = EnderContainers.getInstance().getManager(Updater.class);
-
-            if (updater.notifyPlayer(player)) {
-                MiscUtil.playSound(player, "NOTE_PLING", "BLOCK_NOTE_PLING");
-            }
+        if (MiscUtil.playerHasPerm(player, "update") && Managers.get(Updater.class).notifyPlayer(player)) {
+            MiscUtil.playSound(player, "NOTE_PLING", "BLOCK_NOTE_PLING");
         }
     }
 
@@ -137,10 +133,11 @@ public class EnderChestListener implements Listener {
 
         // Play the closing sound when we use the default enderchest!
         if (inventory.getType().equals(InventoryType.ENDER_CHEST) && Files.getConfiguration().isUseVanillaEnderchest()) {
-            if (Files.getConfiguration().isGlobalSound())
+            if (Files.getConfiguration().isGlobalSound()) {
                 MiscUtil.playSound(player.getLocation(), "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
-            else
+            } else {
                 MiscUtil.playSound(player, "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
+            }
         }
     }
 

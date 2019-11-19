@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.storage;
 
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
 
 import java.lang.reflect.Constructor;
@@ -41,7 +42,7 @@ public abstract class StorageWrapper {
     private static DatabaseManager databaseManager;
 
     static {
-        databaseManager = EnderContainers.getInstance().getManager(DatabaseManager.class);
+        databaseManager = Managers.get(DatabaseManager.class);
         logger = EnderContainers.getInstance().getLogger();
         classCacheMap = new ConcurrentHashMap<>();
         cacheMap = new ConcurrentHashMap<>();

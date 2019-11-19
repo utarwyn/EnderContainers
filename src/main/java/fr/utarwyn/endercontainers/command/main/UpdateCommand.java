@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.command.main;
 
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.command.AbstractCommand;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.util.Updater;
@@ -15,7 +16,7 @@ public class UpdateCommand extends AbstractCommand {
 
     public UpdateCommand() {
         super("update");
-        this.updater = EnderContainers.getInstance().getManager(Updater.class);
+        this.updater = Managers.get(Updater.class);
 
         this.setPermission("update");
     }

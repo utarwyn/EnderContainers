@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.hologram;
 
 import fr.utarwyn.endercontainers.AbstractManager;
+import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
@@ -47,8 +48,8 @@ public class HologramManager extends AbstractManager implements Runnable {
      */
     @Override
     public void load() {
-        this.chestManager = this.plugin.getManager(EnderChestManager.class);
-        this.dependenciesManager = this.plugin.getManager(DependenciesManager.class);
+        this.chestManager = Managers.get(EnderChestManager.class);
+        this.dependenciesManager = Managers.get(DependenciesManager.class);
 
         this.task = this.plugin.getServer().getScheduler().runTaskTimer(this.plugin, this, 20L, 5L);
         this.holograms = new ConcurrentHashMap<>();

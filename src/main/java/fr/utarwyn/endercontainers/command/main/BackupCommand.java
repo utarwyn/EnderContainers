@@ -1,6 +1,6 @@
 package fr.utarwyn.endercontainers.command.main;
 
-import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.command.AbstractCommand;
 import fr.utarwyn.endercontainers.command.backup.*;
@@ -21,7 +21,7 @@ public class BackupCommand extends AbstractCommand {
     public BackupCommand() {
         super("backup");
 
-        BackupManager manager = EnderContainers.getInstance().getManager(BackupManager.class);
+        BackupManager manager = Managers.get(BackupManager.class);
 
         this.addSubCommand(new ListCommand(manager));
         this.addSubCommand(new InfoCommand(manager));

@@ -85,23 +85,4 @@ public class EnderContainers extends JavaPlugin {
         Managers.unloadAll();
     }
 
-    /**
-     * Get the instance of a registered manager by its class.
-     * This method causes a warning if the manager cannot be found because
-     * it's not a normal phenomenon.
-     *
-     * @param clazz Class searched into the manager collection
-     * @param <T>   Generic type which represents the manager object
-     * @return Registered manager if found otherwise null
-     */
-    public final <T extends AbstractManager> T getManager(Class<T> clazz) {
-        T inst = Managers.get(clazz);
-
-        if (inst == null) {
-            this.getLogger().log(Level.WARNING, "{0} instance is null!", clazz);
-        }
-
-        return inst;
-    }
-
 }

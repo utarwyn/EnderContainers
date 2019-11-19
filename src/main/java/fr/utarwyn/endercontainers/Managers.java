@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -14,7 +15,7 @@ public class Managers {
     /**
      * Cache map for instances of managers.
      */
-    private static ConcurrentHashMap<Class<? extends AbstractManager>, AbstractManager> instances = new ConcurrentHashMap<>();
+    private static Map<Class<? extends AbstractManager>, AbstractManager> instances = new ConcurrentHashMap<>();
 
     /**
      * Managers constructor.
@@ -25,41 +26,6 @@ public class Managers {
     }
 
     /**
-     * Gets managers instances.
-     *
-     * @return all managers instances
-     */
-    static ConcurrentHashMap<Class<? extends AbstractManager>, AbstractManager> getInstances() {
-        return instances;
-    }
-
-    /**
-     * Register a specific manager in the memory.
-     *
-     * @param clazz class of the manager to load for the plugin
-     * @return instance of the registered manager. Null if the manager is already registered.
-     */
-    static <T extends AbstractManager> T register(EnderContainers plugin, Class<T> clazz) {
-        if (!instances.containsKey(clazz)) {
-            try {
-                T instance = clazz.newInstance();
-
-                instances.put(clazz, instance);
-
-                instance.setPlugin(plugin);
-                instance.initialize();
-                instance.load();
-
-                return instance;
-            } catch (InstantiationException | IllegalAccessException e) {
-                plugin.getLogger().log(Level.SEVERE, "Cannot register the manager " + clazz.getName(), e);
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * Gets an instance of a manager by its class.
      *
      * @param clazz class of the manager to get
@@ -67,13 +33,13 @@ public class Managers {
      * @return manager if found otherwise null
      */
     @SuppressWarnings("unchecked")
-    protected static <T extends AbstractManager> T get(Class<T> clazz) {
+    public static <T extends AbstractManager> T get(Class<T> clazz) {
         AbstractManager instance = instances.get(clazz);
 
         if (clazz.isInstance(instance)) {
             return (T) instance;
         } else {
-            return null;
+            throw new NullPointerException(clazz + " instance is null!");
         }
     }
 
@@ -100,6 +66,41 @@ public class Managers {
      */
     public static void reloadAll() {
         instances.keySet().forEach(Managers::reload);
+    }
+
+    /**
+     * Gets managers instances.
+     *
+     * @return all managers instances
+     */
+    static Map<Class<? extends AbstractManager>, AbstractManager> getInstances() {
+        return instances;
+    }
+
+    /**
+     * Register a specific manager in the memory.
+     *
+     * @param clazz class of the manager to load for the plugin
+     * @return instance of the registered manager. Null if the manager is already registered.
+     */
+    static <T extends AbstractManager> T register(EnderContainers plugin, Class<T> clazz) {
+        if (!instances.containsKey(clazz)) {
+            try {
+                T instance = clazz.getDeclaredConstructor().newInstance();
+
+                instances.put(clazz, instance);
+
+                instance.setPlugin(plugin);
+                instance.initialize();
+                instance.load();
+
+                return instance;
+            } catch (ReflectiveOperationException e) {
+                plugin.getLogger().log(Level.SEVERE, "Cannot register the manager " + clazz.getName(), e);
+            }
+        }
+
+        return null;
     }
 
     /**

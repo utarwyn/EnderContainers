@@ -1,6 +1,6 @@
 package fr.utarwyn.endercontainers.menu.enderchest;
 
-import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 import fr.utarwyn.endercontainers.configuration.Files;
@@ -93,7 +93,7 @@ public class EnderChestHubMenu extends AbstractMenu {
      */
     public EnderChestHubMenu(UUID owner) {
         this.owner = owner;
-        this.manager = EnderContainers.getInstance().getManager(EnderChestManager.class);
+        this.manager = Managers.get(EnderChestManager.class);
         this.page = 1;
 
         this.reloadInventory();
@@ -212,7 +212,6 @@ public class EnderChestHubMenu extends AbstractMenu {
 
         ItemStack itemStack;
 
-        // TODO: maybe add an option to personalize the material here (instead of a glass pane)?
         if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
             itemStack = new ItemStack(CompatibilityHelper.matchMaterial(dyeColor.name() + "_STAINED_GLASS_PANE"));
         } else {
@@ -224,7 +223,6 @@ public class EnderChestHubMenu extends AbstractMenu {
         List<String> lore = new ArrayList<>();
 
         // Update lore with the chest's status
-        // TODO maybe allow users to integrally personalize the description!
         if (!accessible) {
             lore.add(Files.getLocale().getMenuChestLocked());
         }
@@ -270,8 +268,6 @@ public class EnderChestHubMenu extends AbstractMenu {
         if (title.contains("%percent%")) {
             title = title.replace("%percent%", fillingColor + "(" + String.format("%.0f", chest.getFillPercentage() * 100) + "%)" + accessibilityColor);
         }
-
-        // TODO: items number placeholder?
 
         return title;
     }
