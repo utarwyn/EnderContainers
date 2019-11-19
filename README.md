@@ -7,8 +7,8 @@ Works with Bukkit/Spigot 1.8 to 1.14!
 </h4>
 
 <p align="center">
-    <a href="https://travis-ci.org/utarwyn/EnderContainers">
-        <img src="https://img.shields.io/travis/utarwyn/EnderContainers.svg" alt="Travis">
+    <a href="https://travis-ci.com/utarwyn/EnderContainers">
+        <img src="https://img.shields.io/travis/com/utarwyn/EnderContainers.svg" alt="Travis">
     </a>
     <a href="https://sonarcloud.io/dashboard?id=fr.utarwyn%3AEnderContainers">
         <img src="https://sonarcloud.io/api/project_badges/measure?project=fr.utarwyn%3AEnderContainers&metric=alert_status" alt="SonarQube Quality gate">

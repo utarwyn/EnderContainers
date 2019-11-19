@@ -14,14 +14,6 @@
     <url>https://github.com/utarwyn/EnderContainers</url>
     <inceptionYear>2015</inceptionYear>
 
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub Utarwyn Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/utarwyn/EnderContainers</url>
-        </repository>
-    </distributionManagement>
-
     <licenses>
         <license>
             <name>The BSD 3-Clause License</name>
@@ -250,4 +242,33 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.8.3</version>
+                        <executions>
+                            <execution>
+                                <id>prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
