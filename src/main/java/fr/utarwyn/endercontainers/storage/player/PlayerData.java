@@ -56,7 +56,7 @@ public abstract class PlayerData extends StorageWrapper {
      * @return The formatted UUID
      */
     String getMinimalUUID() {
-        return this.uuid.toString().replaceAll("-", "");
+        return this.uuid.toString().replace("-", "");
     }
 
     protected boolean hasParams(Object... params) {

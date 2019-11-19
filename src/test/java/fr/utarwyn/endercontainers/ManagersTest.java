@@ -2,19 +2,23 @@ package fr.utarwyn.endercontainers;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ManagersTest {
 
+    @Mock
     private AbstractManager manager;
 
     @Before
     public void setUp() {
-        this.manager = mock(AbstractManager.class);
         Managers.getInstances().clear();
     }
 

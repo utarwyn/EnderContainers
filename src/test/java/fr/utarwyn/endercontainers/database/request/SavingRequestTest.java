@@ -80,18 +80,14 @@ public class SavingRequestTest {
     }
 
     @Test
-    public void execute() {
+    public void execute() throws SQLException {
         Database database = mock(Database.class);
         SavingRequest request = new SavingRequest(database, "test");
 
         request.fields("amount").values(1).where("id = ?").attributes(4);
 
-        try {
-            when(database.execUpdateStatement(request)).thenReturn(true);
-            assertThat(request.execute()).isTrue();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        when(database.execUpdateStatement(request)).thenReturn(true);
+        assertThat(request.execute()).isTrue();
     }
 
     @Test

@@ -3,26 +3,25 @@ package fr.utarwyn.endercontainers;
 import org.bukkit.Server;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class AbstractManagerTest {
 
-    private EnderContainers plugin;
-
+    @Mock(answer = Answers.CALLS_REAL_METHODS)
     private AbstractManager manager;
 
-    @Before
-    public void setUp() {
-        this.manager = mock(AbstractManager.class, Mockito.CALLS_REAL_METHODS);
-        this.plugin = mock(EnderContainers.class);
-    }
+    @Mock
+    private EnderContainers plugin;
 
     @Test
     public void registerListener() {

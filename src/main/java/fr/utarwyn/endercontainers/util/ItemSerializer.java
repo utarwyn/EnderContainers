@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
@@ -70,7 +71,7 @@ public class ItemSerializer {
     private static String experimentalSerialization(ConcurrentMap<Integer, ItemStack> items) {
         StringBuilder serialization = new StringBuilder(new String((items.size() + ";").getBytes(), StandardCharsets.UTF_8));
 
-        for (ConcurrentMap.Entry<Integer, ItemStack> entry : items.entrySet()) {
+        for (Entry<Integer, ItemStack> entry : items.entrySet()) {
             ItemStack is = entry.getValue();
 
             if (is != null) {
@@ -96,7 +97,7 @@ public class ItemSerializer {
                 Map<Enchantment, Integer> isEnch = is.getEnchantments();
 
                 if (isEnch.size() > 0) {
-                    for (ConcurrentHashMap.Entry<Enchantment, Integer> enchEntry : isEnch.entrySet()) {
+                    for (Entry<Enchantment, Integer> enchEntry : isEnch.entrySet()) {
                         serializedItemStack.append(":e@")
                                 .append(CompatibilityHelper.enchantmentToString(enchEntry.getKey()))
                                 .append("@").append(enchEntry.getValue());
@@ -104,7 +105,7 @@ public class ItemSerializer {
                 }
 
                 // Display name
-                if (is.getItemMeta().getDisplayName() != null) {
+                if (is.getItemMeta() != null && !is.getItemMeta().getDisplayName().equals("")) {
                     String[] itemDisplayName = new String(
                             is.getItemMeta().getDisplayName().getBytes(StandardCharsets.UTF_8),
                             StandardCharsets.UTF_8
@@ -118,13 +119,13 @@ public class ItemSerializer {
                 }
 
                 // Item descriptions
-                if (is.getItemMeta().getLore() != null) {
+                if (is.getItemMeta() != null && is.getItemMeta().getLore() != null) {
                     List<String> itemLores = is.getItemMeta().getLore();
                     serializedItemStack.append(":l@");
 
-                    for (String itemLore : itemLores)
+                    for (String itemLore : itemLores) {
                         serializedItemStack.append(escapeItemDisplayName(itemLore)).append("=");
-
+                    }
                 }
 
                 // Slot where the itemstack is stored
@@ -148,7 +149,7 @@ public class ItemSerializer {
 
             dataOutput.writeInt(items.size());
 
-            for (ConcurrentMap.Entry<Integer, ItemStack> entry : items.entrySet()) {
+            for (Entry<Integer, ItemStack> entry : items.entrySet()) {
                 dataOutput.writeInt(entry.getKey());
                 dataOutput.writeObject(entry.getValue());
             }

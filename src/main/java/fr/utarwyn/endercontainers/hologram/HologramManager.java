@@ -107,7 +107,7 @@ public class HologramManager extends AbstractManager implements Runnable {
             String title = Files.getLocale().getChestNametag()
                     .replace("%enderchests%", String.valueOf(copEcs))
                     .replace("%maxenderchests%", String.valueOf(Files.getConfiguration().getMaxEnderchests()))
-                    .replaceAll("%plurial%", ((copEcs > 1) ? "s" : ""));
+                    .replace("%plurial%", ((copEcs > 1) ? "s" : ""));
 
             this.holograms.put(player.getUniqueId(), new Hologram(player, title, block.getLocation()));
         }

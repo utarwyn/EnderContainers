@@ -8,8 +8,10 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -32,7 +34,8 @@ public class CommandManager extends AbstractManager {
         try {
             this.register(EnderchestCommand.class);
             this.register(MainCommand.class);
-        } catch (IllegalAccessException | InstantiationException e) {
+        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException |
+                InvocationTargetException | NoSuchFieldException e) {
             this.logger.log(Level.SEVERE, "Cannot instanciate a command class", e);
         }
     }
@@ -44,39 +47,18 @@ public class CommandManager extends AbstractManager {
      * @param command Command to unregister completely from the server.
      */
     public void unregister(PluginCommand command) {
-        CommandMap commandMap = getCommandMap();
-
-        if (commandMap == null) {
-            return;
-        }
-
         try {
-            Field fKownCmds;
-            HashMap<String, Command> knownCmds;
+            CommandMap commandMap = this.getCommandMap();
+            Map<String, Command> commands = this.getRegisteredCommands(commandMap);
 
-            try {
-                fKownCmds = commandMap.getClass().getDeclaredField("knownCommands");
-            } catch (NoSuchFieldException ex) {
-                fKownCmds = null;
-            }
-
-            if (fKownCmds != null) { // Old versions
-                fKownCmds.setAccessible(true);
-                knownCmds = (HashMap<String, Command>) fKownCmds.get(commandMap);
-                fKownCmds.setAccessible(false);
-            } else { // For 1.13 servers
-                Method m = commandMap.getClass().getDeclaredMethod("getKnownCommands");
-                knownCmds = (HashMap<String, Command>) m.invoke(commandMap);
-            }
-
-            knownCmds.remove(command.getName());
+            commands.remove(command.getName());
             for (String alias : command.getAliases()) {
-                if (knownCmds.containsKey(alias) && knownCmds.get(alias).toString().contains(command.getName())) {
-                    knownCmds.remove(alias);
+                if (commands.containsKey(alias) && commands.get(alias).toString().contains(command.getName())) {
+                    commands.remove(alias);
                 }
             }
-        } catch (Exception ex) {
-            this.logger.log(Level.SEVERE, "Cannot unregister the command " + command.getName() + " from the server!", ex);
+        } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            this.logger.log(Level.SEVERE, "Cannot unregister the command " + command.getName() + " from the server!", e);
         }
     }
 
@@ -86,11 +68,12 @@ public class CommandManager extends AbstractManager {
      *
      * @param commandClass Class of the command to register inside the Bukkit server
      */
-    private void register(Class<? extends AbstractCommand> commandClass) throws IllegalAccessException, InstantiationException {
+    private void register(Class<? extends AbstractCommand> commandClass) throws IllegalAccessException,
+            InstantiationException, NoSuchFieldException, NoSuchMethodException, InvocationTargetException {
         CommandMap commandMap = getCommandMap();
 
         if (commandMap != null) {
-            commandMap.register("endercontainers", commandClass.newInstance());
+            commandMap.register("endercontainers", commandClass.getDeclaredConstructor().newInstance());
         }
     }
 
@@ -98,24 +81,47 @@ public class CommandManager extends AbstractManager {
      * This method returns the command map of the server!
      *
      * @return The Bukkit internal Command map
+     * @throws NoSuchFieldException "commandMap" field cannot be found
+     * @throws IllegalAccessException cannot access to the field "commandMap"
      */
-    private CommandMap getCommandMap() {
+    private CommandMap getCommandMap() throws NoSuchFieldException, IllegalAccessException {
         // Get the command map of the server first!
         if (cachedCommandMap == null) {
-            try {
-                Server server = this.plugin.getServer();
-                Field fMap = server.getClass().getDeclaredField("commandMap");
+            Server server = this.plugin.getServer();
+            Field fMap = server.getClass().getDeclaredField("commandMap");
 
-                fMap.setAccessible(true);
-                cachedCommandMap = (SimpleCommandMap) fMap.get(server);
-                fMap.setAccessible(false);
-            } catch (Exception ex) {
-                this.logger.log(Level.SEVERE, "Cannot fetch the command map from the server!", ex);
-                return null;
-            }
+            fMap.setAccessible(true);
+            cachedCommandMap = (SimpleCommandMap) fMap.get(server);
+            fMap.setAccessible(false);
         }
 
         return cachedCommandMap;
+    }
+
+    /**
+     * This method returns a map with all commands registered in the server.
+     *
+     * @param commandMap command map in which commands are stored
+     * @return map of all registered commands
+     * @throws NoSuchMethodException     method "getKnownCommands" cannot be found
+     * @throws InvocationTargetException cannot invoke the method "getKnownCommands"
+     * @throws IllegalAccessException    cannot access to a private field/method
+     */
+    private HashMap<String, Command> getRegisteredCommands(CommandMap commandMap)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        HashMap<String, Command> knownCmds;
+
+        try { // 1.8 -> 1.12
+            Field fKownCmds = commandMap.getClass().getDeclaredField("knownCommands");
+            fKownCmds.setAccessible(true);
+            knownCmds = (HashMap<String, Command>) fKownCmds.get(commandMap);
+            fKownCmds.setAccessible(false);
+        } catch (NoSuchFieldException ex) { // 1.13+
+            Method m = commandMap.getClass().getDeclaredMethod("getKnownCommands");
+            knownCmds = (HashMap<String, Command>) m.invoke(commandMap);
+        }
+
+        return knownCmds;
     }
 
 }

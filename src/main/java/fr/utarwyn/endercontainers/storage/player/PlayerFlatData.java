@@ -19,6 +19,11 @@ import java.util.logging.Level;
  */
 public class PlayerFlatData extends PlayerData {
 
+    /**
+     * Prefix used in the config file to store player data.
+     */
+    private static final String PREFIX = "enderchests";
+
     private FlatFile flatFile;
 
     PlayerFlatData(UUID uuid) {
@@ -45,7 +50,7 @@ public class PlayerFlatData extends PlayerData {
 
     @Override
     public ConcurrentMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
-        String path = "enderchests." + enderChest.getNum() + ".contents";
+        String path = PREFIX + "." + enderChest.getNum() + ".contents";
 
         if (!this.flatFile.getConfiguration().contains(path)) {
             return new ConcurrentHashMap<>();
@@ -56,13 +61,13 @@ public class PlayerFlatData extends PlayerData {
 
     @Override
     public int getEnderchestRows(EnderChest enderChest) {
-        String path = "enderchests." + enderChest.getNum() + ".rows";
+        String path = PREFIX + "." + enderChest.getNum() + ".rows";
         return this.flatFile.getConfiguration().contains(path) ? this.flatFile.getConfiguration().getInt(path) : 3;
     }
 
     @Override
     public void saveEnderchest(EnderChest chest, ConcurrentMap<Integer, ItemStack> contents) {
-        String path = "enderchests." + chest.getNum() + ".";
+        String path = PREFIX + "." + chest.getNum() + ".";
 
         this.flatFile.getConfiguration().set(path + "rows", chest.getRows());
         this.flatFile.getConfiguration().set(path + "position", chest.getNum());

@@ -7,10 +7,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -22,40 +22,32 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class AbstractMenuTest {
 
-    @Mock
+    @Mock(answer = Answers.CALLS_REAL_METHODS)
     private AbstractMenu menu;
+
+    @Mock
+    private Inventory inventory;
 
     @BeforeClass
     public static void setUpClass() {
         TestHelper.setUpServer();
     }
 
-    @Before
-    public void setUp() {
-        doCallRealMethod().when(this.menu).getInventory();
-        doCallRealMethod().when(this.menu).reloadInventory();
-        doCallRealMethod().when(this.menu).open(any(Player.class));
-        doCallRealMethod().when(this.menu).getFilledSlotsNb();
-        doCallRealMethod().when(this.menu).getMapContents();
-    }
-
     @Test
     public void inventory() {
         assertThat(this.menu.inventory).isNull();
-        this.menu.inventory = mock(Inventory.class);
+        this.menu.inventory = this.inventory;
         assertThat(this.menu.getInventory()).isNotNull().isEqualTo(this.menu.inventory);
     }
 
     @Test
     public void reloadInventory() {
-        Inventory inventory = mock(Inventory.class);
-
         int rows = 5;
         String title = "very long default inventory title";
 
         when(Bukkit.getServer().createInventory(
                 any(InventoryHolder.class), any(Integer.class), any(String.class)
-        )).thenReturn(inventory);
+        )).thenReturn(this.inventory);
 
         when(this.menu.getRows()).thenReturn(rows);
         when(this.menu.getTitle()).thenReturn(title);
@@ -78,19 +70,18 @@ public class AbstractMenuTest {
     @Test
     public void open() {
         Player player = mock(Player.class);
-        Inventory inventory = mock(Inventory.class);
 
         when(Bukkit.getServer().isPrimaryThread()).thenReturn(true);
 
-        this.menu.inventory = inventory;
+        this.menu.inventory = this.inventory;
         this.menu.open(player);
 
-        verify(player, times(1)).openInventory(inventory);
+        verify(player, times(1)).openInventory(this.inventory);
     }
 
     @Test
     public void filledSlotsNb() {
-        this.menu.inventory = mock(Inventory.class);
+        this.menu.inventory = this.inventory;
 
         when(this.menu.inventory.getContents()).thenReturn(this.getFakeItemList());
         assertThat(this.menu.getFilledSlotsNb()).isEqualTo(3);
@@ -98,7 +89,7 @@ public class AbstractMenuTest {
 
     @Test
     public void mapContents() {
-        this.menu.inventory = mock(Inventory.class);
+        this.menu.inventory = this.inventory;
         when(this.menu.inventory.getContents()).thenReturn(this.getFakeItemList());
 
         Map<Integer, ItemStack> map = this.menu.getMapContents();

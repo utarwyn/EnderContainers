@@ -7,8 +7,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -86,13 +88,13 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
         dependencyClasses.put("Factions", FactionsDependency.class);
 
         // And register them if the plugin is loaded on the server.
-        for (ConcurrentHashMap.Entry<String, Class<? extends Dependency>> dependency : dependencyClasses.entrySet()) {
+        for (Entry<String, Class<? extends Dependency>> dependency : dependencyClasses.entrySet()) {
             String name = dependency.getKey();
 
             if (this.pluginManager.isPluginEnabled(name)) {
                 try {
-                    this.registerDependency(name, dependency.getValue().newInstance());
-                } catch (InstantiationException | IllegalAccessException e) {
+                    this.registerDependency(name, dependency.getValue().getDeclaredConstructor().newInstance());
+                } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                     this.logger.log(Level.SEVERE, "Cannot instanciate the dependency " + name, e);
                 }
             }

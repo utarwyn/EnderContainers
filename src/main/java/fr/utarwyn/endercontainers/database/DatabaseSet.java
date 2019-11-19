@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -124,7 +125,7 @@ public class DatabaseSet {
         StringBuilder s = new StringBuilder("{DatabaseSet #" + this.hashCode() + " (");
 
         int i = 0;
-        for (ConcurrentHashMap.Entry<String, Object> entry : this.set.entrySet()) {
+        for (Entry<String, Object> entry : this.set.entrySet()) {
             s.append(entry.getKey()).append("=").append(entry.getValue());
             s.append((i < this.set.size() - 1) ? " " : "");
 

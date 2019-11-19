@@ -40,18 +40,14 @@ public class DeleteRequestTest {
     }
 
     @Test
-    public void execute() {
+    public void execute() throws SQLException {
         Database database = mock(Database.class);
         DeleteRequest request = new DeleteRequest(database, "test = ?");
 
         request.from("table").attributes("qwerty");
 
-        try {
-            when(database.execUpdateStatement(request)).thenReturn(true);
-            assertThat(request.execute()).isTrue();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        when(database.execUpdateStatement(request)).thenReturn(true);
+        assertThat(request.execute()).isTrue();
     }
 
     @Test

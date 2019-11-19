@@ -23,7 +23,7 @@ import java.util.logging.Level;
  */
 public class BackupsFlatData extends BackupsData {
 
-    private static final String CONF_PREFIX = "backups";
+    private static final String PREFIX = "backups";
 
     private FlatFile flatFile;
 
@@ -67,7 +67,7 @@ public class BackupsFlatData extends BackupsData {
     private static File getBackupFolder(Backup backup) {
         return new File(
                 EnderContainers.getInstance().getDataFolder(),
-                "backups" + File.separator + backup.getName()
+                PREFIX + File.separator + backup.getName()
         );
     }
 
@@ -82,19 +82,19 @@ public class BackupsFlatData extends BackupsData {
             logger.log(Level.SEVERE, "Cannot load the backups file", e);
         }
 
-        if (!this.flatFile.getConfiguration().isConfigurationSection(CONF_PREFIX)) {
-            this.flatFile.getConfiguration().set(CONF_PREFIX, new ArrayList<>());
+        if (!this.flatFile.getConfiguration().isConfigurationSection(PREFIX)) {
+            this.flatFile.getConfiguration().set(PREFIX, new ArrayList<>());
         }
 
         YamlConfiguration config = this.flatFile.getConfiguration();
-        ConfigurationSection section = config.getConfigurationSection(CONF_PREFIX);
+        ConfigurationSection section = config.getConfigurationSection(PREFIX);
 
         if (section != null) {
             for (String key : section.getKeys(false)) {
-                String name = config.getString(CONF_PREFIX + "." + key + ".name");
-                Timestamp date = new Timestamp(config.getLong(CONF_PREFIX + "." + key + ".date"));
-                String type = config.getString(CONF_PREFIX + "." + key + ".type");
-                String createdBy = config.getString(CONF_PREFIX + "." + key + ".createdBy");
+                String name = config.getString(PREFIX + "." + key + ".name");
+                Timestamp date = new Timestamp(config.getLong(PREFIX + "." + key + ".date"));
+                String type = config.getString(PREFIX + "." + key + ".type");
+                String createdBy = config.getString(PREFIX + "." + key + ".createdBy");
 
                 this.backups.add(new Backup(name, date, type, createdBy));
             }
@@ -121,10 +121,10 @@ public class BackupsFlatData extends BackupsData {
         YamlConfiguration config = this.flatFile.getConfiguration();
         String name = backup.getName();
 
-        config.set(CONF_PREFIX + "." + name + ".name", name);
-        config.set(CONF_PREFIX + "." + name + ".date", backup.getDate().getTime());
-        config.set(CONF_PREFIX + "." + name + ".type", backup.getType());
-        config.set(CONF_PREFIX + "." + name + ".createdBy", backup.getCreatedBy());
+        config.set(PREFIX + "." + name + ".name", name);
+        config.set(PREFIX + "." + name + ".date", backup.getDate().getTime());
+        config.set(PREFIX + "." + name + ".type", backup.getType());
+        config.set(PREFIX + "." + name + ".createdBy", backup.getCreatedBy());
 
         this.save();
         return true;
@@ -171,7 +171,7 @@ public class BackupsFlatData extends BackupsData {
             return false;
         }
 
-        this.flatFile.getConfiguration().set(CONF_PREFIX + "." + backup.getName(), null);
+        this.flatFile.getConfiguration().set(PREFIX + "." + backup.getName(), null);
         this.save();
 
         return true;

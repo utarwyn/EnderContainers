@@ -140,21 +140,6 @@ public class EnderChestListener implements Listener {
             else
                 MiscUtil.playSound(player, "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
         }
-
-        /*
-         * To save a vanilla enderchest of an offline player,
-         * we need to force the writing of owner data on the disk
-         * so we have to check when the inventory closes to
-         * start the custom method.
-         */
-        /* TODO MiscUtil.runAsync(() -> {
-            if (inventory.getType().equals(InventoryType.ENDER_CHEST)) {
-                EnderChest chest = OfflineEnderChestMenu.getOpenedChestFor(player);
-
-                if (chest != null)
-                    MiscUtil.saveVanillaEnderchestOf(chest.getOwner(), inventory);
-            }
-        });*/
     }
 
 }

@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Collections;
@@ -23,25 +24,33 @@ public class MenuManagerTest {
 
     private MenuManager menuManager;
 
+    @Mock
+    private AbstractMenu menu;
+
+    @Mock
+    private Inventory inventory;
+
+    @Mock
+    private InventoryView inventoryView;
+
+    @Mock
+    private Player player;
+
     @Before
     public void setUp() {
         this.menuManager = new MenuManager();
+
+        when(this.inventory.getHolder()).thenReturn(this.menu);
+        when(this.inventoryView.getTopInventory()).thenReturn(this.inventory);
+        when(this.inventoryView.getPlayer()).thenReturn(this.player);
     }
 
     @Test
     public void inventoryClick() {
-        AbstractMenu menu = mock(AbstractMenu.class);
-        Inventory inventory = mock(Inventory.class);
-        InventoryView view = mock(InventoryView.class);
-        Player player = mock(Player.class);
-
-        when(inventory.getHolder()).thenReturn(menu);
-        when(view.getTopInventory()).thenReturn(inventory);
-        when(view.getPlayer()).thenReturn(player);
         when(inventory.getSize()).thenReturn(54);
 
         InventoryClickEvent event = new InventoryClickEvent(
-                view, InventoryType.SlotType.CONTAINER, 2,
+                inventoryView, InventoryType.SlotType.CONTAINER, 2,
                 ClickType.LEFT, InventoryAction.NOTHING
         );
 
@@ -50,7 +59,7 @@ public class MenuManagerTest {
         assertThat(event.isCancelled()).isFalse();
 
         // Default event without cancellation
-        when(view.getItem(event.getRawSlot())).thenReturn(new ItemStack(Material.STONE));
+        when(inventoryView.getItem(event.getRawSlot())).thenReturn(new ItemStack(Material.STONE));
         this.menuManager.onInventoryClick(event);
         verify(menu, times(1)).onClick(player, event.getSlot());
         assertThat(event.isCancelled()).isFalse();
@@ -63,16 +72,7 @@ public class MenuManagerTest {
 
     @Test
     public void inventoryClose() {
-        AbstractMenu menu = mock(AbstractMenu.class);
-        Inventory inventory = mock(Inventory.class);
-        InventoryView view = mock(InventoryView.class);
-        Player player = mock(Player.class);
-
-        when(inventory.getHolder()).thenReturn(menu);
-        when(view.getTopInventory()).thenReturn(inventory);
-        when(view.getPlayer()).thenReturn(player);
-
-        InventoryCloseEvent event = new InventoryCloseEvent(view);
+        InventoryCloseEvent event = new InventoryCloseEvent(inventoryView);
 
         this.menuManager.onInventoryClose(event);
         verify(menu, times(1)).onClose(player);
@@ -80,17 +80,11 @@ public class MenuManagerTest {
 
     @Test
     public void closeAll() {
-        AbstractMenu menu = mock(AbstractMenu.class);
-        Inventory menuInv = mock(Inventory.class);
-        InventoryView menuView = mock(InventoryView.class);
         Inventory enderchestInv = mock(Inventory.class);
         InventoryView enderchestView = mock(InventoryView.class);
-
         Player player = mock(Player.class);
 
-        when(menuInv.getHolder()).thenReturn(menu);
-        when(menuView.getTopInventory()).thenReturn(menuInv);
-        when(player.getOpenInventory()).thenReturn(menuView);
+        when(player.getOpenInventory()).thenReturn(this.inventoryView);
 
         TestHelper.setUpServer();
         doReturn(Collections.singletonList(player)).when(Bukkit.getServer()).getOnlinePlayers();
