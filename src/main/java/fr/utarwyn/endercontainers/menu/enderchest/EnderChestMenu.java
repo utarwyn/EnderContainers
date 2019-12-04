@@ -22,7 +22,7 @@ public class EnderChestMenu extends AbstractMenu {
     /**
      * Enderchest who generated this menu
      */
-    EnderChest chest;
+    private EnderChest chest;
 
     /**
      * Construct a menu whiches contain contents of an enderchest.

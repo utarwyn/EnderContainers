@@ -87,15 +87,6 @@ public class MiscUtil {
     }
 
     /**
-     * Shortcut used to create an synchronous Java thread
-     *
-     * @param runnable Runnable to run synchronously
-     */
-    public static void runSync(Runnable runnable) {
-        Bukkit.getScheduler().runTask(EnderContainers.getInstance(), runnable);
-    }
-
-    /**
      * Returns the existance of a sound by its name
      *
      * @param soundName Sound name to check

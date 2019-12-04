@@ -59,12 +59,9 @@ public abstract class PlayerData extends StorageWrapper {
         return this.uuid.toString().replace("-", "");
     }
 
+    @Override
     protected boolean hasParams(Object... params) {
         return params.length == 1 && this.uuid.equals(params[0]);
-    }
-
-    protected boolean isUnused() {
-        return this.getPlayer() == null;
     }
 
     /**
@@ -86,7 +83,7 @@ public abstract class PlayerData extends StorageWrapper {
     /**
      * Save the enderchest with its content.
      *
-     * @param chest enderchest to save
+     * @param chest    enderchest to save
      * @param contents contents of its container
      */
     public abstract void saveEnderchest(EnderChest chest, ConcurrentMap<Integer, ItemStack> contents);

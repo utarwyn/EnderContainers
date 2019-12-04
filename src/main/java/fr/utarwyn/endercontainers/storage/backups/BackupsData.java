@@ -23,10 +23,6 @@ public abstract class BackupsData extends StorageWrapper {
         return true;
     }
 
-    protected boolean isUnused() {
-        return false;
-    }
-
     /**
      * Get the list of all cached backups
      *

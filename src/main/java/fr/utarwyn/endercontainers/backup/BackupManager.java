@@ -45,6 +45,7 @@ public class BackupManager extends AbstractManager {
     @Override
     protected void unload() {
         StorageWrapper.unload(BackupsData.class);
+        this.storage = null;
     }
 
     /**

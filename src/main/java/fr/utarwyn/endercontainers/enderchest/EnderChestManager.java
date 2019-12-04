@@ -3,15 +3,16 @@ package fr.utarwyn.endercontainers.enderchest;
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.enderchest.context.ContextRunnable;
+import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
+import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.menu.MenuManager;
-import fr.utarwyn.endercontainers.menu.enderchest.EnderChestHubMenu;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
-import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The new enderchest manager to manage all chests
@@ -22,14 +23,9 @@ import java.util.UUID;
 public class EnderChestManager extends AbstractManager {
 
     /**
-     * A list which contains all the stored enderchests
+     * A map which contains all loaded player contexts.
      */
-    private List<EnderChest> enderchests;
-
-    /**
-     * The purge task which removed the cache periodically
-     */
-    private EnderChestPurgeTask purgeTask;
+    private Map<UUID, PlayerContext> contextMap;
 
     /**
      * {@inheritDoc}
@@ -44,9 +40,7 @@ public class EnderChestManager extends AbstractManager {
      */
     @Override
     public void load() {
-        this.enderchests = new ArrayList<>();
-        // Start the purge task
-        this.purgeTask = new EnderChestPurgeTask(this);
+        this.contextMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -57,103 +51,50 @@ public class EnderChestManager extends AbstractManager {
         // Close all menus
         Managers.get(MenuManager.class).closeAll();
 
-        // Last purge & stop the purge task
-        this.purgeTask.run();
-        this.purgeTask.cancel();
-
         // Unload all data
+        this.contextMap.clear();
         StorageWrapper.unload(PlayerData.class);
     }
 
     /**
-     * Returns a specific chest by its owner and its number
+     * Get from configuration the count of enderchests a player can have.
      *
-     * @param owner The owner of the chest
-     * @param num   The number of the chest
-     * @return The found chest, null otherwise.
+     * @return maximum number of enderchests
      */
-    public EnderChest getEnderChest(UUID owner, int num) {
-        for (EnderChest chest : this.enderchests)
-            if (chest.getNum() == num && chest.getOwner() == owner)
-                return chest;
-
-        EnderChest chest = new EnderChest(owner, num);
-        this.enderchests.add(chest);
-        return chest;
+    public int getMaxEnderchests() {
+        return Files.getConfiguration().getMaxEnderchests();
     }
 
     /**
-     * Count the number of enderchests of a specific owner
+     * Load all chests and data of a player asynchronously if needed
+     * and call a method when this work is done.
      *
-     * @param owner The UUID of the owner
-     * @return The number of enderchests owned by the UUID
+     * @param owner    player for which the method has to load context
+     * @param callback method called at the end of the task
      */
-    public int getEnderchestsNbOf(UUID owner) {
-        int nb = 0;
-
-        for (int i = 0; i < Files.getConfiguration().getMaxEnderchests(); i++) {
-            EnderChest ec = this.getEnderChest(owner, i);
-            // Reload chest information before display the hologram.
-            ec.reloadMeta();
-
-            if (ec.isAccessible())
-                nb++;
+    public void loadPlayerContext(UUID owner, ContextRunnable callback) {
+        if (!this.contextMap.containsKey(owner)) {
+            this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin,
+                    new LoadTask(this.plugin, this, owner, callback));
+        } else {
+            callback.run(this.contextMap.get(owner));
         }
-
-        return nb;
     }
 
     /**
-     * Permits to open the Hub menu with the list of enderchests
-     * of a specific player to an entity.
+     * Register a context of loaded enderchests for a specific player.
      *
-     * @param owner  The owner of enderchests to open
-     * @param viewer The player whom to send the menu
+     * @param context context to register
      */
-    public void openHubMenuFor(UUID owner, Player viewer) {
-        new EnderChestHubMenu(owner).open(viewer);
+    public void registerPlayerContext(PlayerContext context) {
+        this.contextMap.put(context.getOwner(), context);
     }
 
     /**
-     * Permits to open the Hub menu with the list of enderchests
-     * of a specific player to him.
-     *
-     * @param player The owner of enderchests to open to him
+     * Purge all chests and the context of a player from memory
      */
-    public void openHubMenuFor(Player player) {
-        this.openHubMenuFor(player.getUniqueId(), player);
-    }
-
-    /**
-     * Permits to open an enderchest to its owner.
-     *
-     * @param player The owner of enderchests to open to him
-     * @param num    The number of the enderchest to open
-     */
-    public boolean openEnderchestFor(Player player, int num) {
-        EnderChest chest = this.getEnderChest(player.getUniqueId(), num);
-
-        // Reload chest's metas before trying to open it.
-        chest.reloadMeta();
-
-        if (!chest.isAccessible()) return false;
-
-        chest.openContainerFor(player);
-        return true;
-    }
-
-    /**
-     * Method called by the {@link EnderChestPurgeTask} to delete unused chest objects in memory
-     */
-    void deleteUnusedChests() {
-        this.enderchests.removeIf(EnderChest::isUnused);
-    }
-
-    /**
-     * Purge all chests of a player from memory
-     */
-    void deleteChestsOf(Player player) {
-        this.enderchests.removeIf(chest -> chest.getOwner().equals(player.getUniqueId()));
+    void deletePlayerContext(UUID owner) {
+        this.contextMap.remove(owner);
     }
 
 }

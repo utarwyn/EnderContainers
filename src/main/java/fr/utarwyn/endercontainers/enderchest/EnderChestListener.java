@@ -20,6 +20,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 
+import java.util.UUID;
+
 /**
  * Class used to intercept events of player
  *
@@ -61,10 +63,10 @@ public class EnderChestListener implements Listener {
 
         // Right click on an ender chest?
         if (block != null && block.getType().equals(Material.ENDER_CHEST)) {
-
             // Player is in sneaking mode with item in the hand?
-            if (player.isSneaking() && !player.getInventory().getItemInMainHand().getType().equals(Material.AIR))
+            if (player.isSneaking() && !player.getInventory().getItemInMainHand().getType().equals(Material.AIR)) {
                 return;
+            }
 
             // Plugin not enabled or world disabled in config?
             if (Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName())) {
@@ -73,18 +75,10 @@ public class EnderChestListener implements Listener {
 
             event.setCancelled(true);
 
-            // Check dependencies
-            if (!this.dependenciesManager.onBlockChestOpened(block, player, true))
-                return;
-
-            // Open the main menu for the player
-            MiscUtil.runAsync(() -> this.manager.openHubMenuFor(player));
-
-            // Play sound (not in async mode)!
-            if (Files.getConfiguration().isGlobalSound()) {
-                MiscUtil.playSound(block.getLocation(), "CHEST_OPEN", "BLOCK_CHEST_OPEN");
-            } else {
-                MiscUtil.playSound(player, "CHEST_OPEN", "BLOCK_CHEST_OPEN");
+            // Check for dependencies if the player can interact with the block here
+            if (this.dependenciesManager.onBlockChestOpened(block, player, true)) {
+                this.manager.loadPlayerContext(player.getUniqueId(),
+                        context -> context.openHubMenuFor(player, block));
             }
         }
     }
@@ -111,12 +105,11 @@ public class EnderChestListener implements Listener {
      */
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
+        UUID owner = event.getPlayer().getUniqueId();
 
-        // When a player quits, clear all of its data from memory.
-        // (force method, instead of waiting the automatic purge task)
-        this.manager.deleteChestsOf(player);
-        StorageWrapper.unload(PlayerData.class, player.getUniqueId());
+        // Clear all the player data from memory
+        this.manager.deletePlayerContext(owner);
+        StorageWrapper.unload(PlayerData.class, owner);
     }
 
     /**

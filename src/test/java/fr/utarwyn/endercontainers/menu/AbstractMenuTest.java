@@ -71,8 +71,6 @@ public class AbstractMenuTest {
     public void open() {
         Player player = mock(Player.class);
 
-        when(Bukkit.getServer().isPrimaryThread()).thenReturn(true);
-
         this.menu.inventory = this.inventory;
         this.menu.open(player);
 

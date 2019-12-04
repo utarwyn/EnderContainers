@@ -28,36 +28,42 @@ public class EnderchestCommand extends AbstractCommand {
             return;
         }
 
-        Integer argument = this.readArgOrDefault(null);
-        int chestNumber = (argument != null) ? argument - 1 : -1;
+        Integer chestNumber = this.readArgOrDefault(null);
 
-        if (argument != null && (chestNumber < 0 || chestNumber >= Files.getConfiguration().getMaxEnderchests())) {
-            PluginMsg.accessDenied(player);
-            return;
-        }
-
-        MiscUtil.runAsync(() -> {
-            if (argument == null) {
-                if (MiscUtil.playerHasPerm(player, "cmd.enderchests")) {
-                    this.manager.openHubMenuFor(player);
-                } else {
-                    PluginMsg.accessDenied(player);
-                }
+        if (chestNumber != null) {
+            if (chestNumber > 0 && chestNumber <= Files.getConfiguration().getMaxEnderchests()) {
+                this.openChestMenu(player, chestNumber - 1);
             } else {
-                if (MiscUtil.playerHasPerm(player, "cmd.enderchests") || MiscUtil.playerHasPerm(player, "cmd.enderchest." + chestNumber)) {
-                    if (!this.manager.openEnderchestFor(player, chestNumber)) {
-                        this.sendTo(player, ChatColor.RED + Files.getLocale().getNopermOpenChest());
-                    }
-                } else {
-                    PluginMsg.accessDenied(player);
-                }
+                PluginMsg.accessDenied(player);
             }
-        });
+        } else {
+            this.openHubMenu(player);
+        }
     }
 
     @Override
     public void performConsole(CommandSender sender) {
         PluginMsg.errorMessage(sender, Files.getLocale().getNopermConsole());
+    }
+
+    private void openHubMenu(Player player) {
+        if (MiscUtil.playerHasPerm(player, "cmd.enderchests")) {
+            this.manager.loadPlayerContext(player.getUniqueId(), context -> context.openHubMenuFor(player));
+        } else {
+            PluginMsg.accessDenied(player);
+        }
+    }
+
+    private void openChestMenu(Player player, int num) {
+        if (MiscUtil.playerHasPerm(player, "cmd.enderchests") || MiscUtil.playerHasPerm(player, "cmd.enderchest." + num)) {
+            this.manager.loadPlayerContext(player.getUniqueId(), context -> {
+                if (!context.openEnderchestFor(player, num)) {
+                    this.sendTo(player, ChatColor.RED + Files.getLocale().getNopermOpenChest());
+                }
+            });
+        } else {
+            PluginMsg.accessDenied(player);
+        }
     }
 
 }

@@ -5,6 +5,7 @@ import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
+import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,8 +13,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * The hologram manager. It runs automatically a task to show/hide
@@ -37,7 +40,7 @@ public class HologramManager extends AbstractManager implements Runnable {
     /**
      * All stored holograms by owner
      */
-    private ConcurrentHashMap<UUID, Hologram> holograms;
+    private ConcurrentMap<UUID, Hologram> holograms;
 
     /**
      * The BukkitTask object which manage the spawning/dispawning of holograms
@@ -89,38 +92,50 @@ public class HologramManager extends AbstractManager implements Runnable {
     }
 
     /**
-     * Called automatically by the BukkitTask
+     * Task runner
      */
     @Override
     public void run() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName())) continue;
+        List<String> disabledWorlds = Files.getConfiguration().getDisabledWorlds();
 
-            UUID uuid = player.getUniqueId();
-            Block block = player.getTargetBlock(null, 6);
+        // We have to check hologram status for all players in enabled worlds
+        Bukkit.getOnlinePlayers().parallelStream()
+                .filter(player -> !disabledWorlds.contains(player.getWorld().getName()))
+                .forEach(this::checkHologramStatus);
 
-            if (Material.ENDER_CHEST.equals(block.getType())) {
-                if (!this.holograms.containsKey(uuid) && this.dependenciesManager.onBlockChestOpened(block, player, false)) {
-                    this.spawnHologramFor(player, block);
-                }
-            } else if (this.holograms.containsKey(uuid)) {
-                this.holograms.get(uuid).destroy();
-                this.holograms.remove(uuid);
-            }
-        }
-
-        // Clear unused holograms
+        // Unused holograms can be cleared
         this.holograms.entrySet().removeIf(entry -> !entry.getValue().isPlayerOnline());
     }
 
     /**
-     * Spawn an hologram for a specific player and a specific enderchest.
+     * Check the status of the hologram for a player.
      *
-     * @param observer observer of the hologram
-     * @param block    where the hologram has to spawn
+     * @param player player to handle
      */
-    private void spawnHologramFor(Player observer, Block block) {
-        int count = this.chestManager.getEnderchestsNbOf(observer.getUniqueId());
+    private void checkHologramStatus(Player player) {
+        UUID uuid = player.getUniqueId();
+        Block block = player.getTargetBlock(null, 6);
+
+        if (Material.ENDER_CHEST.equals(block.getType())) {
+            if (!this.holograms.containsKey(uuid) && this.dependenciesManager.onBlockChestOpened(block, player, false)) {
+                this.chestManager.loadPlayerContext(player.getUniqueId(),
+                        context -> this.spawnHologram(context, player, block));
+            }
+        } else if (this.holograms.containsKey(uuid)) {
+            this.holograms.get(uuid).destroy();
+            this.holograms.remove(uuid);
+        }
+    }
+
+    /**
+     * Spawn an hologram above a block for a specific player.
+     *
+     * @param context  Context in which all chests are loaded
+     * @param observer Player for which the hologram should spawn
+     * @param block    Enderchest for which the hologram have to appear
+     */
+    private void spawnHologram(PlayerContext context, Player observer, Block block) {
+        int count = context.getAccessibleChestCount();
         String title = HologramManager.generateNametagTitle(count);
         Location location = block.getLocation().clone().add(.5, Hologram.LINE_HEIGHT - 1.25D, .5);
 
