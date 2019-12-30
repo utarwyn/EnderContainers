@@ -1,7 +1,5 @@
 package fr.utarwyn.endercontainers.util;
 
-import fr.utarwyn.endercontainers.EnderContainers;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
@@ -75,15 +73,6 @@ public class MiscUtil {
      */
     public static boolean senderHasPerm(CommandSender sender, String perm) {
         return !(sender instanceof Player && !playerHasPerm((Player) sender, perm)) || sender instanceof ConsoleCommandSender;
-    }
-
-    /**
-     * Shortcut used to create an asynchronous Java thread
-     *
-     * @param runnable Runnable to run asynchronously
-     */
-    public static void runAsync(Runnable runnable) {
-        Bukkit.getScheduler().runTaskAsynchronously(EnderContainers.getInstance(), runnable);
     }
 
     /**

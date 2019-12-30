@@ -3,7 +3,6 @@ package fr.utarwyn.endercontainers.command.backup;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.command.Parameter;
 import fr.utarwyn.endercontainers.configuration.Files;
-import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.command.CommandSender;
 
@@ -22,8 +21,8 @@ public class CreateCommand extends AbstractBackupCommand {
 
         this.sendTo(sender, Files.getLocale().getBackupCreationStarting());
 
-        MiscUtil.runAsync(() -> {
-            if (this.manager.createBackup(name, sender.getName())) {
+        this.manager.createBackup(name, sender.getName(), result -> {
+            if (result) {
                 this.sendTo(sender, Files.getLocale().getBackupCreated().replace("%backup%", name));
             } else {
                 PluginMsg.errorMessage(sender, Files.getLocale().getBackupExists().replace("%backup%", name));
