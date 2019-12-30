@@ -23,8 +23,8 @@
     </licenses>
 
     <properties>
-        <bukkit.version>1.14.4-R0.1-SNAPSHOT</bukkit.version>
-        <dbcp.version>2.1.1</dbcp.version>
+        <bukkit.version>1.15.1-R0.1-SNAPSHOT</bukkit.version>
+        <dbcp.version>2.7.0</dbcp.version>
         <citizensapi.version>2.0.25-SNAPSHOT</citizensapi.version>
         <worldguard.version>7.0.0-SNAPSHOT</worldguard.version>
         <worldguard.old.version>6.1.1-SNAPSHOT</worldguard.old.version>
