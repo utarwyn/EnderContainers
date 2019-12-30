@@ -7,7 +7,6 @@ import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
@@ -178,8 +177,12 @@ public class EnderChest {
      */
     public void openContainerFor(Player player) {
         if (this.num == 0 && Files.getConfiguration().isUseVanillaEnderchest()) {
-            Inventory inventory = MiscUtil.getVanillaEnderchestOf(this.owner);
-            player.openInventory(Objects.requireNonNull(inventory));
+            Player ownerObj = this.getOwnerPlayer();
+            // Owner must be online
+            if (ownerObj != null && ownerObj.isOnline()) {
+                player.openInventory(ownerObj.getEnderChest());
+            }
+            // TODO Support opening chests of offline players
         } else {
             this.container.open(player);
         }

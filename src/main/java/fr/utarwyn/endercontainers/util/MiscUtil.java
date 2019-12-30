@@ -7,10 +7,8 @@ import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 
 import java.io.File;
-import java.util.UUID;
 
 /**
  * Miscellaneous utility class of the plugin.
@@ -53,44 +51,6 @@ public class MiscUtil {
         if (sound == null) return;
 
         player.playSound(player.getLocation(), sound, 1f, 1f);
-    }
-
-    /**
-     * Gets the vanilla enderchest for an offline player, using NMS hacks.
-     *
-     * @param owner UUID of the owner of the chest
-     * @return The inventory which represents the enderchest
-     */
-    public static Inventory getVanillaEnderchestOf(UUID owner) {
-        Player player = Bukkit.getPlayer(owner);
-        // Player is online
-        if (player != null && player.isOnline())
-            return player.getEnderChest();
-
-        Player offlinePlayer = NMSHacks.getPlayerObjectOfOfflinePlayer("", owner);
-
-        if (offlinePlayer != null) {
-            offlinePlayer.loadData();
-            return offlinePlayer.getEnderChest();
-        }
-
-        return null;
-    }
-
-    /**
-     * Saves the vanilla enderchest of an offline player, using NMS hacks.
-     *
-     * @param owner UUID of the owner of the chest
-     * @param inv   The inventory which have to be saved as the enderchest of the player
-     */
-    public static void saveVanillaEnderchestOf(UUID owner, Inventory inv) {
-        Player offlinePlayer = NMSHacks.getPlayerObjectOfOfflinePlayer("", owner);
-
-        if (offlinePlayer != null) {
-            offlinePlayer.loadData();
-            offlinePlayer.getEnderChest().setContents(inv.getContents());
-            offlinePlayer.saveData();
-        }
     }
 
     /**
