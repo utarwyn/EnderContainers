@@ -47,7 +47,7 @@ public class HelpCommand extends AbstractCommand {
         sender.sendMessage(" ");
         sender.sendMessage("  " + formatCommandFor(sender, "§6/enderchest §e[number]", "cmd"));
         sender.sendMessage("  §7   ⏩ Open your personal enderchest");
-        sender.sendMessage("  " + formatCommandFor(sender, "§6/ecp open §e[number]", "openchests"));
+        sender.sendMessage("  " + formatCommandFor(sender, "§6/ecp open §e<player>", "openchests"));
         sender.sendMessage("  §7   ⏩ Open a player's enderchest");
         sender.sendMessage("  " + formatCommandFor(sender, "§6/ecp backup §blist,info,create,load,remove", "backups"));
         sender.sendMessage("  §7   ⏩ Manage containers backups");
