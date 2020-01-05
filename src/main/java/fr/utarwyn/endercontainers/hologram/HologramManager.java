@@ -6,6 +6,7 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -34,14 +35,29 @@ public class HologramManager extends AbstractManager implements Runnable {
     private DependenciesManager dependenciesManager;
 
     /**
+     * All stored holograms by owner
+     */
+    private ConcurrentHashMap<UUID, Hologram> holograms;
+
+    /**
      * The BukkitTask object which manage the spawning/dispawning of holograms
      */
     private BukkitTask task;
 
     /**
-     * All stored holograms by owner
+     * Generate a title with custom data for a block nametag.
+     *
+     * @param chestCount accessible enderchest count
+     * @return the generated title with all replaced data
      */
-    private ConcurrentHashMap<UUID, Hologram> holograms;
+    private static String generateNametagTitle(int chestCount) {
+        int max = Files.getConfiguration().getMaxEnderchests();
+
+        return Files.getLocale().getChestNametag()
+                .replace("%enderchests%", String.valueOf(chestCount))
+                .replace("%maxenderchests%", String.valueOf(max))
+                .replace("%plural%", ((chestCount > 1) ? "s" : ""));
+    }
 
     /**
      * {@inheritDoc}
@@ -50,9 +66,12 @@ public class HologramManager extends AbstractManager implements Runnable {
     public void load() {
         this.chestManager = Managers.get(EnderChestManager.class);
         this.dependenciesManager = Managers.get(DependenciesManager.class);
-
-        this.task = this.plugin.getServer().getScheduler().runTaskTimer(this.plugin, this, 20L, 5L);
         this.holograms = new ConcurrentHashMap<>();
+
+        // Start the task only if the block nametag is enabled
+        if (Files.getConfiguration().isBlockNametag()) {
+            this.task = this.plugin.getServer().getScheduler().runTaskTimer(this.plugin, this, 20L, 5L);
+        }
     }
 
     /**
@@ -65,9 +84,8 @@ public class HologramManager extends AbstractManager implements Runnable {
             this.task = null;
         }
 
-        for (Hologram hologram : this.holograms.values()) {
-            hologram.destroy();
-        }
+        this.holograms.values().forEach(Hologram::destroy);
+        this.holograms.clear();
     }
 
     /**
@@ -75,8 +93,6 @@ public class HologramManager extends AbstractManager implements Runnable {
      */
     @Override
     public void run() {
-        if (!Files.getConfiguration().isBlockNametag()) return;
-
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName())) continue;
 
@@ -84,7 +100,9 @@ public class HologramManager extends AbstractManager implements Runnable {
             Block block = player.getTargetBlock(null, 6);
 
             if (Material.ENDER_CHEST.equals(block.getType())) {
-                this.spawnHologramFor(player, block);
+                if (!this.holograms.containsKey(uuid) && this.dependenciesManager.onBlockChestOpened(block, player, false)) {
+                    this.spawnHologramFor(player, block);
+                }
             } else if (this.holograms.containsKey(uuid)) {
                 this.holograms.get(uuid).destroy();
                 this.holograms.remove(uuid);
@@ -98,20 +116,15 @@ public class HologramManager extends AbstractManager implements Runnable {
     /**
      * Spawn an hologram for a specific player and a specific enderchest.
      *
-     * @param player Player for which the hologram should spawn
-     * @param block  Enderchest for which the hologram have to appear
+     * @param observer observer of the hologram
+     * @param block    where the hologram has to spawn
      */
-    private void spawnHologramFor(Player player, Block block) {
-        if (!this.holograms.containsKey(player.getUniqueId()) && this.dependenciesManager.onBlockChestOpened(block, player, false)) {
-            int copEcs = this.chestManager.getEnderchestsNbOf(player.getUniqueId());
+    private void spawnHologramFor(Player observer, Block block) {
+        int count = this.chestManager.getEnderchestsNbOf(observer.getUniqueId());
+        String title = HologramManager.generateNametagTitle(count);
+        Location location = block.getLocation().clone().add(.5, Hologram.LINE_HEIGHT - 1.25D, .5);
 
-            String title = Files.getLocale().getChestNametag()
-                    .replace("%enderchests%", String.valueOf(copEcs))
-                    .replace("%maxenderchests%", String.valueOf(Files.getConfiguration().getMaxEnderchests()))
-                    .replace("%plurial%", ((copEcs > 1) ? "s" : ""));
-
-            this.holograms.put(player.getUniqueId(), new Hologram(player, title, block.getLocation()));
-        }
+        this.holograms.put(observer.getUniqueId(), new Hologram(observer, title, location));
     }
 
 }

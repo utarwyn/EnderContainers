@@ -126,27 +126,27 @@ public class NMSHologramUtil {
     /**
      * Spawn a custom hologram (text, location) for a player.
      *
-     * @param player   observer of the hologram
      * @param location location of the hologram
      * @param text     text to display with the hologram
+     * @param observer observer of the hologram
      * @return Entity identifier of the spawned hologram
      * @throws ReflectiveOperationException error with reflection
      * @see <a href="https://wiki.vg/Protocol#Spawn_Mob">Protocol for 1.8 to 1.14</a>
      * @see <a href="https://wiki.vg/Pre-release_protocol#Spawn_Mob">Protocol for 1.15+</a>
      */
-    public static int spawnHologram(Player player, Location location, String text) throws ReflectiveOperationException {
+    public static int spawnHologram(Location location, String text, Player observer) throws ReflectiveOperationException {
         // First, we need to generate the fake armorstand
         Object entity = createHologramEntity(location.getWorld(), location.getX(), location.getY(), location.getZ(), text);
         int entityId = (int) entityClass.getDeclaredMethod("getId").invoke(entity);
 
         // Send the spawn packet for 1.8+
-        sendPacket(player, spawnPacketConstructor.newInstance(entity));
+        sendPacket(observer, spawnPacketConstructor.newInstance(entity));
 
         // Send the metadata packet for 1.15+
         if (ServerVersion.isNewerThan(ServerVersion.V1_14)) {
             Method getDataWatcher = entityClass.getDeclaredMethod("getDataWatcher");
             Object metadataPacket = metadataPacketConstructor.newInstance(entityId, getDataWatcher.invoke(entity), false);
-            sendPacket(player, metadataPacket);
+            sendPacket(observer, metadataPacket);
         }
 
         return entityId;

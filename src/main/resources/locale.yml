@@ -76,4 +76,4 @@ dependencies:
 ##                      ##
 miscellaneous:
 
-  chest_nametag: '&6&l%enderchests%/%maxenderchests%&r&e enderchest%plurial% available'
+  chest_nametag: '&6&l%enderchests%/%maxenderchests%&r&e enderchest%plural% available'

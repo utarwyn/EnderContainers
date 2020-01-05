@@ -20,7 +20,7 @@ class Hologram {
      * Static field used to calculate the offset between each line
      * in an hologram.
      */
-    private static final double ABS = 0.23D;
+    static final double LINE_HEIGHT = 0.23D;
 
     /**
      * The title of the hologram (its content)
@@ -35,7 +35,7 @@ class Hologram {
     /**
      * The player who has to receive the hologram
      */
-    private Player player;
+    private Player observer;
 
     /**
      * Identifier of the spawned entity for the observer
@@ -45,12 +45,12 @@ class Hologram {
     /**
      * Construct an hologram and spawn it directly
      *
-     * @param player   The player who has to receive the hologram
+     * @param observer The observer who has to receive the hologram
      * @param title    The title/content of the hologram
      * @param location The location of the hologram
      */
-    Hologram(Player player, String title, Location location) {
-        this.player = player;
+    Hologram(Player observer, String title, Location location) {
+        this.observer = observer;
         this.title = title;
         this.location = location;
         this.entityId = -1;
@@ -64,7 +64,7 @@ class Hologram {
      * @return True if the player is online
      */
     boolean isPlayerOnline() {
-        return this.player != null && this.player.isOnline();
+        return this.observer != null && this.observer.isOnline();
     }
 
     /**
@@ -73,7 +73,7 @@ class Hologram {
     void destroy() {
         if (this.entityId > -1) {
             try {
-                NMSHologramUtil.destroyEntity(this.entityId, this.player);
+                NMSHologramUtil.destroyEntity(this.entityId, this.observer);
             } catch (ReflectiveOperationException e) {
                 EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot destroy the hologram", e);
             }
@@ -84,10 +84,8 @@ class Hologram {
      * Spawn the hologram
      */
     private void spawn() {
-        Location displayLoc = this.location.clone().add(.5, ABS - 1.25D, .5);
-
         try {
-            this.entityId = NMSHologramUtil.spawnHologram(this.player, displayLoc, this.title);
+            this.entityId = NMSHologramUtil.spawnHologram(this.location, this.title, this.observer);
         } catch (ReflectiveOperationException e) {
             EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot spawn the hologram", e);
         }
