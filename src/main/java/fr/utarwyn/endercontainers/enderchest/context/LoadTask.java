@@ -1,13 +1,9 @@
 package fr.utarwyn.endercontainers.enderchest.context;
 
 import fr.utarwyn.endercontainers.EnderContainers;
-import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Represents the task which loads a memory context with
@@ -58,14 +54,14 @@ public class LoadTask implements Runnable {
      */
     @Override
     public void run() {
-        int maxIndex = this.manager.getMaxEnderchests() - 1;
+        // Initialize the player context
+        int count = this.manager.getMaxEnderchests();
+        PlayerContext context = new PlayerContext(this.owner);
 
-        List<EnderChest> chests = IntStream.rangeClosed(0, maxIndex)
-                .mapToObj(n -> new EnderChest(owner, n))
-                .collect(Collectors.toList());
+        // This task can take a certain amount of time to be executed
+        context.loadEnderchests(count);
 
-        PlayerContext context = new PlayerContext(this.owner, chests);
-
+        // Schedule the callback and register the player context in memory
         this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, () -> {
             this.manager.registerPlayerContext(context);
             this.runnable.run(context);

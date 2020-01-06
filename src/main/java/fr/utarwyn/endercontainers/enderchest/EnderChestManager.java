@@ -6,6 +6,7 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.context.ContextRunnable;
 import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
+import fr.utarwyn.endercontainers.enderchest.context.SaveTask;
 import fr.utarwyn.endercontainers.menu.MenuManager;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
@@ -51,8 +52,10 @@ public class EnderChestManager extends AbstractManager {
         // Close all menus
         Managers.get(MenuManager.class).closeAll();
 
-        // Unload all data
+        // Save and unload all data
+        this.contextMap.values().forEach(context -> new SaveTask(context).run());
         this.contextMap.clear();
+
         StorageWrapper.unload(PlayerData.class);
     }
 
@@ -91,10 +94,14 @@ public class EnderChestManager extends AbstractManager {
     }
 
     /**
-     * Purge all chests and the context of a player from memory
+     * Save all data of a player, and purge all of its chests from memory.
      */
-    void deletePlayerContext(UUID owner) {
-        this.contextMap.remove(owner);
+    void saveAndDeletePlayerContext(UUID owner) {
+        if (this.contextMap.containsKey(owner)) {
+            SaveTask saveTask = new SaveTask(this.contextMap.get(owner));
+            this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, saveTask);
+            this.contextMap.remove(owner);
+        }
     }
 
 }

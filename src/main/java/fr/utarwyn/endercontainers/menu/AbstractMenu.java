@@ -27,12 +27,26 @@ public abstract class AbstractMenu implements InventoryHolder {
     protected Inventory inventory;
 
     /**
+     * True if the menu has been initialized, false otherwise
+     */
+    private boolean initialized;
+
+    /**
      * Returns the number of filled slots in the container.
      *
      * @return Number of fileld slots
      */
     public int getFilledSlotsNb() {
         return (int) Arrays.stream(this.inventory.getContents()).filter(Objects::nonNull).count();
+    }
+
+    /**
+     * Get the loading state of the menu.
+     *
+     * @return true if the menu has been initialized
+     */
+    public boolean isInitialized() {
+        return this.initialized;
     }
 
     /**
@@ -59,7 +73,7 @@ public abstract class AbstractMenu implements InventoryHolder {
      *
      * @return generated map with contents
      */
-    protected ConcurrentMap<Integer, ItemStack> getMapContents() {
+    public ConcurrentMap<Integer, ItemStack> getMapContents() {
         ItemStack[] contents = this.inventory.getContents();
         ConcurrentMap<Integer, ItemStack> contentsMap = new ConcurrentHashMap<>();
 
@@ -92,6 +106,8 @@ public abstract class AbstractMenu implements InventoryHolder {
         this.inventory.setContents(itemStacks);
 
         this.prepare();
+
+        this.initialized = true;
     }
 
     /**

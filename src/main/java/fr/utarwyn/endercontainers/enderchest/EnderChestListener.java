@@ -108,7 +108,7 @@ public class EnderChestListener implements Listener {
         UUID owner = event.getPlayer().getUniqueId();
 
         // Clear all the player data from memory
-        this.manager.deletePlayerContext(owner);
+        this.manager.saveAndDeletePlayerContext(owner);
         StorageWrapper.unload(PlayerData.class, owner);
     }
 

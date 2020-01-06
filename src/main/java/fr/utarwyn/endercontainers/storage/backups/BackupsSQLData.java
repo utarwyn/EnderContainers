@@ -6,7 +6,6 @@ import org.apache.commons.lang.StringUtils;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -84,17 +83,12 @@ public class BackupsSQLData extends BackupsData {
         List<String> dataElementList = new ArrayList<>();
 
         for (DatabaseSet set : sets) {
-            if (set.getTimestamp("last_locking_time") == null) {
-                set.setObject("last_locking_time", new Timestamp(0));
-            }
-
             dataElementList.add(
                     set.getInteger("id") + ":"
                             + set.getInteger("num") + ":"
                             + Base64Coder.encodeString(set.getString("owner")) + ":"
                             + Base64Coder.encodeString(set.getString("contents")) + ":"
-                            + set.getInteger("rows") + ":"
-                            + set.getTimestamp("last_locking_time").getTime()
+                            + set.getInteger("rows")
             );
         }
 
@@ -113,7 +107,6 @@ public class BackupsSQLData extends BackupsData {
             String owner = Base64Coder.decodeString(info[2]);
             String contents = Base64Coder.decodeString(info[3]);
             int rows = Integer.parseInt(info[4]);
-            Timestamp lastLockingTime = new Timestamp(Long.parseLong(info[5]));
 
             set = new DatabaseSet();
             set.setObject("id", id);
@@ -121,7 +114,6 @@ public class BackupsSQLData extends BackupsData {
             set.setObject("owner", owner);
             set.setObject("contents", contents);
             set.setObject("rows", rows);
-            set.setObject("last_locking_time", lastLockingTime);
 
             sets.add(set);
         }

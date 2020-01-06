@@ -1,12 +1,10 @@
 package fr.utarwyn.endercontainers.menu.enderchest;
 
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.menu.AbstractMenu;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
@@ -81,19 +79,10 @@ public class EnderChestMenu extends AbstractMenu {
      */
     @Override
     public void onClose(Player player) {
-        if (EnderContainers.getInstance().isEnabled()) {
-            Bukkit.getScheduler().runTaskAsynchronously(
-                    EnderContainers.getInstance(), () -> this.chest.save(this.getMapContents())
-            );
-
-            if (Files.getConfiguration().isGlobalSound()) {
-                MiscUtil.playSound(player.getLocation(), "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
-            } else {
-                MiscUtil.playSound(player, "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
-            }
+        if (Files.getConfiguration().isGlobalSound()) {
+            MiscUtil.playSound(player.getLocation(), "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
         } else {
-            // Do the save synchronously because the plugin is disabling...
-            this.chest.save(this.getMapContents());
+            MiscUtil.playSound(player, "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
         }
     }
 

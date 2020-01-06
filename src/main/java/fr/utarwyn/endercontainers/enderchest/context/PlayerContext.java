@@ -3,14 +3,16 @@ package fr.utarwyn.endercontainers.enderchest.context;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.menu.enderchest.EnderChestHubMenu;
+import fr.utarwyn.endercontainers.storage.StorageWrapper;
+import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * A context in which all enderchests of a player are loaded.
@@ -31,14 +33,19 @@ public class PlayerContext {
     private UUID owner;
 
     /**
+     * Storage object which manages data of the player
+     */
+    private PlayerData data;
+
+    /**
      * Construct a new player context.
      *
-     * @param owner  owner of the context
-     * @param chests chests loaded in the context
+     * @param owner owner of the context
      */
-    PlayerContext(UUID owner, List<EnderChest> chests) {
+    PlayerContext(UUID owner) {
         this.owner = owner;
-        this.chests = chests;
+        this.chests = new ArrayList<>();
+        this.data = Objects.requireNonNull(StorageWrapper.get(PlayerData.class, this.owner));
     }
 
     /**
@@ -51,6 +58,15 @@ public class PlayerContext {
     }
 
     /**
+     * Get the storage object which manages this context.
+     *
+     * @return this storage object
+     */
+    public PlayerData getData() {
+        return this.data;
+    }
+
+    /**
      * Searching in the context for a chest which has a specific number.
      *
      * @param num The number of the chest
@@ -58,6 +74,26 @@ public class PlayerContext {
      */
     public Optional<EnderChest> getChest(int num) {
         return this.chests.stream().filter(ch -> ch.getNum() == num).findFirst();
+    }
+
+    /**
+     * Count the number of accessible enderchests of the owner.
+     *
+     * @return The number of accessible enderchests loaded in the context
+     */
+    public int getAccessibleChestCount() {
+        return (int) this.chests.stream().filter(EnderChest::isAccessible).count();
+    }
+
+    /**
+     * Load a certain amount of enderchests in this player context.
+     *
+     * @param count amount of chests to load
+     */
+    public void loadEnderchests(int count) {
+        this.chests = IntStream.rangeClosed(0, count - 1)
+                .mapToObj(n -> new EnderChest(this, n))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -110,12 +146,10 @@ public class PlayerContext {
     }
 
     /**
-     * Count the number of accessible enderchests of the owner.
-     *
-     * @return The number of accessible enderchests loaded in the context
+     * Save all datas stored in the context.
      */
-    public int getAccessibleChestCount() {
-        return (int) this.chests.stream().filter(EnderChest::isAccessible).count();
+    public void save() {
+        this.data.saveContext(this.chests);
     }
 
 }
