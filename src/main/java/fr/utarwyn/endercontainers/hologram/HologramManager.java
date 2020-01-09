@@ -99,7 +99,7 @@ public class HologramManager extends AbstractManager implements Runnable {
         List<String> disabledWorlds = Files.getConfiguration().getDisabledWorlds();
 
         // We have to check hologram status for all players in enabled worlds
-        Bukkit.getOnlinePlayers().parallelStream()
+        Bukkit.getOnlinePlayers().stream()
                 .filter(player -> !disabledWorlds.contains(player.getWorld().getName()))
                 .forEach(this::checkHologramStatus);
 
