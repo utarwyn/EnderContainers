@@ -1,11 +1,10 @@
 package fr.utarwyn.endercontainers.menu.enderchest;
 
-import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
-import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
+import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.menu.AbstractMenu;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
@@ -20,7 +19,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
+import java.util.Optional;
 
 /**
  * Represents the menu with the list of all enderchests.
@@ -72,14 +71,9 @@ public class EnderChestHubMenu extends AbstractMenu {
     }
 
     /**
-     * The enderchest manager
+     * The player context
      */
-    private EnderChestManager manager;
-
-    /**
-     * The owner of all enderchests in the menu
-     */
-    private UUID owner;
+    private PlayerContext context;
 
     /**
      * Current page for the player who has opened the menu
@@ -89,11 +83,10 @@ public class EnderChestHubMenu extends AbstractMenu {
     /**
      * Construct the Hub menu for a player
      *
-     * @param owner The player who owns enderchests in the menu
+     * @param context context used for the preparation of the menu
      */
-    public EnderChestHubMenu(UUID owner) {
-        this.owner = owner;
-        this.manager = Managers.get(EnderChestManager.class);
+    public EnderChestHubMenu(PlayerContext context) {
+        this.context = context;
         this.page = 1;
 
         this.reloadInventory();
@@ -113,12 +106,10 @@ public class EnderChestHubMenu extends AbstractMenu {
 
         // Adding chest items
         for (int num = min; num < nb; num++) {
-            EnderChest ec = this.manager.getEnderChest(this.owner, num);
-            // Reload chest's metas before.
-            ec.reloadMeta();
+            Optional<EnderChest> chest = this.context.getChest(num);
 
-            if (ec.isAccessible() || !Files.getConfiguration().isOnlyShowAccessibleEnderchests()) {
-                this.inventory.setItem(num - min, this.getItemStackOf(ec));
+            if (chest.isPresent() && (chest.get().isAccessible() || !Files.getConfiguration().isOnlyShowAccessibleEnderchests())) {
+                this.inventory.setItem(num - min, this.getItemStackOf(chest.get()));
             }
         }
 
@@ -151,9 +142,8 @@ public class EnderChestHubMenu extends AbstractMenu {
      */
     @Override
     protected String getTitle() {
-        return Files.getLocale().getMenuMainTitle().replace(
-                "%player%", Objects.requireNonNull(UUIDFetcher.getName(owner))
-        );
+        String name = UUIDFetcher.getName(this.context.getOwner());
+        return Files.getLocale().getMenuMainTitle().replace("%player%", Objects.requireNonNull(name));
     }
 
     /**
@@ -173,16 +163,8 @@ public class EnderChestHubMenu extends AbstractMenu {
             return true;
         }
 
-        // Check for a chest (with the slot and the index of the first chest in the menu)
-        EnderChest chest = this.manager.getEnderChest(this.owner, this.getFirstChestIndex() + slot);
-
-        // Reload the chest's metas before opening it.
-        // It allows to check if the player has kept his permission
-        // while he opened the Hub menu.
-        chest.reloadMeta();
-
-        if (chest.isAccessible()) {
-            chest.openContainerFor(player);
+        // Open the selected chest
+        if (this.context.openEnderchestFor(player, this.getFirstChestIndex() + slot)) {
             MiscUtil.playSound(player, "CLICK", "UI_BUTTON_CLICK");
         } else {
             MiscUtil.playSound(player, "ANVIL_BREAK", "BLOCK_ANVIL_BREAK");
@@ -196,7 +178,7 @@ public class EnderChestHubMenu extends AbstractMenu {
      */
     @Override
     public void onClose(Player player) {
-        // Nothing to do here
+        // Not implemented
     }
 
     /**
@@ -207,7 +189,6 @@ public class EnderChestHubMenu extends AbstractMenu {
      * @return The itemstack generated
      */
     private ItemStack getItemStackOf(EnderChest ec) {
-        boolean accessible = ec.isAccessible();
         DyeColor dyeColor = ec.isAccessible() ? this.getDyePercentageColor(ec.getFillPercentage()) : DyeColor.BLACK;
 
         ItemStack itemStack;
@@ -223,7 +204,7 @@ public class EnderChestHubMenu extends AbstractMenu {
         List<String> lore = new ArrayList<>();
 
         // Update lore with the chest's status
-        if (!accessible) {
+        if (!ec.isAccessible()) {
             lore.add(Files.getLocale().getMenuChestLocked());
         }
         if (ec.isFull()) {

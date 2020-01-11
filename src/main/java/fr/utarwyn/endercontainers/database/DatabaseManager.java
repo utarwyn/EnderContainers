@@ -117,17 +117,15 @@ public class DatabaseManager extends AbstractManager {
      * @param contents All contents of the chest
      */
     public void saveEnderchest(boolean insert, UUID owner, int num, int rows, String contents) throws SQLException {
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-
         if (insert) {
             database.update(formatTable(CHEST_TABLE))
-                    .fields("num", "owner", "rows", "contents", "last_locking_time")
-                    .values(num, owner.toString(), rows, contents, now)
+                    .fields("num", "owner", "rows", "contents")
+                    .values(num, owner.toString(), rows, contents)
                     .execute();
         } else {
             database.update(formatTable(CHEST_TABLE))
-                    .fields("rows", "contents", "last_locking_time")
-                    .values(rows, contents, now)
+                    .fields("rows", "contents")
+                    .values(rows, contents)
                     .where("`num` = ?", "`owner` = ?")
                     .attributes(String.valueOf(num), owner.toString())
                     .execute();
@@ -261,7 +259,7 @@ public class DatabaseManager extends AbstractManager {
             List<String> tables = this.database.getTables();
 
             if (!tables.contains(formatTable(CHEST_TABLE))) {
-                database.request("CREATE TABLE `" + formatTable(CHEST_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `num` TINYINT(2) NOT NULL DEFAULT '0', `owner` VARCHAR(36) NULL, `contents` MEDIUMTEXT NULL, `rows` INT(1) NOT NULL DEFAULT 0, `last_locking_time` TIMESTAMP NULL, PRIMARY KEY (`id`), INDEX `USER KEY` (`num`, `owner`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
+                database.request("CREATE TABLE `" + formatTable(CHEST_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `num` TINYINT(2) NOT NULL DEFAULT '0', `owner` VARCHAR(36) NULL, `contents` MEDIUMTEXT NULL, `rows` INT(1) NOT NULL DEFAULT 0, PRIMARY KEY (`id`), INDEX `USER KEY` (`num`, `owner`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
                 if (Files.getConfiguration().isDebug()) {
                     this.logger.log(Level.INFO, "Table `{0}` created in the database.", formatTable(CHEST_TABLE));
                 }

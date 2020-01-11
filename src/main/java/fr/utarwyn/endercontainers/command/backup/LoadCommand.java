@@ -1,11 +1,9 @@
 package fr.utarwyn.endercontainers.command.backup;
 
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.command.Parameter;
 import fr.utarwyn.endercontainers.configuration.Files;
-import fr.utarwyn.endercontainers.util.MiscUtil;
-import org.bukkit.ChatColor;
+import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.command.CommandSender;
 
 public class LoadCommand extends AbstractBackupCommand {
@@ -23,11 +21,11 @@ public class LoadCommand extends AbstractBackupCommand {
 
         this.sendTo(sender, Files.getLocale().getBackupLoadingStarted());
 
-        MiscUtil.runAsync(() -> {
-            if (this.manager.applyBackup(name)) {
-                sender.sendMessage(EnderContainers.PREFIX + Files.getLocale().getBackupLoaded().replace("%backup%", name));
+        this.manager.applyBackup(name, result -> {
+            if (result) {
+                this.sendTo(sender, Files.getLocale().getBackupLoaded().replace("%backup%", name));
             } else {
-                sender.sendMessage(EnderContainers.PREFIX + ChatColor.RED + Files.getLocale().getBackupUnknown().replace("%backup%", name));
+                PluginMsg.errorMessage(sender, Files.getLocale().getBackupUnknown().replace("%backup%", name));
             }
         });
     }

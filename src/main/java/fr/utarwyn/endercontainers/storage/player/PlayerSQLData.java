@@ -28,7 +28,7 @@ public class PlayerSQLData extends PlayerData {
 
     @Override
     protected void load() {
-        this.enderchestsDataset = getDatabaseManager().getEnderchestsOf(this.getUUID());
+        this.enderchestsDataset = getDatabaseManager().getEnderchestsOf(this.uuid);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class PlayerSQLData extends PlayerData {
     }
 
     @Override
-    public void saveEnderchest(EnderChest enderChest, ConcurrentMap<Integer, ItemStack> contents) {
+    protected void saveEnderchest(EnderChest enderChest) {
         boolean insert = true;
 
         for (DatabaseSet set : this.enderchestsDataset)
@@ -64,11 +64,11 @@ public class PlayerSQLData extends PlayerData {
                 break;
             }
 
-        String serializedContents = ItemSerializer.serialize(contents);
+        String contents = ItemSerializer.serialize(enderChest.getContents());
 
         try {
             getDatabaseManager().saveEnderchest(insert, enderChest.getOwner(),
-                    enderChest.getNum(), enderChest.getRows(), serializedContents);
+                    enderChest.getNum(), enderChest.getRows(), contents);
         } catch (SQLException e) {
             logger.log(Level.SEVERE,
                     "Cannot save the enderchest for user " + enderChest.getOwner() + " in the database", e);
@@ -80,7 +80,7 @@ public class PlayerSQLData extends PlayerData {
             DatabaseSet set = new DatabaseSet();
             set.setObject("num", enderChest.getNum());
             set.setObject("owner", enderChest.getOwner().toString());
-            set.setObject("contents", serializedContents);
+            set.setObject("contents", contents);
             set.setObject("rows", enderChest.getRows());
 
             this.enderchestsDataset.add(set);

@@ -1,12 +1,13 @@
 package fr.utarwyn.endercontainers.backup;
 
 import fr.utarwyn.endercontainers.AbstractManager;
-import fr.utarwyn.endercontainers.Managers;
-import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
+import fr.utarwyn.endercontainers.backup.action.ActionCallback;
+import fr.utarwyn.endercontainers.backup.action.BackupApplyTask;
+import fr.utarwyn.endercontainers.backup.action.BackupCreateTask;
+import fr.utarwyn.endercontainers.backup.action.BackupRemoveTask;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
 import fr.utarwyn.endercontainers.storage.backups.BackupsData;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +46,16 @@ public class BackupManager extends AbstractManager {
     @Override
     protected void unload() {
         StorageWrapper.unload(BackupsData.class);
+        this.storage = null;
+    }
+
+    /**
+     * Get the internal backups storage
+     *
+     * @return backups storage
+     */
+    public BackupsData getStorage() {
+        return this.storage;
     }
 
     /**
@@ -69,63 +80,55 @@ public class BackupManager extends AbstractManager {
     }
 
     /**
-     * Create a backup with a name and an author
+     * Asynchronously create a backup with a name and an operator.
      *
-     * @param name    The name of the backup which have to be created.
-     * @param creator The name of the player who load this action.
-     * @return True if the backup was created with success.
+     * @param name     name of the backup to create
+     * @param operator name of the player who triggered this action
+     * @param callback method ran when the action is finished
      */
-    public boolean createBackup(String name, String creator) {
-        if (this.getBackupByName(name).isPresent()) {
-            return false;
-        }
-
-        // Create a new backup
-        Backup backup = new Backup(
-                name, new Timestamp(System.currentTimeMillis()),
-                "all", creator
+    public void createBackup(String name, String operator, ActionCallback callback) {
+        this.plugin.getServer().getScheduler().runTaskAsynchronously(
+                this.plugin,
+                new BackupCreateTask(this.plugin, this, operator, name, callback)
         );
-
-        // Save the backup in the proper config
-        if (!this.storage.saveNewBackup(backup)) {
-            return false;
-        }
-
-        // Execute the backup (save all enderchests)
-        if (!this.storage.executeStorage(backup)) {
-            return false;
-        }
-
-        return this.backups.add(backup);
     }
 
     /**
-     * Apply a backup indefinitly and erase all older enderchests
+     * Asynchronously apply a backup by replacing all current data.
      *
-     * @param name name of the backup which have to be applied
-     * @return true if the backup has been properly applied
+     * @param name     name of the backup to apply
+     * @param callback method ran when the action is finished
      */
-    public boolean applyBackup(String name) {
+    public void applyBackup(String name, ActionCallback callback) {
         Optional<Backup> backup = this.getBackupByName(name);
 
-        if (backup.isPresent() && this.storage.applyBackup(backup.get())) {
-            return Managers.reload(EnderChestManager.class);
+        if (backup.isPresent()) {
+            this.plugin.getServer().getScheduler().runTaskAsynchronously(
+                    this.plugin,
+                    new BackupApplyTask(this.plugin, this, backup.get(), callback)
+            );
+        } else {
+            callback.run(false);
         }
-
-        return false;
     }
 
     /**
-     * Remove a backup from data & memory by its name.
+     * Asynchronously remove a backup and all of its data.
      *
-     * @param name name of the backup which have to be removed
-     * @return true if the backup has been properly removed
+     * @param name     name of the backup to remove
+     * @param callback method ran when the action is finished
      */
-    public boolean removeBackup(String name) {
+    public void removeBackup(String name, ActionCallback callback) {
         Optional<Backup> backup = this.getBackupByName(name);
-        return backup.isPresent()
-                && this.storage.removeBackup(backup.get())
-                && this.backups.remove(backup.get());
+
+        if (backup.isPresent()) {
+            this.plugin.getServer().getScheduler().runTaskAsynchronously(
+                    this.plugin,
+                    new BackupRemoveTask(this.plugin, this, backup.get(), callback)
+            );
+        } else {
+            callback.run(false);
+        }
     }
 
 }

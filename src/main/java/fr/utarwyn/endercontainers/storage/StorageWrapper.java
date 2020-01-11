@@ -121,16 +121,6 @@ public abstract class StorageWrapper {
     }
 
     /**
-     * Clear the cache by deleting storage wrappers with given class that are unused.
-     *
-     * @param clazz Class to match with storage wrappers to check
-     */
-    public static void clearUnusedCache(Class<? extends StorageWrapper> clazz) {
-        if (!cacheMap.containsKey(clazz)) return;
-        cacheMap.get(clazz).removeIf(StorageWrapper::isUnused);
-    }
-
-    /**
      * Unload a storage wrapper to free the memory with given class and params.
      *
      * @param clazz  Class to match with storage wrappers
@@ -164,12 +154,5 @@ public abstract class StorageWrapper {
      * @return true if all params match with the stored params in wrapper
      */
     protected abstract boolean hasParams(Object... params);
-
-    /**
-     * Allows to get is the storage is unused or not.
-     *
-     * @return true if the storage is not used
-     */
-    protected abstract boolean isUnused();
 
 }

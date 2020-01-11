@@ -6,10 +6,8 @@ import fr.utarwyn.endercontainers.command.AbstractCommand;
 import fr.utarwyn.endercontainers.command.Parameter;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
-import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -35,23 +33,14 @@ public class OpenCommand extends AbstractCommand {
             return;
         }
 
-        String toInspect = this.readArg();
+        String playername = this.readArg();
+        UUID uuid = UUIDFetcher.getUUID(playername);
 
-        MiscUtil.runAsync(() -> {
-            Player playerToSpec = Bukkit.getPlayer(toInspect);
-
-            if (playerToSpec == null || !playerToSpec.isOnline()) {
-                UUID uuid = UUIDFetcher.getUUID(toInspect);
-
-                if (uuid != null) {
-                    this.manager.openHubMenuFor(uuid, player);
-                } else {
-                    player.sendMessage(EnderContainers.PREFIX + "§cPlayer §6" + toInspect + " §cnot found.");
-                }
-            } else {
-                this.manager.openHubMenuFor(playerToSpec.getUniqueId(), player);
-            }
-        });
+        if (uuid != null) {
+            this.manager.loadPlayerContext(uuid, context -> context.openHubMenuFor(player));
+        } else {
+            player.sendMessage(EnderContainers.PREFIX + "§cPlayer §6" + playername + " §cnot found.");
+        }
     }
 
     @Override

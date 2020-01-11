@@ -2,15 +2,14 @@ package fr.utarwyn.endercontainers.storage.player;
 
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Storage wrapper to manage data of a specific player
+ * Storage wrapper to manage data of a specific player.
  *
  * @author Utarwyn
  * @since 2.0.0
@@ -20,7 +19,7 @@ public abstract class PlayerData extends StorageWrapper {
     /**
      * UUID of the player linked to this wrapper
      */
-    private UUID uuid;
+    protected UUID uuid;
 
     /**
      * Construct a new storage wrapper for a player (even offline)
@@ -33,38 +32,21 @@ public abstract class PlayerData extends StorageWrapper {
     }
 
     /**
-     * Returns the UUID of the player
-     *
-     * @return UUID of the player
+     * {@inheritDoc}
      */
-    public UUID getUUID() {
-        return this.uuid;
-    }
-
-    /**
-     * The player linked to the storage wrapper
-     *
-     * @return Player linked if online otherwise null.
-     */
-    public Player getPlayer() {
-        return Bukkit.getPlayer(this.uuid);
-    }
-
-    /**
-     * Returns the formatted UUID without hyphen
-     *
-     * @return The formatted UUID
-     */
-    String getMinimalUUID() {
-        return this.uuid.toString().replace("-", "");
-    }
-
+    @Override
     protected boolean hasParams(Object... params) {
         return params.length == 1 && this.uuid.equals(params[0]);
     }
 
-    protected boolean isUnused() {
-        return this.getPlayer() == null;
+    /**
+     * Save a full player context in the storage.
+     *
+     * @param chests chests to save
+     */
+    public void saveContext(List<EnderChest> chests) {
+        chests.forEach(this::saveEnderchest);
+        this.save();
     }
 
     /**
@@ -84,11 +66,10 @@ public abstract class PlayerData extends StorageWrapper {
     public abstract int getEnderchestRows(EnderChest enderChest);
 
     /**
-     * Save the enderchest with its content.
+     * Save all data of an enderchest.
      *
      * @param chest enderchest to save
-     * @param contents contents of its container
      */
-    public abstract void saveEnderchest(EnderChest chest, ConcurrentMap<Integer, ItemStack> contents);
+    protected abstract void saveEnderchest(EnderChest chest);
 
 }

@@ -33,9 +33,10 @@ public class PlayerFlatData extends PlayerData {
     @Override
     protected void load() {
         try {
-            this.flatFile = new FlatFile("data/" + this.getMinimalUUID() + ".yml");
+            String minimalUuid = this.uuid.toString().replace("-", "");
+            this.flatFile = new FlatFile("data/" + minimalUuid + ".yml");
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Cannot load the data file of the user" + this.getUUID(), e);
+            logger.log(Level.SEVERE, "Cannot load the data file of the user" + this.uuid, e);
         }
     }
 
@@ -44,7 +45,7 @@ public class PlayerFlatData extends PlayerData {
         try {
             this.flatFile.save();
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Cannot save the data file of the user " + this.getUUID(), e);
+            logger.log(Level.SEVERE, "Cannot save the data file of the user " + this.uuid, e);
         }
     }
 
@@ -66,15 +67,13 @@ public class PlayerFlatData extends PlayerData {
     }
 
     @Override
-    public void saveEnderchest(EnderChest chest, ConcurrentMap<Integer, ItemStack> contents) {
-        String path = PREFIX + "." + chest.getNum() + ".";
+    protected void saveEnderchest(EnderChest chest) {
+        String path = PREFIX + "." + chest.getNum();
+        String contents = !chest.getContents().isEmpty() ? ItemSerializer.serialize(chest.getContents()) : null;
 
-        this.flatFile.getConfiguration().set(path + "rows", chest.getRows());
-        this.flatFile.getConfiguration().set(path + "position", chest.getNum());
-        this.flatFile.getConfiguration().set(path + "contents", ItemSerializer.serialize(contents));
-        this.flatFile.getConfiguration().set(path + "lastlocking", System.currentTimeMillis() / 1000); // UNIX format
-
-        this.save();
+        this.flatFile.getConfiguration().set(path + ".rows", chest.getRows());
+        this.flatFile.getConfiguration().set(path + ".position", chest.getNum());
+        this.flatFile.getConfiguration().set(path + ".contents", contents);
     }
 
 }

@@ -1,6 +1,5 @@
 package fr.utarwyn.endercontainers.menu;
 
-import fr.utarwyn.endercontainers.util.MiscUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -28,6 +27,11 @@ public abstract class AbstractMenu implements InventoryHolder {
     protected Inventory inventory;
 
     /**
+     * True if the menu has been initialized, false otherwise
+     */
+    private boolean initialized;
+
+    /**
      * Returns the number of filled slots in the container.
      *
      * @return Number of fileld slots
@@ -37,19 +41,21 @@ public abstract class AbstractMenu implements InventoryHolder {
     }
 
     /**
+     * Get the loading state of the menu.
+     *
+     * @return true if the menu has been initialized
+     */
+    public boolean isInitialized() {
+        return this.initialized;
+    }
+
+    /**
      * Open the container to a specific player.
      *
      * @param player Player that will receive the container
      */
     public void open(Player player) {
-		/* We need to open the menu in the main Thread of the server in 1.14 version!
-		   And this is much more performant to do like this. */
-        // TODO So, we have to rewrite completly threads mangement in the plugin, its very ugly for now!
-        if (Bukkit.isPrimaryThread()) {
-            player.openInventory(this.inventory);
-        } else {
-            MiscUtil.runSync(() -> player.openInventory(this.inventory));
-        }
+        player.openInventory(this.inventory);
     }
 
     /**
@@ -67,7 +73,7 @@ public abstract class AbstractMenu implements InventoryHolder {
      *
      * @return generated map with contents
      */
-    protected ConcurrentMap<Integer, ItemStack> getMapContents() {
+    public ConcurrentMap<Integer, ItemStack> getMapContents() {
         ItemStack[] contents = this.inventory.getContents();
         ConcurrentMap<Integer, ItemStack> contentsMap = new ConcurrentHashMap<>();
 
@@ -100,6 +106,8 @@ public abstract class AbstractMenu implements InventoryHolder {
         this.inventory.setContents(itemStacks);
 
         this.prepare();
+
+        this.initialized = true;
     }
 
     /**

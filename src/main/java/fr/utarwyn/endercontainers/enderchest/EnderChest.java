@@ -1,20 +1,18 @@
 package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.menu.enderchest.EnderChestMenu;
-import fr.utarwyn.endercontainers.storage.StorageWrapper;
-import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Class used to create a custom enderchest
+ * Represents a custom enderchest of a player.
  *
  * @author Utarwyn
  * @since 2.0.0
@@ -22,14 +20,14 @@ import java.util.concurrent.ConcurrentMap;
 public class EnderChest {
 
     /**
+     * Player context for which the enderchest has been loaded
+     */
+    private PlayerContext context;
+
+    /**
      * The number of the enderchest
      */
     private int num;
-
-    /**
-     * Owner of the enderchest
-     */
-    private UUID owner;
 
     /**
      * Menu whiches can contain contents of this enderchest
@@ -42,21 +40,16 @@ public class EnderChest {
     private int rows;
 
     /**
-     * True if the chest is accessible
-     */
-    private boolean accessible;
-
-    /**
-     * Allows to create a new enderchest
+     * Construct a new enderchest.
      *
-     * @param owner The owner's UUID of the chest
-     * @param num   The number of the enderchest
+     * @param context context of the player's chest
+     * @param num     number of the enderchest
      */
-    EnderChest(UUID owner, int num) {
-        this.owner = owner;
+    public EnderChest(PlayerContext context, int num) {
+        this.context = context;
         this.num = num;
-
-        this.load();
+        this.rows = this.calculateRowCount();
+        this.container = new EnderChestMenu(this);
     }
 
     /**
@@ -74,7 +67,7 @@ public class EnderChest {
      * @return UUID of the chest's owner
      */
     public UUID getOwner() {
-        return this.owner;
+        return this.context.getOwner();
     }
 
     /**
@@ -119,7 +112,11 @@ public class EnderChest {
      * @return content of the enderchest
      */
     public ConcurrentMap<Integer, ItemStack> getContents() {
-        return this.getOwnerData().getEnderchestContents(this);
+        if (this.container != null && this.container.isInitialized()) {
+            return this.container.getMapContents();
+        } else {
+            return this.context.getData().getEnderchestContents(this);
+        }
     }
 
     /**
@@ -132,12 +129,28 @@ public class EnderChest {
     }
 
     /**
+     * Allow to know if the chest is managed by the server.
+     *
+     * @return true if the chest is a vanilla one
+     */
+    public boolean isVanilla() {
+        return this.num == 0 && Files.getConfiguration().isUseVanillaEnderchest();
+    }
+
+    /**
      * Returns the accessibility of the chest
      *
      * @return True if the chest is accessible
      */
     public boolean isAccessible() {
-        return this.accessible;
+        Player player = this.getOwnerPlayer();
+
+        // For the first chest or if the player is offline, viewer has the access.
+        if (!this.isDefault() && player != null) {
+            return MiscUtil.playerHasPerm(player, "open." + this.getNum());
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -159,24 +172,12 @@ public class EnderChest {
     }
 
     /**
-     * Returns true if the chest was not used
-     * (not used mean that the owner is offline and the container has no viewer
-     * so it have to be cleared from the memory)
-     *
-     * @return True if the chest is unused
-     * @see EnderChestPurgeTask Task which uses this method to clear unused data.
-     */
-    boolean isUnused() {
-        return this.getOwnerPlayer() == null && this.container.getInventory().getViewers().isEmpty();
-    }
-
-    /**
      * Open the chest container for a specific player
      *
      * @param player The player who wants to open the container
      */
     public void openContainerFor(Player player) {
-        if (this.num == 0 && Files.getConfiguration().isUseVanillaEnderchest()) {
+        if (this.isVanilla()) {
             Player ownerObj = this.getOwnerPlayer();
             // Owner must be online
             if (ownerObj != null && ownerObj.isOnline()) {
@@ -189,48 +190,6 @@ public class EnderChest {
     }
 
     /**
-     * Save the enderchest. This method has to be called asynchronously if possible!
-     */
-    public void save(ConcurrentMap<Integer, ItemStack> contents) {
-        this.getOwnerData().saveEnderchest(this, contents);
-    }
-
-    /**
-     * Reload all metas of the chest
-     * (that means the number of rows and the accessibility of the chest)
-     */
-    public void reloadMeta() {
-        // Detection of number of rows ...
-        Integer rowsNb = this.generateRowsNb();
-        if (rowsNb == null) {
-            rowsNb = this.getOwnerData().getEnderchestRows(this);
-        }
-
-        this.rows = rowsNb;
-
-        // Load the accessibility of the enderchest ...
-        Boolean accessibility = this.genereateAccessibility();
-
-        /*
-         * If the accessibility cannot be resolved, it means that the player is offline.
-         * So, it means that the enderchest will be opened by an administrator,
-         * and in this case, the chest have to be accessible.
-         */
-        this.accessible = accessibility != null ? accessibility : true;
-    }
-
-    /**
-     * Load the chest at the creation of it
-     */
-    private void load() {
-        // Reload metas of the chest!
-        this.reloadMeta();
-
-        // Load the container for an online/offline player.
-        this.container = new EnderChestMenu(this);
-    }
-
-    /**
      * Get the number of rows accessible if the player
      * is connected on the server. This number is generated in terms
      * of permissions of the player.
@@ -238,36 +197,28 @@ public class EnderChest {
      *
      * @return The number of rows generated or null if the player is not connected
      */
-    private Integer generateRowsNb() {
+    private int calculateRowCount() {
+        int row = 3;
+
+        // Use the vanilla chest!
+        if (this.isVanilla()) return row;
+
         Player player = this.getOwnerPlayer();
 
         // No player connected for this chest, use the cache instead.
-        if (player == null) return null;
-        // Use the vanilla chest!
-        if (this.num == 0 && Files.getConfiguration().isUseVanillaEnderchest()) return 3;
+        if (player == null) {
+            return this.context.getData().getEnderchestRows(this);
+        }
 
-        for (int row = 6; row > 0; row--)
-            if (MiscUtil.playerHasPerm(player, "slot" + this.num + ".row" + row) || MiscUtil.playerHasPerm(player, "slots.row" + row))
-                return row;
+        for (int iRow = 6; iRow > 0; iRow--) {
+            if (MiscUtil.playerHasPerm(player, "slot" + this.num + ".row" + iRow)
+                    || MiscUtil.playerHasPerm(player, "slots.row" + iRow)) {
+                row = iRow;
+                break;
+            }
+        }
 
-        return 3;
-    }
-
-    /**
-     * Get the accessibility of the chest if the player
-     * is connected on the server. This value is generated in terms
-     * of permissions of the player.
-     * (That's why it have to be connected)
-     *
-     * @return The accessibility generated or null if the player is not connected
-     */
-    private Boolean genereateAccessibility() {
-        Player player = this.getOwnerPlayer();
-
-        if (this.isDefault()) return true;
-        if (player == null) return null;
-
-        return MiscUtil.playerHasPerm(player, "open." + this.getNum());
+        return row;
     }
 
     /**
@@ -276,16 +227,7 @@ public class EnderChest {
      * @return The Player object of the owner if he is connected, null otherwise
      */
     private Player getOwnerPlayer() {
-        return Bukkit.getPlayer(this.owner);
-    }
-
-    /**
-     * Get data of the owner of the chest.
-     *
-     * @return data of the chest's owner
-     */
-    private PlayerData getOwnerData() {
-        return Objects.requireNonNull(StorageWrapper.get(PlayerData.class, this.owner));
+        return Bukkit.getPlayer(this.getOwner());
     }
 
 }
