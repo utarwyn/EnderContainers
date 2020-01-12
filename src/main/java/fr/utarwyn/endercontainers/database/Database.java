@@ -52,13 +52,13 @@ public class Database implements AutoCloseable {
     private BasicDataSource source;
 
     /**
-     * Constructor used to create a MySQL database object
+     * Constructor to create a new MySQL database object.
      *
-     * @param host     Host of the MySQL server
-     * @param port     Port of the MySQL server
-     * @param user     Username to connect to the database
-     * @param password Password to connect to the database
-     * @param name     The name of the database
+     * @param host     host of the database server
+     * @param port     port of the database server
+     * @param user     username to open the connection
+     * @param password password to open the connection
+     * @param name     name of the database to use
      */
     Database(String host, int port, String user, String password, String name) {
         this.host = host;
@@ -240,7 +240,7 @@ public class Database implements AutoCloseable {
     private void createPool() throws SQLException {
         source = new BasicDataSource();
         source.setDriverClassName("com.mysql.jdbc.Driver");
-        source.setUrl("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.name);
+        source.setUrl("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.name + "?useSSL=false");
         source.setUsername(this.user);
         source.setPassword(this.password);
 
