@@ -8,8 +8,6 @@ import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.enderchest.context.SaveTask;
 import fr.utarwyn.endercontainers.menu.MenuManager;
-import fr.utarwyn.endercontainers.storage.StorageWrapper;
-import fr.utarwyn.endercontainers.storage.player.PlayerData;
 
 import java.util.Map;
 import java.util.UUID;
@@ -55,8 +53,6 @@ public class EnderChestManager extends AbstractManager {
         // Save and unload all data
         this.contextMap.values().forEach(context -> new SaveTask(context).run());
         this.contextMap.clear();
-
-        StorageWrapper.unload(PlayerData.class);
     }
 
     /**

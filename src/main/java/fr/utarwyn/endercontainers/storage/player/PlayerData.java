@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Logger;
 
 /**
  * Storage wrapper to manage data of a specific player.
@@ -24,19 +25,12 @@ public abstract class PlayerData extends StorageWrapper {
     /**
      * Construct a new storage wrapper for a player (even offline)
      *
-     * @param uuid The uuid of the player to manage its data
+     * @param logger plugin logger
+     * @param uuid   The uuid of the player to manage its data
      */
-    PlayerData(UUID uuid) {
+    public PlayerData(Logger logger, UUID uuid) {
+        super(logger);
         this.uuid = uuid;
-        this.load();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasParams(Object... params) {
-        return params.length == 1 && this.uuid.equals(params[0]);
     }
 
     /**
@@ -60,10 +54,10 @@ public abstract class PlayerData extends StorageWrapper {
     /**
      * Returns the number of rows saved for an enderchest
      *
-     * @param enderChest Get this enderchest's number of rows
+     * @param chest Get this enderchest's number of rows
      * @return Number of rows stored for the enderchest
      */
-    public abstract int getEnderchestRows(EnderChest enderChest);
+    public abstract int getEnderchestRows(EnderChest chest);
 
     /**
      * Save all data of an enderchest.

@@ -1,16 +1,20 @@
 package fr.utarwyn.endercontainers.enderchest.context;
 
+import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.menu.enderchest.EnderChestHubMenu;
-import fr.utarwyn.endercontainers.storage.StorageWrapper;
+import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -45,7 +49,7 @@ public class PlayerContext {
     PlayerContext(UUID owner) {
         this.owner = owner;
         this.chests = new ArrayList<>();
-        this.data = Objects.requireNonNull(StorageWrapper.get(PlayerData.class, this.owner));
+        this.data = Managers.get(StorageManager.class).createPlayerDataStorage(this.owner);
     }
 
     /**

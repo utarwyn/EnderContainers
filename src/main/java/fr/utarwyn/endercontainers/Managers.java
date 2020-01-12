@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -15,7 +14,7 @@ public class Managers {
     /**
      * Cache map for instances of managers.
      */
-    private static Map<Class<? extends AbstractManager>, AbstractManager> instances = new ConcurrentHashMap<>();
+    private static Map<Class<? extends AbstractManager>, AbstractManager> instances = new LinkedHashMap<>();
 
     /**
      * Managers constructor.
@@ -104,10 +103,16 @@ public class Managers {
     }
 
     /**
-     * Unload all managers
+     * Unload and unregister all managers.
      */
-    static void unloadAll() {
-        instances.values().forEach(AbstractManager::unload);
+    static void unregisterAll() {
+        List<AbstractManager> managers = new ArrayList<>(instances.values());
+
+        // Unload managers by reverting their order
+        Collections.reverse(managers);
+        managers.forEach(AbstractManager::unload);
+
+        instances.clear();
     }
 
 }

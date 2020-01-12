@@ -1,11 +1,12 @@
 package fr.utarwyn.endercontainers.backup;
 
 import fr.utarwyn.endercontainers.AbstractManager;
+import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.backup.action.ActionCallback;
 import fr.utarwyn.endercontainers.backup.action.BackupApplyTask;
 import fr.utarwyn.endercontainers.backup.action.BackupCreateTask;
 import fr.utarwyn.endercontainers.backup.action.BackupRemoveTask;
-import fr.utarwyn.endercontainers.storage.StorageWrapper;
+import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.backups.BackupsData;
 
 import java.util.List;
@@ -34,9 +35,7 @@ public class BackupManager extends AbstractManager {
      */
     @Override
     public void load() {
-        this.storage = StorageWrapper.get(BackupsData.class);
-        assert this.storage != null;
-
+        this.storage = Managers.get(StorageManager.class).createBackupDataStorage();
         this.backups = this.storage.getCachedBackups();
     }
 
@@ -45,7 +44,6 @@ public class BackupManager extends AbstractManager {
      */
     @Override
     protected void unload() {
-        StorageWrapper.unload(BackupsData.class);
         this.storage = null;
     }
 

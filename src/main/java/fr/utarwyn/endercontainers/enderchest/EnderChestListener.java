@@ -3,8 +3,6 @@ package fr.utarwyn.endercontainers.enderchest;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
-import fr.utarwyn.endercontainers.storage.StorageWrapper;
-import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.Updater;
 import org.bukkit.Material;
@@ -109,7 +107,6 @@ public class EnderChestListener implements Listener {
 
         // Clear all the player data from memory
         this.manager.saveAndDeletePlayerContext(owner);
-        StorageWrapper.unload(PlayerData.class, owner);
     }
 
     /**

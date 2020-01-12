@@ -14,6 +14,7 @@ import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Storage wrapper for backups (flatfile)
@@ -25,37 +26,20 @@ public class BackupsFlatData extends BackupsData {
 
     private static final String PREFIX = "backups";
 
+    /**
+     * Object which manages interaction with a flat file
+     */
     private FlatFile flatFile;
 
-    BackupsFlatData() {
+    /**
+     * Construct a new backup storage wrapper with a flat file.
+     *
+     * @param logger plugin logger
+     */
+    public BackupsFlatData(Logger logger) {
+        super(logger);
         this.backups = new ArrayList<>();
         this.load();
-    }
-
-    /**
-     * Copy all files from a folder to a different folder.
-     *
-     * @param from Source folder
-     * @param to   Destination folder
-     * @return True if all files have been copied in destination folder.
-     */
-    private static boolean copyFolderFiles(File from, File to) {
-        File[] filesFrom = from.listFiles();
-        if (filesFrom == null) return false;
-
-        for (File fileFrom : filesFrom) {
-            if (fileFrom.getName().contains(".")) {
-                File fileTo = new File(to, fileFrom.getName());
-                try {
-                    Files.copy(fileFrom.toPath(), fileTo.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    logger.log(Level.SEVERE, String.format("Cannot copy file %s to %s", fileFrom.toPath(), fileTo.toPath()), e);
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
 
     /**
@@ -79,7 +63,7 @@ public class BackupsFlatData extends BackupsData {
         try {
             this.flatFile = new FlatFile("backups.yml");
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Cannot load the backups file", e);
+            this.logger.log(Level.SEVERE, "Cannot load the backups file", e);
         }
 
         if (!this.flatFile.getConfiguration().isConfigurationSection(PREFIX)) {
@@ -109,7 +93,7 @@ public class BackupsFlatData extends BackupsData {
         try {
             this.flatFile.save();
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Cannot save the backups file", e);
+            this.logger.log(Level.SEVERE, "Cannot save the backups file", e);
         }
     }
 
@@ -142,7 +126,7 @@ public class BackupsFlatData extends BackupsData {
         }
 
         File enderFolder = new File(EnderContainers.getInstance().getDataFolder(), "data");
-        return BackupsFlatData.copyFolderFiles(enderFolder, folder);
+        return this.copyFolderFiles(enderFolder, folder);
     }
 
     /**
@@ -154,7 +138,7 @@ public class BackupsFlatData extends BackupsData {
 
         if (folder.exists()) {
             File enderFolder = new File(EnderContainers.getInstance().getDataFolder(), "data");
-            return BackupsFlatData.copyFolderFiles(folder, enderFolder);
+            return this.copyFolderFiles(folder, enderFolder);
         }
 
         return false;
@@ -173,6 +157,32 @@ public class BackupsFlatData extends BackupsData {
 
         this.flatFile.getConfiguration().set(PREFIX + "." + backup.getName(), null);
         this.save();
+
+        return true;
+    }
+
+    /**
+     * Copy all files from a folder to a different folder.
+     *
+     * @param from Source folder
+     * @param to   Destination folder
+     * @return True if all files have been copied in destination folder.
+     */
+    private boolean copyFolderFiles(File from, File to) {
+        File[] filesFrom = from.listFiles();
+        if (filesFrom == null) return false;
+
+        for (File fileFrom : filesFrom) {
+            if (fileFrom.getName().contains(".")) {
+                File fileTo = new File(to, fileFrom.getName());
+                try {
+                    Files.copy(fileFrom.toPath(), fileTo.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    this.logger.log(Level.SEVERE, String.format("Cannot copy file %s to %s", fileFrom.toPath(), fileTo.toPath()), e);
+                    return false;
+                }
+            }
+        }
 
         return true;
     }

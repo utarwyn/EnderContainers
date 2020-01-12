@@ -5,9 +5,9 @@ import fr.utarwyn.endercontainers.configuration.Files;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -42,7 +42,9 @@ public class DatabaseManager extends AbstractManager {
      * @return Escaped fields, columns or table names
      */
     public static String[] espaceFields(String[] fields) {
-        return Arrays.stream(fields).map(field -> '`' + field + '`').toArray(String[]::new);
+        return Arrays.stream(fields)
+                .map(field -> '`' + field + '`')
+                .toArray(String[]::new);
     }
 
     /**
@@ -118,12 +120,12 @@ public class DatabaseManager extends AbstractManager {
      */
     public void saveEnderchest(boolean insert, UUID owner, int num, int rows, String contents) throws SQLException {
         if (insert) {
-            database.update(formatTable(CHEST_TABLE))
+            this.database.update(formatTable(CHEST_TABLE))
                     .fields("num", "owner", "rows", "contents")
                     .values(num, owner.toString(), rows, contents)
                     .execute();
         } else {
-            database.update(formatTable(CHEST_TABLE))
+            this.database.update(formatTable(CHEST_TABLE))
                     .fields("rows", "contents")
                     .values(rows, contents)
                     .where("`num` = ?", "`owner` = ?")
@@ -137,13 +139,10 @@ public class DatabaseManager extends AbstractManager {
      *
      * @return The list of saved enderchests
      */
-    public List<DatabaseSet> getAllEnderchests() {
-        try {
-            return database.select().from(formatTable(CHEST_TABLE)).findAll();
-        } catch (SQLException e) {
-            this.logger.log(Level.SEVERE, "Cannot retrieve all enderchests from the database", e);
-            return new ArrayList<>();
-        }
+    public List<DatabaseSet> getAllEnderchests() throws SQLException {
+        return this.database.select()
+                .from(formatTable(CHEST_TABLE))
+                .findAll();
     }
 
     /**
@@ -152,36 +151,25 @@ public class DatabaseManager extends AbstractManager {
      * @param owner The owner of chests
      * @return The list of all chests for a player
      */
-    public List<DatabaseSet> getEnderchestsOf(UUID owner) {
-        try {
-            return database.select().from(formatTable(CHEST_TABLE))
-                    .where("`owner` = ?").attributes(owner.toString())
-                    .findAll();
-        } catch (SQLException e) {
-            this.logger.log(Level.SEVERE,
-                    "Cannot retrieve enderchests of user " + owner + " from the database", e);
-            return new ArrayList<>();
-        }
+    public List<DatabaseSet> getEnderchestsOf(UUID owner) throws SQLException {
+        return this.database.select().from(formatTable(CHEST_TABLE))
+                .where("`owner` = ?").attributes(owner.toString())
+                .findAll();
     }
 
     /**
-     * Drop all data from the enderchests table
-     * (Used for the applying of backups)
-     */
-    public void emptyChestTable() throws SQLException {
-        database.emptyTable(formatTable(CHEST_TABLE));
-    }
-
-    /**
-     * Save a list of enderchests in the database.
+     * Replace all enderchests in the table
+     * by a list of new enderchests.
      *
-     * @param chestSets The list of enderchests to save
+     * @param datasets The list of enderchests to save
      */
-    public void saveEnderchestSets(List<DatabaseSet> chestSets) throws SQLException {
-        for (DatabaseSet set : chestSets) {
-            database.update(formatTable(CHEST_TABLE))
+    public void replaceEnderchests(List<DatabaseSet> datasets) throws SQLException {
+        this.database.emptyTable(formatTable(CHEST_TABLE));
+
+        for (DatabaseSet set : datasets) {
+            this.database.update(formatTable(CHEST_TABLE))
                     .fields(set.getKeys().toArray(new String[0]))
-                    .values(set.getValues())
+                    .values(set.getValues().toArray(new Object[0]))
                     .execute();
         }
     }
@@ -191,13 +179,8 @@ public class DatabaseManager extends AbstractManager {
      *
      * @return The list of saved backups
      */
-    public List<DatabaseSet> getBackups() {
-        try {
-            return database.select().from(formatTable(BACKUP_TABLE)).findAll();
-        } catch (SQLException e) {
-            this.logger.log(Level.SEVERE, "Cannot retrieve backups list from the database", e);
-            return new ArrayList<>();
-        }
+    public List<DatabaseSet> getBackups() throws SQLException {
+        return this.database.select().from(formatTable(BACKUP_TABLE)).findAll();
     }
 
     /**
@@ -206,16 +189,11 @@ public class DatabaseManager extends AbstractManager {
      * @param name Name of a backup to get
      * @return The found backup (or null if not found)
      */
-    public DatabaseSet getBackup(String name) {
-        try {
-            return database.select().from(formatTable(BACKUP_TABLE))
-                    .where("`name` = ?").attributes(name)
-                    .find();
-        } catch (SQLException e) {
-            this.logger.log(Level.SEVERE,
-                    "Cannot retrieve the backup " + name + " from the database", e);
-            return null;
-        }
+    public Optional<DatabaseSet> getBackup(String name) throws SQLException {
+        return Optional.ofNullable(this.database.select()
+                .from(formatTable(BACKUP_TABLE))
+                .where("`name` = ?").attributes(name)
+                .find());
     }
 
     /**
@@ -228,7 +206,7 @@ public class DatabaseManager extends AbstractManager {
      * @param createdBy Entity who created the backup (console or player)
      */
     public void saveBackup(String name, long date, String type, String data, String createdBy) throws SQLException {
-        database.update(formatTable(BACKUP_TABLE))
+        this.database.update(formatTable(BACKUP_TABLE))
                 .fields("name", "date", "type", "data", "created_by")
                 .values(name, new Timestamp(date), type, data, createdBy)
                 .execute();
@@ -240,14 +218,13 @@ public class DatabaseManager extends AbstractManager {
      * @param name Name of the backup to remove
      * @return True if the backup was successfully removed.
      */
-    public boolean removeBackup(String name) {
-        try {
-            return this.database.delete("`name` = ?").from(formatTable(BACKUP_TABLE))
-                    .attributes(name).execute();
-        } catch (SQLException e) {
-            this.logger.log(Level.SEVERE, "Cannot delete backup " + name + " from the database", e);
-            return false;
-        }
+    public boolean removeBackup(String name) throws SQLException {
+        Optional<DatabaseSet> backup = this.getBackup(name);
+
+        return backup.isPresent() && this.database.delete("`id` = ?")
+                .from(formatTable(BACKUP_TABLE))
+                .attributes(backup.get().getInteger("id"))
+                .execute();
     }
 
     /**
