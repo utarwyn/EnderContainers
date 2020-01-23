@@ -2,13 +2,9 @@ package fr.utarwyn.endercontainers.configuration;
 
 import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
 
 /**
  * Locale class. Reflects a locale .yml file.
@@ -118,42 +114,8 @@ public class Locale extends YamlFile {
     private String chestNametag;
 
     Locale(JavaPlugin plugin) {
-        super(plugin);
-    }
-
-    @Override
-    public FileConfiguration getFileConfiguration() {
-        // Create custom locale .yml file if not exists
-        File localeFolder = new File(plugin.getDataFolder(), "locales/");
-        File file = new File(localeFolder, Files.getConfiguration().getLocale() + ".yml");
-
-        if (!file.exists()) {
-            // File doesn't exists... use the template to pre-fill the data.
-            try {
-                if (!localeFolder.exists() && !localeFolder.mkdir()) return null;
-                if (!file.createNewFile()) return null;
-
-                InputStream in = plugin.getResource("locale.yml");
-                if (in == null) return null;
-
-                try (InputStreamReader isr = new InputStreamReader(in, StandardCharsets.UTF_8);
-                     FileOutputStream out = new FileOutputStream(file);
-                     OutputStreamWriter osw = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
-                    char[] tempbytes = new char[512];
-                    int readbytes = isr.read(tempbytes, 0, 512);
-
-                    while (readbytes > -1) {
-                        osw.write(tempbytes, 0, readbytes);
-                        readbytes = isr.read(tempbytes, 0, 512);
-                    }
-                }
-            } catch (IOException e) {
-                this.plugin.getLogger().log(Level.SEVERE, "Cannot write the initial locale file on the disk", e);
-            }
-        }
-
-        // And load all locale messages ...
-        return YamlConfiguration.loadConfiguration(file);
+        super(plugin, "locale.yml");
+        this.setDefaultFilename("locales/en.yml");
     }
 
     @Override

@@ -3,7 +3,6 @@ package fr.utarwyn.endercontainers.configuration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -24,10 +23,10 @@ public class Configuration extends YamlFile {
     private List<String> disabledWorlds;
 
     @Configurable(key = "enderchests.max")
-    private Integer maxEnderchests;
+    private int maxEnderchests;
 
     @Configurable(key = "enderchests.default")
-    private Integer defaultEnderchests;
+    private int defaultEnderchests;
 
     @Configurable(key = "enderchests.onlyShowAccessible")
     private boolean onlyShowAccessibleEnderchests;
@@ -68,17 +67,26 @@ public class Configuration extends YamlFile {
     @Configurable(key = "others.globalSound")
     private boolean globalSound;
 
+    /**
+     * Create a configuration object.
+     * We don't have to provide a file object because its managed by Bukkit.
+     *
+     * @param plugin the Bukkit plugin
+     */
     Configuration(JavaPlugin plugin) {
-        super(plugin);
+        super(plugin, null);
     }
 
     @Override
     protected FileConfiguration getFileConfiguration() {
-        if (!new File(this.plugin.getDataFolder(), "config.yml").exists()) {
-            this.plugin.saveDefaultConfig();
-        }
-
+        this.plugin.saveDefaultConfig();
         return this.plugin.getConfig();
+    }
+
+    @Override
+    public boolean reload() {
+        this.plugin.reloadConfig();
+        return this.load();
     }
 
     public boolean isDebug() {

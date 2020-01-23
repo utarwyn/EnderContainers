@@ -37,9 +37,7 @@ enderchests:
   useVanillaEnderchest: true
 
 
-# Mysql configuration (Optional)
-# Change these values only if you want to link the plugin with a MySQL database
-# (Also compatible with MariaDB)
+# Mysql/MariaDB configuration, if needed
 mysql:
 
   # You can enable the MySQL module here
@@ -50,17 +48,16 @@ mysql:
   port: 3306
   user: 'root'
   password: ''
-  database: 'example'
+  database: 'endercontainers'
 
   # You can choose a prefix for all EnderContainers tables
   tablePrefix: 'ec_'
 
 
 # Miscellaneous configuration
-# You can change what you want in this category, all options are optionals
 others:
 
-  # Make the text above enderchests visible (or not)
+  # Make the text above enderchests visible?
   blockNametag: false
 
   # Check automatically for update?

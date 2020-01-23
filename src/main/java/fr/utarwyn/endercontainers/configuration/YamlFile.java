@@ -1,9 +1,16 @@
 package fr.utarwyn.endercontainers.configuration;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.logging.Level;
 
 /**
@@ -22,23 +29,48 @@ public abstract class YamlFile {
     protected JavaPlugin plugin;
 
     /**
-     * Construct a YamlFile.
-     * It shoulds only exist once during the plugin lifecycle.
-     *
-     * @param plugin The EnderContainers Java plugin
+     * Java file object
      */
-    YamlFile(JavaPlugin plugin) {
+    private File file;
+
+    /**
+     * Name of the file used to aggregate the editable configuration
+     */
+    private String defaultFilename;
+
+    /**
+     * Construct a new file object written with YAML language.
+     *
+     * @param plugin   the bukkit plugin
+     * @param filename name of the resource to manage with the instance
+     */
+    YamlFile(JavaPlugin plugin, String filename) {
         this.plugin = plugin;
+
+        if (filename != null) {
+            this.file = new File(plugin.getDataFolder(), filename);
+            this.defaultFilename = this.file.getName();
+        }
+    }
+
+    /**
+     * Sets the name of the default internal configuration file for this instance.
+     *
+     * @param defaultFilename default filename
+     */
+    public void setDefaultFilename(String defaultFilename) {
+        this.defaultFilename = defaultFilename;
     }
 
     /**
      * Fill all configurable attributes in this class with
-     * the {@link Configurable Configurable} annotation.
+     * the {@link Configurable Configurable} annotation and load
+     * their values from the configuration file.
      *
      * @return True if all configuration values have been loaded.
      */
     public boolean load() {
-        // Gets the configuration file from
+        // Gets the configuration file
         FileConfiguration configuration = this.getFileConfiguration();
 
         // Load every needed config value dynamically!
@@ -48,30 +80,20 @@ public abstract class YamlFile {
 
             // Getting the config key associated with the field
             String configKey = (conf.key().isEmpty()) ? field.getName() : conf.key();
+            Object value = configuration.get(configKey);
 
             // Changing the value of the field
             try {
-                Object value = configuration.get(configKey);
-                if (value == null) {
-                    throw new NullPointerException("Yaml value doesn't exist for key " + configKey + "!");
-                }
-
                 field.setAccessible(true);
-                field.set(this, parseValue(configKey, value));
+                field.set(this, this.parseValue(configKey, value));
                 field.setAccessible(false);
-            } catch (Exception e) {
-                plugin.getLogger().severe("");
-                plugin.getLogger().severe(">> --------------- <<");
-                plugin.getLogger().severe(">> CRITICAL ERROR! <<");
-                plugin.getLogger().severe(">> --------------- <<");
-                plugin.getLogger().severe("");
-                plugin.getLogger().severe(">> Error when loading Yaml for class " + this.getClass().getSimpleName() + "! Yaml value " + configKey.toUpperCase() + " cannot be parsed!");
-                plugin.getLogger().severe(">> Are you sure that value '" + configuration.get(configKey) + "' is good?");
-                plugin.getLogger().severe("");
+            } catch (ReflectiveOperationException | IllegalArgumentException e) {
+                String configName = getClass().getSimpleName().toLowerCase();
+                String message = String.format("Cannot parse the config key '%s' in %s file", configKey, configName);
 
-                plugin.getLogger().log(Level.SEVERE, "Cannot parse the yaml file", e);
-
+                this.plugin.getLogger().log(Level.SEVERE, message, e);
                 this.plugin.getPluginLoader().disablePlugin(this.plugin);
+
                 return false;
             }
         }
@@ -85,7 +107,6 @@ public abstract class YamlFile {
      * @return True if the reload was a success.
      */
     public boolean reload() {
-        this.plugin.reloadConfig();
         return load();
     }
 
@@ -102,10 +123,35 @@ public abstract class YamlFile {
     }
 
     /**
-     * This method have to return the configuration to be loaded in this class instance.
+     * Gets a file configuration object with default values.
+     * If the editable file has not already been created, this method will create it.
      *
-     * @return The file configuration object
+     * @return configuration object ready to be parsed
      */
-    protected abstract FileConfiguration getFileConfiguration();
+    protected FileConfiguration getFileConfiguration() {
+        InputStream defConfigStream = this.plugin.getResource(this.defaultFilename);
+
+        // Create the file from the internal template if does not exist in the data folder
+        if (!this.file.exists()) {
+            if (defConfigStream != null) {
+                try {
+                    Files.copy(defConfigStream, this.file.toPath());
+                } catch (IOException e) {
+                    return null;
+                }
+            } else {
+                throw new NullPointerException("Cannot find the default configuration " + this.defaultFilename);
+            }
+        }
+
+        // Load the configuration from the file and set the default configuration if provided
+        FileConfiguration configuration = YamlConfiguration.loadConfiguration(this.file);
+
+        if (defConfigStream != null) {
+            configuration.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, StandardCharsets.UTF_8)));
+        }
+
+        return configuration;
+    }
 
 }
