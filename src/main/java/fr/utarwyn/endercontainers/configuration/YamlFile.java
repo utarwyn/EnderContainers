@@ -49,7 +49,7 @@ public abstract class YamlFile {
 
         if (filename != null) {
             this.file = new File(plugin.getDataFolder(), filename);
-            this.defaultFilename = this.file.getName();
+            this.defaultFilename = filename;
         }
     }
 

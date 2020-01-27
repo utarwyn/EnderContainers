@@ -3,7 +3,7 @@ package fr.utarwyn.endercontainers.dependency;
 import com.github.intellectualsites.plotsquared.plot.flag.Flags;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
-import com.sk89q.worldedit.world.item.ItemType;
+import com.sk89q.worldedit.world.block.BlockType;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.block.Block;
@@ -68,7 +68,7 @@ public class PlotSquaredDependency extends Dependency {
      * @return true if the player can interact this plot
      */
     private boolean canPlayerUseEnderchest(Plot plot, Player player) {
-        Optional<Set<ItemType>> flag = plot.getFlag(Flags.USE);
+        Optional<Set<BlockType>> flag = plot.getFlag(Flags.USE);
         boolean hasProtection = flag.isPresent() && flag.get().stream()
                 .anyMatch(type -> type.getId().equals(ENDERCHEST_MATERIAL_NAME));
 
