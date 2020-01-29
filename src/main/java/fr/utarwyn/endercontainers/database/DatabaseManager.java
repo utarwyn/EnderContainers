@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.database;
 
 import fr.utarwyn.endercontainers.AbstractManager;
+import fr.utarwyn.endercontainers.configuration.Configuration;
 import fr.utarwyn.endercontainers.configuration.Files;
 
 import java.sql.SQLException;
@@ -53,36 +54,28 @@ public class DatabaseManager extends AbstractManager {
     @Override
     public void load() {
         // MySQL is enabled or not?
-        if (!Files.getConfiguration().isMysql()) {
-            this.logger.info("MySQL disabled. Using flat system to store data.");
-            return;
-        }
+        if (Files.getConfiguration().isMysql()) {
+            // Setup the database from the configuration
+            this.setupDatabase();
 
-        long begin = System.currentTimeMillis();
+            try {
+                long beginTime = System.currentTimeMillis();
 
-        // Connect to the MySQL server ...
-        String host = Files.getConfiguration().getMysqlHost();
-        int port = Files.getConfiguration().getMysqlPort();
+                // Open a new connection to the SQL server
+                this.database.open();
 
-        this.database = new Database(
-                host, port,
-                Files.getConfiguration().getMysqlUser(),
-                Files.getConfiguration().getMysqlPassword(),
-                Files.getConfiguration().getMysqlDatabase()
-        );
+                // Initialize the tables if needed
+                this.createTables();
 
-        if (this.database.isConnected()) {
-            this.logger.log(Level.INFO, "MySQL enabled and ready. Connected to database {0}:{1}",
-                    new Object[]{host, String.valueOf(port)});
-
-            if (Files.getConfiguration().isDebug()) {
-                this.logger.log(Level.INFO, "Connection time: {0}ms", System.currentTimeMillis() - begin);
+                // Log the successful connection into the console
+                this.logConnection(beginTime);
+            } catch (SQLException e) {
+                this.logger.log(Level.SEVERE, "Unable to connect to your database. Please verify your credentials.", e);
+                this.logger.warning("SQL supports disabled because of an error during the connection.");
+                this.database = null;
             }
-
-            this.init();
         } else {
-            this.logger.severe("Unable to connect to your database. Please verify your credentials.");
-            this.logger.warning("SQL supports disabled because of an error during the connection.");
+            this.logger.info("MySQL disabled. Using flat system to store data.");
         }
     }
 
@@ -228,27 +221,73 @@ public class DatabaseManager extends AbstractManager {
     }
 
     /**
+     * Setup the database connection from user configuration.
+     */
+    private void setupDatabase() {
+        Configuration config = Files.getConfiguration();
+
+        // Setup the database object
+        this.database = new Database(
+                config.getMysqlHost(), config.getMysqlPort(),
+                config.getMysqlUser(), config.getMysqlPassword(), config.getMysqlDatabase()
+        );
+
+        // Connection over SSL?
+        if (config.isMysqlSsl()) {
+            DatabaseSecureCredentials credentials = new DatabaseSecureCredentials();
+
+            try {
+                credentials.setClientKeystore(config.getMysqlSslKeystoreFile(), config.getMysqlSslKeystorePassword());
+            } catch (NullPointerException e) {
+                this.logger.log(Level.SEVERE, "keystore file or password from your configuration seems to be null", e);
+                return;
+            }
+
+            if (config.getMysqlSslTrustKeystoreFile() != null && config.getMysqlSslTrustKeystorePassword() != null) {
+                credentials.setTrustKeystore(config.getMysqlSslTrustKeystoreFile(), config.getMysqlSslTrustKeystorePassword());
+            }
+
+            this.database.setSecureCredentials(credentials);
+        }
+    }
+
+    /**
+     * Log a successful database connection into the console.
+     *
+     * @param beginTime timestamp where the connection has started
+     */
+    private void logConnection(long beginTime) {
+        this.logger.log(Level.INFO, "MySQL enabled and ready. Connected to database {0}", this.database.getEndpoint());
+
+        if (this.database.isSecured()) {
+            this.logger.info("Good news! You are using a secure connection to your database server.");
+        } else {
+            this.logger.warning("You are using an unsecure connection to your database server. Be careful!");
+        }
+
+        if (Files.getConfiguration().isDebug()) {
+            this.logger.log(Level.INFO, "Connection time: {0}ms", System.currentTimeMillis() - beginTime);
+        }
+    }
+
+    /**
      * Initialize the database if this is the first launch of the MySQL manager
      */
-    private void init() {
-        try {
-            String collation = this.database.getServerVersion() >= 5.5 ? "utf8mb4_unicode_ci" : "utf8_unicode_ci";
-            List<String> tables = this.database.getTables();
+    private void createTables() throws SQLException {
+        String collation = this.database.getServerVersion() >= 5.5 ? "utf8mb4_unicode_ci" : "utf8_unicode_ci";
+        List<String> tables = this.database.getTables();
 
-            if (!tables.contains(formatTable(CHEST_TABLE))) {
-                database.request("CREATE TABLE `" + formatTable(CHEST_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `num` TINYINT(2) NOT NULL DEFAULT '0', `owner` VARCHAR(36) NULL, `contents` MEDIUMTEXT NULL, `rows` INT(1) NOT NULL DEFAULT 0, PRIMARY KEY (`id`), INDEX `USER KEY` (`num`, `owner`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
-                if (Files.getConfiguration().isDebug()) {
-                    this.logger.log(Level.INFO, "Table `{0}` created in the database.", formatTable(CHEST_TABLE));
-                }
+        if (!tables.contains(formatTable(CHEST_TABLE))) {
+            database.request("CREATE TABLE `" + formatTable(CHEST_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `num` TINYINT(2) NOT NULL DEFAULT '0', `owner` VARCHAR(36) NULL, `contents` MEDIUMTEXT NULL, `rows` INT(1) NOT NULL DEFAULT 0, PRIMARY KEY (`id`), INDEX `USER KEY` (`num`, `owner`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
+            if (Files.getConfiguration().isDebug()) {
+                this.logger.log(Level.INFO, "Table `{0}` created in the database.", formatTable(CHEST_TABLE));
             }
-            if (!tables.contains(formatTable(BACKUP_TABLE))) {
-                database.request("CREATE TABLE `" + formatTable(BACKUP_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255) NOT NULL, `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `type` VARCHAR(60) NULL, `data` MEDIUMTEXT NULL, `created_by` VARCHAR(60) NULL, PRIMARY KEY (`id`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
-                if (Files.getConfiguration().isDebug()) {
-                    this.logger.log(Level.INFO, "Table `{0}` created in the database.", formatTable(BACKUP_TABLE));
-                }
+        }
+        if (!tables.contains(formatTable(BACKUP_TABLE))) {
+            database.request("CREATE TABLE `" + formatTable(BACKUP_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255) NOT NULL, `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `type` VARCHAR(60) NULL, `data` MEDIUMTEXT NULL, `created_by` VARCHAR(60) NULL, PRIMARY KEY (`id`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
+            if (Files.getConfiguration().isDebug()) {
+                this.logger.log(Level.INFO, "Table `{0}` created in the database.", formatTable(BACKUP_TABLE));
             }
-        } catch (SQLException e) {
-            this.logger.log(Level.SEVERE, "Cannot create tables in the database", e);
         }
     }
 

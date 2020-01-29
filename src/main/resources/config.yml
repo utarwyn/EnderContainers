@@ -50,6 +50,11 @@ mysql:
   password: ''
   database: 'endercontainers'
 
+  # Change this section if you want to connect over SSL, by default its disabled.
+  # Check our wiki on Github to know how to configure it!
+  ssl:
+    enabled: false
+
   # You can choose a prefix for all EnderContainers tables
   tablePrefix: 'ec_'
 

@@ -49,7 +49,15 @@ public class Database implements AutoCloseable {
     /**
      * Source object used to perform requests to the database
      */
-    private BasicDataSource source;
+    BasicDataSource source;
+    /**
+     * Flag which controls the connection state to the database
+     */
+    private boolean connected;
+    /**
+     * Has the connection been opened over SSL?
+     */
+    private boolean secured;
 
     /**
      * Constructor to create a new MySQL database object.
@@ -66,12 +74,10 @@ public class Database implements AutoCloseable {
         this.user = user;
         this.password = password;
         this.name = name;
+        this.secured = false;
 
-        try {
-            this.createPool();
-        } catch (SQLException ex) {
-            this.source = null;
-        }
+        this.source = new BasicDataSource();
+        this.source.addConnectionProperty("useSSL", "false");
     }
 
     /**
@@ -80,7 +86,47 @@ public class Database implements AutoCloseable {
      * @return True if connected.
      */
     public boolean isConnected() {
-        return this.source != null && !this.source.isClosed();
+        return this.connected && !this.source.isClosed();
+    }
+
+    /**
+     * Checks if the connection has been opened over SSL or not.
+     *
+     * @return true if the connection is secured
+     */
+    public boolean isSecured() {
+        return this.secured;
+    }
+
+    /**
+     * Returns the full endpoint to access to the database server.
+     *
+     * @return host + port of the database server
+     */
+    public String getEndpoint() {
+        return this.host + ':' + this.port;
+    }
+
+    /**
+     * Configure the datasource to use SSL with provided credentials.
+     * This method MUST be called before the opening of the first connection.
+     *
+     * @param credentials credentials to securize the connection over SSL
+     */
+    public void setSecureCredentials(DatabaseSecureCredentials credentials) {
+        this.secured = true;
+
+        this.source.addConnectionProperty("useSSL", "true");
+        this.source.addConnectionProperty("requireSSL", "true");
+        this.source.addConnectionProperty("clientCertificateKeyStoreUrl", credentials.getClientKeystoreFile());
+        this.source.addConnectionProperty("clientCertificateKeyStoreType", DatabaseSecureCredentials.KEYSTORE_TYPE);
+        this.source.addConnectionProperty("clientCertificateKeyStorePassword", credentials.getClientKeystorePassword());
+
+        if (credentials.isUsingTrustCertificate()) {
+            this.source.addConnectionProperty("trustCertificateKeyStoreUrl", credentials.getTrustKeystoreFile());
+            this.source.addConnectionProperty("trustCertificateKeyStoreType", DatabaseSecureCredentials.KEYSTORE_TYPE);
+            this.source.addConnectionProperty("trustCertificateKeyStorePassword", credentials.getTrustKeystorePassword());
+        }
     }
 
     /**
@@ -99,6 +145,25 @@ public class Database implements AutoCloseable {
     }
 
     /**
+     * Open a connection to the databaser server.
+     * (create a pool to execute all requests in an optimized way)
+     */
+    public void open() throws SQLException {
+        this.source.setDriverClassName("com.mysql.jdbc.Driver");
+        this.source.setUrl("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.name);
+        this.source.setUsername(this.user);
+        this.source.setPassword(this.password);
+
+        this.source.setInitialSize(1);
+        this.source.setMaxOpenPreparedStatements(8);
+        this.source.setMaxTotal(8);
+
+        // Connection test
+        this.source.getConnection().close();
+        this.connected = true;
+    }
+
+    /**
      * Closes the connection to the SQL server
      *
      * @throws SQLException throwed if the connection cannot be closed.
@@ -107,6 +172,7 @@ public class Database implements AutoCloseable {
     public void close() throws SQLException {
         if (this.isConnected()) {
             this.source.close();
+            this.connected = false;
         }
     }
 
@@ -231,25 +297,6 @@ public class Database implements AutoCloseable {
 
             return statement.executeUpdate() > 0;
         }
-    }
-
-    /**
-     * Initialize the external pool SQL object
-     * (the object executes all requests in an optimized and intelligent thread)
-     */
-    private void createPool() throws SQLException {
-        source = new BasicDataSource();
-        source.setDriverClassName("com.mysql.jdbc.Driver");
-        source.setUrl("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.name + "?useSSL=false");
-        source.setUsername(this.user);
-        source.setPassword(this.password);
-
-        source.setInitialSize(1);
-        source.setMaxOpenPreparedStatements(8);
-        source.setMaxTotal(8);
-
-        // Connection test
-        source.getConnection().close();
     }
 
 }

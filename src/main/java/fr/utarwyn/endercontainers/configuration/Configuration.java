@@ -52,6 +52,21 @@ public class Configuration extends YamlFile {
     @Configurable(key = "mysql.database")
     private String mysqlDatabase;
 
+    @Configurable(key = "mysql.ssl.enabled")
+    private boolean mysqlSsl;
+
+    @Configurable(key = "mysql.ssl.keystore_file")
+    private String mysqlSslKeystoreFile;
+
+    @Configurable(key = "mysql.ssl.keystore_password")
+    private String mysqlSslKeystorePassword;
+
+    @Configurable(key = "mysql.ssl.ca_keystore_file")
+    private String mysqlSslTrustKeystoreFile;
+
+    @Configurable(key = "mysql.ssl.ca_keystore_password")
+    private String mysqlSslTrustKeystorePassword;
+
     @Configurable(key = "mysql.tablePrefix")
     private String mysqlTablePrefix;
 
@@ -139,6 +154,26 @@ public class Configuration extends YamlFile {
 
     public String getMysqlDatabase() {
         return this.mysqlDatabase;
+    }
+
+    public boolean isMysqlSsl() {
+        return this.mysqlSsl;
+    }
+
+    public String getMysqlSslKeystoreFile() {
+        return this.mysqlSslKeystoreFile;
+    }
+
+    public String getMysqlSslKeystorePassword() {
+        return this.mysqlSslKeystorePassword;
+    }
+
+    public String getMysqlSslTrustKeystoreFile() {
+        return this.mysqlSslTrustKeystoreFile;
+    }
+
+    public String getMysqlSslTrustKeystorePassword() {
+        return this.mysqlSslTrustKeystorePassword;
     }
 
     public String getMysqlTablePrefix() {
