@@ -6,6 +6,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,6 +51,15 @@ public abstract class AbstractMenu implements InventoryHolder {
     }
 
     /**
+     * Check if somebody is viewing the menu.
+     *
+     * @return true if there is at least one player viewing the menu
+     */
+    public boolean isUsed() {
+        return this.inventory != null && !this.inventory.getViewers().isEmpty();
+    }
+
+    /**
      * Open the container to a specific player.
      *
      * @param player Player that will receive the container
@@ -63,6 +73,7 @@ public abstract class AbstractMenu implements InventoryHolder {
      *
      * @return inventory with all items of this menu
      */
+    @Nonnull
     @Override
     public Inventory getInventory() {
         return this.inventory;

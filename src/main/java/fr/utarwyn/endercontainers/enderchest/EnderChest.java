@@ -4,7 +4,6 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.menu.enderchest.EnderChestMenu;
 import fr.utarwyn.endercontainers.util.MiscUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -120,12 +119,55 @@ public class EnderChest {
     }
 
     /**
+     * Check the accessibility of the chest
+     *
+     * @return True if the chest is accessible
+     */
+    public boolean isAccessible() {
+        Player player = this.context.getOwnerAsObject();
+
+        // For the first chest or if the player is offline, viewer has the access.
+        if (!this.isDefault() && player != null) {
+            return MiscUtil.playerHasPerm(player, "open." + this.getNum());
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Check if the container is used by someone on the server.
+     *
+     * @return true if at least one player is using it
+     */
+    public boolean isContainerUsed() {
+        return this.container.isUsed();
+    }
+
+    /**
      * Returns true if the chest was enabled by default
      *
      * @return True if the chest is unlocked for everyone
      */
     public boolean isDefault() {
         return this.num < Files.getConfiguration().getDefaultEnderchests();
+    }
+
+    /**
+     * Check if the container is empty.
+     *
+     * @return True if the container is empty
+     */
+    public boolean isEmpty() {
+        return this.getSize() == 0;
+    }
+
+    /**
+     * Check if the container is full.
+     *
+     * @return True if the container is full
+     */
+    public boolean isFull() {
+        return this.getSize() == this.getMaxSize();
     }
 
     /**
@@ -138,52 +180,18 @@ public class EnderChest {
     }
 
     /**
-     * Returns the accessibility of the chest
-     *
-     * @return True if the chest is accessible
-     */
-    public boolean isAccessible() {
-        Player player = this.getOwnerPlayer();
-
-        // For the first chest or if the player is offline, viewer has the access.
-        if (!this.isDefault() && player != null) {
-            return MiscUtil.playerHasPerm(player, "open." + this.getNum());
-        } else {
-            return true;
-        }
-    }
-
-    /**
-     * Returns true if the container is full
-     *
-     * @return True if the container is full
-     */
-    public boolean isFull() {
-        return this.getSize() == this.getMaxSize();
-    }
-
-    /**
-     * Returns true if the container is empty
-     *
-     * @return True if the container is empty
-     */
-    public boolean isEmpty() {
-        return this.getSize() == 0;
-    }
-
-    /**
      * Open the chest container for a specific player
      *
      * @param player The player who wants to open the container
      */
     public void openContainerFor(Player player) {
         if (this.isVanilla()) {
-            Player ownerObj = this.getOwnerPlayer();
-            // Owner must be online
-            if (ownerObj != null && ownerObj.isOnline()) {
+            Player ownerObj = this.context.getOwnerAsObject();
+
+            // TODO Support opening chests of offline players
+            if (ownerObj != null) {
                 player.openInventory(ownerObj.getEnderChest());
             }
-            // TODO Support opening chests of offline players
         } else {
             this.container.open(player);
         }
@@ -203,7 +211,7 @@ public class EnderChest {
         // Use the vanilla chest!
         if (this.isVanilla()) return row;
 
-        Player player = this.getOwnerPlayer();
+        Player player = this.context.getOwnerAsObject();
 
         // No player connected for this chest, use the cache instead.
         if (player == null) {
@@ -219,15 +227,6 @@ public class EnderChest {
         }
 
         return row;
-    }
-
-    /**
-     * Get the owner as a Player object
-     *
-     * @return The Player object of the owner if he is connected, null otherwise
-     */
-    private Player getOwnerPlayer() {
-        return Bukkit.getPlayer(this.getOwner());
     }
 
 }

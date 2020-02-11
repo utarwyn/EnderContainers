@@ -14,7 +14,7 @@ public class Managers {
     /**
      * Cache map for instances of managers.
      */
-    private static Map<Class<? extends AbstractManager>, AbstractManager> instances = new LinkedHashMap<>();
+    static Map<Class<? extends AbstractManager>, AbstractManager> instances = new LinkedHashMap<>();
 
     /**
      * Managers constructor.
@@ -65,15 +65,6 @@ public class Managers {
      */
     public static void reloadAll() {
         instances.keySet().forEach(Managers::reload);
-    }
-
-    /**
-     * Gets managers instances.
-     *
-     * @return all managers instances
-     */
-    static Map<Class<? extends AbstractManager>, AbstractManager> getInstances() {
-        return instances;
     }
 
     /**

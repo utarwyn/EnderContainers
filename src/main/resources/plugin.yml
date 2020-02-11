@@ -3,4 +3,4 @@ author: Utarwyn
 version: 2.2.0
 main: fr.utarwyn.endercontainers.EnderContainers
 api-version: "1.13"
-softdepend: [Factions, PlotSquared, Citizens, Essentials, WorldGuard]
+softdepend: [Factions, PlotSquared, Essentials, WorldGuard]

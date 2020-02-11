@@ -38,7 +38,6 @@ public class WorldGuardV7Hook implements DependencyListener {
 
         // Check for denied flags at the chest's location!
         return query.testBuild(location, localPlayer, Flags.INTERACT, Flags.USE);
-
     }
 
 }

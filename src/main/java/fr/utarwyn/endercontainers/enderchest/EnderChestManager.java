@@ -24,7 +24,7 @@ public class EnderChestManager extends AbstractManager {
     /**
      * A map which contains all loaded player contexts.
      */
-    private Map<UUID, PlayerContext> contextMap;
+    Map<UUID, PlayerContext> contextMap;
 
     /**
      * {@inheritDoc}
@@ -65,6 +65,17 @@ public class EnderChestManager extends AbstractManager {
     }
 
     /**
+     * Check if the context of a specific player is unused at a given time.
+     * All chests of this context must not have viewer in their container.
+     *
+     * @param owner owner of the context to check
+     * @return true if the context is unused
+     */
+    public boolean isContextUnused(UUID owner) {
+        return this.contextMap.containsKey(owner) && this.contextMap.get(owner).isChestsUnused();
+    }
+
+    /**
      * Load all chests and data of a player asynchronously if needed
      * and call a method when this work is done.
      *
@@ -90,13 +101,20 @@ public class EnderChestManager extends AbstractManager {
     }
 
     /**
-     * Save all data of a player, and purge all of its chests from memory.
+     * Save all data of a player.
+     * Also purge its context from memory if needed.
+     *
+     * @param owner  owner of the player context to save
+     * @param delete should the context must be deleted from the memory
      */
-    void saveAndDeletePlayerContext(UUID owner) {
+    public void savePlayerContext(UUID owner, boolean delete) {
         if (this.contextMap.containsKey(owner)) {
             SaveTask saveTask = new SaveTask(this.contextMap.get(owner));
             this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, saveTask);
-            this.contextMap.remove(owner);
+
+            if (delete) {
+                this.contextMap.remove(owner);
+            }
         }
     }
 

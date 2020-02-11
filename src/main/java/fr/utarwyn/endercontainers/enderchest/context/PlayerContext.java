@@ -7,6 +7,7 @@ import fr.utarwyn.endercontainers.menu.enderchest.EnderChestHubMenu;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import fr.utarwyn.endercontainers.util.MiscUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -62,6 +63,17 @@ public class PlayerContext {
     }
 
     /**
+     * Get the owner as a Player object.
+     * The player must be online to get the object.
+     *
+     * @return player object of the owner if it is connected, null otherwise
+     */
+    public Player getOwnerAsObject() {
+        Player player = Bukkit.getPlayer(this.getOwner());
+        return player != null && player.isOnline() ? player : null;
+    }
+
+    /**
      * Get the storage object which manages this context.
      *
      * @return this storage object
@@ -87,6 +99,15 @@ public class PlayerContext {
      */
     public int getAccessibleChestCount() {
         return (int) this.chests.stream().filter(EnderChest::isAccessible).count();
+    }
+
+    /**
+     * Check if there is no player using containers of this context.
+     *
+     * @return true if chests of this context are unused
+     */
+    public boolean isChestsUnused() {
+        return this.chests.stream().noneMatch(EnderChest::isContainerUsed);
     }
 
     /**

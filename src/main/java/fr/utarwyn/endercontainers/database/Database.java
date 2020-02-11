@@ -50,10 +50,12 @@ public class Database implements AutoCloseable {
      * Source object used to perform requests to the database
      */
     BasicDataSource source;
+
     /**
      * Flag which controls the connection state to the database
      */
     private boolean connected;
+
     /**
      * Has the connection been opened over SSL?
      */

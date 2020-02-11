@@ -1,10 +1,13 @@
 package fr.utarwyn.endercontainers.menu.enderchest;
 
+import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
+import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.menu.AbstractMenu;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
@@ -79,6 +82,13 @@ public class EnderChestMenu extends AbstractMenu {
      */
     @Override
     public void onClose(Player player) {
+        // Save and delete the player context if the owner of the chest is offline
+        Player owner = Bukkit.getPlayer(this.chest.getOwner());
+        if (owner == null || !owner.isOnline()) {
+            Managers.get(EnderChestManager.class).savePlayerContext(this.chest.getOwner(), true);
+        }
+
+        // Play the closing sound
         if (Files.getConfiguration().isGlobalSound()) {
             MiscUtil.playSound(player.getLocation(), "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
         } else {
