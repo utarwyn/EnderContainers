@@ -71,8 +71,8 @@ public class ManagersTest {
         assertThat(Managers.reload(AbstractManager.class)).isFalse();
 
         // Check if methods "load" and "unload" are called on a manager
-        verify(this.manager, times(1)).load();
-        verify(this.manager, times(1)).unload();
+        verify(this.manager).load();
+        verify(this.manager).unload();
     }
 
 }

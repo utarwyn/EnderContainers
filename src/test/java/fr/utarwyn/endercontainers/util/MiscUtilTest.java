@@ -27,11 +27,11 @@ public class MiscUtilTest {
 
         // Unknown sound
         MiscUtil.playSound(location, UNKNOWN_SOUND, UNKNOWN_SOUND);
-        verify(world, times(0)).playSound(location, sound, 1f, 1f);
+        verify(world, never()).playSound(location, sound, 1f, 1f);
 
         // Existing sound
         MiscUtil.playSound(location, EXISITING_SOUND, EXISITING_SOUND);
-        verify(world, times(1)).playSound(location, sound, 1f, 1f);
+        verify(world).playSound(location, sound, 1f, 1f);
 
         // Existing sound in 1.9+
         MiscUtil.playSound(location, UNKNOWN_SOUND, EXISITING_SOUND);
@@ -48,11 +48,11 @@ public class MiscUtilTest {
 
         // Unknown sound
         MiscUtil.playSound(player, UNKNOWN_SOUND, UNKNOWN_SOUND);
-        verify(player, times(0)).playSound(player.getLocation(), sound, 1f, 1f);
+        verify(player, never()).playSound(player.getLocation(), sound, 1f, 1f);
 
         // Exisiting sound
         MiscUtil.playSound(player, EXISITING_SOUND, EXISITING_SOUND);
-        verify(player, times(1)).playSound(player.getLocation(), sound, 1f, 1f);
+        verify(player).playSound(player.getLocation(), sound, 1f, 1f);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class MiscUtilTest {
         assertThat(MiscUtil.senderHasPerm(console, perm)).isTrue();
         assertThat(MiscUtil.senderHasPerm(player, perm)).isFalse();
 
-        verify(player, times(1)).isOp();
+        verify(player).isOp();
     }
 
 }

@@ -28,6 +28,11 @@ public abstract class AbstractMenu implements InventoryHolder {
     protected Inventory inventory;
 
     /**
+     * Flag which defines if item moves in the menu are restricted
+     */
+    protected boolean itemMovingRestricted = true;
+
+    /**
      * True if the menu has been initialized, false otherwise
      */
     private boolean initialized;
@@ -39,6 +44,15 @@ public abstract class AbstractMenu implements InventoryHolder {
      */
     public int getFilledSlotsNb() {
         return (int) Arrays.stream(this.inventory.getContents()).filter(Objects::nonNull).count();
+    }
+
+    /**
+     * Check if item moves inside this menu are restricted.
+     *
+     * @return value of the moveRestricted flag
+     */
+    public boolean isItemMovingRestricted() {
+        return this.itemMovingRestricted;
     }
 
     /**
@@ -98,6 +112,16 @@ public abstract class AbstractMenu implements InventoryHolder {
     }
 
     /**
+     * Called when a player click on an item in the menu
+     *
+     * @param player The player who interacts with the menu
+     * @param slot   The slot where the player has clicked
+     */
+    public void onClick(Player player, int slot) {
+        // Not implemented
+    }
+
+    /**
      * Reload the menu by replacing the current inventory.
      */
     protected void reloadInventory() {
@@ -139,15 +163,6 @@ public abstract class AbstractMenu implements InventoryHolder {
      * @return the displayed title
      */
     protected abstract String getTitle();
-
-    /**
-     * Called when a player click on an item in the menu
-     *
-     * @param player The player who interacts with the menu
-     * @param slot   The slot where the player has clicked
-     * @return True if the event has to be cancelled
-     */
-    public abstract boolean onClick(Player player, int slot);
 
     /**
      * Called when a player closes the menu

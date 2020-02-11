@@ -150,17 +150,18 @@ public class EnderChestHubMenu extends AbstractMenu {
      * {@inheritDoc}
      */
     @Override
-    public boolean onClick(Player player, int slot) {
-        ItemStack item = Objects.requireNonNull(this.inventory.getItem(slot));
+    public void onClick(Player player, int slot) {
+        ItemStack item = this.inventory.getItem(slot);
+        if (item == null) return;
 
         // Check for previous/next page
-        if (slot >= PER_PAGE && item.getType() == SKULL_MATERIAL) {
+        if (item.getType() == SKULL_MATERIAL) {
             if (slot == PER_PAGE) this.page--;
             else if (slot == PER_PAGE + 1) this.page++;
 
             this.reloadInventory();
             this.open(player);
-            return true;
+            return;
         }
 
         // Open the selected chest
@@ -169,8 +170,6 @@ public class EnderChestHubMenu extends AbstractMenu {
         } else {
             MiscUtil.playSound(player, "ANVIL_BREAK", "BLOCK_ANVIL_BREAK");
         }
-
-        return true;
     }
 
     /**

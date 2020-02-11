@@ -32,6 +32,8 @@ public class EnderChestMenu extends AbstractMenu {
      */
     public EnderChestMenu(EnderChest chest) {
         this.chest = chest;
+        this.itemMovingRestricted = false;
+
         this.reloadInventory();
     }
 
@@ -67,14 +69,6 @@ public class EnderChestMenu extends AbstractMenu {
         return Files.getLocale().getMenuChestTitle()
                 .replace("%player%", playername)
                 .replace("%num%", num);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean onClick(Player player, int slot) {
-        return false;
     }
 
     /**

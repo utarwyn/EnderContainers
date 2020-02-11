@@ -48,7 +48,7 @@ public class EnderChestManagerTest {
         this.manager.initialize();
 
         // Verify that the enderchest listener has been registered
-        verify(Bukkit.getServer().getPluginManager(), times(1))
+        verify(Bukkit.getServer().getPluginManager())
                 .registerEvents(any(EnderChestListener.class), any(EnderContainers.class));
     }
 
@@ -59,7 +59,7 @@ public class EnderChestManagerTest {
 
         this.manager.unload();
 
-        verify(menuManager, times(1)).closeAll();
+        verify(menuManager).closeAll();
         assertThat(this.manager.contextMap).isEmpty();
     }
 
@@ -98,10 +98,10 @@ public class EnderChestManagerTest {
         // Reload a registered context
         PlayerContext context = this.registerPlayerContext(uuid);
         this.manager.loadPlayerContext(uuid, callback);
-        verify(callback, times(1)).run(context);
+        verify(callback).run(context);
 
         // Verify that the scheduler has been called only once (in the first scenario)
-        verify(Bukkit.getServer().getScheduler(), times(1))
+        verify(Bukkit.getServer().getScheduler())
                 .runTaskAsynchronously(any(EnderContainers.class), any(LoadTask.class));
     }
 
@@ -130,7 +130,7 @@ public class EnderChestManagerTest {
         this.manager.savePlayerContext(uuid, false);
         assertThat(this.manager.contextMap).containsKey(uuid);
 
-        verify(Bukkit.getServer().getScheduler(), times(1))
+        verify(Bukkit.getServer().getScheduler())
                 .runTaskAsynchronously(any(EnderContainers.class), any(SaveTask.class));
 
         // Check deletion of a context

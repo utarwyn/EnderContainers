@@ -36,7 +36,7 @@ public class AbstractManagerTest {
         this.manager.plugin = this.plugin;
         this.manager.registerListener(listener);
 
-        verify(pluginManager, times(1)).registerEvents(listener, this.plugin);
+        verify(pluginManager).registerEvents(listener, this.plugin);
     }
 
     @Test

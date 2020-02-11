@@ -2,14 +2,15 @@ package fr.utarwyn.endercontainers.menu;
 
 import fr.utarwyn.endercontainers.AbstractManager;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+
+import java.util.Optional;
 
 /**
  * Manages all menus of the plugin.
@@ -33,20 +34,44 @@ public class MenuManager extends AbstractManager {
      * Called when a player click in an inventory.
      * Used to detect an interaction with one of registered menus.
      *
-     * @param event The inventory click event
+     * @param event inventory click event
      */
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Inventory inventory = event.getView().getTopInventory();
+        Optional<AbstractMenu> menu = this.getMenuFromInventory(inventory);
 
-        if (event.getRawSlot() < inventory.getSize()) {
-            AbstractMenu menu = this.getMenuFromInventory(inventory);
-            Player player = (Player) event.getWhoClicked();
-            ItemStack item = event.getCurrentItem();
+        int slot = event.getRawSlot();
+        boolean validSlot = slot >= 0 && slot < inventory.getSize();
 
-            if (menu != null && item != null && !Material.AIR.equals(item.getType())) {
-                event.setCancelled(menu.onClick(player, event.getSlot()));
+        if (menu.isPresent()) {
+            // A restricted move is when player clicks in the menu or uses shift click
+            boolean restrictedMove = validSlot || event.isShiftClick();
+            event.setCancelled(menu.get().isItemMovingRestricted() && restrictedMove);
+
+            // Perform the action only when player clicks on a valid slot of the menu
+            if (validSlot) {
+                menu.get().onClick((Player) event.getWhoClicked(), slot);
             }
+        }
+    }
+
+    /**
+     * Called when a player drag items in an inventory.
+     * Used to detect cancel an interaction with one of registered menus.
+     *
+     * @param event inventory drag event
+     */
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent event) {
+        Inventory inventory = event.getView().getTopInventory();
+        Optional<AbstractMenu> menu = this.getMenuFromInventory(inventory);
+
+        if (menu.isPresent() && menu.get().isItemMovingRestricted()) {
+            boolean itemInMenu = event.getRawSlots().stream()
+                    .anyMatch(slot -> slot < inventory.getSize());
+
+            event.setCancelled(itemInMenu);
         }
     }
 
@@ -58,11 +83,8 @@ public class MenuManager extends AbstractManager {
      */
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        AbstractMenu menu = this.getMenuFromInventory(event.getInventory());
-
-        if (menu != null) {
-            menu.onClose((Player) event.getPlayer());
-        }
+        Optional<AbstractMenu> menu = this.getMenuFromInventory(event.getInventory());
+        menu.ifPresent(m -> m.onClose((Player) event.getPlayer()));
     }
 
     /**
@@ -71,11 +93,11 @@ public class MenuManager extends AbstractManager {
     public void closeAll() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             Inventory inventory = player.getOpenInventory().getTopInventory();
-            AbstractMenu menu = this.getMenuFromInventory(inventory);
+            Optional<AbstractMenu> menu = this.getMenuFromInventory(inventory);
 
-            if (menu != null) {
+            if (menu.isPresent()) {
                 player.closeInventory();
-                menu.onClose(player);
+                menu.get().onClose(player);
             }
 
             if (InventoryType.ENDER_CHEST.equals(inventory.getType())) {
@@ -90,8 +112,9 @@ public class MenuManager extends AbstractManager {
      * @param inventory Inventory to check
      * @return Menu if found, otherwise null
      */
-    private AbstractMenu getMenuFromInventory(Inventory inventory) {
-        return inventory.getHolder() instanceof AbstractMenu ? (AbstractMenu) inventory.getHolder() : null;
+    private Optional<AbstractMenu> getMenuFromInventory(Inventory inventory) {
+        boolean isCustom = inventory.getHolder() instanceof AbstractMenu;
+        return isCustom ? Optional.of((AbstractMenu) inventory.getHolder()) : Optional.empty();
     }
 
 }

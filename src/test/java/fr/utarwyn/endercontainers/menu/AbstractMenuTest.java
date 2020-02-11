@@ -14,6 +14,7 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,6 +35,26 @@ public class AbstractMenuTest {
     }
 
     @Test
+    public void itemMovingRestricted() {
+        this.menu.itemMovingRestricted = true;
+        assertThat(this.menu.isItemMovingRestricted()).isTrue();
+        this.menu.itemMovingRestricted = false;
+        assertThat(this.menu.isItemMovingRestricted()).isFalse();
+    }
+
+    @Test
+    public void isUsed() {
+        // With no inventory
+        assertThat(this.menu.isUsed()).isFalse();
+        this.menu.inventory = this.inventory;
+
+        // With an inventory, simulate a viewer
+        assertThat(this.menu.isUsed()).isFalse();
+        when(this.inventory.getViewers()).thenReturn(Collections.singletonList(mock(Player.class)));
+        assertThat(this.menu.isUsed()).isTrue();
+    }
+
+    @Test
     public void inventory() {
         assertThat(this.menu.inventory).isNull();
         this.menu.inventory = this.inventory;
@@ -51,20 +72,23 @@ public class AbstractMenuTest {
 
         when(this.menu.getRows()).thenReturn(rows);
         when(this.menu.getTitle()).thenReturn(title);
+        assertThat(this.menu.isInitialized()).isFalse();
 
         // Create a new inventory
         this.menu.reloadInventory();
 
         assertThat(this.menu.inventory).isNotNull();
-        verify(this.menu, times(1)).prepare();
-        verify(Bukkit.getServer(), times(1)).createInventory(this.menu, rows * 9, title.substring(0, 32));
+        assertThat(this.menu.isInitialized()).isTrue();
+
+        verify(this.menu).prepare();
+        verify(Bukkit.getServer()).createInventory(this.menu, rows * 9, title.substring(0, 32));
 
         // Reload an inventory with itemstacks
         ItemStack[] itemList = this.getFakeItemList();
 
         when(this.menu.inventory.getContents()).thenReturn(itemList);
         this.menu.reloadInventory();
-        verify(this.menu.inventory, times(1)).setContents(itemList);
+        verify(this.menu.inventory).setContents(itemList);
     }
 
     @Test
@@ -72,9 +96,11 @@ public class AbstractMenuTest {
         Player player = mock(Player.class);
 
         this.menu.inventory = this.inventory;
-        this.menu.open(player);
 
-        verify(player, times(1)).openInventory(this.inventory);
+        this.menu.open(player);
+        this.menu.onClick(player, 0);
+
+        verify(player).openInventory(this.inventory);
     }
 
     @Test
