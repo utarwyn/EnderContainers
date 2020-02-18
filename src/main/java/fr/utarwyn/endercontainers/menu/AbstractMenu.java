@@ -47,42 +47,6 @@ public abstract class AbstractMenu implements InventoryHolder {
     }
 
     /**
-     * Check if item moves inside this menu are restricted.
-     *
-     * @return value of the moveRestricted flag
-     */
-    public boolean isItemMovingRestricted() {
-        return this.itemMovingRestricted;
-    }
-
-    /**
-     * Get the loading state of the menu.
-     *
-     * @return true if the menu has been initialized
-     */
-    public boolean isInitialized() {
-        return this.initialized;
-    }
-
-    /**
-     * Check if somebody is viewing the menu.
-     *
-     * @return true if there is at least one player viewing the menu
-     */
-    public boolean isUsed() {
-        return this.inventory != null && !this.inventory.getViewers().isEmpty();
-    }
-
-    /**
-     * Open the container to a specific player.
-     *
-     * @param player Player that will receive the container
-     */
-    public void open(Player player) {
-        player.openInventory(this.inventory);
-    }
-
-    /**
      * Returns the inventory with items of this menu.
      *
      * @return inventory with all items of this menu
@@ -112,6 +76,33 @@ public abstract class AbstractMenu implements InventoryHolder {
     }
 
     /**
+     * Check if item moves inside this menu are restricted.
+     *
+     * @return value of the moveRestricted flag
+     */
+    public boolean isItemMovingRestricted() {
+        return this.itemMovingRestricted;
+    }
+
+    /**
+     * Get the loading state of the menu.
+     *
+     * @return true if the menu has been initialized
+     */
+    public boolean isInitialized() {
+        return this.initialized;
+    }
+
+    /**
+     * Check if somebody is viewing the menu.
+     *
+     * @return true if there is at least one player viewing the menu
+     */
+    public boolean isUsed() {
+        return this.inventory != null && !this.inventory.getViewers().isEmpty();
+    }
+
+    /**
      * Called when a player click on an item in the menu
      *
      * @param player The player who interacts with the menu
@@ -119,6 +110,15 @@ public abstract class AbstractMenu implements InventoryHolder {
      */
     public void onClick(Player player, int slot) {
         // Not implemented
+    }
+
+    /**
+     * Open the container to a specific player.
+     *
+     * @param player Player that will receive the container
+     */
+    public void open(Player player) {
+        player.openInventory(this.inventory);
     }
 
     /**
@@ -146,9 +146,11 @@ public abstract class AbstractMenu implements InventoryHolder {
     }
 
     /**
-     * Prepare this menu by adding needed items directly inside the current inventory.
+     * Called when a player closes the menu
+     *
+     * @param player The player who closes the menu
      */
-    protected abstract void prepare();
+    public abstract void onClose(Player player);
 
     /**
      * Return the number of rows needed for this container.
@@ -158,17 +160,15 @@ public abstract class AbstractMenu implements InventoryHolder {
     protected abstract int getRows();
 
     /**
+     * Prepare this menu by adding needed items directly inside the current inventory.
+     */
+    protected abstract void prepare();
+
+    /**
      * Return the title displayed at the top of this container.
      *
      * @return the displayed title
      */
     protected abstract String getTitle();
-
-    /**
-     * Called when a player closes the menu
-     *
-     * @param player The player who closes the menu
-     */
-    public abstract void onClose(Player player);
 
 }

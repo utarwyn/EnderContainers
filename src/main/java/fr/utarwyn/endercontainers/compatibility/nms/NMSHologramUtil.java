@@ -1,4 +1,4 @@
-package fr.utarwyn.endercontainers.hologram;
+package fr.utarwyn.endercontainers.compatibility.nms;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.compatibility.ServerVersion;
@@ -17,12 +17,7 @@ import java.util.logging.Level;
  * @author Utarwyn
  * @since 2.2.0
  */
-public class NMSHologramUtil {
-
-    /**
-     * Static field used to get all classes of the internal Minecraft server
-     */
-    private static String nmsPackage;
+public class NMSHologramUtil extends NMSUtil {
 
     /**
      * Reflection NMS Entity class
@@ -75,9 +70,6 @@ public class NMSHologramUtil {
     private static Constructor<?> destroyPacketConstructor;
 
     static {
-        String version = ServerVersion.getBukkitVersion();
-        nmsPackage = "net.minecraft.server." + version;
-
         try {
             Class<?> worldClass = getNMSClass("World");
             Class<?> armorStandClass = getNMSClass("EntityArmorStand");
@@ -86,14 +78,14 @@ public class NMSHologramUtil {
 
             packetClass = getNMSClass("Packet");
             entityClass = getNMSClass("Entity");
-            craftWorldClass = Class.forName("org.bukkit.craftbukkit." + version + ".CraftWorld");
+            craftWorldClass = getCraftbukkitClass("CraftWorld");
 
             spawnPacketConstructor = spawnPacketClass.getConstructor(getNMSClass("EntityLiving"));
             destroyPacketConstructor = destroyPacketClass.getConstructor(int[].class);
 
             // 1.13+ :: text to display needed to be converted to a IChatBaseComponent component
             if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
-                chatMessageClass = Class.forName("org.bukkit.craftbukkit." + version + ".util.CraftChatMessage");
+                chatMessageClass = getCraftbukkitClass("util.CraftChatMessage");
                 chatBaseComponentClass = getNMSClass("IChatBaseComponent");
             }
 
@@ -234,17 +226,6 @@ public class NMSHologramUtil {
         setInvisible.invoke(entityObject, true);
 
         return entityObject;
-    }
-
-    /**
-     * Get an internal net Minecraft Server class.
-     *
-     * @param className name of the class to get
-     * @return the internal class found by the name
-     * @throws ClassNotFoundException thrown if the class is not found
-     */
-    private static Class<?> getNMSClass(String className) throws ClassNotFoundException {
-        return Class.forName(nmsPackage + "." + className);
     }
 
 }

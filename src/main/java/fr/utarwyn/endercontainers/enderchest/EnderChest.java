@@ -21,7 +21,7 @@ public class EnderChest {
     /**
      * Player context for which the enderchest has been loaded
      */
-    private PlayerContext context;
+    protected PlayerContext context;
 
     /**
      * The number of the enderchest
@@ -102,7 +102,7 @@ public class EnderChest {
      * @return The fill percentage
      */
     public double getFillPercentage() {
-        return (double) this.container.getFilledSlotsNb() / (this.rows * 9);
+        return (double) this.getSize() / (this.rows * 9);
     }
 
     /**
@@ -171,30 +171,12 @@ public class EnderChest {
     }
 
     /**
-     * Allow to know if the chest is managed by the server.
-     *
-     * @return true if the chest is a vanilla one
-     */
-    public boolean isVanilla() {
-        return this.num == 0 && Files.getConfiguration().isUseVanillaEnderchest();
-    }
-
-    /**
-     * Open the chest container for a specific player
+     * Open the chest container for a specific player.
      *
      * @param player The player who wants to open the container
      */
     public void openContainerFor(Player player) {
-        if (this.isVanilla()) {
-            Player ownerObj = this.context.getOwnerAsObject();
-
-            // TODO Support opening chests of offline players
-            if (ownerObj != null) {
-                player.openInventory(ownerObj.getEnderChest());
-            }
-        } else {
-            this.container.open(player);
-        }
+        this.container.open(player);
     }
 
     /**
@@ -205,11 +187,8 @@ public class EnderChest {
      *
      * @return The number of rows generated or null if the player is not connected
      */
-    private int calculateRowCount() {
+    protected int calculateRowCount() {
         int row = 3;
-
-        // Use the vanilla chest!
-        if (this.isVanilla()) return row;
 
         Player player = this.context.getOwnerAsObject();
 

@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.hologram;
 
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.compatibility.nms.NMSHologramUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 

@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.enderchest.context;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
+import fr.utarwyn.endercontainers.enderchest.VanillaEnderChest;
 import fr.utarwyn.endercontainers.menu.enderchest.EnderChestHubMenu;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
@@ -117,7 +118,7 @@ public class PlayerContext {
      */
     public void loadEnderchests(int count) {
         this.chests = IntStream.rangeClosed(0, count - 1)
-                .mapToObj(n -> new EnderChest(this, n))
+                .mapToObj(this::createEnderchest)
                 .collect(Collectors.toList());
     }
 
@@ -175,6 +176,20 @@ public class PlayerContext {
      */
     public void save() {
         this.data.saveContext(this.chests);
+    }
+
+    /**
+     * Create an object to manage an enderchest.
+     *
+     * @param number number of the chest
+     * @return created enderchest instance
+     */
+    private EnderChest createEnderchest(int number) {
+        if (number == 0 && Files.getConfiguration().isUseVanillaEnderchest()) {
+            return new VanillaEnderChest(this);
+        } else {
+            return new EnderChest(this, number);
+        }
     }
 
 }

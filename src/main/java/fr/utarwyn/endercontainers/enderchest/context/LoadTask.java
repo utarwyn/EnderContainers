@@ -4,6 +4,7 @@ import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Represents the task which loads a memory context with
@@ -30,9 +31,9 @@ public class LoadTask implements Runnable {
     private UUID owner;
 
     /**
-     * Entity to run when this task is finished
+     * Object to consum when this task is finished
      */
-    private ContextRunnable runnable;
+    private Consumer<PlayerContext> consumer;
 
     /**
      * Construct a new loading task.
@@ -40,13 +41,13 @@ public class LoadTask implements Runnable {
      * @param plugin   the main plugin
      * @param manager  the enderchests manager
      * @param owner    owner of the context to load
-     * @param runnable a callback entity
+     * @param consumer object to consum at the end of the task
      */
-    public LoadTask(EnderContainers plugin, EnderChestManager manager, UUID owner, ContextRunnable runnable) {
+    public LoadTask(EnderContainers plugin, EnderChestManager manager, UUID owner, Consumer<PlayerContext> consumer) {
         this.plugin = plugin;
         this.manager = manager;
         this.owner = owner;
-        this.runnable = runnable;
+        this.consumer = consumer;
     }
 
     /**
@@ -64,7 +65,7 @@ public class LoadTask implements Runnable {
         // Schedule the callback and register the player context in memory
         this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, () -> {
             this.manager.registerPlayerContext(context);
-            this.runnable.run(context);
+            this.consumer.accept(context);
         });
     }
 

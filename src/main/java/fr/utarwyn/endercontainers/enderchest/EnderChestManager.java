@@ -3,15 +3,17 @@ package fr.utarwyn.endercontainers.enderchest;
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
-import fr.utarwyn.endercontainers.enderchest.context.ContextRunnable;
 import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.enderchest.context.SaveTask;
 import fr.utarwyn.endercontainers.menu.MenuManager;
+import org.bukkit.entity.Player;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
  * The new enderchest manager to manage all chests
@@ -65,6 +67,26 @@ public class EnderChestManager extends AbstractManager {
     }
 
     /**
+     * Retreive the vanilla enderchest used by a specific player.
+     * It searchs for the enderchest through all contexts, so it can be slow.
+     *
+     * @param player viewer of the enderchest
+     * @return found vanilla enderchest, null otherwise
+     */
+    public Optional<VanillaEnderChest> getVanillaEnderchestUsedBy(Player player) {
+        if (!Files.getConfiguration().isUseVanillaEnderchest()) {
+            return Optional.empty();
+        }
+
+        return this.contextMap.values().stream()
+                .map(context -> context.getChest(0))
+                .filter(Optional::isPresent)
+                .map(ec -> (VanillaEnderChest) ec.get())
+                .filter(ec -> ec.isUsedBy(player))
+                .findFirst();
+    }
+
+    /**
      * Check if the context of a specific player is unused at a given time.
      * All chests of this context must not have viewer in their container.
      *
@@ -80,14 +102,14 @@ public class EnderChestManager extends AbstractManager {
      * and call a method when this work is done.
      *
      * @param owner    player for which the method has to load context
-     * @param callback method called at the end of the task
+     * @param consumer method consumed at the end of the task
      */
-    public void loadPlayerContext(UUID owner, ContextRunnable callback) {
+    public void loadPlayerContext(UUID owner, Consumer<PlayerContext> consumer) {
         if (!this.contextMap.containsKey(owner)) {
             this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin,
-                    new LoadTask(this.plugin, this, owner, callback));
+                    new LoadTask(this.plugin, this, owner, consumer));
         } else {
-            callback.run(this.contextMap.get(owner));
+            consumer.accept(this.contextMap.get(owner));
         }
     }
 

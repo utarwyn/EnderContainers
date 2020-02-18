@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -124,6 +125,20 @@ public class EnderChestListener implements Listener {
 
         // Play the closing sound when we use the default enderchest!
         if (inventory.getType().equals(InventoryType.ENDER_CHEST) && Files.getConfiguration().isUseVanillaEnderchest()) {
+            Optional<VanillaEnderChest> vanilla = this.manager.getVanillaEnderchestUsedBy(player);
+
+            // When closing the default enderchest, save it ...
+            if (vanilla.isPresent() && !vanilla.get().getOwnerAsPlayer().equals(player)) {
+                Player ownerObj = vanilla.get().getOwnerAsPlayer();
+
+                // ... and delete the context from memory if the player is offline.
+                if (!ownerObj.isOnline()) {
+                    this.manager.savePlayerContext(vanilla.get().getOwner(), true);
+                    ownerObj.saveData();
+                }
+            }
+
+            // Play the closing sound
             if (Files.getConfiguration().isGlobalSound()) {
                 MiscUtil.playSound(player.getLocation(), "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
             } else {

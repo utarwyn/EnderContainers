@@ -3,7 +3,6 @@ package fr.utarwyn.endercontainers.enderchest;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
-import fr.utarwyn.endercontainers.enderchest.context.ContextRunnable;
 import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.enderchest.context.SaveTask;
@@ -18,6 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -92,13 +92,13 @@ public class EnderChestManagerTest {
         TestHelper.setupManager(this.manager);
 
         // Load an unregistered context
-        ContextRunnable callback = mock(ContextRunnable.class);
-        this.manager.loadPlayerContext(uuid, callback);
+        Consumer<PlayerContext> consumer = mock(Consumer.class);
+        this.manager.loadPlayerContext(uuid, consumer);
 
         // Reload a registered context
         PlayerContext context = this.registerPlayerContext(uuid);
-        this.manager.loadPlayerContext(uuid, callback);
-        verify(callback).run(context);
+        this.manager.loadPlayerContext(uuid, consumer);
+        verify(consumer).accept(context);
 
         // Verify that the scheduler has been called only once (in the first scenario)
         verify(Bukkit.getServer().getScheduler())
