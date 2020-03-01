@@ -4,11 +4,13 @@ import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 
+import java.util.function.Consumer;
+
 /**
  * Task to asynchronously remove a backup and all of its data.
  *
  * @author Utarwyn
- * @since 2.3.0
+ * @since 2.2.0
  */
 public class BackupRemoveTask extends BackupAbstractTask {
 
@@ -23,10 +25,11 @@ public class BackupRemoveTask extends BackupAbstractTask {
      * @param plugin   the EnderContainers plugin
      * @param manager  the backup manager
      * @param backup   backup to remove
-     * @param callback object to call at the end of the task
+     * @param consumer object to consume at the end of the task
      */
-    public BackupRemoveTask(EnderContainers plugin, BackupManager manager, Backup backup, ActionCallback callback) {
-        super(plugin, manager, callback);
+    public BackupRemoveTask(EnderContainers plugin, BackupManager manager,
+                            Backup backup, Consumer<Boolean> consumer) {
+        super(plugin, manager, consumer);
         this.backup = backup;
     }
 
@@ -35,7 +38,7 @@ public class BackupRemoveTask extends BackupAbstractTask {
      */
     @Override
     public void run() {
-        this.runCallback(this.manager.getStorage().removeBackup(backup)
+        this.supplyResult(this.manager.getStorage().removeBackup(backup)
                 && this.manager.getBackups().remove(backup));
     }
 

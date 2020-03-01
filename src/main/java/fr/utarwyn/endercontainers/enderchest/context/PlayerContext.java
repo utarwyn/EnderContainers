@@ -24,7 +24,7 @@ import java.util.stream.IntStream;
  * A context in which all enderchests of a player are loaded.
  *
  * @author Utarwyn
- * @since 2.3.0
+ * @since 2.2.0
  */
 public class PlayerContext {
 

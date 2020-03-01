@@ -6,11 +6,13 @@ import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 
+import java.util.function.Consumer;
+
 /**
  * Task to asynchronously apply a backup by replacing all current data.
  *
  * @author Utarwyn
- * @since 2.3.0
+ * @since 2.2.0
  */
 public class BackupApplyTask extends BackupAbstractTask {
 
@@ -25,10 +27,11 @@ public class BackupApplyTask extends BackupAbstractTask {
      * @param plugin   the EnderContainers plugin
      * @param manager  the backup manager
      * @param backup   backup to apply
-     * @param callback object to call at the end of the task
+     * @param consumer object to consume at the end of the task
      */
-    public BackupApplyTask(EnderContainers plugin, BackupManager manager, Backup backup, ActionCallback callback) {
-        super(plugin, manager, callback);
+    public BackupApplyTask(EnderContainers plugin, BackupManager manager,
+                           Backup backup, Consumer<Boolean> consumer) {
+        super(plugin, manager, consumer);
         this.backup = backup;
     }
 
@@ -43,7 +46,7 @@ public class BackupApplyTask extends BackupAbstractTask {
             result = Managers.reload(EnderChestManager.class);
         }
 
-        this.runCallback(result);
+        this.supplyResult(result);
     }
 
 }

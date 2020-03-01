@@ -1,13 +1,16 @@
 package fr.utarwyn.endercontainers;
 
 import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.configuration.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -47,7 +50,9 @@ public class TestHelper {
             lenient().when(server.getScheduler()).thenReturn(scheduler);
             lenient().when(server.getPluginManager()).thenReturn(pluginManager);
 
+            TestHelper.mockSchedulers(server);
             Bukkit.setServer(server);
+
             serverReady = true;
         }
     }
@@ -55,8 +60,10 @@ public class TestHelper {
     /**
      * Setup a mocked version of configuration files.
      */
-    public static synchronized void setUpFiles() throws IOException, InvalidConfigurationException {
+    public static synchronized void setUpFiles() throws IOException,
+            InvalidConfigurationException, ReflectiveOperationException {
         if (!filesReady) {
+            // Initialize the configuration object
             EnderContainers plugin = mock(EnderContainers.class);
             FileConfiguration config = new YamlConfiguration();
 
@@ -64,6 +71,15 @@ public class TestHelper {
             when(plugin.getConfig()).thenReturn(config);
 
             Files.initConfiguration(plugin);
+
+            // Initialize the locale object
+            Field localeField = Files.class.getDeclaredField("locale");
+            Locale locale = mock(Locale.class, RETURNS_SMART_NULLS);
+
+            localeField.setAccessible(true);
+            localeField.set(null, locale);
+            localeField.setAccessible(false);
+
             filesReady = true;
         }
     }
@@ -107,6 +123,28 @@ public class TestHelper {
         }
 
         field.setAccessible(false);
+    }
+
+    /**
+     * Mock basic server scheduler methods to perform
+     * all task in the same thread as testing scripts.
+     *
+     * @param server mocked server
+     */
+    private static void mockSchedulers(Server server) {
+        lenient().when(server.getScheduler().scheduleSyncDelayedTask(
+                any(), any(Runnable.class)
+        )).then(answer -> {
+            answer.getArgument(1, Runnable.class).run();
+            return 1;
+        });
+
+        lenient().when(server.getScheduler().runTaskAsynchronously(
+                any(), any(Runnable.class)
+        )).then(answer -> {
+            answer.getArgument(1, Runnable.class).run();
+            return mock(BukkitTask.class);
+        });
     }
 
 }

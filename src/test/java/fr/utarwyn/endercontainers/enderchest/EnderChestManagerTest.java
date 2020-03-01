@@ -7,8 +7,14 @@ import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.enderchest.context.SaveTask;
 import fr.utarwyn.endercontainers.menu.MenuManager;
+import fr.utarwyn.endercontainers.storage.StorageManager;
+import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,6 +23,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +35,9 @@ public class EnderChestManagerTest {
     private EnderChestManager manager;
 
     @BeforeClass
-    public static void setUpClass() throws IOException, InvalidConfigurationException {
+    public static void setUpClass() throws IOException,
+            InvalidConfigurationException, ReflectiveOperationException {
+        TestHelper.setUpServer();
         TestHelper.setUpFiles();
     }
 
@@ -89,20 +98,38 @@ public class EnderChestManagerTest {
         UUID uuid = UUID.randomUUID();
 
         // Setup the manager correctly
+        StorageManager manager = mock(StorageManager.class);
+        PlayerData storage = mock(PlayerData.class);
+        Inventory inventory = mock(Inventory.class);
+
+        when(storage.getEnderchestContents(any())).thenReturn(new ConcurrentHashMap<>());
+        when(manager.createPlayerDataStorage(any())).thenReturn(storage);
+
+        lenient().when(inventory.getContents()).thenReturn(new ItemStack[0]);
+        when(Bukkit.getServer().createInventory(
+                any(InventoryHolder.class), any(Integer.class), any(String.class)
+        )).thenReturn(inventory);
+
+        TestHelper.registerManagers(manager);
         TestHelper.setupManager(this.manager);
 
+        // Register a fake player with this uuid
+        Player player = mock(Player.class);
+        when(player.isOnline()).thenReturn(true);
+        when(player.getName()).thenReturn("Utarwyn");
+        when(Bukkit.getServer().getPlayer(uuid)).thenReturn(player);
+
         // Load an unregistered context
-        Consumer<PlayerContext> consumer = mock(Consumer.class);
+        Consumer<PlayerContext> consumer = result -> assertThat(result).isNotNull();
         this.manager.loadPlayerContext(uuid, consumer);
 
         // Reload a registered context
-        PlayerContext context = this.registerPlayerContext(uuid);
+        this.registerPlayerContext(uuid);
         this.manager.loadPlayerContext(uuid, consumer);
-        verify(consumer).accept(context);
 
         // Verify that the scheduler has been called only once (in the first scenario)
         verify(Bukkit.getServer().getScheduler())
-                .runTaskAsynchronously(any(EnderContainers.class), any(LoadTask.class));
+                .runTaskAsynchronously(any(), any(LoadTask.class));
     }
 
     @Test

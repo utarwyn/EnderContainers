@@ -5,12 +5,13 @@ import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 
 import java.sql.Timestamp;
+import java.util.function.Consumer;
 
 /**
  * Task to asynchronously create a backup with a name and an operator.
  *
  * @author Utarwyn
- * @since 2.3.0
+ * @since 2.2.0
  */
 public class BackupCreateTask extends BackupAbstractTask {
 
@@ -31,11 +32,11 @@ public class BackupCreateTask extends BackupAbstractTask {
      * @param manager  the backup manager
      * @param operator operator which creates the backup
      * @param name     name of the backup to create
-     * @param callback object to call at the end of the task
+     * @param consumer object to consum at the end of the task
      */
     public BackupCreateTask(EnderContainers plugin, BackupManager manager, String operator,
-                            String name, ActionCallback callback) {
-        super(plugin, manager, callback);
+                            String name, Consumer<Boolean> consumer) {
+        super(plugin, manager, consumer);
         this.operator = operator;
         this.name = name;
     }
@@ -60,7 +61,7 @@ public class BackupCreateTask extends BackupAbstractTask {
             }
         }
 
-        this.runCallback(result);
+        this.supplyResult(result);
     }
 
 }

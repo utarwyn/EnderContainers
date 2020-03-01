@@ -3,11 +3,13 @@ package fr.utarwyn.endercontainers.backup.action;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 
+import java.util.function.Consumer;
+
 /**
  * Represents an action which can be performed on a backup.
  *
  * @author Utarwyn
- * @since 2.3.0
+ * @since 2.2.0
  */
 public abstract class BackupAbstractTask implements Runnable {
 
@@ -17,9 +19,9 @@ public abstract class BackupAbstractTask implements Runnable {
     protected BackupManager manager;
 
     /**
-     * Object to call when the action is finished
+     * Object to consume when the action is finished
      */
-    protected ActionCallback callback;
+    protected Consumer<Boolean> callback;
 
     /**
      * The EnderContainers plugin
@@ -31,21 +33,23 @@ public abstract class BackupAbstractTask implements Runnable {
      *
      * @param plugin   the EnderContainers plugin
      * @param manager  the backup manager
-     * @param callback callable object at the end of the task
+     * @param consumer object consumed at the end of the task
      */
-    public BackupAbstractTask(EnderContainers plugin, BackupManager manager, ActionCallback callback) {
+    public BackupAbstractTask(EnderContainers plugin, BackupManager manager,
+                              Consumer<Boolean> consumer) {
         this.plugin = plugin;
         this.manager = manager;
-        this.callback = callback;
+        this.callback = consumer;
     }
 
     /**
-     * Run a callable object at the end of the task.
+     * Supply the result of the task to the registered consumer.
      *
      * @param result action result
      */
-    protected void runCallback(boolean result) {
-        this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, () -> this.callback.run(result));
+    protected void supplyResult(boolean result) {
+        this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin,
+                () -> this.callback.accept(result));
     }
 
 }
