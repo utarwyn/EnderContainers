@@ -20,7 +20,7 @@ public class RemoveCommand extends AbstractBackupCommand {
         String name = this.readArg();
 
         this.manager.removeBackup(name, result -> {
-            if (result) {
+            if (Boolean.TRUE.equals(result)) {
                 this.sendTo(sender, Files.getLocale().getBackupRemoved().replace("%backup%", name));
             } else {
                 PluginMsg.errorMessage(sender, Files.getLocale().getBackupUnknown().replace("%backup%", name));

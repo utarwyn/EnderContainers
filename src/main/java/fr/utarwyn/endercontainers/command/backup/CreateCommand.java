@@ -22,7 +22,7 @@ public class CreateCommand extends AbstractBackupCommand {
         this.sendTo(sender, Files.getLocale().getBackupCreationStarting());
 
         this.manager.createBackup(name, sender.getName(), result -> {
-            if (result) {
+            if (Boolean.TRUE.equals(result)) {
                 this.sendTo(sender, Files.getLocale().getBackupCreated().replace("%backup%", name));
             } else {
                 PluginMsg.errorMessage(sender, Files.getLocale().getBackupExists().replace("%backup%", name));

@@ -22,7 +22,7 @@ public class LoadCommand extends AbstractBackupCommand {
         this.sendTo(sender, Files.getLocale().getBackupLoadingStarted());
 
         this.manager.applyBackup(name, result -> {
-            if (result) {
+            if (Boolean.TRUE.equals(result)) {
                 this.sendTo(sender, Files.getLocale().getBackupLoaded().replace("%backup%", name));
             } else {
                 PluginMsg.errorMessage(sender, Files.getLocale().getBackupUnknown().replace("%backup%", name));

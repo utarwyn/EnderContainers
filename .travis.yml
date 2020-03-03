@@ -1,6 +1,6 @@
 language: java
 dist: trusty
-sudo: false
+os: linux
 install: true
 
 git:
