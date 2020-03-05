@@ -64,7 +64,7 @@ public class Updater extends AbstractManager implements Runnable {
      * {@inheritDoc}
      */
     @Override
-    public void load() {
+    public synchronized void load() {
         // Check for updates if enabled by the server administrator
         if (Files.getConfiguration().isUpdateChecker()) {
             this.plugin.getServer().getScheduler().runTask(this.plugin, this);
@@ -77,7 +77,7 @@ public class Updater extends AbstractManager implements Runnable {
      * {@inheritDoc}
      */
     @Override
-    public void unload() {
+    public synchronized void unload() {
         this.latestVersion = null;
         this.currentVersion = null;
         this.latestVersionValue = 0;

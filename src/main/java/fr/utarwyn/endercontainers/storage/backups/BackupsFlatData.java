@@ -3,7 +3,6 @@ package fr.utarwyn.endercontainers.storage.backups;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.storage.FlatFile;
-import fr.utarwyn.endercontainers.util.MiscUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -151,14 +150,20 @@ public class BackupsFlatData extends BackupsData {
     public boolean removeBackup(Backup backup) {
         File folder = BackupsFlatData.getBackupFolder(backup);
 
-        if (folder.exists() && !MiscUtil.deleteFolder(folder)) {
-            return false;
+        try {
+            if (folder.exists()) {
+                this.deleteFolder(folder);
+            }
+
+            this.flatFile.getConfiguration().set(PREFIX + "." + backup.getName(), null);
+            this.save();
+
+            return true;
+        } catch (IOException e) {
+            this.logger.log(Level.SEVERE, "Cannot delete the folder: " + folder, e);
         }
 
-        this.flatFile.getConfiguration().set(PREFIX + "." + backup.getName(), null);
-        this.save();
-
-        return true;
+        return false;
     }
 
     /**
@@ -185,6 +190,30 @@ public class BackupsFlatData extends BackupsData {
         }
 
         return true;
+    }
+
+    /**
+     * Delete a folder recursively with all files inside of it.
+     *
+     * @param folder folder to delete
+     * @throws IOException if a folder or file cannot be deleted
+     */
+    private void deleteFolder(File folder) throws IOException {
+        File[] files = folder.listFiles();
+        if (files == null) {
+            Files.delete(folder.toPath());
+            return;
+        }
+
+        for (File file : files) {
+            if (file.isDirectory()) {
+                this.deleteFolder(file);
+            } else {
+                Files.delete(file.toPath());
+            }
+        }
+
+        Files.delete(folder.toPath());
     }
 
 }

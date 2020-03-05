@@ -6,8 +6,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-
 /**
  * Miscellaneous utility class of the plugin.
  *
@@ -87,28 +85,6 @@ public class MiscUtil {
                 return true;
 
         return false;
-    }
-
-    /**
-     * Delete a folder recursively with all files inside of it
-     *
-     * @param folder Folder to delete
-     * @return True if the folder have been dekleted without errors.
-     */
-    public static boolean deleteFolder(File folder) {
-        File[] files = folder.listFiles();
-        if (files == null)
-            return folder.delete();
-
-        for (File file : files) {
-            if (file.isDirectory()) {
-                if (!deleteFolder(file))
-                    return false;
-            } else if (!file.delete())
-                return false;
-        }
-
-        return folder.delete();
     }
 
     /**
