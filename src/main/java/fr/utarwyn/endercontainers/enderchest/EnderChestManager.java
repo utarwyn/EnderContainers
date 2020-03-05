@@ -40,7 +40,7 @@ public class EnderChestManager extends AbstractManager {
      * {@inheritDoc}
      */
     @Override
-    public void load() {
+    public synchronized void load() {
         this.contextMap = new ConcurrentHashMap<>();
     }
 
@@ -48,9 +48,9 @@ public class EnderChestManager extends AbstractManager {
      * {@inheritDoc}
      */
     @Override
-    protected void unload() {
+    protected synchronized void unload() {
         // Close all menus
-        Managers.get(MenuManager.class).closeAll();
+        this.plugin.executeTaskOnMainThread(() -> Managers.get(MenuManager.class).closeAll());
 
         // Save and unload all data
         this.contextMap.values().forEach(context -> new SaveTask(context).run());

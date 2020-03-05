@@ -87,4 +87,17 @@ public class EnderContainers extends JavaPlugin {
         Managers.unregisterAll();
     }
 
+    /**
+     * Execute a task in the primary thread of the server.
+     *
+     * @param runnable task to execute in the main thread
+     */
+    public void executeTaskOnMainThread(Runnable runnable) {
+        if (getServer().isPrimaryThread()) {
+            runnable.run();
+        } else {
+            getServer().getScheduler().scheduleSyncDelayedTask(this, runnable);
+        }
+    }
+
 }

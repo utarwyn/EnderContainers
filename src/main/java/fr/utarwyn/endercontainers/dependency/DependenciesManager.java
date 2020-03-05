@@ -36,7 +36,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
      * {@inheritDoc}
      */
     @Override
-    public void load() {
+    public synchronized void load() {
         this.dependencies = new ArrayList<>();
         this.pluginManager = this.plugin.getServer().getPluginManager();
 
@@ -48,7 +48,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
      * {@inheritDoc}
      */
     @Override
-    public void unload() {
+    public synchronized void unload() {
         for (Dependency dependency : this.dependencies) {
             dependency.onDisable();
         }

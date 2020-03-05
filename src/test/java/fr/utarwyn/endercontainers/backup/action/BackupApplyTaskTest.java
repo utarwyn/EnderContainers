@@ -6,7 +6,6 @@ import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.storage.backups.BackupsData;
-import org.bukkit.Bukkit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,12 +29,11 @@ public class BackupApplyTaskTest {
 
     @Test
     public void run() {
-        EnderContainers plugin = mock(EnderContainers.class);
+        EnderContainers plugin = TestHelper.getPlugin();
         BackupManager manager = mock(BackupManager.class);
         Backup backup = mock(Backup.class);
         BackupsData storage = mock(BackupsData.class);
 
-        when(plugin.getServer()).thenReturn(Bukkit.getServer());
         when(manager.getStorage()).thenReturn(storage);
 
         // Check a valid task
@@ -52,7 +50,7 @@ public class BackupApplyTaskTest {
 
         when(storage.applyBackup(backup)).thenReturn(false);
         task2.run();
-        verify(this.enderChestManager).load();
+        verify(this.enderChestManager, times(2)).load();
     }
 
 }

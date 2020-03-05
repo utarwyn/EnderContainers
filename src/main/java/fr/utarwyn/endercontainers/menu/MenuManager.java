@@ -89,6 +89,7 @@ public class MenuManager extends AbstractManager {
 
     /**
      * Close all menus for everyone connected on the server.
+     * MUST be called on the primary thread of the server.
      */
     public void closeAll() {
         for (Player player : Bukkit.getOnlinePlayers()) {

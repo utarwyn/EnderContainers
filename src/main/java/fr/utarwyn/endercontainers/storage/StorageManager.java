@@ -37,7 +37,7 @@ public class StorageManager extends AbstractManager {
      * {@inheritDoc}
      */
     @Override
-    public void load() {
+    public synchronized void load() {
         // Use the good type of storage by checking the database state
         DatabaseManager databaseManager = Managers.get(DatabaseManager.class);
         boolean useSqlStorage = databaseManager.isReady();
@@ -50,7 +50,7 @@ public class StorageManager extends AbstractManager {
      * {@inheritDoc}
      */
     @Override
-    public void unload() {
+    public synchronized void unload() {
         this.backupDataPattern = null;
         this.playerDataPattern = null;
     }

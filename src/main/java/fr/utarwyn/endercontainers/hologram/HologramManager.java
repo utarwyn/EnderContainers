@@ -66,7 +66,7 @@ public class HologramManager extends AbstractManager implements Runnable {
      * {@inheritDoc}
      */
     @Override
-    public void load() {
+    public synchronized void load() {
         this.chestManager = Managers.get(EnderChestManager.class);
         this.dependenciesManager = Managers.get(DependenciesManager.class);
         this.holograms = new ConcurrentHashMap<>();
@@ -81,7 +81,7 @@ public class HologramManager extends AbstractManager implements Runnable {
      * {@inheritDoc}
      */
     @Override
-    protected void unload() {
+    protected synchronized void unload() {
         if (this.task != null) {
             this.task.cancel();
             this.task = null;

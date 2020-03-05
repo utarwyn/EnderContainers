@@ -34,7 +34,7 @@ public class BackupManager extends AbstractManager {
      * {@inheritDoc}
      */
     @Override
-    public void load() {
+    public synchronized void load() {
         this.storage = Managers.get(StorageManager.class).createBackupDataStorage();
         this.backups = this.storage.getCachedBackups();
     }
@@ -43,7 +43,7 @@ public class BackupManager extends AbstractManager {
      * {@inheritDoc}
      */
     @Override
-    protected void unload() {
+    protected synchronized void unload() {
         this.storage = null;
     }
 
@@ -85,10 +85,16 @@ public class BackupManager extends AbstractManager {
      * @param consumer object to consume when the action is finished
      */
     public void createBackup(String name, String operator, Consumer<Boolean> consumer) {
-        this.plugin.getServer().getScheduler().runTaskAsynchronously(
-                this.plugin,
-                new BackupCreateTask(this.plugin, this, operator, name, consumer)
-        );
+        Optional<Backup> backup = this.getBackupByName(name);
+
+        if (!backup.isPresent()) {
+            this.plugin.getServer().getScheduler().runTaskAsynchronously(
+                    this.plugin,
+                    new BackupCreateTask(this.plugin, this, operator, name, consumer)
+            );
+        } else {
+            consumer.accept(false);
+        }
     }
 
     /**

@@ -1,8 +1,10 @@
 package fr.utarwyn.endercontainers.backup.action;
 
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.backup.BackupManager;
+import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 
 import java.sql.Timestamp;
 import java.util.function.Consumer;
@@ -48,17 +50,16 @@ public class BackupCreateTask extends BackupAbstractTask {
     public void run() {
         boolean result = false;
 
-        if (!this.manager.getBackupByName(name).isPresent()) {
-            // Create a new backup
-            Backup backup = new Backup(
-                    this.name, new Timestamp(System.currentTimeMillis()),
-                    "all", this.operator
-            );
+        // Create a new backup
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        Backup backup = new Backup(this.name, now, "all", this.operator);
 
-            // Save the backup in the proper config and execute the backup
-            if (this.manager.getStorage().saveNewBackup(backup) && this.manager.getStorage().executeStorage(backup)) {
-                result = this.manager.getBackups().add(backup);
-            }
+        // Reload the manager to save all contexts data
+        Managers.reload(EnderChestManager.class);
+
+        // Save the backup in the proper config and execute the backup
+        if (this.manager.getStorage().saveNewBackup(backup) && this.manager.getStorage().executeStorage(backup)) {
+            result = this.manager.getBackups().add(backup);
         }
 
         this.supplyResult(result);

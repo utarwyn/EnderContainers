@@ -40,13 +40,8 @@ public class BackupApplyTask extends BackupAbstractTask {
      */
     @Override
     public void run() {
-        boolean result = false;
-
-        if (this.manager.getStorage().applyBackup(this.backup)) {
-            result = Managers.reload(EnderChestManager.class);
-        }
-
-        this.supplyResult(result);
+        Managers.reload(EnderChestManager.class);
+        this.supplyResult(this.manager.getStorage().applyBackup(this.backup));
     }
 
 }

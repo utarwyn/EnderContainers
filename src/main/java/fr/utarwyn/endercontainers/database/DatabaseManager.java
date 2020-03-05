@@ -52,7 +52,7 @@ public class DatabaseManager extends AbstractManager {
      * {@inheritDoc}
      */
     @Override
-    public void load() {
+    public synchronized void load() {
         // MySQL is enabled or not?
         if (Files.getConfiguration().isMysql()) {
             // Setup the database from the configuration
@@ -83,7 +83,7 @@ public class DatabaseManager extends AbstractManager {
      * {@inheritDoc}
      */
     @Override
-    protected void unload() {
+    protected synchronized void unload() {
         try {
             if (this.database != null) {
                 this.database.close();

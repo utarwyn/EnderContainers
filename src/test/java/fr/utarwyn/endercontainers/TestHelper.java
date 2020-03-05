@@ -8,7 +8,6 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -31,6 +30,8 @@ public class TestHelper {
     private static boolean serverReady = false;
 
     private static boolean filesReady = false;
+
+    private static EnderContainers plugin = null;
 
     private TestHelper() {
 
@@ -64,7 +65,7 @@ public class TestHelper {
             InvalidConfigurationException, ReflectiveOperationException {
         if (!filesReady) {
             // Initialize the configuration object
-            EnderContainers plugin = mock(EnderContainers.class);
+            EnderContainers plugin = TestHelper.getPlugin();
             FileConfiguration config = new YamlConfiguration();
 
             config.load(new InputStreamReader(TestHelper.class.getResourceAsStream("/config.yml")));
@@ -93,10 +94,8 @@ public class TestHelper {
     public static void setupManager(AbstractManager manager) throws ReflectiveOperationException {
         TestHelper.setUpServer();
 
-        EnderContainers plugin = mock(EnderContainers.class);
+        EnderContainers plugin = TestHelper.getPlugin();
         Field field = manager.getClass().getSuperclass().getDeclaredField("plugin");
-
-        when(plugin.getServer()).thenReturn(Bukkit.getServer());
 
         field.setAccessible(true);
         field.set(manager, plugin);
@@ -123,6 +122,24 @@ public class TestHelper {
         }
 
         field.setAccessible(false);
+    }
+
+    public static EnderContainers getPlugin() {
+        if (plugin == null) {
+            TestHelper.setUpServer();
+            Server server = Bukkit.getServer();
+
+            plugin = mock(EnderContainers.class);
+
+            lenient().when(plugin.getServer()).thenReturn(server);
+            lenient().doReturn(server.getLogger()).when(plugin).getLogger();
+            lenient().doAnswer(answer -> {
+                answer.getArgument(0, Runnable.class).run();
+                return null;
+            }).when(plugin).executeTaskOnMainThread(any());
+        }
+
+        return plugin;
     }
 
     /**

@@ -64,10 +64,16 @@ public class EnderChestManagerTest {
     @Test
     public void unload() throws ReflectiveOperationException {
         MenuManager menuManager = mock(MenuManager.class);
+        PlayerContext context = mock(PlayerContext.class);
+
         TestHelper.registerManagers(menuManager);
+        TestHelper.setupManager(this.manager);
+
+        this.manager.contextMap.put(UUID.randomUUID(), context);
 
         this.manager.unload();
 
+        verify(context).save();
         verify(menuManager).closeAll();
         assertThat(this.manager.contextMap).isEmpty();
     }

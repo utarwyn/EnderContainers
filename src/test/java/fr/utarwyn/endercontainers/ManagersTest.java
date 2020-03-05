@@ -6,11 +6,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.logging.Logger;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ManagersTest {
@@ -25,9 +23,7 @@ public class ManagersTest {
 
     @Test
     public void register() {
-        EnderContainers plugin = mock(EnderContainers.class);
-        Logger logger = mock(Logger.class);
-        when(plugin.getLogger()).thenReturn(logger);
+        EnderContainers plugin = TestHelper.getPlugin();
 
         assertThat(Managers.instances).isEmpty();
 
@@ -39,11 +35,6 @@ public class ManagersTest {
         // A manager cannot be registered two times
         AbstractManager manager2 = Managers.register(plugin, this.manager.getClass());
         assertThat(manager2).isNull();
-        assertThat(Managers.instances).hasSize(1);
-
-        // Try to register directly an abstract class?
-        AbstractManager manager3 = Managers.register(plugin, AbstractManager.class);
-        assertThat(manager3).isNull();
         assertThat(Managers.instances).hasSize(1);
     }
 

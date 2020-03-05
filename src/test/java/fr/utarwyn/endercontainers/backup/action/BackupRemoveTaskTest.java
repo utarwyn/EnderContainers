@@ -5,8 +5,6 @@ import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.storage.backups.BackupsData;
-import org.bukkit.Bukkit;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -20,20 +18,14 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class BackupRemoveTaskTest {
 
-    @Before
-    public void setUp() {
-        TestHelper.setUpServer();
-    }
-
     @Test
     public void run() {
-        EnderContainers plugin = mock(EnderContainers.class);
+        EnderContainers plugin = TestHelper.getPlugin();
         BackupManager manager = mock(BackupManager.class);
         Backup backup = mock(Backup.class);
         BackupsData storage = mock(BackupsData.class);
         List<Backup> backupList = new ArrayList<>();
 
-        when(plugin.getServer()).thenReturn(Bukkit.getServer());
         when(manager.getStorage()).thenReturn(storage);
         when(manager.getBackups()).thenReturn(backupList);
 

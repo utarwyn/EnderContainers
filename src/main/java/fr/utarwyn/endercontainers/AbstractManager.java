@@ -53,14 +53,14 @@ public abstract class AbstractManager implements Listener {
      * Called when the manager is loading.
      * Called in the constructor so before the constructor of sub-managers.
      */
-    public void load() {
+    public synchronized void load() {
         // Not implemented
     }
 
     /**
      * Called when the manager is unloading.
      */
-    protected void unload() {
+    protected synchronized void unload() {
         // Not implemented
     }
 
