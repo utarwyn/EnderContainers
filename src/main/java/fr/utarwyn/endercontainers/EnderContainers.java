@@ -30,6 +30,12 @@ public class EnderContainers extends JavaPlugin {
      */
     public static final String PREFIX = "§8[§6EnderContainers§8] §7";
 
+    /*
+     * The plugin's identifier on the "bStats" service
+     * @see https://bstats.org/plugin/bukkit/EnderContainers
+     */
+    private static final int BSTATS_PLUGIN_ID = 1855;
+
     /**
      * The Endercontainers instance
      */
@@ -76,7 +82,7 @@ public class EnderContainers extends JavaPlugin {
         Objects.requireNonNull(Managers.get(CommandManager.class)).registerCommands();
 
         // And load Metrics!
-        new Metrics(this);
+        new Metrics(this, BSTATS_PLUGIN_ID);
     }
 
     /**
