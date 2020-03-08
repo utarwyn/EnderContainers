@@ -3,7 +3,7 @@ package fr.utarwyn.endercontainers.compatibility;
 import org.bukkit.Bukkit;
 
 /**
- * Class to get the server version quickly and easily!
+ * Utility object used to get the current server version.
  *
  * @author Utarwyn
  * @since 2.2.0

@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers;
 
+import fr.utarwyn.endercontainers.compatibility.v1_12.FakeServer;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.Locale;
 import org.bukkit.Bukkit;
@@ -7,6 +8,10 @@ import org.bukkit.Server;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
@@ -15,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import static org.mockito.Mockito.*;
@@ -33,6 +39,8 @@ public class TestHelper {
 
     private static EnderContainers plugin = null;
 
+    private static Player player = null;
+
     private TestHelper() {
 
     }
@@ -42,7 +50,7 @@ public class TestHelper {
      */
     public static synchronized void setUpServer() {
         if (!serverReady) {
-            Server server = mock(Server.class);
+            Server server = mock(FakeServer.class);
             Logger logger = Logger.getGlobal();
             BukkitScheduler scheduler = mock(BukkitScheduler.class);
             PluginManager pluginManager = mock(PluginManager.class);
@@ -52,6 +60,7 @@ public class TestHelper {
             lenient().when(server.getPluginManager()).thenReturn(pluginManager);
 
             TestHelper.mockSchedulers(server);
+            TestHelper.mockServerObjects(server);
             Bukkit.setServer(server);
 
             serverReady = true;
@@ -124,6 +133,11 @@ public class TestHelper {
         field.setAccessible(false);
     }
 
+    /**
+     * Retrieve a mocked instance of the plugin.
+     *
+     * @return mocked instance of the plugin
+     */
     public static EnderContainers getPlugin() {
         if (plugin == null) {
             TestHelper.setUpServer();
@@ -140,6 +154,28 @@ public class TestHelper {
         }
 
         return plugin;
+    }
+
+    /**
+     * Retrieve a mocked instance of a fake connected player.
+     *
+     * @return mocked instance of a player
+     */
+    public static Player getPlayer() {
+        if (player == null) {
+            TestHelper.setUpServer();
+
+            UUID uuid = UUID.randomUUID();
+            player = mock(Player.class);
+
+            when(player.isOnline()).thenReturn(true);
+            when(player.getUniqueId()).thenReturn(uuid);
+            when(player.getName()).thenReturn("Utarwyn");
+
+            when(Bukkit.getServer().getPlayer(uuid)).thenReturn(player);
+        }
+
+        return player;
     }
 
     /**
@@ -161,6 +197,22 @@ public class TestHelper {
         )).then(answer -> {
             answer.getArgument(1, Runnable.class).run();
             return mock(BukkitTask.class);
+        });
+    }
+
+    /**
+     * Mock some basic server methods.
+     *
+     * @param server mocked server
+     */
+    private static void mockServerObjects(Server server) {
+        // Inventory creation
+        lenient().when(server.createInventory(
+                any(InventoryHolder.class), anyInt(), anyString()
+        )).thenAnswer(answer -> {
+            Inventory inventory = mock(Inventory.class);
+            lenient().when(inventory.getContents()).thenReturn(new ItemStack[0]);
+            return inventory;
         });
     }
 

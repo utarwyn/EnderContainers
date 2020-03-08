@@ -5,7 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -65,10 +64,6 @@ public class AbstractMenuTest {
     public void reloadInventory() {
         int rows = 5;
         String title = "very long default inventory title";
-
-        when(Bukkit.getServer().createInventory(
-                any(InventoryHolder.class), any(Integer.class), any(String.class)
-        )).thenReturn(this.inventory);
 
         when(this.menu.getRows()).thenReturn(rows);
         when(this.menu.getTitle()).thenReturn(title);

@@ -12,9 +12,6 @@ import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -101,37 +98,25 @@ public class EnderChestManagerTest {
 
     @Test
     public void loadPlayerContext() throws ReflectiveOperationException {
-        UUID uuid = UUID.randomUUID();
-
         // Setup the manager correctly
         StorageManager manager = mock(StorageManager.class);
         PlayerData storage = mock(PlayerData.class);
-        Inventory inventory = mock(Inventory.class);
 
         when(storage.getEnderchestContents(any())).thenReturn(new ConcurrentHashMap<>());
         when(manager.createPlayerDataStorage(any())).thenReturn(storage);
 
-        lenient().when(inventory.getContents()).thenReturn(new ItemStack[0]);
-        when(Bukkit.getServer().createInventory(
-                any(InventoryHolder.class), any(Integer.class), any(String.class)
-        )).thenReturn(inventory);
-
         TestHelper.registerManagers(manager);
         TestHelper.setupManager(this.manager);
 
-        // Register a fake player with this uuid
-        Player player = mock(Player.class);
-        when(player.isOnline()).thenReturn(true);
-        when(player.getName()).thenReturn("Utarwyn");
-        when(Bukkit.getServer().getPlayer(uuid)).thenReturn(player);
+        Player player = TestHelper.getPlayer();
 
         // Load an unregistered context
         Consumer<PlayerContext> consumer = result -> assertThat(result).isNotNull();
-        this.manager.loadPlayerContext(uuid, consumer);
+        this.manager.loadPlayerContext(player.getUniqueId(), consumer);
 
         // Reload a registered context
-        this.registerPlayerContext(uuid);
-        this.manager.loadPlayerContext(uuid, consumer);
+        this.registerPlayerContext(player.getUniqueId());
+        this.manager.loadPlayerContext(player.getUniqueId(), consumer);
 
         // Verify that the scheduler has been called only once (in the first scenario)
         verify(Bukkit.getServer().getScheduler())

@@ -67,7 +67,7 @@ public class EnderChestManager extends AbstractManager {
     }
 
     /**
-     * Retreive the vanilla enderchest used by a specific player.
+     * Retrieve the vanilla enderchest used by a specific player.
      * It searchs for the enderchest through all contexts, so it can be slow.
      *
      * @param player viewer of the enderchest

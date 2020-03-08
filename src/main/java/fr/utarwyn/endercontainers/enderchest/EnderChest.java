@@ -19,6 +19,11 @@ import java.util.concurrent.ConcurrentMap;
 public class EnderChest {
 
     /**
+     * Menu whiches can contain contents of this enderchest
+     */
+    EnderChestMenu container;
+
+    /**
      * Player context for which the enderchest has been loaded
      */
     protected PlayerContext context;
@@ -27,11 +32,6 @@ public class EnderChest {
      * The number of the enderchest
      */
     private int num;
-
-    /**
-     * Menu whiches can contain contents of this enderchest
-     */
-    private EnderChestMenu container;
 
     /**
      * The number of rows of the chest's menu
