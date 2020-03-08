@@ -33,7 +33,7 @@
         <plotsquared.version>4.453</plotsquared.version>
         <bstats.version>1.5</bstats.version>
         <junit.version>4.13</junit.version>
-        <mockito.version>2.28.2</mockito.version>
+        <mockito.version>3.3.0</mockito.version>
         <assertj.version>3.11.1</assertj.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
