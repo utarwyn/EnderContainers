@@ -278,7 +278,7 @@ public class DatabaseManager extends AbstractManager {
         List<String> tables = this.database.getTables();
 
         if (!tables.contains(formatTable(CHEST_TABLE))) {
-            database.request("CREATE TABLE `" + formatTable(CHEST_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `num` TINYINT(2) NOT NULL DEFAULT '0', `owner` VARCHAR(36) NULL, `contents` MEDIUMTEXT NULL, `rows` INT(1) NOT NULL DEFAULT 0, PRIMARY KEY (`id`), INDEX `USER KEY` (`num`, `owner`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
+            database.request("CREATE TABLE `" + formatTable(CHEST_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `num` TINYINT(2) NOT NULL DEFAULT '0', `owner` VARCHAR(36) NULL, `contents` MEDIUMTEXT NULL, `rows` INT(1) NOT NULL DEFAULT 0, PRIMARY KEY (`id`), UNIQUE KEY `NUM OWNER` (`num`,`owner`), INDEX `USER KEY` (`num`, `owner`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
             if (Files.getConfiguration().isDebug()) {
                 this.logger.log(Level.INFO, "Table `{0}` created in the database.", formatTable(CHEST_TABLE));
             }
