@@ -34,7 +34,7 @@
         <bstats.version>1.7</bstats.version>
         <junit.version>4.13</junit.version>
         <mockito.version>2.28.2</mockito.version>
-        <assertj.version>3.11.1</assertj.version>
+        <assertj.version>3.15.0</assertj.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
