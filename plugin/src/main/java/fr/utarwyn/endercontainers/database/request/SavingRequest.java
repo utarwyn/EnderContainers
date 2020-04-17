@@ -17,7 +17,7 @@ import java.util.List;
  * @author Utarwyn <maxime.malgorn@laposte.net>
  * @since 2.2.0
  */
-public class SavingRequest implements IRequest {
+public class SavingRequest implements Request {
 
     /**
      * Used database

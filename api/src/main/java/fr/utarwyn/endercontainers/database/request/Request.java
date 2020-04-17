@@ -1,12 +1,12 @@
 package fr.utarwyn.endercontainers.database.request;
 
 /**
- * Request interface
+ * Request interface.
  *
  * @author Utarwyn <maxime.malgorn@laposte.net>
  * @since 2.2.0
  */
-public interface IRequest {
+public interface Request {
 
     /**
      * Generate the final request to be executed on the database

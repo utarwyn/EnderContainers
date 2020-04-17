@@ -15,7 +15,7 @@ import java.util.List;
  * @author Utarwyn <maxime.malgorn@laposte.net>
  * @since 2.2.0
  */
-public class SelectRequest implements IRequest {
+public class SelectRequest implements Request {
 
     private Database database;
 

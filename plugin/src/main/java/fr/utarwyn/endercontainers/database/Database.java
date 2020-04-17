@@ -1,7 +1,7 @@
 package fr.utarwyn.endercontainers.database;
 
 import fr.utarwyn.endercontainers.database.request.DeleteRequest;
-import fr.utarwyn.endercontainers.database.request.IRequest;
+import fr.utarwyn.endercontainers.database.request.Request;
 import fr.utarwyn.endercontainers.database.request.SavingRequest;
 import fr.utarwyn.endercontainers.database.request.SelectRequest;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -288,7 +288,7 @@ public class Database implements AutoCloseable {
      * @return True if the update statement was executed
      * @throws SQLException if a SQL exception has been thrown during the process
      */
-    public boolean execUpdateStatement(IRequest request) throws SQLException {
+    public boolean execUpdateStatement(Request request) throws SQLException {
         Object[] attributes = request.getAttributes();
 
         try (Connection connection = this.source.getConnection();

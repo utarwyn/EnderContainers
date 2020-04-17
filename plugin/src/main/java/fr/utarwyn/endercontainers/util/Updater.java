@@ -1,10 +1,14 @@
 package fr.utarwyn.endercontainers.util;
 
+import com.google.gson.Gson;
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.configuration.Files;
 import org.bukkit.command.CommandSender;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -135,13 +139,15 @@ public class Updater extends AbstractManager implements Runnable {
      * @throws IOException throwed if the method cannot read the remote json
      */
     private void retreiveVersions() throws IOException {
-        /* BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(VERSION_URL).openStream()));
-        JSONArray versions = (JSONArray) JSONValue.parseWithException(reader);
-        JSONObject version = (JSONObject) versions.get(versions.size() - 1); */
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(VERSION_URL).openStream()));
+        VersionInfo[] infos = new Gson().fromJson(reader, VersionInfo[].class);
 
-        // TODO Use Gson here
-        this.currentVersion = this.plugin.getDescription().getVersion();
-        this.latestVersion = null;
+        if (infos.length > 0) {
+            this.currentVersion = this.plugin.getDescription().getVersion();
+            this.latestVersion = infos[0].name;
+        } else {
+            throw new IOException("Malformated remote version json");
+        }
 
         this.currentVersionValue = this.getVersionDecimalValue(this.currentVersion);
         this.latestVersionValue = this.getVersionDecimalValue(this.latestVersion);
@@ -183,6 +189,13 @@ public class Updater extends AbstractManager implements Runnable {
      */
     private boolean isUsingDevelopmentBuild() {
         return this.currentVersionValue > this.latestVersionValue;
+    }
+
+    /**
+     * Version info retreived from the Spiget API
+     */
+    private static class VersionInfo {
+        String name;
     }
 
 }

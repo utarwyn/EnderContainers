@@ -11,7 +11,7 @@ import java.sql.SQLException;
  * @author Utarwyn <maxime.malgorn@laposte.net>
  * @since 2.2.0
  */
-public class DeleteRequest implements IRequest {
+public class DeleteRequest implements Request {
 
     private Database database;
 
