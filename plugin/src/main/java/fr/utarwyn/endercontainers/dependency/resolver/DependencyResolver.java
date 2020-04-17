@@ -1,22 +1,21 @@
-package fr.utarwyn.endercontainers.dependency;
+package fr.utarwyn.endercontainers.dependency.resolver;
 
-import fr.utarwyn.endercontainers.api.dependency.dependency.Dependency;
+import fr.utarwyn.endercontainers.dependency.Dependency;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
- * Build a new dependency instance with a custom version matching.
+ * Resolve a dependency instance with a custom version matching.
  *
  * @author Utarwyn <maxime.malgorn@laposte.net>
  * @since 2.2.0
  */
-public class DependencyBuilder {
+public class DependencyResolver {
 
     /**
      * Bukkit plugin manager
@@ -34,23 +33,23 @@ public class DependencyBuilder {
     private Map<Pattern, Class<? extends Dependency>> patterns;
 
     /**
-     * Construct a new dependency builder.
+     * Construct a new dependency resolver.
      *
      * @param pluginManager Bukkit plugin manager
      */
-    DependencyBuilder(PluginManager pluginManager) {
+    public DependencyResolver(PluginManager pluginManager) {
         this.pluginManager = pluginManager;
         this.patterns = new HashMap<>();
     }
 
     /**
-     * Set the name of the built dependency.
+     * Set the name of the resolved dependency.
      * Should match the plugin exact name.
      *
      * @param name name of the dependency
      * @return this instance
      */
-    public DependencyBuilder name(String name) {
+    public DependencyResolver name(String name) {
         this.name = name;
         return this;
     }
@@ -62,7 +61,7 @@ public class DependencyBuilder {
      * @param clazz      class to use for for the targeted version
      * @return this instance
      */
-    public DependencyBuilder matchVersion(String expression, Class<? extends Dependency> clazz) {
+    public DependencyResolver matchVersion(String expression, Class<? extends Dependency> clazz) {
         this.patterns.put(Pattern.compile(expression), clazz);
         return this;
     }
@@ -73,18 +72,17 @@ public class DependencyBuilder {
      * @param clazz class to use for with all versions
      * @return this instance
      */
-    public DependencyBuilder use(Class<? extends Dependency> clazz) {
+    public DependencyResolver use(Class<? extends Dependency> clazz) {
         return this.matchVersion(".*", clazz);
     }
 
     /**
-     * Build the dependency if it is loaded and a matcher
+     * Resolve the dependency if the concerned plugin is loaded and a matcher
      * has targeted the plugin's version from the plugin manager.
      *
-     * @return built dependency instance if present
-     * @throws ReflectiveOperationException thrown if the dependency instance cannot be created
+     * @return resolved dependency instance with info if present
      */
-    public Optional<Dependency> build() throws ReflectiveOperationException {
+    public Optional<DependencyInfo> resolve() {
         if (this.name == null) {
             throw new NullPointerException("Dependency name cannot be null!");
         }
@@ -95,10 +93,9 @@ public class DependencyBuilder {
         if (this.pluginManager.isPluginEnabled(this.name)) {
             Plugin plugin = this.pluginManager.getPlugin(this.name);
             String pluginVersion = plugin != null ? plugin.getDescription().getVersion() : null;
-            Optional<Dependency> dependency = this.constructInstance(plugin, pluginVersion);
 
-            dependency.ifPresent(Dependency::onEnable);
-            return dependency;
+            return this.constructInstance(pluginVersion)
+                    .map(dependency -> new DependencyInfo(dependency, plugin, pluginVersion));
         }
 
         return Optional.empty();
@@ -107,24 +104,21 @@ public class DependencyBuilder {
     /**
      * Construct a dependency instance from patterns and version of the loaded plugin.
      *
-     * @param plugin        loaded plugin
      * @param pluginVersion version of the loaded plugin
      * @return dependency instance if present
-     * @throws ReflectiveOperationException thrown if the dependency instance cannot be created
      */
-    private Optional<Dependency> constructInstance(Plugin plugin, String pluginVersion)
-            throws ReflectiveOperationException {
-        Optional<? extends Class<? extends Dependency>> foundClazz = this.patterns.entrySet().stream()
+    private Optional<Dependency> constructInstance(String pluginVersion) {
+        return this.patterns.entrySet().stream()
                 .filter(entry -> entry.getKey().matcher(pluginVersion).find())
                 .map(Map.Entry::getValue)
-                .findFirst();
-
-        if (foundClazz.isPresent()) {
-            Constructor<? extends Dependency> constructor = foundClazz.get().getDeclaredConstructor(String.class, Plugin.class);
-            return Optional.of(constructor.newInstance(this.name, plugin));
-        }
-
-        return Optional.empty();
+                .findFirst()
+                .map(clazz -> {
+                    try {
+                        return clazz.getDeclaredConstructor().newInstance();
+                    } catch (ReflectiveOperationException e) {
+                        return null;
+                    }
+                });
     }
 
 }

@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.menu.enderchest;
 import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.menu.AbstractMenu;
@@ -61,12 +62,14 @@ public class EnderChestHubMenu extends AbstractMenu {
 
         SkullMeta prevSkullMeta = (SkullMeta) PREV_PAGE_ITEM.getItemMeta();
         prevSkullMeta.setOwner("MHF_ArrowLeft");
-        prevSkullMeta.setDisplayName(ChatColor.RED + Files.getLocale().getMenuPreviousPage());
+        prevSkullMeta.setDisplayName(ChatColor.RED
+                + Files.getLocale().getMessage(LocaleKey.MENU_PREV_PAGE));
         PREV_PAGE_ITEM.setItemMeta(prevSkullMeta);
 
         SkullMeta nextSkullMeta = (SkullMeta) NEXT_PAGE_ITEM.getItemMeta();
         nextSkullMeta.setOwner("MHF_ArrowRight");
-        nextSkullMeta.setDisplayName(ChatColor.RED + Files.getLocale().getMenuNextPage());
+        nextSkullMeta.setDisplayName(ChatColor.RED
+                + Files.getLocale().getMessage(LocaleKey.MENU_NEXT_PAGE));
         NEXT_PAGE_ITEM.setItemMeta(nextSkullMeta);
     }
 
@@ -143,7 +146,8 @@ public class EnderChestHubMenu extends AbstractMenu {
     @Override
     protected String getTitle() {
         String name = UUIDFetcher.getName(this.context.getOwner());
-        return Files.getLocale().getMenuMainTitle().replace("%player%", Objects.requireNonNull(name));
+        return Files.getLocale().getMessage(LocaleKey.MENU_MAIN_TITLE)
+                .replace("%player%", Objects.requireNonNull(name));
     }
 
     /**
@@ -204,17 +208,18 @@ public class EnderChestHubMenu extends AbstractMenu {
 
         // Update lore with the chest's status
         if (!ec.isAccessible()) {
-            lore.add(Files.getLocale().getMenuChestLocked());
+            lore.add(Files.getLocale().getMessage(LocaleKey.MENU_CHEST_LOCKED));
         }
         if (ec.isFull()) {
-            lore.add(Files.getLocale().getMenuChestFull());
+            lore.add(Files.getLocale().getMessage(LocaleKey.MENU_CHEST_FULL));
         } else if (ec.isEmpty()) {
-            lore.add(Files.getLocale().getMenuChestEmpty());
+            lore.add(Files.getLocale().getMessage(LocaleKey.MENU_CHEST_EMPTY));
         }
 
         // Update itemstack metadata
         if (meta != null) {
-            meta.setDisplayName(this.formatPaneTitle(ec, Files.getLocale().getMenuPaneTitle()));
+            meta.setDisplayName(this.formatPaneTitle(ec,
+                    Files.getLocale().getMessage(LocaleKey.MENU_PANE_TITLE)));
             meta.setLore(lore);
         }
 

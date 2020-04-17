@@ -1,8 +1,9 @@
 package fr.utarwyn.endercontainers.dependency;
 
 import fr.utarwyn.endercontainers.AbstractManager;
-import fr.utarwyn.endercontainers.api.dependency.dependency.Dependency;
-import fr.utarwyn.endercontainers.api.dependency.dependency.DependencyListener;
+import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
+import fr.utarwyn.endercontainers.dependency.resolver.DependencyInfo;
+import fr.utarwyn.endercontainers.dependency.resolver.DependencyResolver;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -17,7 +18,7 @@ import java.util.logging.Level;
  * @author Utarwyn
  * @since 1.0.3
  */
-public class DependenciesManager extends AbstractManager implements DependencyListener {
+public class DependenciesManager extends AbstractManager implements DependencyValidator {
 
     /**
      * The Bukkit plugin manager
@@ -36,13 +37,7 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
     public synchronized void load() {
         this.dependencies = new ArrayList<>();
         this.pluginManager = this.plugin.getServer().getPluginManager();
-
-        try {
-            this.loadDependencies();
-            this.logLoadedDependencies();
-        } catch (ReflectiveOperationException e) {
-            this.logger.log(Level.SEVERE, "Cannot load one of dependency objects", e);
-        }
+        this.loadDependenciesWithLog();
     }
 
     /**
@@ -55,60 +50,54 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
     }
 
     /**
-     * Called when a player wants to open its enderchest
-     * by interacting with an enderchest block.
-     *
-     * @param block       block clicked by the player
-     * @param player      player who interacts with the chest
-     * @param sendMessage send a message to the player if action is forbidden
-     * @return true if the block chest can be opened
+     * {@inheritDoc}
      */
     @Override
-    public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
-        return this.dependencies.stream().allMatch(d -> d.onBlockChestOpened(block, player, sendMessage));
+    public void validateBlockChestOpening(Block block, Player player)
+            throws BlockChestOpeningException {
+        for (Dependency dependency : this.dependencies) {
+            dependency.validateBlockChestOpening(block, player);
+        }
     }
 
     /**
      * Load each dependency if the needed plugin is enabled.
      */
-    private void loadDependencies() throws ReflectiveOperationException {
+    private void loadDependencies() {
         // Essentials
-        new DependencyBuilder(this.pluginManager)
+        new DependencyResolver(this.pluginManager)
                 .name("Essentials")
                 .use(EssentialsDependency.class)
-                .build().ifPresent(this.dependencies::add);
+                .resolve().ifPresent(this::enableDependency);
 
         // Factions
-        new DependencyBuilder(this.pluginManager)
+        new DependencyResolver(this.pluginManager)
                 .name("Factions")
                 .matchVersion("^1\\.6.*", Factions1Dependency.class)
                 .matchVersion("^2.*", Factions2Dependency.class)
-                .build().ifPresent(this.dependencies::add);
+                .resolve().ifPresent(this::enableDependency);
 
         // PlotSquared
-        new DependencyBuilder(this.pluginManager)
+        new DependencyResolver(this.pluginManager)
                 .name("PlotSquared")
                 .use(PlotSquaredDependency.class)
-                .build().ifPresent(this.dependencies::add);
+                .resolve().ifPresent(this::enableDependency);
 
         // WorldGuard
-        new DependencyBuilder(this.pluginManager)
+        new DependencyResolver(this.pluginManager)
                 .name("WorldGuard")
                 .matchVersion("^6.*", WorldGuard6Dependency.class)
                 .matchVersion("^7.*", WorldGuard7Dependency.class)
-                .build().ifPresent(this.dependencies::add);
+                .resolve().ifPresent(this::enableDependency);
     }
 
     /**
-     * This method logs all information about loaded dependencies.
+     * Load each dependency if the needed plugin is enabled and logs it.
      */
-    private void logLoadedDependencies() {
+    private void loadDependenciesWithLog() {
         this.logger.info("-----------[Dependencies]-----------");
 
-        this.dependencies.forEach(dependency -> this.logger.log(
-                Level.INFO, "  Use {0} (v{1}) as a dependency!",
-                new Object[]{dependency.getName(), dependency.getPluginVersion()}
-        ));
+        this.loadDependencies();
 
         int size = this.dependencies.size();
         if (size > 0) {
@@ -118,6 +107,19 @@ public class DependenciesManager extends AbstractManager implements DependencyLi
         }
 
         this.logger.info("------------------------------------");
+    }
+
+    /**
+     * Load and enable a dependency from its resolved info.
+     *
+     * @param info resolved dependency info
+     */
+    private void enableDependency(DependencyInfo info) {
+        this.logger.log(Level.INFO, "  Use {0} (v{1}) as a dependency!",
+                new Object[]{info.getPlugin().getName(), info.getPluginVersion()});
+
+        info.getDependency().onEnable(info.getPlugin());
+        this.dependencies.add(info.getDependency());
     }
 
 }

@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.menu.enderchest;
 
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.menu.AbstractMenu;
@@ -66,7 +67,7 @@ public class EnderChestMenu extends AbstractMenu {
         String num = String.valueOf(this.chest.getNum() + 1);
         String playername = Objects.requireNonNull(UUIDFetcher.getName(this.chest.getOwner()));
 
-        return Files.getLocale().getMenuChestTitle()
+        return Files.getLocale().getMessage(LocaleKey.MENU_CHEST_TITLE)
                 .replace("%player%", playername)
                 .replace("%num%", num);
     }

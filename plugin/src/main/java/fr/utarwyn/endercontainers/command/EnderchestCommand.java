@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.command;
 
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.PluginMsg;
@@ -24,7 +25,7 @@ public class EnderchestCommand extends AbstractCommand {
     @Override
     public void performPlayer(Player player) {
         if (Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName())) {
-            PluginMsg.errorMessage(player, Files.getLocale().getPluginWorldDisabled());
+            PluginMsg.errorMessageWithPrefix(player, LocaleKey.ERR_WORLD_DISABLED);
             return;
         }
 
@@ -43,7 +44,7 @@ public class EnderchestCommand extends AbstractCommand {
 
     @Override
     public void performConsole(CommandSender sender) {
-        PluginMsg.errorMessage(sender, Files.getLocale().getNopermConsole());
+        PluginMsg.errorMessageWithPrefix(sender, LocaleKey.ERR_NOPERM_CONSOLE);
     }
 
     private void openHubMenu(Player player) {
@@ -58,7 +59,7 @@ public class EnderchestCommand extends AbstractCommand {
         if (MiscUtil.playerHasPerm(player, "cmd.enderchests") || MiscUtil.playerHasPerm(player, "cmd.enderchest." + num)) {
             this.manager.loadPlayerContext(player.getUniqueId(), context -> {
                 if (!context.openEnderchestFor(player, num)) {
-                    this.sendTo(player, ChatColor.RED + Files.getLocale().getNopermOpenChest());
+                    PluginMsg.errorMessageWithPrefix(player, LocaleKey.ERR_NOPERM_OPEN_CHEST);
                 }
             });
         } else {

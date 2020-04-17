@@ -1,9 +1,9 @@
 package fr.utarwyn.endercontainers.command.main;
 
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.command.AbstractCommand;
-import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.configuration.LocaleKey;
+import fr.utarwyn.endercontainers.util.PluginMsg;
 import fr.utarwyn.endercontainers.util.Updater;
 import org.bukkit.command.CommandSender;
 
@@ -24,7 +24,7 @@ public class UpdateCommand extends AbstractCommand {
     @Override
     public void perform(CommandSender sender) {
         if (!this.updater.notifyPlayer(sender)) {
-            sender.sendMessage(EnderContainers.PREFIX + "§7" + Files.getLocale().getNoUpdate());
+            PluginMsg.messageWithPrefix(sender, LocaleKey.CMD_NO_UPDATE);
         }
     }
 

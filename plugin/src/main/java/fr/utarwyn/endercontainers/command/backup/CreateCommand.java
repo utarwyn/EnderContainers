@@ -2,9 +2,11 @@ package fr.utarwyn.endercontainers.command.backup;
 
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.command.Parameter;
-import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.command.CommandSender;
+
+import java.util.Collections;
 
 public class CreateCommand extends AbstractBackupCommand {
 
@@ -19,13 +21,15 @@ public class CreateCommand extends AbstractBackupCommand {
     public void perform(CommandSender sender) {
         String name = this.readArg();
 
-        this.sendTo(sender, Files.getLocale().getBackupCreationStarting());
+        PluginMsg.messageWithPrefix(sender, LocaleKey.CMD_BACKUP_CREATION_STARTED);
 
         this.manager.createBackup(name, sender.getName(), result -> {
             if (Boolean.TRUE.equals(result)) {
-                this.sendTo(sender, Files.getLocale().getBackupCreated().replace("%backup%", name));
+                PluginMsg.messageWithPrefix(sender, LocaleKey.CMD_BACKUP_CREATED,
+                        Collections.singletonMap("backup", name));
             } else {
-                PluginMsg.errorMessage(sender, Files.getLocale().getBackupExists().replace("%backup%", name));
+                PluginMsg.errorMessageWithPrefix(sender, LocaleKey.CMD_BACKUP_EXISTS,
+                        Collections.singletonMap("backup", name));
             }
         });
     }

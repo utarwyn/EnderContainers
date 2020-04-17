@@ -2,9 +2,11 @@ package fr.utarwyn.endercontainers.command.backup;
 
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.command.Parameter;
-import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.command.CommandSender;
+
+import java.util.Collections;
 
 public class RemoveCommand extends AbstractBackupCommand {
 
@@ -21,9 +23,11 @@ public class RemoveCommand extends AbstractBackupCommand {
 
         this.manager.removeBackup(name, result -> {
             if (Boolean.TRUE.equals(result)) {
-                this.sendTo(sender, Files.getLocale().getBackupRemoved().replace("%backup%", name));
+                PluginMsg.messageWithPrefix(sender, LocaleKey.CMD_BACKUP_REMOVED,
+                        Collections.singletonMap("backup", name));
             } else {
-                PluginMsg.errorMessage(sender, Files.getLocale().getBackupUnknown().replace("%backup%", name));
+                PluginMsg.errorMessageWithPrefix(sender, LocaleKey.CMD_BACKUP_UNKNOWN,
+                        Collections.singletonMap("backup", name));
             }
         });
     }

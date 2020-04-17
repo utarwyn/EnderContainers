@@ -3,7 +3,9 @@ package fr.utarwyn.endercontainers.hologram;
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
+import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import org.bukkit.Bukkit;
@@ -56,7 +58,7 @@ public class HologramManager extends AbstractManager implements Runnable {
     private static String generateNametagTitle(int chestCount) {
         int max = Files.getConfiguration().getMaxEnderchests();
 
-        return Files.getLocale().getChestNametag()
+        return Files.getLocale().getMessage(LocaleKey.MISC_CHEST_NAMETAG)
                 .replace("%enderchests%", String.valueOf(chestCount))
                 .replace("%maxenderchests%", String.valueOf(max))
                 .replace("%plural%", ((chestCount > 1) ? "s" : ""));
@@ -117,9 +119,14 @@ public class HologramManager extends AbstractManager implements Runnable {
         Block block = player.getTargetBlock(null, 6);
 
         if (Material.ENDER_CHEST.equals(block.getType())) {
-            if (!this.holograms.containsKey(uuid) && this.dependenciesManager.onBlockChestOpened(block, player, false)) {
-                this.chestManager.loadPlayerContext(player.getUniqueId(),
-                        context -> this.spawnHologram(context, player, block));
+            if (!this.holograms.containsKey(uuid)) {
+                try {
+                    this.dependenciesManager.validateBlockChestOpening(block, player);
+                    this.chestManager.loadPlayerContext(player.getUniqueId(),
+                            context -> this.spawnHologram(context, player, block));
+                } catch (BlockChestOpeningException ignored) {
+                    // Nothing
+                }
             }
         } else if (this.holograms.containsKey(uuid)) {
             this.holograms.get(uuid).destroy();

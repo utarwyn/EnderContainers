@@ -3,7 +3,9 @@ package fr.utarwyn.endercontainers.enderchest;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
+import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import fr.utarwyn.endercontainers.util.MiscUtil;
+import fr.utarwyn.endercontainers.util.PluginMsg;
 import fr.utarwyn.endercontainers.util.Updater;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -75,9 +77,15 @@ public class EnderChestListener implements Listener {
             event.setCancelled(true);
 
             // Check for dependencies if the player can interact with the block here
-            if (this.dependenciesManager.onBlockChestOpened(block, player, true)) {
+            try {
+                this.dependenciesManager.validateBlockChestOpening(block, player);
+
                 this.manager.loadPlayerContext(player.getUniqueId(),
                         context -> context.openHubMenuFor(player, block));
+            } catch (BlockChestOpeningException e) {
+                if (e.getKey() != null) {
+                    PluginMsg.errorMessage(player, e.getKey(), e.getParameters());
+                }
             }
         }
     }

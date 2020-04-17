@@ -1,9 +1,7 @@
 package fr.utarwyn.endercontainers.command;
 
-import fr.utarwyn.endercontainers.EnderContainers;
-import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.util.PluginMsg;
-import org.bukkit.ChatColor;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -89,16 +87,16 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 
         // Check argument count
         if (!this.checkArgLength(args.length)) {
-            sender.sendMessage(EnderContainers.PREFIX + ChatColor.RED + Files.getLocale().getCmdWrongArgumentCount());
+            PluginMsg.errorMessageWithPrefix(sender, LocaleKey.ERR_CMD_ARG_COUNT);
             return true;
         }
 
         // Check also each argument
         int i = 0;
-        for (Parameter param : this.parameters) {
+        for (Parameter<?> param : this.parameters) {
             if (i < args.length && !param.checkValue(args[i])) {
-                sender.sendMessage(EnderContainers.PREFIX + ChatColor.RED +
-                        Files.getLocale().getCmdInvalidParameter().replace("%param%", args[i]));
+                PluginMsg.errorMessageWithPrefix(sender, LocaleKey.ERR_CMD_INVALID_PARAM,
+                        Collections.singletonMap("param", args[i]));
                 return true;
             }
 
@@ -225,10 +223,6 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
         this.subCommands.add(command);
     }
 
-    protected void sendTo(CommandSender sender, String message) {
-        sender.sendMessage(EnderContainers.PREFIX + message);
-    }
-
     protected <T> T readArg() {
         return this.readArgAt(this.nextArg);
     }
@@ -286,7 +280,7 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
     /**
      * Extract from a list and sort auto-completions that begin with a sent argument.
      *
-     * @param argument argument sent by a user
+     * @param argument    argument sent by a user
      * @param completions list of initial auto-completions to check
      * @return sorted list of extracted auto-completions
      */

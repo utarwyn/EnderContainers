@@ -2,7 +2,6 @@ package fr.utarwyn.endercontainers;
 
 import fr.utarwyn.endercontainers.compatibility.v1_12.FakeServer;
 import fr.utarwyn.endercontainers.configuration.Files;
-import fr.utarwyn.endercontainers.configuration.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -16,6 +15,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
@@ -70,25 +70,20 @@ public class TestHelper {
     /**
      * Setup a mocked version of configuration files.
      */
-    public static synchronized void setUpFiles() throws IOException,
-            InvalidConfigurationException, ReflectiveOperationException {
+    public static synchronized void setUpFiles() throws IOException, InvalidConfigurationException {
         if (!filesReady) {
             // Initialize the configuration object
             EnderContainers plugin = TestHelper.getPlugin();
             FileConfiguration config = new YamlConfiguration();
+            String localePath = TestHelper.class.getResource("/locale.yml").getPath();
 
-            config.load(new InputStreamReader(TestHelper.class.getResourceAsStream("/config.yml")));
+            config.load(new InputStreamReader(TestHelper.class.getResourceAsStream("/config.test.yml")));
+
             when(plugin.getConfig()).thenReturn(config);
+            when(plugin.getDataFolder()).thenReturn(new File(localePath).getParentFile());
 
             Files.initConfiguration(plugin);
-
-            // Initialize the locale object
-            Field localeField = Files.class.getDeclaredField("locale");
-            Locale locale = mock(Locale.class, RETURNS_SMART_NULLS);
-
-            localeField.setAccessible(true);
-            localeField.set(null, locale);
-            localeField.setAccessible(false);
+            Files.initLocale(plugin);
 
             filesReady = true;
         }

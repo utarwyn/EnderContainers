@@ -2,30 +2,46 @@ package fr.utarwyn.endercontainers.dependency;
 
 import com.massivecraft.factions.entity.*;
 import com.massivecraft.massivecore.ps.PS;
-import fr.utarwyn.endercontainers.api.dependency.dependency.Dependency;
+import fr.utarwyn.endercontainers.configuration.LocaleKey;
+import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-public class Factions2Dependency extends Dependency {
+import java.util.Collections;
 
-    public Factions2Dependency(String name, Plugin plugin) {
-        super(name, plugin);
+/**
+ * Factions v2 dependency. Protect enderchests in enemy factions.
+ * Support: Factions with MassiveCore
+ *
+ * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @since 2.2.0
+ */
+public class Factions2Dependency implements Dependency {
+
+    @Override
+    public void onEnable(Plugin plugin) {
+        // Not implemented
     }
 
     @Override
-    public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
+    public void onDisable() {
+        // Not implemented
+    }
+
+    @Override
+    public void validateBlockChestOpening(Block block, Player player)
+            throws BlockChestOpeningException {
         MPlayer mPlayer = MPlayer.get(player);
 
         // Bypass the check?
-        if (mPlayer == null) return false;
-        if (mPlayer.isOverriding()) return true;
+        if (mPlayer == null || mPlayer.isOverriding()) return;
 
         // Init checking variables
         Faction playerFac = mPlayer.getFaction();
         Faction currentFac = BoardColl.get().getFactionAt(PS.valueOf(block));
-        if (currentFac == null) return true;
+        if (currentFac == null) return;
 
         boolean canOpen;
         boolean playerFacIsReal = this.isRealFaction(playerFac);
@@ -46,18 +62,22 @@ public class Factions2Dependency extends Dependency {
             canOpen = !currentFacIsReal;
         }
 
-        // Prevent to access to the enderchest if needed!
-        // Sending the message only in a specific case!
-        if (!canOpen && sendMessage) {
-            /*PluginMsg.errorSMessage(player, Files.getLocale().getAccessDeniedFactions()
-                    .replace("%faction%", facColor + currentFac.getName() + ChatColor.RED));*/
+        if (!canOpen) {
+            throw new BlockChestOpeningException(LocaleKey.ERR_DEP_FACTIONS,
+                    Collections.singletonMap("faction", facColor + currentFac.getName()));
         }
-
-        return canOpen;
     }
 
+    /**
+     * Verify if a faction is real and owned by a player.
+     *
+     * @param faction faction to check
+     * @return true if the faction is real
+     */
     private boolean isRealFaction(Faction faction) {
-        return faction != null && !faction.isNone() && faction != FactionColl.get().getWarzone()
+        return faction != null
+                && !faction.isNone()
+                && faction != FactionColl.get().getWarzone()
                 && faction != FactionColl.get().getSafezone();
     }
 

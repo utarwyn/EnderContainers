@@ -4,6 +4,8 @@ import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.command.AbstractCommand;
 import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.configuration.LocaleKey;
+import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -33,8 +35,7 @@ public class ReloadCommand extends AbstractCommand {
         }
 
         Managers.reloadAll();
-
-        this.sendTo(sender, ChatColor.GREEN + Files.getLocale().getConfigReloaded());
+        PluginMsg.messageWithPrefix(sender, LocaleKey.CMD_CONFIG_RELOADED, ChatColor.GREEN);
     }
 
 }

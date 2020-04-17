@@ -4,7 +4,8 @@ import com.github.intellectualsites.plotsquared.plot.flag.Flags;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import com.sk89q.worldedit.world.block.BlockType;
-import fr.utarwyn.endercontainers.api.dependency.dependency.Dependency;
+import fr.utarwyn.endercontainers.configuration.LocaleKey;
+import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -19,7 +20,7 @@ import java.util.Set;
  * @author Utarwyn
  * @since 1.0.6
  */
-public class PlotSquaredDependency extends Dependency {
+public class PlotSquaredDependency implements Dependency {
 
     /**
      * Material name of the enderchest block.
@@ -29,24 +30,31 @@ public class PlotSquaredDependency extends Dependency {
     /**
      * {@inheritDoc}
      */
-    public PlotSquaredDependency(String name, Plugin plugin) {
-        super(name, plugin);
+    @Override
+    public void onEnable(Plugin plugin) {
+        // Not implemented
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
+    public void onDisable() {
+        // Not implemented
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void validateBlockChestOpening(Block block, Player player)
+            throws BlockChestOpeningException {
         Location location = this.getP2Location(block.getLocation());
         Plot plot = location != null ? location.getPlot() : null;
-        boolean canUse = player.isOp() || plot == null || this.canPlayerUseEnderchest(plot, player);
 
-        if (!canUse && sendMessage) {
-            // TODO PluginMsg.errorSMessage(player, Files.getLocale().getAccessDeniedPlotSq());
+        if (!player.isOp() && plot != null && !this.canPlayerUseEnderchest(plot, player)) {
+            throw new BlockChestOpeningException(LocaleKey.ERR_DEP_PLOTSQ);
         }
-
-        return canUse;
     }
 
     /**

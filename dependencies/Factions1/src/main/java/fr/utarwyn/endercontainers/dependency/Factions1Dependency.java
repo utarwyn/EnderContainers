@@ -3,54 +3,63 @@ package fr.utarwyn.endercontainers.dependency;
 import com.massivecraft.factions.*;
 import com.massivecraft.factions.zcore.fperms.Access;
 import com.massivecraft.factions.zcore.fperms.PermissableAction;
-import fr.utarwyn.endercontainers.api.dependency.dependency.Dependency;
+import fr.utarwyn.endercontainers.configuration.LocaleKey;
+import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Collections;
 
 /**
  * Factions dependency. Protect enderchests in enemy factions.
  * Support: Legacy Factions / FactionsUUID / SavageFactions
  *
- * @author Maxime <maxime.malgorn@laposte.net>
+ * @author Utarwyn <maxime.malgorn@laposte.net>
  * @since 2.2.0
  */
-public class Factions1Dependency extends Dependency {
+public class Factions1Dependency implements Dependency {
 
-    public Factions1Dependency(String name, Plugin plugin) {
-        super(name, plugin);
+    @Override
+    public void onEnable(Plugin plugin) {
+        // Not implemented
     }
 
     @Override
-    public boolean onBlockChestOpened(Block block, Player player, boolean sendMessage) {
+    public void onDisable() {
+        // Not implemented
+    }
+
+    @Override
+    public void validateBlockChestOpening(Block block, Player player)
+            throws BlockChestOpeningException {
         FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
 
         // Bypass the check?
-        if (fPlayer == null) return false;
-        if (fPlayer.isAdminBypassing()) return true;
+        if (fPlayer == null || fPlayer.isAdminBypassing()) return;
 
         // Init checking variables
         Faction playerFac = fPlayer.getFaction();
         Faction currentFac = Board.getInstance().getFactionAt(new FLocation(block));
 
-        boolean canOpen;
         boolean playerFacIsReal = this.isRealFaction(playerFac);
         boolean currentFacIsReal = this.isRealFaction(currentFac);
 
-        // Check faction custom permissions (do not support relationals perms)
-        if (playerFacIsReal && currentFacIsReal)
-            canOpen = (currentFac == playerFac && playerFac.getAccess(fPlayer, PermissableAction.CONTAINER) != Access.DENY);
-        else {
-            canOpen = !currentFacIsReal;
-
-            // Send message only when needed (to not interfere with Factions!)!
-            if (!canOpen && sendMessage) {
-                /*PluginMsg.errorSMessage(player, Files.getLocale().getAccessDeniedFactions()
-                        .replace("%faction%", currentFac.getTag() + ChatColor.RED));*/
+        // Check permission between the two factions if there are real
+        if (playerFacIsReal && currentFacIsReal) {
+            if (currentFac != playerFac || playerFac.getAccess(fPlayer, PermissableAction.CONTAINER) == Access.DENY) {
+                // Exception without message error in this case
+                throw new BlockChestOpeningException();
             }
         }
-
-        return canOpen;
+        // If the current player does not have a faction
+        // but trying to open a chest in a real faction
+        else if (currentFacIsReal) {
+            throw new BlockChestOpeningException(
+                    LocaleKey.ERR_DEP_FACTIONS,
+                    Collections.singletonMap("faction", currentFac.getTag())
+            );
+        }
     }
 
     private boolean isRealFaction(Faction faction) {

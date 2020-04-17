@@ -5,6 +5,7 @@ import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.command.AbstractCommand;
 import fr.utarwyn.endercontainers.command.Parameter;
 import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
@@ -29,7 +30,7 @@ public class OpenCommand extends AbstractCommand {
     @Override
     public void performPlayer(Player player) {
         if (Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName())) {
-            PluginMsg.errorMessage(player, Files.getLocale().getPluginWorldDisabled());
+            PluginMsg.errorMessageWithPrefix(player, LocaleKey.ERR_WORLD_DISABLED);
             return;
         }
 
@@ -45,7 +46,7 @@ public class OpenCommand extends AbstractCommand {
 
     @Override
     public void performConsole(CommandSender sender) {
-        PluginMsg.errorMessage(sender, Files.getLocale().getNopermConsole());
+        PluginMsg.errorMessageWithPrefix(sender, LocaleKey.ERR_NOPERM_CONSOLE);
     }
 
 }
