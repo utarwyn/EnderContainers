@@ -50,7 +50,9 @@ public class PlayerFlatData extends PlayerData {
             String minimalUuid = this.uuid.toString().replace("-", "");
             this.flatFile = new FlatFile("data/" + minimalUuid + ".yml");
         } catch (IOException e) {
-            this.logger.log(Level.SEVERE, "Cannot load the data file of the user" + this.uuid, e);
+            this.logger.log(Level.SEVERE, String.format(
+                    "Cannot load the data file of the user %s", this.uuid
+            ), e);
         }
     }
 
@@ -62,7 +64,9 @@ public class PlayerFlatData extends PlayerData {
         try {
             this.flatFile.save();
         } catch (IOException e) {
-            this.logger.log(Level.SEVERE, "Cannot save the data file of the user " + this.uuid, e);
+            this.logger.log(Level.SEVERE, String.format(
+                    "Cannot save the data file of the user %s", this.uuid
+            ), e);
         }
     }
 
@@ -86,7 +90,8 @@ public class PlayerFlatData extends PlayerData {
     @Override
     public int getEnderchestRows(EnderChest chest) {
         String path = PREFIX + "." + chest.getNum() + ".rows";
-        return this.flatFile.getConfiguration().contains(path) ? this.flatFile.getConfiguration().getInt(path) : 3;
+        return this.flatFile.getConfiguration().contains(path) ?
+                this.flatFile.getConfiguration().getInt(path) : 3;
     }
 
     /**
@@ -95,7 +100,8 @@ public class PlayerFlatData extends PlayerData {
     @Override
     protected void saveEnderchest(EnderChest chest) {
         String path = PREFIX + "." + chest.getNum();
-        String contents = !chest.getContents().isEmpty() ? ItemSerializer.serialize(chest.getContents()) : null;
+        String contents = !chest.getContents().isEmpty() ?
+                ItemSerializer.serialize(chest.getContents()) : null;
 
         this.flatFile.getConfiguration().set(path + ".rows", chest.getRows());
         this.flatFile.getConfiguration().set(path + ".position", chest.getNum());

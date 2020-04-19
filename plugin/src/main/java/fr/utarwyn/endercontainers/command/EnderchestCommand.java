@@ -6,7 +6,6 @@ import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.PluginMsg;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

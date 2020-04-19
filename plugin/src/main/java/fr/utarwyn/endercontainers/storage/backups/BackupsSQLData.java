@@ -48,9 +48,13 @@ public class BackupsSQLData extends BackupsData {
     @Override
     protected void load() {
         try {
-            this.databaseManager.getBackups().forEach(set -> this.backups.add(
-                    new Backup(set.getString("name"), set.getTimestamp("date"),
-                            set.getString("type"), set.getString("created_by"))));
+            this.databaseManager.getBackups()
+                    .forEach(set -> this.backups.add(
+                            new Backup(
+                                    set.getString("name"), set.getTimestamp("date"),
+                                    set.getString("type"), set.getString("created_by")
+                            )
+                    ));
         } catch (SQLException e) {
             this.logger.log(Level.SEVERE, "Cannot retrieve backups list from the database", e);
         }
@@ -76,7 +80,8 @@ public class BackupsSQLData extends BackupsData {
             );
             return true;
         } catch (SQLException e) {
-            this.logger.log(Level.SEVERE, "Cannot save the backup " + backup.getName(), e);
+            this.logger.log(Level.SEVERE,
+                    String.format("Cannot save the backup %s", backup.getName()), e);
             return false;
         }
     }
@@ -99,8 +104,9 @@ public class BackupsSQLData extends BackupsData {
         try {
             backupSet = this.databaseManager.getBackup(backup.getName());
         } catch (SQLException e) {
-            this.logger.log(Level.SEVERE, "Cannot retrieve the backup "
-                    + backup.getName() + " from the database", e);
+            this.logger.log(Level.SEVERE, String.format(
+                    "Cannot retrieve the backup %s from the database", backup.getName()
+            ), e);
         }
 
         if (backupSet.isPresent()) {
@@ -124,7 +130,9 @@ public class BackupsSQLData extends BackupsData {
         try {
             return this.databaseManager.removeBackup(backup.getName());
         } catch (SQLException e) {
-            this.logger.log(Level.SEVERE, "Cannot delete backup " + backup.getName() + " from the database", e);
+            this.logger.log(Level.SEVERE, String.format(
+                    "Cannot delete backup %s from the database", backup.getName()
+            ), e);
             return false;
         }
     }

@@ -108,8 +108,11 @@ public class VanillaEnderChest extends EnderChest {
             try {
                 this.owner = NMSPlayerUtil.loadPlayer(offlinePlayer);
             } catch (ReflectiveOperationException e) {
-                EnderContainers.getInstance().getLogger().log(Level.SEVERE,
-                        "Cannot get the profile of player " + context.getOwner(), e);
+                EnderContainers.getInstance().getLogger().log(
+                        Level.SEVERE,
+                        String.format("Cannot get the profile of player %s", context.getOwner()),
+                        e
+                );
             }
         }
     }

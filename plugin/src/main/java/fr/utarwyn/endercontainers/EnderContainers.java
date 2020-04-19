@@ -59,11 +59,11 @@ public class EnderContainers extends JavaPlugin {
 
         // Load config files
         if (!Files.initConfiguration(this)) {
-            this.getLogger().log(Level.SEVERE, "Cannot load the plugin's configuration. Please check the above log. Plugin loading failed.");
+            this.getLogger().log(Level.SEVERE, "Cannot load the plugin\\'s configuration. Please check the above log. Plugin loading failed.");
             return;
         }
         if (!Files.initLocale(this)) {
-            this.getLogger().log(Level.SEVERE, "Cannot load the plugin's locale. Please check the above log. Plugin loading failed.");
+            this.getLogger().log(Level.SEVERE, "Cannot load the plugin\\'s locale. Please check the above log. Plugin loading failed.");
             return;
         }
 

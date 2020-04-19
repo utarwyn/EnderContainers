@@ -55,7 +55,9 @@ public class CommandManager extends AbstractManager {
                 }
             }
         } catch (ReflectiveOperationException e) {
-            this.logger.log(Level.SEVERE, "Cannot unregister the command " + command.getName() + " from the server!", e);
+            this.logger.log(Level.SEVERE, String.format(
+                    "Cannot unregister the command %s from the server!", command.getName()
+            ), e);
         }
     }
 

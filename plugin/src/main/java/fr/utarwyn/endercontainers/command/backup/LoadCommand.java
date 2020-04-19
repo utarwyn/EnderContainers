@@ -2,7 +2,6 @@ package fr.utarwyn.endercontainers.command.backup;
 
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.command.Parameter;
-import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.command.CommandSender;

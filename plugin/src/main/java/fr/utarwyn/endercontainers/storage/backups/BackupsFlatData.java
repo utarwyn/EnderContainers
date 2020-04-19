@@ -160,7 +160,8 @@ public class BackupsFlatData extends BackupsData {
 
             return true;
         } catch (IOException e) {
-            this.logger.log(Level.SEVERE, "Cannot delete the folder: " + folder, e);
+            this.logger.log(Level.SEVERE,
+                    String.format("Cannot delete the folder: %s", folder), e);
         }
 
         return false;
@@ -180,10 +181,16 @@ public class BackupsFlatData extends BackupsData {
         for (File fileFrom : filesFrom) {
             if (fileFrom.getName().contains(".")) {
                 File fileTo = new File(to, fileFrom.getName());
+
                 try {
-                    Files.copy(fileFrom.toPath(), fileTo.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(
+                            fileFrom.toPath(), fileTo.toPath(),
+                            StandardCopyOption.REPLACE_EXISTING
+                    );
                 } catch (IOException e) {
-                    this.logger.log(Level.SEVERE, String.format("Cannot copy file %s to %s", fileFrom.toPath(), fileTo.toPath()), e);
+                    this.logger.log(Level.SEVERE, String.format(
+                            "Cannot copy file %s to %s", fileFrom.toPath(), fileTo.toPath()
+                    ), e);
                     return false;
                 }
             }

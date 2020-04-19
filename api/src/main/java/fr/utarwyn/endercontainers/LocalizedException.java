@@ -15,12 +15,12 @@ public class LocalizedException extends Exception {
     /**
      * Locale key
      */
-    private LocaleKey key;
+    private final LocaleKey key;
 
     /**
      * Parameters to replace in the message
      */
-    private Map<String, String> parameters;
+    private final Map<String, String> parameters;
 
     /**
      * Construct the exception with a key.

@@ -86,7 +86,8 @@ public class Managers {
 
                 return instance;
             } catch (ReflectiveOperationException e) {
-                plugin.getLogger().log(Level.SEVERE, "Cannot register the manager " + clazz.getName(), e);
+                plugin.getLogger().log(Level.SEVERE,
+                        String.format("Cannot register the manager %s", clazz.getName()), e);
             }
         }
 

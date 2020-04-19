@@ -54,7 +54,9 @@ public class PlayerSQLData extends PlayerData {
         try {
             this.enderchestSets = this.databaseManager.getEnderchestsOf(this.uuid);
         } catch (SQLException e) {
-            this.logger.log(Level.SEVERE, "Cannot retrieve enderchests of user " + this.uuid + " from the database", e);
+            this.logger.log(Level.SEVERE, String.format(
+                    "Cannot retrieve enderchests of user %s from the database", this.uuid
+            ), e);
         }
     }
 
@@ -110,8 +112,9 @@ public class PlayerSQLData extends PlayerData {
                     enderChest.getRows(), contents
             );
         } catch (SQLException e) {
-            this.logger.log(Level.SEVERE, "Cannot save the enderchest for user " +
-                    enderChest.getOwner() + " in the database", e);
+            this.logger.log(Level.SEVERE, String.format(
+                    "Cannot save the enderchest for user %s in the database", enderChest.getOwner()
+            ), e);
             return;
         }
 

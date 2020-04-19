@@ -34,7 +34,7 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
     /**
      * List all parameters of this command
      */
-    private List<Parameter> parameters;
+    private List<Parameter<?>> parameters;
 
     /**
      * List all sub-commands of this command
@@ -215,7 +215,7 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
         // Not implemented by default
     }
 
-    protected void addParameter(Parameter parameter) {
+    protected void addParameter(Parameter<?> parameter) {
         this.parameters.add(parameter);
     }
 
@@ -270,10 +270,11 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
      * @param <T> type of argument to read
      * @return converted read value
      */
+    @SuppressWarnings("unchecked")
     private <T> T readArgument(int idx) {
         this.nextArg = idx + 1;
 
-        Parameter<T> parameter = this.parameters.get(idx);
+        Parameter<T> parameter = (Parameter<T>) this.parameters.get(idx);
         return parameter.convertValue(this.args.get(idx));
     }
 
