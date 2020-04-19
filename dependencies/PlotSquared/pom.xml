@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>fr.utarwyn</groupId>
+        <artifactId>endercontainers</artifactId>
+        <version>2.2.0</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>endercontainers-dependency-plotsquared</artifactId>
+    <name>EnderContainers Dependency PlotSquared</name>
+
+    <properties>
+        <plotsquared.version>4.453</plotsquared.version>
+        <worldedit.version>7.2.0-SNAPSHOT</worldedit.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>plotsquared-repo</id>
+            <url>https://ci.athion.net/job/PlotSquared-Releases/ws/mvn/</url>
+        </repository>
+        <repository>
+            <id>worldedit-repo</id>
+            <url>https://maven.sk89q.com/repo/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>endercontainers-api</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>${bukkit-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.intellectualsites.plotsquared</groupId>
+            <artifactId>PlotSquared-API</artifactId>
+            <version>${plotsquared.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-core</artifactId>
+            <version>${worldedit.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+</project>
