@@ -10,14 +10,14 @@ Works with Bukkit/Spigot 1.8 to 1.15!
     <a href="https://travis-ci.com/utarwyn/EnderContainers">
         <img src="https://img.shields.io/travis/com/utarwyn/EnderContainers.svg" alt="Travis">
     </a>
-    <a href="https://sonarcloud.io/dashboard?id=fr.utarwyn%3AEnderContainers">
-        <img src="https://sonarcloud.io/api/project_badges/measure?project=fr.utarwyn%3AEnderContainers&metric=alert_status" alt="SonarQube Quality gate">
+    <a href="https://sonarcloud.io/dashboard?id=fr.utarwyn%3Aendercontainers">
+        <img src="https://sonarcloud.io/api/project_badges/measure?project=fr.utarwyn%3Aendercontainers&metric=alert_status" alt="SonarQube Quality gate">
     </a>
-    <a href="https://sonarcloud.io/component_measures?id=fr.utarwyn%3AEnderContainers&metric=Maintainability">
-        <img src="https://sonarcloud.io/api/project_badges/measure?project=fr.utarwyn%3AEnderContainers&metric=sqale_rating" alt="SonarQube maintainability">
+    <a href="https://sonarcloud.io/component_measures?id=fr.utarwyn%3Aendercontainers&metric=Maintainability">
+        <img src="https://sonarcloud.io/api/project_badges/measure?project=fr.utarwyn%3Aendercontainers&metric=sqale_rating" alt="SonarQube maintainability">
     </a>
-    <a href="https://sonarcloud.io/project/activity?custom_metrics=tests&graph=custom&id=fr.utarwyn%3AEnderContainers">
-        <img src="https://sonarcloud.io/api/project_badges/measure?project=fr.utarwyn%3AEnderContainers&metric=coverage" alt="SonarQube coverage">
+    <a href="https://sonarcloud.io/project/activity?custom_metrics=tests&graph=custom&id=fr.utarwyn%3Aendercontainers">
+        <img src="https://sonarcloud.io/api/project_badges/measure?project=fr.utarwyn%3Aendercontainers&metric=coverage" alt="SonarQube coverage">
     </a>
     <br>
     <a href="https://www.spigotmc.org/resources/4750/">
