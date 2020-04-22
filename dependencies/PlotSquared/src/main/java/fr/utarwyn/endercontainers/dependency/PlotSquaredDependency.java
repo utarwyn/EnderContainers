@@ -1,31 +1,26 @@
 package fr.utarwyn.endercontainers.dependency;
 
-import com.github.intellectualsites.plotsquared.plot.flag.Flags;
-import com.github.intellectualsites.plotsquared.plot.object.Location;
-import com.github.intellectualsites.plotsquared.plot.object.Plot;
-import com.sk89q.worldedit.world.block.BlockType;
+import com.plotsquared.core.location.Location;
+import com.plotsquared.core.plot.Plot;
+import com.plotsquared.core.plot.flag.implementations.UseFlag;
+import com.plotsquared.core.plot.flag.types.BlockTypeWrapper;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Dependency used to interact with the PlotSquared plugin.
- * Works only with PlotSquared 4.390+ and Bukkit 1.13+.
+ * Works only with PlotSquared 5+ and Bukkit 1.13+.
  *
  * @author Utarwyn
  * @since 1.0.6
  */
 public class PlotSquaredDependency implements Dependency {
-
-    /**
-     * Material name of the enderchest block.
-     */
-    private static final String ENDERCHEST_MATERIAL_NAME = "minecraft:enderchest_chest";
 
     /**
      * {@inheritDoc}
@@ -64,11 +59,10 @@ public class PlotSquaredDependency implements Dependency {
      * @return The PlotSquared formatted Location
      */
     private Location getP2Location(org.bukkit.Location location) {
-        if (location.getWorld() != null) {
-            return new Location(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        } else {
-            return null;
-        }
+        return location.getWorld() != null ? new Location(
+                location.getWorld().getName(),
+                location.getBlockX(), location.getBlockY(), location.getBlockZ()
+        ) : null;
     }
 
     /**
@@ -79,9 +73,9 @@ public class PlotSquaredDependency implements Dependency {
      * @return true if the player can interact this plot
      */
     private boolean canPlayerUseEnderchest(Plot plot, Player player) {
-        Optional<Set<BlockType>> flag = plot.getFlag(Flags.USE);
-        boolean hasProtection = flag.isPresent() && flag.get().stream()
-                .anyMatch(type -> type.getId().equals(ENDERCHEST_MATERIAL_NAME));
+        List<BlockTypeWrapper> blocks = plot.getFlag(UseFlag.class);
+        boolean hasProtection = blocks.stream()
+                .anyMatch(type -> type.getBlockType() == BlockTypes.ENDER_CHEST);
 
         return !hasProtection || plot.isAdded(player.getUniqueId());
     }

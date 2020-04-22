@@ -20,7 +20,7 @@
 
     <repositories>
         <repository>
-            <id>factions-repo</id>
+            <id>enderzone</id>
             <url>https://ci.ender.zone/plugin/repository/everything/</url>
         </repository>
     </repositories>
@@ -31,21 +31,17 @@
             <artifactId>endercontainers-api</artifactId>
             <version>2.2.0</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>${bukkit-api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>com.massivecraft</groupId>
             <artifactId>Factions</artifactId>
             <version>${factions.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
     </dependencies>
-
 </project>

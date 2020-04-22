@@ -11,14 +11,4 @@
 
     <artifactId>endercontainers-api</artifactId>
     <name>EnderContainers API</name>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>${bukkit-api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-
 </project>

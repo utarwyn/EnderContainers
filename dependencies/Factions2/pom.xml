@@ -20,8 +20,8 @@
 
     <repositories>
         <repository>
-            <id>utarwyn-temp-repo</id>
-            <url>http://213.32.65.249:6006/repository/</url>
+            <id>utarwyn</id>
+            <url>http://213.32.65.249:6006/</url>
         </repository>
     </repositories>
 
@@ -31,28 +31,17 @@
             <artifactId>endercontainers-api</artifactId>
             <version>2.2.0</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>${bukkit-api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>com.massivecraft</groupId>
             <artifactId>MassiveCore</artifactId>
             <version>${factions.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>com.massivecraft</groupId>
             <artifactId>Factions</artifactId>
             <version>${factions.version}</version>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
-
 </project>

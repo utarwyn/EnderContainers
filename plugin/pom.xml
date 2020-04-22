@@ -23,7 +23,7 @@
 
     <repositories>
         <repository>
-            <id>bstats-repo</id>
+            <id>bstats</id>
             <url>https://repo.codemc.org/repository/maven-public</url>
         </repository>
     </repositories>
@@ -63,13 +63,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-dependency-worldguard7</artifactId>
             <version>2.2.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>${bukkit-api.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>

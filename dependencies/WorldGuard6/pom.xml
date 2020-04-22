@@ -20,8 +20,8 @@
 
     <repositories>
         <repository>
-            <id>worldedit-repo</id>
-            <url>https://maven.sk89q.com/repo/</url>
+            <id>enginehub</id>
+            <url>https://maven.enginehub.org/repo/</url>
         </repository>
     </repositories>
 
@@ -39,15 +39,10 @@
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>com.sk89q.spigot</groupId>
-                    <artifactId>bukkit-classloader-check</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sk89q</groupId>
-                    <artifactId>commandbook</artifactId>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
     </dependencies>
-
 </project>
