@@ -2,29 +2,33 @@ name: Java Integration
 
 on:
   push:
-    branches: [ master ]
-    paths:
-      - 'src/**'
-      - 'pom.xml'
+    branches:
+      - master
   pull_request:
-    branches: [ master ]
-    paths:
-      - 'src/**'
-      - 'pom.xml'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2.0.0
-      - name: Setup Java JDK 1.8
-        uses: actions/setup-java@v1.3.0
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - name: Build with Maven
-        run: mvn package --file pom.xml
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v1.1
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Build and analyze with SonarCloud
+        run: >
+          mvn --batch-mode
+          -Pcoverage
+          clean verify
+          sonar:sonar
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.organization=utarwyn-github
+          -Dsonar.projectKey=fr.utarwyn:endercontainers
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
