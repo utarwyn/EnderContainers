@@ -148,7 +148,9 @@ public abstract class YamlFile {
         FileConfiguration configuration = YamlConfiguration.loadConfiguration(this.file);
 
         if (defConfigStream != null) {
-            configuration.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, StandardCharsets.UTF_8)));
+            configuration.setDefaults(YamlConfiguration.loadConfiguration(
+                    new InputStreamReader(defConfigStream, StandardCharsets.UTF_8)
+            ));
         }
 
         return configuration;

@@ -5,6 +5,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 /**
  * Manages a flat file stored on the disk.
@@ -63,13 +64,11 @@ public class FlatFile {
 
         // Create the flat configuration file if doesn't exists.
         if (!this.file.exists()) {
-            if (!this.file.getParentFile().exists() && !this.file.getParentFile().mkdirs()) {
-                throw new IOException("cannot create the folder for file " + this.file);
+            if (this.file.getParentFile() != null) {
+                Files.createDirectories(this.file.getParentFile().toPath());
             }
 
-            if (!this.file.createNewFile()) {
-                throw new IOException("cannot create the file " + this.file);
-            }
+            Files.createFile(this.file.toPath());
         }
 
         this.configuration = YamlConfiguration.loadConfiguration(this.file);

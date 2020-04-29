@@ -5,6 +5,7 @@ import fr.utarwyn.endercontainers.storage.FlatFile;
 import fr.utarwyn.endercontainers.util.ItemSerializer;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,7 +49,7 @@ public class PlayerFlatData extends PlayerData {
     public void load() {
         try {
             String minimalUuid = this.uuid.toString().replace("-", "");
-            this.flatFile = new FlatFile("data/" + minimalUuid + ".yml");
+            this.flatFile = new FlatFile("data" + File.separator + minimalUuid + ".yml");
         } catch (IOException e) {
             this.logger.log(Level.SEVERE, String.format(
                     "Cannot load the data file of the user %s", this.uuid

@@ -17,7 +17,7 @@ public enum LocaleKey {
     CMD_BACKUP_REMOVED("commands.backups.removed"),
     CMD_BACKUP_UNKNOWN("commands.backups.unknown"),
     CMD_BACKUP_ZERO("commands.backups.zero"),
-    CMD_BACKUP_LABEL_NAME("commands.backuos.label_name"),
+    CMD_BACKUP_LABEL_NAME("commands.backups.label_name"),
     CMD_BACKUP_LABEL_DATE("commands.backups.label_date"),
     CMD_BACKUP_LABEL_BY("commands.backups.label_by"),
     CMD_BACKUP_LABEL_LOADCMD("commands.backups.label_loadcmd"),
