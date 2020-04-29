@@ -26,17 +26,17 @@ class Hologram {
     /**
      * The title of the hologram (its content)
      */
-    private String title;
+    private final String title;
 
     /**
      * The location where the hologram have to spawn
      */
-    private Location location;
+    private final Location location;
 
     /**
      * The player who has to receive the hologram
      */
-    private Player observer;
+    private final Player observer;
 
     /**
      * Identifier of the spawned entity for the observer

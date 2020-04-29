@@ -13,32 +13,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 /**
- * Dependency used to interact with the WorldGuard V7+ plugin.
+ * Interacts with the WorldGuard V7+ plugin.
+ * Prevent to open chests in zones protected with the flag USE.
  *
  * @author Utarwyn
  * @since 2.2.0
  */
-public class WorldGuard7Dependency implements Dependency {
+public class WorldGuard7Dependency extends Dependency {
 
     /**
-     * WorldGuard plugin
+     * Construct the WorldGuard7 dependency object.
+     *
+     * @param plugin plugin instance
      */
-    private WorldGuardPlugin worldGuardPlugin;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onEnable(Plugin plugin) {
-        this.worldGuardPlugin = (WorldGuardPlugin) plugin;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onDisable() {
-        this.worldGuardPlugin = null;
+    public WorldGuard7Dependency(Plugin plugin) {
+        super(plugin);
     }
 
     /**
@@ -50,8 +39,9 @@ public class WorldGuard7Dependency implements Dependency {
         // OP? Ok, you can do whatever you want...
         if (player.isOp()) return;
 
-        // Retrieve the WorldGuard Player instance, create a region query and adapt the block location.
-        LocalPlayer localPlayer = this.worldGuardPlugin.wrapPlayer(player);
+        // Retrieve a WorldGuard player object, create a region query and adapt the block location.
+        WorldGuardPlugin wgPlugin = (WorldGuardPlugin) this.plugin;
+        LocalPlayer localPlayer = wgPlugin.wrapPlayer(player);
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
         Location location = BukkitAdapter.adapt(block.getLocation());
 

@@ -31,12 +31,12 @@ public class EnderChest {
     /**
      * The number of the enderchest
      */
-    private int num;
+    private final int num;
 
     /**
      * The number of rows of the chest's menu
      */
-    private int rows;
+    private final int rows;
 
     /**
      * Construct a new enderchest.

@@ -18,22 +18,22 @@ public class LoadTask implements Runnable {
     /**
      * The EnderContainers plugin
      */
-    private EnderContainers plugin;
+    private final EnderContainers plugin;
 
     /**
      * The Enderchest manager
      */
-    private EnderChestManager manager;
+    private final EnderChestManager manager;
 
     /**
      * Owner for who we have to create a context
      */
-    private UUID owner;
+    private final UUID owner;
 
     /**
      * Object to consum when this task is finished
      */
-    private Consumer<PlayerContext> consumer;
+    private final Consumer<PlayerContext> consumer;
 
     /**
      * Construct a new loading task.

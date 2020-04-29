@@ -18,18 +18,20 @@ import java.util.Collections;
  * @author Utarwyn <maxime.malgorn@laposte.net>
  * @since 2.2.0
  */
-public class Factions2Dependency implements Dependency {
+public class Factions2Dependency extends Dependency {
 
-    @Override
-    public void onEnable(Plugin plugin) {
-        // Not implemented
+    /**
+     * Construct the Factions2 dependency object.
+     *
+     * @param plugin plugin instance
+     */
+    public Factions2Dependency(Plugin plugin) {
+        super(plugin);
     }
 
-    @Override
-    public void onDisable() {
-        // Not implemented
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validateBlockChestOpening(Block block, Player player)
             throws BlockChestOpeningException {

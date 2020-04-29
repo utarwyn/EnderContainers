@@ -34,12 +34,12 @@ public class EnderChestListener implements Listener {
     /**
      * The enderchest manager
      */
-    private EnderChestManager manager;
+    private final EnderChestManager manager;
 
     /**
      * The dependencies manager
      */
-    private DependenciesManager dependenciesManager;
+    private final DependenciesManager dependenciesManager;
 
     /**
      * Construct the listener

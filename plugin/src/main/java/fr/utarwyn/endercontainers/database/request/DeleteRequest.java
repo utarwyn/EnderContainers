@@ -6,18 +6,18 @@ import org.apache.commons.lang.StringUtils;
 import java.sql.SQLException;
 
 /**
- * A delete request
+ * Builds a delete request to perform in the database.
  *
  * @author Utarwyn <maxime.malgorn@laposte.net>
  * @since 2.2.0
  */
 public class DeleteRequest implements Request {
 
-    private Database database;
+    private final Database database;
+
+    private final String[] conditions;
 
     private String table;
-
-    private String[] conditions;
 
     private Object[] attributes;
 

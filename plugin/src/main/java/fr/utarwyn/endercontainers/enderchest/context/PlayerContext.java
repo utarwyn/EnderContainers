@@ -12,10 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -28,19 +25,19 @@ import java.util.stream.IntStream;
 public class PlayerContext {
 
     /**
-     * List of all chests loaded in the context
-     */
-    private List<EnderChest> chests;
-
-    /**
      * Owner of this memory context
      */
-    private UUID owner;
+    private final UUID owner;
 
     /**
      * Storage object which manages data of the player
      */
-    private PlayerData data;
+    private final PlayerData data;
+
+    /**
+     * List of all chests loaded in the context
+     */
+    private Set<EnderChest> chests;
 
     /**
      * Construct a new player context.
@@ -49,7 +46,7 @@ public class PlayerContext {
      */
     PlayerContext(UUID owner) {
         this.owner = owner;
-        this.chests = new ArrayList<>();
+        this.chests = Collections.synchronizedSet(new HashSet<>());
         this.data = Managers.get(StorageManager.class).createPlayerDataStorage(this.owner);
     }
 
@@ -89,7 +86,9 @@ public class PlayerContext {
      * @return chest found
      */
     public Optional<EnderChest> getChest(int num) {
-        return this.chests.stream().filter(ch -> ch.getNum() == num).findFirst();
+        return this.chests.stream()
+                .filter(ch -> ch.getNum() == num)
+                .findFirst();
     }
 
     /**
@@ -98,7 +97,9 @@ public class PlayerContext {
      * @return The number of accessible enderchests loaded in the context
      */
     public int getAccessibleChestCount() {
-        return (int) this.chests.stream().filter(EnderChest::isAccessible).count();
+        return (int) this.chests.stream()
+                .filter(EnderChest::isAccessible)
+                .count();
     }
 
     /**
@@ -118,7 +119,7 @@ public class PlayerContext {
     public void loadEnderchests(int count) {
         this.chests = IntStream.rangeClosed(0, count - 1)
                 .mapToObj(this::createEnderchest)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     /**

@@ -9,8 +9,8 @@ import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.hologram.HologramManager;
 import fr.utarwyn.endercontainers.menu.MenuManager;
 import fr.utarwyn.endercontainers.storage.StorageManager;
+import fr.utarwyn.endercontainers.util.MetricsHandler;
 import fr.utarwyn.endercontainers.util.Updater;
-import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
@@ -29,12 +29,6 @@ public class EnderContainers extends JavaPlugin {
      * The plugin prefix
      */
     public static final String PREFIX = "§8[§6EnderContainers§8] §7";
-
-    /*
-     * The plugin's identifier on the "bStats" service
-     * @see https://bstats.org/plugin/bukkit/EnderContainers
-     */
-    private static final int BSTATS_PLUGIN_ID = 1855;
 
     /**
      * The Endercontainers instance
@@ -81,8 +75,8 @@ public class EnderContainers extends JavaPlugin {
         // Registering commands
         Objects.requireNonNull(Managers.get(CommandManager.class)).registerCommands();
 
-        // And load Metrics!
-        new Metrics(this, BSTATS_PLUGIN_ID);
+        // Initialize the metrics handler
+        new MetricsHandler(this);
     }
 
     /**

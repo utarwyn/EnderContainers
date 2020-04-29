@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,7 +21,7 @@ public class DatabaseSet {
      * Object which stores all data collected for a row
      * (String key -> Object value)
      */
-    private ConcurrentHashMap<String, Object> set;
+    private final Map<String, Object> set;
 
     /**
      * Construct a new database row object

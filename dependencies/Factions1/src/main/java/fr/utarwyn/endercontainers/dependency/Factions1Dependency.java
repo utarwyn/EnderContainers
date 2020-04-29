@@ -18,18 +18,20 @@ import java.util.Collections;
  * @author Utarwyn <maxime.malgorn@laposte.net>
  * @since 2.2.0
  */
-public class Factions1Dependency implements Dependency {
+public class Factions1Dependency extends Dependency {
 
-    @Override
-    public void onEnable(Plugin plugin) {
-        // Not implemented
+    /**
+     * Construct the Factions1 dependency object.
+     *
+     * @param plugin plugin instance
+     */
+    public Factions1Dependency(Plugin plugin) {
+        super(plugin);
     }
 
-    @Override
-    public void onDisable() {
-        // Not implemented
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validateBlockChestOpening(Block block, Player player)
             throws BlockChestOpeningException {
@@ -62,8 +64,18 @@ public class Factions1Dependency implements Dependency {
         }
     }
 
+    /**
+     * Checks if a faction is real or fictive.
+     * Handles Warzone, Safezone and Wilderness.
+     *
+     * @param faction faction to check
+     * @return true if the faction is real
+     */
     private boolean isRealFaction(Faction faction) {
-        return faction != null && !faction.isWilderness() && !faction.isWarZone() && !faction.isSafeZone();
+        return faction != null
+                && !faction.isWilderness()
+                && !faction.isWarZone()
+                && !faction.isSafeZone();
     }
 
 }

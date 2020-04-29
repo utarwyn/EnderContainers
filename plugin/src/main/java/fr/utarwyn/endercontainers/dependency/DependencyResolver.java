@@ -1,6 +1,5 @@
-package fr.utarwyn.endercontainers.dependency.resolver;
+package fr.utarwyn.endercontainers.dependency;
 
-import fr.utarwyn.endercontainers.dependency.Dependency;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
@@ -20,17 +19,17 @@ public class DependencyResolver {
     /**
      * Bukkit plugin manager
      */
-    private PluginManager pluginManager;
+    private final PluginManager pluginManager;
+
+    /**
+     * Patterns to match dependency's versions
+     */
+    private final Map<Pattern, Class<? extends Dependency>> patterns;
 
     /**
      * Name of the dependency instance to build
      */
     private String name;
-
-    /**
-     * Patterns to match dependency's versions
-     */
-    private Map<Pattern, Class<? extends Dependency>> patterns;
 
     /**
      * Construct a new dependency resolver.
@@ -80,9 +79,9 @@ public class DependencyResolver {
      * Resolve the dependency if the concerned plugin is loaded and a matcher
      * has targeted the plugin's version from the plugin manager.
      *
-     * @return resolved dependency instance with info if present
+     * @return resolved dependency instance if present
      */
-    public Optional<DependencyInfo> resolve() {
+    public Optional<Dependency> resolve() {
         if (this.name == null) {
             throw new NullPointerException("Dependency name cannot be null!");
         }
@@ -91,11 +90,7 @@ public class DependencyResolver {
         }
 
         if (this.pluginManager.isPluginEnabled(this.name)) {
-            Plugin plugin = this.pluginManager.getPlugin(this.name);
-            String pluginVersion = plugin != null ? plugin.getDescription().getVersion() : null;
-
-            return this.constructInstance(pluginVersion)
-                    .map(dependency -> new DependencyInfo(dependency, plugin, pluginVersion));
+            return this.constructInstance(this.pluginManager.getPlugin(this.name));
         }
 
         return Optional.empty();
@@ -104,17 +99,19 @@ public class DependencyResolver {
     /**
      * Construct a dependency instance from patterns and version of the loaded plugin.
      *
-     * @param pluginVersion version of the loaded plugin
+     * @param plugin loaded Bukkit plugin instance
      * @return dependency instance if present
      */
-    private Optional<Dependency> constructInstance(String pluginVersion) {
+    private Optional<Dependency> constructInstance(Plugin plugin) {
+        String pluginVersion = plugin.getDescription().getVersion();
+
         return this.patterns.entrySet().stream()
                 .filter(entry -> entry.getKey().matcher(pluginVersion).find())
                 .map(Map.Entry::getValue)
                 .findFirst()
                 .map(clazz -> {
                     try {
-                        return clazz.getDeclaredConstructor().newInstance();
+                        return clazz.getDeclaredConstructor(Plugin.class).newInstance(plugin);
                     } catch (ReflectiveOperationException e) {
                         return null;
                     }

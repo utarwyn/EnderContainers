@@ -24,27 +24,27 @@ public class Database implements AutoCloseable {
     /**
      * Host of the MySQL server
      */
-    private String host;
+    private final String host;
 
     /**
      * Port of the MySQL server
      */
-    private int port;
+    private final int port;
 
     /**
      * User used to connect to the MySQL server
      */
-    private String user;
+    private final String user;
 
     /**
      * Password used to connect to the MySQL server
      */
-    private String password;
+    private final String password;
 
     /**
      * Name of the database used to store data
      */
-    private String name;
+    private final String name;
 
     /**
      * Source object used to perform requests to the database

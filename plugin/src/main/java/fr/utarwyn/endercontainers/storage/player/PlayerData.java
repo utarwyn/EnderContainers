@@ -4,7 +4,7 @@ import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
@@ -38,7 +38,7 @@ public abstract class PlayerData extends StorageWrapper {
      *
      * @param chests chests to save
      */
-    public void saveContext(List<EnderChest> chests) {
+    public void saveContext(Set<EnderChest> chests) {
         chests.forEach(this::saveEnderchest);
         this.save();
     }

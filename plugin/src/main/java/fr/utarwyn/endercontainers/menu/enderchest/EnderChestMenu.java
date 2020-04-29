@@ -24,7 +24,7 @@ public class EnderChestMenu extends AbstractMenu {
     /**
      * Enderchest who generated this menu
      */
-    private EnderChest chest;
+    private final EnderChest chest;
 
     /**
      * Construct a menu whiches contain contents of an enderchest.

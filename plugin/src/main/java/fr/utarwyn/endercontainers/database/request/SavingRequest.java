@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A saving request.
+ * Builds a saving request to perform in the database.
  * Can execute an INSERT or an UPDATE request on the database.
  *
  * @author Utarwyn <maxime.malgorn@laposte.net>
@@ -22,17 +22,22 @@ public class SavingRequest implements Request {
     /**
      * Used database
      */
-    private Database database;
+    private final Database database;
+
+    /**
+     * Table to update
+     */
+    private final String table;
+
+    /**
+     * List of securized SQL attributes
+     */
+    private final List<Object> attributes;
 
     /**
      * Columns to update with the request
      */
     private String[] fields;
-
-    /**
-     * Table to update
-     */
-    private String table;
 
     /**
      * Conditions of the request. Could be empty when inserting values.
@@ -43,11 +48,6 @@ public class SavingRequest implements Request {
      * Values to insert in the database
      */
     private Object[] values;
-
-    /**
-     * List of securized SQL attributes
-     */
-    private List<Object> attributes;
 
     /**
      * Could be set to true to perform a REPLACE request.

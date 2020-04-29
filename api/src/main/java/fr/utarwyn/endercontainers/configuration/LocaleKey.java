@@ -45,12 +45,25 @@ public enum LocaleKey {
 
     MISC_CHEST_NAMETAG("miscellaneous.chest_nametag");
 
-    private String key;
+    /**
+     * Key of the message in the Yaml file
+     */
+    private final String key;
 
+    /**
+     * Construct a new locale key.
+     *
+     * @param key key of the message in the Yaml file
+     */
     LocaleKey(String key) {
         this.key = key;
     }
 
+    /**
+     * Retrieve the key to search the message in the Yaml file.
+     *
+     * @return Yaml key of the message
+     */
     public String getKey() {
         return this.key;
     }

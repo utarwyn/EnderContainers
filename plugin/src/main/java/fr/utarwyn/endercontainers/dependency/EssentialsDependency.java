@@ -12,27 +12,32 @@ import java.util.List;
 
 /**
  * Essentials dependency.
+ * Removes /enderchest command if found.
  *
  * @author Utarwyn <maxime.malgorn@laposte.net>
  * @since 2.2.0
  */
-public class EssentialsDependency implements Dependency {
+public class EssentialsDependency extends Dependency {
+
+    /**
+     * Construct the Essentials dependency object.
+     *
+     * @param plugin plugin instance
+     */
+    public EssentialsDependency(Plugin plugin) {
+        super(plugin);
+    }
 
     @Override
-    public void onEnable(Plugin plugin) {
+    public void onEnable() {
         // Remove the essentials /enderchest command from the server!
-        List<String> overriddenCmds = plugin.getConfig().getStringList("overridden-commands");
+        List<String> overriddenCmds = this.plugin.getConfig().getStringList("overridden-commands");
         PluginCommand pluginCommand = Bukkit.getPluginCommand("essentials:enderchest");
 
         // Server administrators can keep up the Essentials command by adding it to the list of overridden commands.
         if (pluginCommand != null && !overriddenCmds.contains("enderchest")) {
             Managers.get(CommandManager.class).unregister(pluginCommand);
         }
-    }
-
-    @Override
-    public void onDisable() {
-        // Not implemented
     }
 
     @Override

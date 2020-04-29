@@ -2,14 +2,12 @@ package fr.utarwyn.endercontainers.dependency;
 
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
-import fr.utarwyn.endercontainers.dependency.resolver.DependencyInfo;
-import fr.utarwyn.endercontainers.dependency.resolver.DependencyResolver;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -28,16 +26,18 @@ public class DependenciesManager extends AbstractManager implements DependencyVa
     /**
      * A list of all loaded dependencies
      */
-    private List<Dependency> dependencies;
+    private Set<Dependency> dependencies;
 
     /**
      * {@inheritDoc}
      */
     @Override
     public synchronized void load() {
-        this.dependencies = new ArrayList<>();
+        this.dependencies = new HashSet<>();
         this.pluginManager = this.plugin.getServer().getPluginManager();
-        this.loadDependenciesWithLog();
+
+        this.loadDependencies();
+        this.logDependencies();
     }
 
     /**
@@ -47,6 +47,15 @@ public class DependenciesManager extends AbstractManager implements DependencyVa
     public synchronized void unload() {
         this.dependencies.forEach(Dependency::onDisable);
         this.dependencies.clear();
+    }
+
+    /**
+     * Retrieve all loaded dependencies.
+     *
+     * @return list of all dependencies
+     */
+    public Set<Dependency> getDependencies() {
+        return this.dependencies;
     }
 
     /**
@@ -92,16 +101,20 @@ public class DependenciesManager extends AbstractManager implements DependencyVa
     }
 
     /**
-     * Load each dependency if the needed plugin is enabled and logs it.
+     * Logs all dependencies in the console.
      */
-    private void loadDependenciesWithLog() {
+    private void logDependencies() {
         this.logger.info("-----------[Dependencies]-----------");
 
-        this.loadDependencies();
+        this.dependencies.stream().map(Dependency::getPlugin).forEach(plugin ->
+                this.logger.log(Level.INFO, "  Use {0} (v{1}) as a dependency!",
+                        new Object[]{plugin.getName(), plugin.getDescription().getVersion()})
+        );
 
         int size = this.dependencies.size();
         if (size > 0) {
-            this.logger.log(Level.INFO, "  {0} dependenc{1} loaded!", new Object[]{size, (size > 1 ? "ies" : "y")});
+            String plural = size > 1 ? "ies" : "y";
+            this.logger.log(Level.INFO, "  {0} dependenc{1} loaded!", new Object[]{size, plural});
         } else {
             this.logger.info("  No dependency found.");
         }
@@ -112,14 +125,11 @@ public class DependenciesManager extends AbstractManager implements DependencyVa
     /**
      * Load and enable a dependency from its resolved info.
      *
-     * @param info resolved dependency info
+     * @param dependency resolved dependency
      */
-    private void enableDependency(DependencyInfo info) {
-        this.logger.log(Level.INFO, "  Use {0} (v{1}) as a dependency!",
-                new Object[]{info.getPlugin().getName(), info.getPluginVersion()});
-
-        info.getDependency().onEnable(info.getPlugin());
-        this.dependencies.add(info.getDependency());
+    private void enableDependency(Dependency dependency) {
+        dependency.onEnable();
+        this.dependencies.add(dependency);
     }
 
 }

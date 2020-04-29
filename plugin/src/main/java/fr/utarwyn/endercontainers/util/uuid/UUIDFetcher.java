@@ -48,22 +48,22 @@ public class UUIDFetcher {
     /**
      * Gson library object used to parse the retrieved JSON data and convert it to object
      */
-    private static Gson gson = new GsonBuilder().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).create();
+    private static final Gson GSON = new GsonBuilder().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).create();
 
     /**
      * Cache playername -> UUID
      */
-    private static Cache<String, UUID> nameCache;
+    private static final Cache<String, UUID> nameCache;
 
     /**
      * Cache UUID -> playername
      */
-    private static Cache<UUID, String> idCache;
+    private static final Cache<UUID, String> idCache;
 
     /**
      * Pool to execute fetch tasks with an optimized queue
      */
-    private static ExecutorService pool;
+    private static final ExecutorService pool;
 
     static {
         nameCache = new Cache<>();
@@ -131,7 +131,7 @@ public class UUIDFetcher {
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(String.format(UUID_URL, name, timestamp / 1000)).openConnection();
             connection.setReadTimeout(5000);
-            UUIDFetcher data = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher.class);
+            UUIDFetcher data = GSON.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher.class);
 
             nameCache.put(name, data.id);
             idCache.put(data.id, data.name);
@@ -184,7 +184,7 @@ public class UUIDFetcher {
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(String.format(NAME_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
             connection.setReadTimeout(5000);
-            UUIDFetcher[] nameHistory = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher[].class);
+            UUIDFetcher[] nameHistory = GSON.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher[].class);
             UUIDFetcher currentNameData = nameHistory[nameHistory.length - 1];
 
             nameCache.put(currentNameData.name.toLowerCase(), uuid);

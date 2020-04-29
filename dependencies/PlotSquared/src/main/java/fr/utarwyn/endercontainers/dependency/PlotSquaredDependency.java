@@ -14,28 +14,21 @@ import org.bukkit.plugin.Plugin;
 import java.util.List;
 
 /**
- * Dependency used to interact with the PlotSquared plugin.
+ * Interacts with the PlotSquared plugin.
  * Works only with PlotSquared 5+ and Bukkit 1.13+.
  *
  * @author Utarwyn
  * @since 1.0.6
  */
-public class PlotSquaredDependency implements Dependency {
+public class PlotSquaredDependency extends Dependency {
 
     /**
-     * {@inheritDoc}
+     * Construct the PlotSquared dependency object.
+     *
+     * @param plugin plugin instance
      */
-    @Override
-    public void onEnable(Plugin plugin) {
-        // Not implemented
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onDisable() {
-        // Not implemented
+    public PlotSquaredDependency(Plugin plugin) {
+        super(plugin);
     }
 
     /**

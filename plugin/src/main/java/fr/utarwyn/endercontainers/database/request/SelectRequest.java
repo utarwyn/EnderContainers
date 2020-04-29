@@ -10,14 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A select request
+ * Builds a select request to perform in the database.
  *
  * @author Utarwyn <maxime.malgorn@laposte.net>
  * @since 2.2.0
  */
 public class SelectRequest implements Request {
 
-    private Database database;
+    private final Database database;
+
+    private final List<String[]> joins;
+
+    private final List<String[]> leftJoins;
 
     private String[] fields;
 
@@ -32,10 +36,6 @@ public class SelectRequest implements Request {
     private int[] limits;
 
     private Object[] attributes;
-
-    private List<String[]> joins;
-
-    private List<String[]> leftJoins;
 
     public SelectRequest(Database database, String... fields) {
         this.database = database;

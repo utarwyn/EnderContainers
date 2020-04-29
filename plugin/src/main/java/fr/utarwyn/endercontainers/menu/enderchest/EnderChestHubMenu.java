@@ -76,7 +76,7 @@ public class EnderChestHubMenu extends AbstractMenu {
     /**
      * The player context
      */
-    private PlayerContext context;
+    private final PlayerContext context;
 
     /**
      * Current page for the player who has opened the menu

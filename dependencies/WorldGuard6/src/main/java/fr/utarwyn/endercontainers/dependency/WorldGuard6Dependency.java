@@ -10,32 +10,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 /**
- * Dependency used to interact with the WorldGuard V6+ plugin
+ * Interacts with the WorldGuard V6+ plugin.
+ * Prevent to open chests in zones protected with the flag USE.
  *
  * @author Utarwyn
  * @since 2.1.0
  */
-public class WorldGuard6Dependency implements Dependency {
+public class WorldGuard6Dependency extends Dependency {
 
     /**
-     * WorldGuard plugin
+     * Construct the WorldGuard6 dependency object.
+     *
+     * @param plugin plugin instance
      */
-    private WorldGuardPlugin worldGuardPlugin;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onEnable(Plugin plugin) {
-        this.worldGuardPlugin = (WorldGuardPlugin) plugin;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onDisable() {
-        this.worldGuardPlugin = null;
+    public WorldGuard6Dependency(Plugin plugin) {
+        super(plugin);
     }
 
     /**
@@ -48,11 +37,13 @@ public class WorldGuard6Dependency implements Dependency {
         if (player.isOp()) return;
 
         // Retrieve the WorldGuard Player instance and create a region query.
-        LocalPlayer localPlayer = this.worldGuardPlugin.wrapPlayer(player);
-        RegionQuery query = this.worldGuardPlugin.getRegionContainer().createQuery();
+        WorldGuardPlugin wgPlugin = (WorldGuardPlugin) this.plugin;
+        LocalPlayer localPlayer = wgPlugin.wrapPlayer(player);
+        RegionQuery query = wgPlugin.getRegionContainer().createQuery();
 
         // Check for denied flags at the chest's location!
-        if (!query.testBuild(block.getLocation(), localPlayer, DefaultFlag.INTERACT, DefaultFlag.USE)) {
+        if (!query.testBuild(block.getLocation(), localPlayer,
+                DefaultFlag.INTERACT, DefaultFlag.USE)) {
             throw new BlockChestOpeningException();
         }
     }
