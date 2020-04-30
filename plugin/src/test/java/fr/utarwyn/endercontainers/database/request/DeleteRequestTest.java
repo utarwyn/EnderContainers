@@ -51,16 +51,16 @@ public class DeleteRequestTest {
     }
 
     @Test
+    public void withoutCondition() {
+        DeleteRequest request = new DeleteRequest(null).from("table");
+        assertThat(request.getRequest()).isEqualTo("DELETE FROM `table`");
+    }
+
+    @Test
     public void illegalParameters() {
-        DeleteRequest request1 = new DeleteRequest(null, "null");
-        DeleteRequest request2 = new DeleteRequest(null).from("table");
-
-        assertThatNullPointerException().isThrownBy(request1::getRequest)
+        DeleteRequest request = new DeleteRequest(null, "null");
+        assertThatNullPointerException().isThrownBy(request::getRequest)
                 .withMessage("Table seems to be null")
-                .withNoCause();
-
-        assertThatIllegalArgumentException().isThrownBy(request2::getRequest)
-                .withMessage("You must use at least one condition")
                 .withNoCause();
     }
 

@@ -157,7 +157,11 @@ public class DatabaseManager extends AbstractManager {
      * @param datasets The list of enderchests to save
      */
     public void replaceEnderchests(List<DatabaseSet> datasets) throws SQLException {
-        this.database.emptyTable(formatTable(CHEST_TABLE));
+        String chestTable = formatTable(CHEST_TABLE);
+
+        if (!this.database.delete().from(chestTable).execute()) {
+            throw new SQLException("Cannot delete old rows from the chests table");
+        }
 
         for (DatabaseSet set : datasets) {
             this.database.update(formatTable(CHEST_TABLE))

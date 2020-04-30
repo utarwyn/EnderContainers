@@ -132,21 +132,6 @@ public class Database implements AutoCloseable {
     }
 
     /**
-     * Drop all data from a specific table passed in parameter
-     *
-     * @param tableName The name of the table to empty
-     */
-    public void emptyTable(String tableName) throws SQLException {
-        try (Connection connection = this.source.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.executeUpdate("USE `" + this.name + "`");
-            statement.executeUpdate("SET SQL_SAFE_UPDATES = 0;");
-            statement.executeUpdate("truncate `" + tableName + "`");
-            statement.executeUpdate("SET SQL_SAFE_UPDATES = 1;");
-        }
-    }
-
-    /**
      * Open a connection to the databaser server.
      * (create a pool to execute all requests in an optimized way)
      */

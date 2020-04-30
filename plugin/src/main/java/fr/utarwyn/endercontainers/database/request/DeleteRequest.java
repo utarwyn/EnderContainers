@@ -13,20 +13,42 @@ import java.sql.SQLException;
  */
 public class DeleteRequest implements Request {
 
+    /**
+     * Database object
+     */
     private final Database database;
 
+    /**
+     * Conditions to apply for deleting rows
+     */
     private final String[] conditions;
 
+    /**
+     * Table where the request has to be performed
+     */
     private String table;
 
+    /**
+     * Attributs for conditions
+     */
     private Object[] attributes;
 
+    /**
+     * Construct a delete request builder.
+     *
+     * @param database   database object
+     * @param conditions conditions to apply for deleting rows
+     */
     public DeleteRequest(Database database, String... conditions) {
         this.database = database;
         this.conditions = conditions;
         this.attributes = new Object[0];
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Object[] getAttributes() {
         return this.attributes;
     }
@@ -47,17 +69,24 @@ public class DeleteRequest implements Request {
 
     @Override
     public String getRequest() {
+        StringBuilder sb = new StringBuilder();
+
         // Table does not have to be null at this point!
         if (this.table == null) {
             throw new NullPointerException("Table seems to be null");
         }
-        if (this.conditions.length == 0) {
-            throw new IllegalArgumentException("You must use at least one condition");
+
+        sb.append("DELETE FROM `");
+        sb.append(this.table);
+        sb.append("`");
+
+        // Construct conditions if exists
+        if (this.conditions.length > 0) {
+            sb.append(" WHERE ");
+            sb.append(StringUtils.join(this.conditions, " AND "));
         }
 
-        // Create the request string
-        return "DELETE FROM `" + this.table + "` WHERE " +
-                StringUtils.join(this.conditions, " AND ");
+        return sb.toString();
     }
 
 }

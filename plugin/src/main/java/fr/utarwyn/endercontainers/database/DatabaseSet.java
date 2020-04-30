@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -118,7 +119,11 @@ public class DatabaseSet {
      * @param value The value to store
      */
     public void setObject(String key, Object value) {
-        set.put(key, value);
+        Objects.requireNonNull(key, "result set key cannot be null");
+
+        if (value != null) {
+            set.put(key, value);
+        }
     }
 
     @Override
