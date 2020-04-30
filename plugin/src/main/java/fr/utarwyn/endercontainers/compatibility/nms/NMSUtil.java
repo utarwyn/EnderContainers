@@ -13,17 +13,17 @@ public abstract class NMSUtil {
     /**
      * Package where NMS classes are stored
      */
-    private static final String nmsPackage;
+    private static final String NMS_PACKAGE;
 
     /**
      * Package where Craftbukkit classes are stored
      */
-    private static final String craftbukkitPackage;
+    private static final String CRAFTBUKKIT_PACKAGE;
 
     static {
         String version = ServerVersion.getBukkitVersion();
-        nmsPackage = "net.minecraft.server." + version;
-        craftbukkitPackage = "org.bukkit.craftbukkit." + version;
+        NMS_PACKAGE = "net.minecraft.server." + version;
+        CRAFTBUKKIT_PACKAGE = "org.bukkit.craftbukkit." + version;
     }
 
     /**
@@ -40,8 +40,9 @@ public abstract class NMSUtil {
      * @return the Craftbukkit class found by the name
      * @throws ClassNotFoundException thrown if the class is not found
      */
-    protected static Class<?> getCraftbukkitClass(String className) throws ClassNotFoundException {
-        return Class.forName(craftbukkitPackage + "." + className);
+    protected static Class<?> getCraftbukkitClass(String className)
+            throws ClassNotFoundException {
+        return Class.forName(CRAFTBUKKIT_PACKAGE + "." + className);
     }
 
     /**
@@ -51,8 +52,9 @@ public abstract class NMSUtil {
      * @return the internal class found by the name
      * @throws ClassNotFoundException thrown if the class is not found
      */
-    protected static Class<?> getNMSClass(String className) throws ClassNotFoundException {
-        return Class.forName(nmsPackage + "." + className);
+    protected static Class<?> getNMSClass(String className)
+            throws ClassNotFoundException {
+        return Class.forName(NMS_PACKAGE + "." + className);
     }
 
 }
