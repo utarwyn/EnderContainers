@@ -41,9 +41,9 @@ public class InfoCommand extends AbstractBackupCommand {
         PluginMsg.pluginBar(sender);
         sender.sendMessage(" ");
         sender.sendMessage(String.format(
-                " §7   %s: §r%s §7(%s)",
+                " §7   %s: §r%s",
                 locale.getMessage(LocaleKey.CMD_BACKUP_LABEL_NAME),
-                backup.getName(), backup.getType()
+                backup.getName()
         ));
         sender.sendMessage(String.format(
                 " §7  %s: §r%s",

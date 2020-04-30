@@ -76,10 +76,9 @@ public class BackupsFlatData extends BackupsData {
             for (String key : section.getKeys(false)) {
                 String name = config.getString(PREFIX + "." + key + ".name");
                 Timestamp date = new Timestamp(config.getLong(PREFIX + "." + key + ".date"));
-                String type = config.getString(PREFIX + "." + key + ".type");
                 String createdBy = config.getString(PREFIX + "." + key + ".createdBy");
 
-                this.backups.add(new Backup(name, date, type, createdBy));
+                this.backups.add(new Backup(name, date, createdBy));
             }
         }
     }
@@ -106,7 +105,6 @@ public class BackupsFlatData extends BackupsData {
 
         config.set(PREFIX + "." + name + ".name", name);
         config.set(PREFIX + "." + name + ".date", backup.getDate().getTime());
-        config.set(PREFIX + "." + name + ".type", backup.getType());
         config.set(PREFIX + "." + name + ".createdBy", backup.getCreatedBy());
 
         this.save();

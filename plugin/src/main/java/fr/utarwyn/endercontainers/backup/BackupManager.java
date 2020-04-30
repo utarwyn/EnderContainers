@@ -74,7 +74,7 @@ public class BackupManager extends AbstractManager {
     public Optional<Backup> getBackupByName(String name) {
         return this.backups.stream()
                 .filter(backup -> backup.getName().equals(name))
-                .findAny();
+                .findFirst();
     }
 
     /**

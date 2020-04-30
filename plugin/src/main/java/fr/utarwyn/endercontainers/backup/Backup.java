@@ -11,37 +11,30 @@ import java.sql.Timestamp;
 public class Backup {
 
     /**
-     * The name of the backup
+     * Backup name
      */
-    private String name;
+    private final String name;
 
     /**
-     * The date of the backup
+     * Backup creation date
      */
-    private Timestamp date;
+    private final Timestamp date;
 
     /**
-     * The type of the backup (only "all" at the moment)
+     * Name of the entity who created the backup
      */
-    private String type;
+    private final String createdBy;
 
     /**
-     * Store the name of the player which creates the backup
-     */
-    private String createdBy;
-
-    /**
-     * Construct a new backup
+     * Construct a new backup.
      *
-     * @param name      Name of the backup
-     * @param date      Date of the backup
-     * @param type      Type of the backup
-     * @param createdBy Player who creates the backup
+     * @param name      backup name
+     * @param date      backup creation date
+     * @param createdBy name of the entity who created the backup
      */
-    public Backup(String name, Timestamp date, String type, String createdBy) {
+    public Backup(String name, Timestamp date, String createdBy) {
         this.name = name;
         this.date = date;
-        this.type = type;
         this.createdBy = createdBy;
     }
 
@@ -64,16 +57,7 @@ public class Backup {
     }
 
     /**
-     * Returns the type of the backup
-     *
-     * @return The type of the backup
-     */
-    public String getType() {
-        return this.type;
-    }
-
-    /**
-     * Returns the name of the player who created the backup
+     * Returns the name of the player who created the backup.
      *
      * @return The player who created the backup
      */

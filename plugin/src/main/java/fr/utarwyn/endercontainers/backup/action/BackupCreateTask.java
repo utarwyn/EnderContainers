@@ -20,12 +20,12 @@ public class BackupCreateTask extends BackupAbstractTask {
     /**
      * Operator of the creation
      */
-    private String operator;
+    private final String operator;
 
     /**
      * Name of the backup to create
      */
-    private String name;
+    private final String name;
 
     /**
      * Construct a new task to create a backup.
@@ -52,7 +52,7 @@ public class BackupCreateTask extends BackupAbstractTask {
 
         // Create a new backup
         Timestamp now = new Timestamp(System.currentTimeMillis());
-        Backup backup = new Backup(this.name, now, "all", this.operator);
+        Backup backup = new Backup(this.name, now, this.operator);
 
         // Reload the manager to save all contexts data
         Managers.reload(EnderChestManager.class);

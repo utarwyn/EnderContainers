@@ -19,7 +19,7 @@ public class BackupApplyTask extends BackupAbstractTask {
     /**
      * Backup to apply
      */
-    private Backup backup;
+    private final Backup backup;
 
     /**
      * Construct a new task to apply a backup.

@@ -48,13 +48,10 @@ public class BackupsSQLData extends BackupsData {
     @Override
     protected void load() {
         try {
-            this.databaseManager.getBackups()
-                    .forEach(set -> this.backups.add(
-                            new Backup(
-                                    set.getString("name"), set.getTimestamp("date"),
-                                    set.getString("type"), set.getString("created_by")
-                            )
-                    ));
+            this.databaseManager.getBackups().forEach(set -> this.backups.add(
+                    new Backup(set.getString("name"), set.getTimestamp("date"),
+                            set.getString("created_by"))
+            ));
         } catch (SQLException e) {
             this.logger.log(Level.SEVERE, "Cannot retrieve backups list from the database", e);
         }
@@ -75,7 +72,7 @@ public class BackupsSQLData extends BackupsData {
     public boolean saveNewBackup(Backup backup) {
         try {
             this.databaseManager.saveBackup(
-                    backup.getName(), backup.getDate().getTime(), backup.getType(),
+                    backup.getName(), backup.getDate().getTime(),
                     this.getEnderchestsStringData(), backup.getCreatedBy()
             );
             return true;

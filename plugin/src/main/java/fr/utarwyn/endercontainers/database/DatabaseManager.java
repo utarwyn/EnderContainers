@@ -190,18 +190,17 @@ public class DatabaseManager extends AbstractManager {
     }
 
     /**
-     * Save a backup in the database
+     * Save a backup in the database.
      *
-     * @param name      Name of the backup
-     * @param date      Date of the backup
-     * @param type      Type of the backup
-     * @param data      Creation date of the backup
-     * @param createdBy Entity who created the backup (console or player)
+     * @param name      backup name
+     * @param date      backup creation date
+     * @param data      backup data
+     * @param createdBy name of the entity who created the backup
      */
-    public void saveBackup(String name, long date, String type, String data, String createdBy) throws SQLException {
+    public void saveBackup(String name, long date, String data, String createdBy) throws SQLException {
         this.database.update(formatTable(BACKUP_TABLE))
-                .fields("name", "date", "type", "data", "created_by")
-                .values(name, new Timestamp(date), type, data, createdBy)
+                .fields("name", "date", "data", "created_by")
+                .values(name, new Timestamp(date), data, createdBy)
                 .execute();
     }
 
@@ -284,7 +283,7 @@ public class DatabaseManager extends AbstractManager {
             }
         }
         if (!tables.contains(formatTable(BACKUP_TABLE))) {
-            database.request("CREATE TABLE `" + formatTable(BACKUP_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255) NOT NULL, `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `type` VARCHAR(60) NULL, `data` MEDIUMTEXT NULL, `created_by` VARCHAR(60) NULL, PRIMARY KEY (`id`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
+            database.request("CREATE TABLE `" + formatTable(BACKUP_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255) NOT NULL, `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `data` MEDIUMTEXT NULL, `created_by` VARCHAR(60) NULL, PRIMARY KEY (`id`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
             if (Files.getConfiguration().isDebug()) {
                 this.logger.log(Level.INFO, "Table `{0}` created in the database.", formatTable(BACKUP_TABLE));
             }

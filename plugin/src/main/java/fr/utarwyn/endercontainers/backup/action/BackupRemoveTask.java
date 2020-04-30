@@ -17,7 +17,7 @@ public class BackupRemoveTask extends BackupAbstractTask {
     /**
      * Backup to remove
      */
-    private Backup backup;
+    private final Backup backup;
 
     /**
      * Construct a new task to remove a backup.
