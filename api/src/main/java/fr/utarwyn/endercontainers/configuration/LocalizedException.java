@@ -1,6 +1,4 @@
-package fr.utarwyn.endercontainers;
-
-import fr.utarwyn.endercontainers.configuration.LocaleKey;
+package fr.utarwyn.endercontainers.configuration;
 
 import java.util.Map;
 

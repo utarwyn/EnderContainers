@@ -26,14 +26,20 @@ public class DependenciesManager extends AbstractManager implements DependencyVa
     /**
      * A list of all loaded dependencies
      */
-    private Set<Dependency> dependencies;
+    private final Set<Dependency> dependencies;
+
+    /**
+     * Construct the dependencies manager.
+     */
+    public DependenciesManager() {
+        this.dependencies = new HashSet<>();
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public synchronized void load() {
-        this.dependencies = new HashSet<>();
         this.pluginManager = this.plugin.getServer().getPluginManager();
 
         this.loadDependencies();

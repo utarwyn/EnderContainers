@@ -13,12 +13,12 @@ public abstract class NMSUtil {
     /**
      * Package where NMS classes are stored
      */
-    private static String nmsPackage;
+    private static final String nmsPackage;
 
     /**
      * Package where Craftbukkit classes are stored
      */
-    private static String craftbukkitPackage;
+    private static final String craftbukkitPackage;
 
     static {
         String version = ServerVersion.getBukkitVersion();

@@ -99,11 +99,16 @@ public class TestHelper {
         TestHelper.setUpServer();
 
         EnderContainers plugin = TestHelper.getPlugin();
-        Field field = manager.getClass().getSuperclass().getDeclaredField("plugin");
+        Field pluginField = manager.getClass().getSuperclass().getDeclaredField("plugin");
+        Field loggerField = manager.getClass().getSuperclass().getDeclaredField("logger");
 
-        field.setAccessible(true);
-        field.set(manager, plugin);
-        field.setAccessible(false);
+        pluginField.setAccessible(true);
+        pluginField.set(manager, plugin);
+        pluginField.setAccessible(false);
+
+        loggerField.setAccessible(true);
+        loggerField.set(manager, plugin.getLogger());
+        loggerField.setAccessible(false);
     }
 
     /**

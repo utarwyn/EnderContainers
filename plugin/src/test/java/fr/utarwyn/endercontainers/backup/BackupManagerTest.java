@@ -70,11 +70,19 @@ public class BackupManagerTest {
 
         this.loadManager(mock(StorageManager.class), mock(BackupsData.class), backupList);
 
+        // Try to a create a new backup
         this.manager.createBackup("backup", "Utarwyn", result -> {
         });
-
         verify(Bukkit.getServer().getScheduler())
                 .runTaskAsynchronously(any(), any(BackupCreateTask.class));
+
+        // Try to a create a backup which already exists
+        Backup backup = mock(Backup.class);
+        when(backup.getName()).thenReturn("backup");
+        backupList.add(backup);
+
+        this.manager.createBackup("backup", "Utarwyn",
+                result -> assertThat(result).isFalse());
     }
 
     @Test

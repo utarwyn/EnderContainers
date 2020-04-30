@@ -1,6 +1,6 @@
 package fr.utarwyn.endercontainers.dependency.exceptions;
 
-import fr.utarwyn.endercontainers.LocalizedException;
+import fr.utarwyn.endercontainers.configuration.LocalizedException;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
 
 import java.util.Map;
