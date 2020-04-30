@@ -32,21 +32,20 @@ Works with Bukkit/Spigot 1.8 to 1.15!
     <img src="https://i.imgur.com/VCz4kFS.gif" alt="demo">
 </p>
 
-> :warning: Latest stable version available on Spigot is **NOT compatible** with **1.13-1.15 versions** of Minecraft yet. You **have to download an unstable development build** from this repo to get this support.
+> :warning: Latest stable version available on Spigot is **NOT compatible** with **1.13-1.15 versions** of Minecraft yet. You **have to download a development build** from this repo to get this support.
 
 > :wave: Need help about the plugin? Go to the [official wiki](https://github.com/utarwyn/EnderContainers/wiki). \
-> You will found a guide to **install and configure it** very quickly and easily.
+> It contains guides to **configure** and **use** the plugin in few minutes.
 
 
 ## Key Features
 
- - Give access to an **infinite number of enderchests** for your players!
+ - Give access to an **infinite number of enderchests**
  - Each enderchest can have from 1 to 6 rows
  - Ability to open enderchests of **online and offline players**
- - **Absolutely full customization**
  - Support for all items, **even custom items**!
  - Complete backup management
- - Integrations with **Factions, FactionsUUID, WorldGuard, PlotSquared**.
+ - Integrations with **[a bunch of plugins](https://github.com/utarwyn/EnderContainers/wiki/Integrations)**!
 
 
 ## Technical Features
@@ -61,7 +60,7 @@ Works with Bukkit/Spigot 1.8 to 1.15!
 
 ## Support
  
- <a href="https://www.buymeacoff.ee/utarwyn" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/purple_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a> \
+ <a href="https://www.paypal.me/utarwyn" target="_blank"><img src="https://i.imgur.com/ADDI2kk.png" height="50" alt="Paypal button"/></a> \
 **Thank you for your support!** :heart_eyes:
 
 

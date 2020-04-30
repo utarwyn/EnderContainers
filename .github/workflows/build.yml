@@ -3,6 +3,11 @@ name: Java Integration
 on:
   push:
     branches: [master]
+    paths:
+      - 'api/**'
+      - 'dependencies/**'
+      - 'plugin/**'
+      - 'pom.xml'
   pull_request:
 
 jobs:
