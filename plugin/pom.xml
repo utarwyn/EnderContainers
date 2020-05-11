@@ -18,7 +18,7 @@
         <bstats.version>1.7</bstats.version>
         <junit.version>4.13</junit.version>
         <mockito.version>3.3.3</mockito.version>
-        <assertj.version>3.16.0</assertj.version>
+        <assertj.version>3.16.1</assertj.version>
     </properties>
 
     <repositories>
