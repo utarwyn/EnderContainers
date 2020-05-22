@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.dependency;
 
+import fr.utarwyn.endercontainers.mock.DependencyMock;
 import org.bukkit.plugin.Plugin;
 import org.junit.Test;
 
@@ -11,7 +12,7 @@ public class DependencyTest {
     @Test
     public void create() {
         Plugin plugin = mock(Plugin.class);
-        Dependency dependency = new FakeDependency(plugin);
+        Dependency dependency = new DependencyMock(plugin);
 
         // Check the registered plugin
         assertThat(dependency.getPlugin()).isEqualTo(plugin);

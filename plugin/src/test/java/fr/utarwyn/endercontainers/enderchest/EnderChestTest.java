@@ -36,7 +36,8 @@ public class EnderChestTest {
     private EnderChest chest;
 
     @Before
-    public void setUp() throws ReflectiveOperationException, IOException, InvalidConfigurationException {
+    public void setUp() throws ReflectiveOperationException,
+            IOException, InvalidConfigurationException {
         TestHelper.setUpServer();
         TestHelper.setUpFiles();
         TestHelper.registerManagers(mock(MenuManager.class));

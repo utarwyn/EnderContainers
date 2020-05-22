@@ -32,7 +32,8 @@ public class EnderChestManagerTest {
     private EnderChestManager manager;
 
     @BeforeClass
-    public static void setUpClass() throws IOException, InvalidConfigurationException {
+    public static void setUpClass() throws IOException,
+            InvalidConfigurationException, ReflectiveOperationException {
         TestHelper.setUpServer();
         TestHelper.setUpFiles();
     }

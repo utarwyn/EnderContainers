@@ -1,13 +1,17 @@
 package fr.utarwyn.endercontainers.storage.player;
 
+import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
+import fr.utarwyn.endercontainers.storage.serialization.ItemSerializer;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * Storage wrapper to manage data of a specific player.
@@ -20,17 +24,24 @@ public abstract class PlayerData extends StorageWrapper {
     /**
      * UUID of the player linked to this wrapper
      */
-    protected UUID uuid;
+    protected final UUID uuid;
+
+    /**
+     * Serializer to use when storing itemstacks
+     */
+    private final ItemSerializer itemSerializer;
 
     /**
      * Construct a new storage wrapper for a player (even offline)
      *
-     * @param logger plugin logger
-     * @param uuid   The uuid of the player to manage its data
+     * @param uuid           The uuid of the player to manage its data
+     * @param plugin         plugin instance object
+     * @param itemSerializer serializer object to use with this storage object
      */
-    public PlayerData(Logger logger, UUID uuid) {
-        super(logger);
+    public PlayerData(UUID uuid, EnderContainers plugin, ItemSerializer itemSerializer) {
+        super(plugin);
         this.uuid = uuid;
+        this.itemSerializer = itemSerializer;
     }
 
     /**
@@ -43,13 +54,37 @@ public abstract class PlayerData extends StorageWrapper {
         this.save();
     }
 
+    protected String serializeChestContents(EnderChest chest) {
+        try {
+            return this.itemSerializer.serialize(chest.getContents());
+        } catch (IOException e) {
+            this.plugin.getLogger().log(Level.WARNING, String.format(
+                    "cannot serialize items of the chest #%d of %s",
+                    chest.getNum(), chest.getOwner()
+            ), e);
+            return null;
+        }
+    }
+
+    protected ConcurrentMap<Integer, ItemStack> deserializeItems(EnderChest chest, String data) {
+        try {
+            return this.itemSerializer.deserialize(data);
+        } catch (IOException e) {
+            this.plugin.getLogger().log(Level.WARNING, String.format(
+                    "cannot deserialize items of the chest #%d of %s",
+                    chest.getNum(), chest.getOwner()
+            ), e);
+            return new ConcurrentHashMap<>();
+        }
+    }
+
     /**
      * Returns contents of a saved enderchest
      *
-     * @param enderChest Get this enderchest's contents
+     * @param chest Get this enderchest's contents
      * @return The map filled with the contents of the chest
      */
-    public abstract ConcurrentMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest);
+    public abstract ConcurrentMap<Integer, ItemStack> getEnderchestContents(EnderChest chest);
 
     /**
      * Returns the number of rows saved for an enderchest

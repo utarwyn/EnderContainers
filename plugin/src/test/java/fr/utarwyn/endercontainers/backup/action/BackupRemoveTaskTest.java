@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 public class BackupRemoveTaskTest {
 
     @Test
-    public void run() {
+    public void run() throws ReflectiveOperationException {
         EnderContainers plugin = TestHelper.getPlugin();
         BackupManager manager = mock(BackupManager.class);
         Backup backup = mock(Backup.class);

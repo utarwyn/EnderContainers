@@ -1,5 +1,6 @@
-package fr.utarwyn.endercontainers.dependency;
+package fr.utarwyn.endercontainers.mock;
 
+import fr.utarwyn.endercontainers.dependency.Dependency;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -9,14 +10,14 @@ import org.bukkit.plugin.Plugin;
  *
  * @author Utarwyn <maximemalgorn@gmail.com>
  */
-public class FakeDependency extends Dependency {
+public class DependencyMock extends Dependency {
 
     /**
      * Construct a fake dependency object.
      *
      * @param plugin plugin instance
      */
-    public FakeDependency(Plugin plugin) {
+    public DependencyMock(Plugin plugin) {
         super(plugin);
     }
 

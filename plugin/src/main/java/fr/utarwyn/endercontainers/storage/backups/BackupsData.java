@@ -1,10 +1,10 @@
 package fr.utarwyn.endercontainers.storage.backups;
 
+import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Storage wrapper to manage backups data.
@@ -17,15 +17,15 @@ public abstract class BackupsData extends StorageWrapper {
     /**
      * List of cached backups retrieved
      */
-    List<Backup> backups;
+    protected List<Backup> backups;
 
     /**
      * Construct a new backup storage wrapper.
      *
-     * @param logger plugin logger
+     * @param plugin plugin instance object
      */
-    public BackupsData(Logger logger) {
-        super(logger);
+    public BackupsData(EnderContainers plugin) {
+        super(plugin);
     }
 
     /**

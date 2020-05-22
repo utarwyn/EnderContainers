@@ -28,7 +28,7 @@ public class BackupCreateTaskTest {
     private BackupsData storage;
 
     @Before
-    public void setUp() {
+    public void setUp() throws ReflectiveOperationException {
         TestHelper.setUpServer();
 
         this.plugin = TestHelper.getPlugin();

@@ -1,6 +1,6 @@
 package fr.utarwyn.endercontainers.storage;
 
-import java.util.logging.Logger;
+import fr.utarwyn.endercontainers.EnderContainers;
 
 /**
  * Allows to manage storage using different technologies with same methods.
@@ -12,17 +12,17 @@ import java.util.logging.Logger;
 public abstract class StorageWrapper {
 
     /**
-     * The plugin logger
+     * The plugin instance
      */
-    protected Logger logger;
+    protected EnderContainers plugin;
 
     /**
      * Construct a new storage wrapper.
      *
-     * @param logger plugin logger
+     * @param plugin plugin instance object
      */
-    public StorageWrapper(Logger logger) {
-        this.logger = logger;
+    public StorageWrapper(EnderContainers plugin) {
+        this.plugin = plugin;
     }
 
     /**

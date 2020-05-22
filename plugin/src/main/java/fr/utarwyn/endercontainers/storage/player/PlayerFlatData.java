@@ -1,8 +1,9 @@
 package fr.utarwyn.endercontainers.storage.player;
 
+import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.storage.FlatFile;
-import fr.utarwyn.endercontainers.util.ItemSerializer;
+import fr.utarwyn.endercontainers.storage.serialization.ItemSerializer;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -11,7 +12,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Storage wrapper for player data (flatfile)
@@ -34,11 +34,12 @@ public class PlayerFlatData extends PlayerData {
     /**
      * Construct a new player storage wrapper with a flat file.
      *
-     * @param logger plugin logger
-     * @param uuid   player's uuid
+     * @param uuid           player's uuid
+     * @param plugin         plugin instance object
+     * @param itemSerializer object to encode/decode itemstacks
      */
-    public PlayerFlatData(Logger logger, UUID uuid) {
-        super(logger, uuid);
+    public PlayerFlatData(UUID uuid, EnderContainers plugin, ItemSerializer itemSerializer) {
+        super(uuid, plugin, itemSerializer);
         this.load();
     }
 
@@ -51,7 +52,7 @@ public class PlayerFlatData extends PlayerData {
             String minimalUuid = this.uuid.toString().replace("-", "");
             this.flatFile = new FlatFile("data" + File.separator + minimalUuid + ".yml");
         } catch (IOException e) {
-            this.logger.log(Level.SEVERE, String.format(
+            this.plugin.getLogger().log(Level.SEVERE, String.format(
                     "Cannot load the data file of the user %s", this.uuid
             ), e);
         }
@@ -65,7 +66,7 @@ public class PlayerFlatData extends PlayerData {
         try {
             this.flatFile.save();
         } catch (IOException e) {
-            this.logger.log(Level.SEVERE, String.format(
+            this.plugin.getLogger().log(Level.SEVERE, String.format(
                     "Cannot save the data file of the user %s", this.uuid
             ), e);
         }
@@ -75,14 +76,14 @@ public class PlayerFlatData extends PlayerData {
      * {@inheritDoc}
      */
     @Override
-    public ConcurrentMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
-        String path = PREFIX + "." + enderChest.getNum() + ".contents";
+    public ConcurrentMap<Integer, ItemStack> getEnderchestContents(EnderChest chest) {
+        String path = PREFIX + "." + chest.getNum() + ".contents";
 
-        if (!this.flatFile.getConfiguration().contains(path)) {
-            return new ConcurrentHashMap<>();
+        if (this.flatFile.getConfiguration().contains(path)) {
+            return this.deserializeItems(chest, this.flatFile.getConfiguration().getString(path));
         }
 
-        return ItemSerializer.deserialize(this.flatFile.getConfiguration().getString(path));
+        return new ConcurrentHashMap<>();
     }
 
     /**
@@ -102,7 +103,7 @@ public class PlayerFlatData extends PlayerData {
     protected void saveEnderchest(EnderChest chest) {
         String path = PREFIX + "." + chest.getNum();
         String contents = !chest.getContents().isEmpty() ?
-                ItemSerializer.serialize(chest.getContents()) : null;
+                this.serializeChestContents(chest) : null;
 
         this.flatFile.getConfiguration().set(path + ".rows", chest.getRows());
         this.flatFile.getConfiguration().set(path + ".position", chest.getNum());

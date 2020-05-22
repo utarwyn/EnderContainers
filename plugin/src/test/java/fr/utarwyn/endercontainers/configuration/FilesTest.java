@@ -17,7 +17,8 @@ import static org.mockito.Mockito.mock;
 public class FilesTest {
 
     @BeforeClass
-    public static void setUpClass() throws IOException, InvalidConfigurationException {
+    public static void setUpClass() throws IOException,
+            InvalidConfigurationException, ReflectiveOperationException {
         TestHelper.setUpFiles();
     }
 

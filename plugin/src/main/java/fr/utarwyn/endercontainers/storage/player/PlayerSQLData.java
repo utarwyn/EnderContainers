@@ -1,10 +1,11 @@
 package fr.utarwyn.endercontainers.storage.player;
 
+import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
-import fr.utarwyn.endercontainers.util.ItemSerializer;
+import fr.utarwyn.endercontainers.storage.serialization.ItemSerializer;
 import org.bukkit.inventory.ItemStack;
 
 import java.sql.SQLException;
@@ -14,7 +15,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Storage wrapper for player data (MySQL)
@@ -27,7 +27,7 @@ public class PlayerSQLData extends PlayerData {
     /**
      * The database manager
      */
-    private DatabaseManager databaseManager;
+    private final DatabaseManager databaseManager;
 
     /**
      * List of all enderchest datasets retreived from the database.
@@ -37,11 +37,12 @@ public class PlayerSQLData extends PlayerData {
     /**
      * Construct a new player storage wrapper with a SQL database.
      *
-     * @param logger plugin logger
-     * @param uuid   player's uuid
+     * @param uuid           player's uuid
+     * @param plugin         plugin instance object
+     * @param itemSerializer object to encode/decode itemstacks
      */
-    public PlayerSQLData(Logger logger, UUID uuid) {
-        super(logger, uuid);
+    public PlayerSQLData(UUID uuid, EnderContainers plugin, ItemSerializer itemSerializer) {
+        super(uuid, plugin, itemSerializer);
         this.databaseManager = Managers.get(DatabaseManager.class);
         this.load();
     }
@@ -54,7 +55,7 @@ public class PlayerSQLData extends PlayerData {
         try {
             this.enderchestSets = this.databaseManager.getEnderchestsOf(this.uuid);
         } catch (SQLException e) {
-            this.logger.log(Level.SEVERE, String.format(
+            this.plugin.getLogger().log(Level.SEVERE, String.format(
                     "Cannot retrieve enderchests of user %s from the database", this.uuid
             ), e);
         }
@@ -72,10 +73,10 @@ public class PlayerSQLData extends PlayerData {
      * {@inheritDoc}
      */
     @Override
-    public ConcurrentMap<Integer, ItemStack> getEnderchestContents(EnderChest enderChest) {
-        for (DatabaseSet chestSet : this.enderchestSets) {
-            if (chestSet.getInteger("num") == enderChest.getNum()) {
-                return ItemSerializer.deserialize(chestSet.getString("contents"));
+    public ConcurrentMap<Integer, ItemStack> getEnderchestContents(EnderChest chest) {
+        for (DatabaseSet set : this.enderchestSets) {
+            if (set.getInteger("num") == chest.getNum()) {
+                return this.deserializeItems(chest, set.getString("contents"));
             }
         }
 
@@ -104,7 +105,7 @@ public class PlayerSQLData extends PlayerData {
                 .noneMatch(set -> set.getInteger("num") == enderChest.getNum()
                         && set.getString("owner").equals(enderChest.getOwner().toString()));
 
-        String contents = ItemSerializer.serialize(enderChest.getContents());
+        String contents = this.serializeChestContents(enderChest);
 
         try {
             this.databaseManager.saveEnderchest(insert,
@@ -112,7 +113,7 @@ public class PlayerSQLData extends PlayerData {
                     enderChest.getRows(), contents
             );
         } catch (SQLException e) {
-            this.logger.log(Level.SEVERE, String.format(
+            this.plugin.getLogger().log(Level.SEVERE, String.format(
                     "Cannot save the enderchest for user %s in the database", enderChest.getOwner()
             ), e);
             return;

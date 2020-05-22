@@ -1,7 +1,9 @@
 package fr.utarwyn.endercontainers.storage;
 
 import fr.utarwyn.endercontainers.AbstractManager;
+import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.Managers;
+import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.storage.backups.BackupsData;
 import fr.utarwyn.endercontainers.storage.backups.BackupsFlatData;
@@ -9,10 +11,12 @@ import fr.utarwyn.endercontainers.storage.backups.BackupsSQLData;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import fr.utarwyn.endercontainers.storage.player.PlayerFlatData;
 import fr.utarwyn.endercontainers.storage.player.PlayerSQLData;
+import fr.utarwyn.endercontainers.storage.serialization.Base64ItemSerializer;
+import fr.utarwyn.endercontainers.storage.serialization.ItemSerializer;
+import fr.utarwyn.endercontainers.storage.serialization.LegacyItemSerializer;
 
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Manage different types of storages (SQL or in flat file).
@@ -34,6 +38,11 @@ public class StorageManager extends AbstractManager {
     private Class<? extends PlayerData> playerDataPattern;
 
     /**
+     * Stores the loaded item serializer used by chest storage classes.
+     */
+    private ItemSerializer itemSerializer;
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -44,6 +53,13 @@ public class StorageManager extends AbstractManager {
 
         this.backupDataPattern = useSqlStorage ? BackupsSQLData.class : BackupsFlatData.class;
         this.playerDataPattern = useSqlStorage ? PlayerSQLData.class : PlayerFlatData.class;
+
+        // Initialize the item serializer
+        if (Files.getConfiguration().isUseExperimentalSavingSystem()) {
+            this.itemSerializer = new LegacyItemSerializer();
+        } else {
+            this.itemSerializer = new Base64ItemSerializer();
+        }
     }
 
     /**
@@ -62,7 +78,9 @@ public class StorageManager extends AbstractManager {
      */
     public BackupsData createBackupDataStorage() {
         try {
-            return this.backupDataPattern.getDeclaredConstructor(Logger.class).newInstance(this.logger);
+            return this.backupDataPattern
+                    .getDeclaredConstructor(EnderContainers.class)
+                    .newInstance(this.plugin);
         } catch (ReflectiveOperationException e) {
             this.logger.log(Level.SEVERE, "Cannot instantiate a backup data storage object", e);
             return null;
@@ -77,8 +95,9 @@ public class StorageManager extends AbstractManager {
      */
     public PlayerData createPlayerDataStorage(UUID uuid) {
         try {
-            return this.playerDataPattern.getDeclaredConstructor(Logger.class, UUID.class)
-                    .newInstance(this.logger, uuid);
+            return this.playerDataPattern
+                    .getDeclaredConstructor(UUID.class, EnderContainers.class, ItemSerializer.class)
+                    .newInstance(uuid, this.plugin, this.itemSerializer);
         } catch (ReflectiveOperationException e) {
             this.logger.log(Level.SEVERE, "Cannot instantiate a player data storage object", e);
             return null;

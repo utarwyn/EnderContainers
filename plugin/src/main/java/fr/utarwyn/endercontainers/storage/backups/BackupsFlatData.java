@@ -13,7 +13,6 @@ import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Storage wrapper for backups (flatfile)
@@ -33,10 +32,10 @@ public class BackupsFlatData extends BackupsData {
     /**
      * Construct a new backup storage wrapper with a flat file.
      *
-     * @param logger plugin logger
+     * @param plugin plugin instance object
      */
-    public BackupsFlatData(Logger logger) {
-        super(logger);
+    public BackupsFlatData(EnderContainers plugin) {
+        super(plugin);
         this.backups = new ArrayList<>();
         this.load();
     }
@@ -62,7 +61,7 @@ public class BackupsFlatData extends BackupsData {
         try {
             this.flatFile = new FlatFile("backups.yml");
         } catch (IOException e) {
-            this.logger.log(Level.SEVERE, "Cannot load the backups file", e);
+            this.plugin.getLogger().log(Level.SEVERE, "Cannot load the backups file", e);
         }
 
         if (!this.flatFile.getConfiguration().isConfigurationSection(PREFIX)) {
@@ -91,7 +90,7 @@ public class BackupsFlatData extends BackupsData {
         try {
             this.flatFile.save();
         } catch (IOException e) {
-            this.logger.log(Level.SEVERE, "Cannot save the backups file", e);
+            this.plugin.getLogger().log(Level.SEVERE, "Cannot save the backups file", e);
         }
     }
 
@@ -158,7 +157,7 @@ public class BackupsFlatData extends BackupsData {
 
             return true;
         } catch (IOException e) {
-            this.logger.log(Level.SEVERE,
+            this.plugin.getLogger().log(Level.SEVERE,
                     String.format("Cannot delete the folder: %s", folder), e);
         }
 
@@ -186,7 +185,7 @@ public class BackupsFlatData extends BackupsData {
                             StandardCopyOption.REPLACE_EXISTING
                     );
                 } catch (IOException e) {
-                    this.logger.log(Level.SEVERE, String.format(
+                    this.plugin.getLogger().log(Level.SEVERE, String.format(
                             "Cannot copy file %s to %s", fileFrom.toPath(), fileTo.toPath()
                     ), e);
                     return false;

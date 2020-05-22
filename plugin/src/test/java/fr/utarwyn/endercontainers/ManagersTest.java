@@ -22,7 +22,7 @@ public class ManagersTest {
     }
 
     @Test
-    public void register() {
+    public void register() throws ReflectiveOperationException {
         EnderContainers plugin = TestHelper.getPlugin();
 
         assertThat(Managers.instances).isEmpty();

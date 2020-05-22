@@ -16,7 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LocaleTest {
 
     @BeforeClass
-    public static void setupClass() throws InvalidConfigurationException, ReflectiveOperationException, IOException {
+    public static void setupClass() throws InvalidConfigurationException,
+            ReflectiveOperationException, IOException {
         TestHelper.setUpFiles();
     }
 

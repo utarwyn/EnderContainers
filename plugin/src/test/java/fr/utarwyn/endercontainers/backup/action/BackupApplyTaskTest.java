@@ -28,7 +28,7 @@ public class BackupApplyTaskTest {
     }
 
     @Test
-    public void run() {
+    public void run() throws ReflectiveOperationException {
         EnderContainers plugin = TestHelper.getPlugin();
         BackupManager manager = mock(BackupManager.class);
         Backup backup = mock(Backup.class);

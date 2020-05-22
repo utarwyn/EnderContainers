@@ -1,12 +1,17 @@
 package fr.utarwyn.endercontainers;
 
-import fr.utarwyn.endercontainers.compatibility.v1_12.FakeServer;
 import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.mock.ItemFactoryMock;
+import fr.utarwyn.endercontainers.mock.ItemMetaMock;
+import fr.utarwyn.endercontainers.mock.v1_12.ServerMock;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Server;
+import org.bukkit.UnsafeValues;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -50,7 +55,7 @@ public class TestHelper {
      */
     public static synchronized void setUpServer() {
         if (!serverReady) {
-            Server server = mock(FakeServer.class);
+            Server server = mock(ServerMock.class);
             Logger logger = Logger.getGlobal();
             BukkitScheduler scheduler = mock(BukkitScheduler.class);
             PluginManager pluginManager = mock(PluginManager.class);
@@ -60,7 +65,7 @@ public class TestHelper {
             lenient().when(server.getPluginManager()).thenReturn(pluginManager);
 
             TestHelper.mockSchedulers(server);
-            TestHelper.mockServerObjects(server);
+            TestHelper.mockInventoryObjects(server);
             Bukkit.setServer(server);
 
             serverReady = true;
@@ -70,7 +75,8 @@ public class TestHelper {
     /**
      * Setup a mocked version of configuration files.
      */
-    public static synchronized void setUpFiles() throws IOException, InvalidConfigurationException {
+    public static synchronized void setUpFiles() throws IOException,
+            InvalidConfigurationException, ReflectiveOperationException {
         if (!filesReady) {
             // Initialize the configuration object
             EnderContainers plugin = TestHelper.getPlugin();
@@ -138,12 +144,17 @@ public class TestHelper {
      *
      * @return mocked instance of the plugin
      */
-    public static EnderContainers getPlugin() {
+    public static EnderContainers getPlugin() throws ReflectiveOperationException {
         if (plugin == null) {
             TestHelper.setUpServer();
             Server server = Bukkit.getServer();
 
             plugin = mock(EnderContainers.class);
+
+            Field staticAccess = EnderContainers.class.getDeclaredField("instance");
+            staticAccess.setAccessible(true);
+            staticAccess.set(null, plugin);
+            staticAccess.setAccessible(false);
 
             lenient().when(plugin.getServer()).thenReturn(server);
             lenient().doReturn(server.getLogger()).when(plugin).getLogger();
@@ -201,11 +212,11 @@ public class TestHelper {
     }
 
     /**
-     * Mock some basic server methods.
+     * Mock objects and methods related to inventories and itemstacks.
      *
      * @param server mocked server
      */
-    private static void mockServerObjects(Server server) {
+    private static void mockInventoryObjects(Server server) {
         // Inventory creation
         lenient().when(server.createInventory(
                 any(InventoryHolder.class), anyInt(), anyString()
@@ -214,6 +225,18 @@ public class TestHelper {
             lenient().when(inventory.getContents()).thenReturn(new ItemStack[0]);
             return inventory;
         });
+
+        // Register mocked item meta class in the serialization object
+        ConfigurationSerialization.registerClass(ItemMetaMock.class);
+
+        // Unsafe values and item factory
+        UnsafeValues unsafeValues = mock(UnsafeValues.class);
+
+        lenient().when(unsafeValues.getDataVersion()).thenReturn(1);
+        lenient().when(unsafeValues.getMaterial(anyString(), anyInt()))
+                .then(answer -> Material.valueOf(answer.getArgument(0, String.class)));
+        lenient().when(server.getUnsafe()).thenReturn(unsafeValues);
+        lenient().when(server.getItemFactory()).thenReturn(new ItemFactoryMock());
     }
 
 }

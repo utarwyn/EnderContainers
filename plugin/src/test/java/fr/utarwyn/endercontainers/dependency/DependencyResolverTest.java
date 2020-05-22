@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.dependency;
 
+import fr.utarwyn.endercontainers.mock.DependencyMock;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -61,7 +62,7 @@ public class DependencyResolverTest {
     @Test
     public void resolveWithUse() {
         DependencyResolver resolver = new DependencyResolver(this.pluginManager)
-                .name("Plugin").use(FakeDependency.class);
+                .name("Plugin").use(DependencyMock.class);
 
         Optional<Dependency> dependency = resolver.resolve();
 
@@ -82,7 +83,7 @@ public class DependencyResolverTest {
         assertThat(resolver.resolve()).isEmpty();
 
         // Matched version
-        resolver.matchVersion("^1.*", FakeDependency.class);
+        resolver.matchVersion("^1.*", DependencyMock.class);
         assertThat(resolver.resolve()).isNotEmpty();
     }
 
