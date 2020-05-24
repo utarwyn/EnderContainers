@@ -1,94 +1,87 @@
 package fr.utarwyn.endercontainers.database;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import fr.utarwyn.endercontainers.configuration.Configuration;
+import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.database.driver.DatabaseDriver;
 import fr.utarwyn.endercontainers.database.request.DeleteRequest;
 import fr.utarwyn.endercontainers.database.request.Request;
 import fr.utarwyn.endercontainers.database.request.SavingRequest;
 import fr.utarwyn.endercontainers.database.request.SelectRequest;
-import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class used to manage a remote SQL database.
- * <p>
- * Requests model is inspired from my UtariaDatabase plugin.
- * (you can see the source code here: https://github.com/Utaria/UtariaDatabase)
+ * Manages connections to a SQL database.
  *
- * @author Utarwyn
+ * @author Utarwyn <maximemalgorn@gmail.com>
  * @since 1.0.5
  */
 public class Database implements AutoCloseable {
 
     /**
-     * Host of the MySQL server
-     */
-    private final String host;
-
-    /**
-     * Port of the MySQL server
-     */
-    private final int port;
-
-    /**
-     * User used to connect to the MySQL server
-     */
-    private final String user;
-
-    /**
-     * Password used to connect to the MySQL server
-     */
-    private final String password;
-
-    /**
-     * Name of the database used to store data
-     */
-    private final String name;
-
-    /**
      * Source object used to perform requests to the database
      */
-    BasicDataSource source;
+    private final HikariDataSource source;
 
     /**
-     * Flag which controls the connection state to the database
+     * Stores the database server url.
      */
-    private boolean connected;
+    private final String serverUrl;
 
     /**
      * Has the connection been opened over SSL?
      */
-    private boolean secured;
+    private final boolean secure;
 
     /**
-     * Constructor to create a new MySQL database object.
+     * Constructs this object to send request to a database.
      *
-     * @param host     host of the database server
-     * @param port     port of the database server
-     * @param user     username to open the connection
-     * @param password password to open the connection
-     * @param name     name of the database to use
+     * @param driver object to configure the connection pool
      */
-    Database(String host, int port, String user, String password, String name) {
-        this.host = host;
-        this.port = port;
-        this.user = user;
-        this.password = password;
-        this.name = name;
-        this.secured = false;
+    Database(DatabaseDriver driver, DatabaseSecureCredentials credentials) {
+        Configuration pluginConfig = Files.getConfiguration();
+        HikariConfig sourceConfig = new HikariConfig();
 
-        this.source = new BasicDataSource();
-        this.source.addConnectionProperty("useSSL", "false");
+        // Retrieve the database server url from the driver
+        this.serverUrl = driver.getServerUrl(pluginConfig);
+
+        // Apply the plugin configuration to the source config object
+        String sourceUrl = driver.getSourceUrl(this.serverUrl, pluginConfig.getMysqlDatabase());
+        sourceConfig.setJdbcUrl(sourceUrl);
+        driver.configure(sourceConfig, pluginConfig);
+
+        // Apply secure credentials if provided
+        if (credentials != null) {
+            credentials.apply(sourceConfig);
+            this.secure = true;
+        } else {
+            this.secure = false;
+        }
+
+        // Create the source object
+        this.source = new HikariDataSource(sourceConfig);
     }
 
     /**
-     * Know if the object is connected to the database or not.
+     * Retrieves the database server url where the source is connected.
      *
-     * @return True if connected.
+     * @return connected server url
      */
-    public boolean isConnected() {
-        return this.connected && !this.source.isClosed();
+    public String getServerUrl() {
+        return serverUrl;
+    }
+
+    /**
+     * Checks if the data source is running or not.
+     *
+     * @return true if the source is running, false otherwise
+     */
+    public boolean isRunning() {
+        return this.source.isRunning();
     }
 
     /**
@@ -96,70 +89,24 @@ public class Database implements AutoCloseable {
      *
      * @return true if the connection is secured
      */
-    public boolean isSecured() {
-        return this.secured;
+    public boolean isSecure() {
+        return this.secure;
     }
 
     /**
-     * Returns the full endpoint to access to the database server.
-     *
-     * @return host + port of the database server
+     * Checks if the source can connect to the database or not.
      */
-    public String getEndpoint() {
-        return this.host + ':' + this.port;
-    }
-
-    /**
-     * Configure the datasource to use SSL with provided credentials.
-     * This method MUST be called before the opening of the first connection.
-     *
-     * @param credentials credentials to securize the connection over SSL
-     */
-    public void setSecureCredentials(DatabaseSecureCredentials credentials) {
-        this.secured = true;
-
-        this.source.addConnectionProperty("useSSL", "true");
-        this.source.addConnectionProperty("requireSSL", "true");
-        this.source.addConnectionProperty("clientCertificateKeyStoreUrl", credentials.getClientKeystoreFile());
-        this.source.addConnectionProperty("clientCertificateKeyStoreType", DatabaseSecureCredentials.KEYSTORE_TYPE);
-        this.source.addConnectionProperty("clientCertificateKeyStorePassword", credentials.getClientKeystorePassword());
-
-        if (credentials.isUsingTrustCertificate()) {
-            this.source.addConnectionProperty("trustCertificateKeyStoreUrl", credentials.getTrustKeystoreFile());
-            this.source.addConnectionProperty("trustCertificateKeyStoreType", DatabaseSecureCredentials.KEYSTORE_TYPE);
-            this.source.addConnectionProperty("trustCertificateKeyStorePassword", credentials.getTrustKeystorePassword());
-        }
-    }
-
-    /**
-     * Open a connection to the databaser server.
-     * (create a pool to execute all requests in an optimized way)
-     */
-    public void open() throws SQLException {
-        this.source.setDriverClassName("com.mysql.jdbc.Driver");
-        this.source.setUrl("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.name);
-        this.source.setUsername(this.user);
-        this.source.setPassword(this.password);
-
-        this.source.setInitialSize(1);
-        this.source.setMaxOpenPreparedStatements(8);
-        this.source.setMaxTotal(8);
-
-        // Connection test
+    public void testConnection() throws SQLException {
         this.source.getConnection().close();
-        this.connected = true;
     }
 
     /**
-     * Closes the connection to the SQL server
-     *
-     * @throws SQLException throwed if the connection cannot be closed.
+     * Closes the connection pool to the database server.
      */
     @Override
-    public void close() throws SQLException {
-        if (this.isConnected()) {
+    public void close() {
+        if (this.isRunning()) {
             this.source.close();
-            this.connected = false;
         }
     }
 

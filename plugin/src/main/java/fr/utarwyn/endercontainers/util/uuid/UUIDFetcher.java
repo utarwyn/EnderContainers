@@ -206,9 +206,9 @@ public class UUIDFetcher {
      */
     private static class Cache<K, V> {
 
-        private long expireTime = 1000L * 60 * 5; // add 5 min by default
+        private static final long EXPIRE_TIME = 1000L * 60 * 5; // add 5 min by default
 
-        private ConcurrentHashMap<K, CachedEntry<V>> map = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<K, CachedEntry<V>> map = new ConcurrentHashMap<>();
 
         public boolean contains(K key) {
             return map.containsKey(key) && get(key) != null;
@@ -226,7 +226,7 @@ public class UUIDFetcher {
         }
 
         public void put(K key, V value) {
-            map.put(key, new CachedEntry<>(value, expireTime));
+            map.put(key, new CachedEntry<>(value, EXPIRE_TIME));
         }
 
         /**

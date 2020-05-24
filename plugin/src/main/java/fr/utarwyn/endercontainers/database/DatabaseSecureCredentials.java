@@ -1,10 +1,15 @@
 package fr.utarwyn.endercontainers.database;
 
+import com.zaxxer.hikari.HikariConfig;
+import fr.utarwyn.endercontainers.configuration.Configuration;
+
 import java.io.File;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
- * Stores credentials to open a connection to a database server over SSL.
+ * Stores credentials to open a
+ * connection to a database server over SSL.
  *
  * @author Utarwyn
  * @since 2.2.0
@@ -37,34 +42,79 @@ public class DatabaseSecureCredentials {
      */
     private String trustKeystorePassword;
 
-    public String getClientKeystoreFile() {
-        return this.clientKeystoreFile;
+    /**
+     * Creates a new database secure credentials
+     * object from the plugin configuration file.
+     *
+     * @param config plugin configuration object
+     * @return generated credentials object, empty if SSL disabled in the config
+     */
+    public static Optional<DatabaseSecureCredentials> fromConfig(Configuration config) {
+        if (!config.isMysqlSsl()) return Optional.empty();
+        DatabaseSecureCredentials instance = new DatabaseSecureCredentials();
+
+        instance.setClientKeystore(
+                config.getMysqlSslKeystoreFile(),
+                config.getMysqlSslKeystorePassword()
+        );
+
+        if (config.getMysqlSslTrustKeystoreFile() != null
+                && config.getMysqlSslTrustKeystorePassword() != null) {
+            instance.setTrustKeystore(
+                    config.getMysqlSslTrustKeystoreFile(),
+                    config.getMysqlSslTrustKeystorePassword()
+            );
+        }
+
+        return Optional.of(instance);
     }
 
-    public String getClientKeystorePassword() {
-        return this.clientKeystorePassword;
-    }
-
-    public String getTrustKeystoreFile() {
-        return this.trustKeystoreFile;
-    }
-
-    public String getTrustKeystorePassword() {
-        return this.trustKeystorePassword;
-    }
-
-    public boolean isUsingTrustCertificate() {
-        return this.trustKeystoreFile != null && this.trustKeystorePassword != null;
-    }
-
+    /**
+     * Registers a client keystore for the configuration.
+     *
+     * @param file     client keystore file path
+     * @param password client keystore password
+     */
     public void setClientKeystore(String file, String password) {
         this.clientKeystoreFile = new File(file).toURI().toString();
         this.clientKeystorePassword = Objects.requireNonNull(password);
     }
 
+    /**
+     * Registers a trust keystore for the configuration.
+     *
+     * @param file     trust keystore file path
+     * @param password trust keystore password
+     */
     public void setTrustKeystore(String file, String password) {
         this.trustKeystoreFile = new File(file).toURI().toString();
         this.trustKeystorePassword = Objects.requireNonNull(password);
+    }
+
+    /**
+     * Apply the SSL configuration on a data source configuration object.
+     *
+     * @param config source configuration object
+     */
+    public void apply(HikariConfig config) {
+        config.addDataSourceProperty("useSSL", "true");
+        config.addDataSourceProperty("requireSSL", "true");
+
+        config.addDataSourceProperty("clientCertificateKeyStoreUrl",
+                this.clientKeystoreFile);
+        config.addDataSourceProperty("clientCertificateKeyStoreType",
+                DatabaseSecureCredentials.KEYSTORE_TYPE);
+        config.addDataSourceProperty("clientCertificateKeyStorePassword",
+                this.clientKeystorePassword);
+
+        if (this.trustKeystoreFile != null && this.trustKeystorePassword != null) {
+            config.addDataSourceProperty("trustCertificateKeyStoreUrl",
+                    this.trustKeystoreFile);
+            config.addDataSourceProperty("trustCertificateKeyStoreType",
+                    DatabaseSecureCredentials.KEYSTORE_TYPE);
+            config.addDataSourceProperty("trustCertificateKeyStorePassword",
+                    this.trustKeystorePassword);
+        }
     }
 
 }
