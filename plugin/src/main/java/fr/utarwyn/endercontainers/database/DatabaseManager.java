@@ -2,14 +2,11 @@ package fr.utarwyn.endercontainers.database;
 
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.configuration.Files;
-import fr.utarwyn.endercontainers.database.driver.MySQLDriver;
+import fr.utarwyn.endercontainers.database.adapter.MySQLAdapter;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -61,10 +58,10 @@ public class DatabaseManager extends AbstractManager {
             try {
                 long beginTime = System.currentTimeMillis();
 
-                // Try to connect to the SQL server
-                this.database.testConnection();
+                // Initialize the database connection handler
+                this.database.initialize();
 
-                // Initialize the tables if needed
+                // Create the tables if needed
                 this.createTables();
 
                 // Log the successful connection into the console
@@ -247,7 +244,7 @@ public class DatabaseManager extends AbstractManager {
         }
 
         // Setup the database object, for now only supports MySQL connections
-        this.database = new Database(new MySQLDriver(), credentials);
+        this.database = new Database(new MySQLAdapter(), credentials);
     }
 
     /**
@@ -278,7 +275,7 @@ public class DatabaseManager extends AbstractManager {
      */
     private void createTables() throws SQLException {
         String collation = this.database.getServerVersion() >= 5.5 ? "utf8mb4_unicode_ci" : "utf8_unicode_ci";
-        List<String> tables = this.database.getTables();
+        Set<String> tables = this.database.getTables();
 
         if (!tables.contains(formatTable(CHEST_TABLE))) {
             database.request("CREATE TABLE `" + formatTable(CHEST_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `num` TINYINT(2) NOT NULL DEFAULT '0', `owner` VARCHAR(36) NULL, `contents` MEDIUMTEXT NULL, `rows` INT(1) NOT NULL DEFAULT 0, PRIMARY KEY (`id`), UNIQUE KEY `NUM OWNER` (`num`,`owner`), INDEX `USER KEY` (`num`, `owner`)) COLLATE='" + collation + "' ENGINE=InnoDB;");

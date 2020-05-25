@@ -15,6 +15,7 @@
 
     <properties>
         <hikaricp.version>3.4.5</hikaricp.version>
+        <slf4j.version>1.7.25</slf4j.version>
         <bstats.version>1.7</bstats.version>
         <junit.version>4.13</junit.version>
         <mockito.version>3.3.3</mockito.version>
@@ -75,7 +76,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
-            <version>1.7.25</version>
+            <version>${slf4j.version}</version>
             <scope>compile</scope>
         </dependency>
 

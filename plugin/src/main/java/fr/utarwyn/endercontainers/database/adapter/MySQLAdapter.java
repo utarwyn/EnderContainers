@@ -1,12 +1,14 @@
-package fr.utarwyn.endercontainers.database.driver;
+package fr.utarwyn.endercontainers.database.adapter;
 
 import com.zaxxer.hikari.HikariConfig;
 import fr.utarwyn.endercontainers.configuration.Configuration;
 
 /**
+ * The MySQL database adapter.
+ *
  * @author Utarwyn <maximemalgorn@gmail.com>
  */
-public class MySQLDriver implements DatabaseDriver {
+public class MySQLAdapter implements DatabaseAdapter {
 
     /**
      * {@inheritDoc}

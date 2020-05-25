@@ -4,15 +4,16 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import fr.utarwyn.endercontainers.configuration.Configuration;
 import fr.utarwyn.endercontainers.configuration.Files;
-import fr.utarwyn.endercontainers.database.driver.DatabaseDriver;
+import fr.utarwyn.endercontainers.database.adapter.DatabaseAdapter;
 import fr.utarwyn.endercontainers.database.request.DeleteRequest;
 import fr.utarwyn.endercontainers.database.request.Request;
 import fr.utarwyn.endercontainers.database.request.SavingRequest;
 import fr.utarwyn.endercontainers.database.request.SelectRequest;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Manages connections to a SQL database.
@@ -23,9 +24,13 @@ import java.util.List;
 public class Database implements AutoCloseable {
 
     /**
-     * Source object used to perform requests to the database
+     * Configuration object used to initialize the connection pool.
      */
-    private final HikariDataSource source;
+    private final HikariConfig configuration;
+    /**
+     * Source object used to perform requests to the database.
+     */
+    HikariDataSource source;
 
     /**
      * Stores the database server url.
@@ -40,30 +45,28 @@ public class Database implements AutoCloseable {
     /**
      * Constructs this object to send request to a database.
      *
-     * @param driver object to configure the connection pool
+     * @param adapter     object to configure the connection pool
+     * @param credentials credentials object to connect over SSL
      */
-    Database(DatabaseDriver driver, DatabaseSecureCredentials credentials) {
-        Configuration pluginConfig = Files.getConfiguration();
-        HikariConfig sourceConfig = new HikariConfig();
+    Database(DatabaseAdapter adapter, DatabaseSecureCredentials credentials) {
+        this.configuration = new HikariConfig();
 
-        // Retrieve the database server url from the driver
-        this.serverUrl = driver.getServerUrl(pluginConfig);
+        // Retrieve the database server url from the adapter
+        Configuration pluginConfig = Files.getConfiguration();
+        this.serverUrl = adapter.getServerUrl(pluginConfig);
 
         // Apply the plugin configuration to the source config object
-        String sourceUrl = driver.getSourceUrl(this.serverUrl, pluginConfig.getMysqlDatabase());
-        sourceConfig.setJdbcUrl(sourceUrl);
-        driver.configure(sourceConfig, pluginConfig);
+        String sourceUrl = adapter.getSourceUrl(this.serverUrl, pluginConfig.getMysqlDatabase());
+        this.configuration.setJdbcUrl(sourceUrl);
+        adapter.configure(this.configuration, pluginConfig);
 
         // Apply secure credentials if provided
         if (credentials != null) {
-            credentials.apply(sourceConfig);
+            credentials.apply(this.configuration);
             this.secure = true;
         } else {
             this.secure = false;
         }
-
-        // Create the source object
-        this.source = new HikariDataSource(sourceConfig);
     }
 
     /**
@@ -94,10 +97,16 @@ public class Database implements AutoCloseable {
     }
 
     /**
-     * Checks if the source can connect to the database or not.
+     * Initialize the connection pool from the registered configuration.
+     * If the pool has already been initialized, does nothing.
+     *
+     * @throws SQLException thrown if the connection pool cannot connect to the database
      */
-    public void testConnection() throws SQLException {
-        this.source.getConnection().close();
+    public void initialize() throws SQLException {
+        if (this.source == null) {
+            this.source = new HikariDataSource(this.configuration);
+            this.source.getConnection().close();
+        }
     }
 
     /**
@@ -129,12 +138,12 @@ public class Database implements AutoCloseable {
     }
 
     /**
-     * Returns the list of all tables created in the database
+     * Returns a collection with all tables of the database.
      *
-     * @return List of tables.
+     * @return collection of table names
      */
-    public List<String> getTables() throws SQLException {
-        List<String> tables = new ArrayList<>();
+    public Set<String> getTables() throws SQLException {
+        Set<String> tables = new HashSet<>();
 
         try (Connection conn = this.source.getConnection();
              ResultSet result = conn.getMetaData().getTables(null, null, "%", null)) {
