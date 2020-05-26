@@ -11,6 +11,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.logging.Level;
+
 public class ReloadCommand extends AbstractCommand {
 
     public ReloadCommand() {
@@ -22,7 +24,7 @@ public class ReloadCommand extends AbstractCommand {
     @Override
     public void perform(CommandSender sender) {
         String advice = sender instanceof Player
-                ? "See the console for more info!"
+                ? "See console for more info!"
                 : "See above error log.";
 
         try {
@@ -35,8 +37,9 @@ public class ReloadCommand extends AbstractCommand {
             PluginMsg.messageWithPrefix(sender, LocaleKey.CMD_CONFIG_RELOADED, ChatColor.GREEN);
         } catch (YamlFileLoadException e) {
             sender.sendMessage(EnderContainers.PREFIX +
-                    "§cError when reloading a configuration file! " + advice);
-            sender.sendMessage(EnderContainers.PREFIX + "§8Cannot fully reload the plugin.");
+                    "§cError when loading a configuration file! " + advice);
+            EnderContainers.getInstance().getLogger().log(Level.SEVERE,
+                    "Cannot load plugin configuration or messages file", e);
         }
     }
 

@@ -58,7 +58,7 @@ public abstract class ConfigurableFileWrapper extends YamlFileWrapper {
                 field.setAccessible(true);
                 field.set(this, value);
                 field.setAccessible(false);
-            } catch (ReflectiveOperationException e) {
+            } catch (ReflectiveOperationException | IllegalArgumentException e) {
                 String configName = getClass().getSimpleName().toLowerCase();
                 throw new YamlFileLoadException(String.format(
                         "Cannot set the config value %s of key %s for %s",
