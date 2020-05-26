@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.storage;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.storage.backups.BackupsFlatData;
 import fr.utarwyn.endercontainers.storage.backups.BackupsSQLData;
@@ -29,7 +30,7 @@ public class StorageManagerTest {
     private DatabaseManager databaseManager;
 
     @BeforeClass
-    public static void setUpClass() throws IOException,
+    public static void setUpClass() throws IOException, YamlFileLoadException,
             InvalidConfigurationException, ReflectiveOperationException {
         TestHelper.setUpFiles();
     }

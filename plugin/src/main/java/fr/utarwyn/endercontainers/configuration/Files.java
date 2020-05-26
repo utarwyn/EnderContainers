@@ -1,9 +1,11 @@
 package fr.utarwyn.endercontainers.configuration;
 
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- * A file handler which create and contains a single instance of all config files.
+ * A file handler which create and contains
+ * a single instance of all config files.
  *
  * @author Utarwyn <maxime.malgorn@laposte.net>
  * @since 2.2.0
@@ -46,33 +48,31 @@ public class Files {
     }
 
     /**
-     * Construct a new configuration instance. If the instance exists, it does not create a new one.
+     * Constructs a new configuration instance.
+     * If the instance exists, it does not create a new one.
      *
-     * @param plugin The Bukkit plugin
-     * @return true if the configuration has been initialized and loaded.
+     * @param plugin java plugin object
+     * @throws YamlFileLoadException thrown if the configuration file cannot be loaded
      */
-    public static boolean initConfiguration(JavaPlugin plugin) {
+    public static void initConfiguration(JavaPlugin plugin) throws YamlFileLoadException {
         if (configuration == null) {
             configuration = new Configuration(plugin);
-            return configuration.load();
+            configuration.load();
         }
-
-        return false;
     }
 
     /**
-     * Construct a new locale instance. If the instance exists, it does not create a new one.
+     * Constructs a new locale instance.
+     * If the instance exists, it does not create a new one.
      *
-     * @param plugin The Bukkit plugin
-     * @return true if the locale has been initialized and loaded.
+     * @param plugin java plugin object
+     * @throws YamlFileLoadException thrown if the configuration file cannot be loaded
      */
-    public static boolean initLocale(JavaPlugin plugin) {
+    public static void initLocale(JavaPlugin plugin) throws YamlFileLoadException {
         if (locale == null) {
             locale = new Locale(plugin);
-            return locale.load();
+            locale.load();
         }
-
-        return false;
     }
 
 }

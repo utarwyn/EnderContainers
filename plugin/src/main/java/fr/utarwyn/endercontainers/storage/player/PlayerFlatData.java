@@ -1,8 +1,9 @@
 package fr.utarwyn.endercontainers.storage.player;
 
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileWrapper;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
-import fr.utarwyn.endercontainers.storage.FlatFile;
 import fr.utarwyn.endercontainers.storage.serialization.ItemSerializer;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,7 +15,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 
 /**
- * Storage wrapper for player data (flatfile)
+ * Storage wrapper to manage player data through a Yaml file.
  *
  * @author Utarwyn
  * @since 2.0.0
@@ -27,9 +28,9 @@ public class PlayerFlatData extends PlayerData {
     private static final String PREFIX = "enderchests";
 
     /**
-     * Object which manages interaction with a flat file
+     * Object which manages configuration and data of the player
      */
-    private FlatFile flatFile;
+    private final YamlFileWrapper configuration;
 
     /**
      * Construct a new player storage wrapper with a flat file.
@@ -40,6 +41,12 @@ public class PlayerFlatData extends PlayerData {
      */
     public PlayerFlatData(UUID uuid, EnderContainers plugin, ItemSerializer itemSerializer) {
         super(uuid, plugin, itemSerializer);
+
+        String minimalUuid = this.uuid.toString().replace("-", "");
+        this.configuration = new YamlFileWrapper(new File(
+                this.plugin.getDataFolder(), "data" + File.separator + minimalUuid + ".yml"
+        ));
+
         this.load();
     }
 
@@ -49,9 +56,8 @@ public class PlayerFlatData extends PlayerData {
     @Override
     public void load() {
         try {
-            String minimalUuid = this.uuid.toString().replace("-", "");
-            this.flatFile = new FlatFile("data" + File.separator + minimalUuid + ".yml");
-        } catch (IOException e) {
+            this.configuration.load();
+        } catch (YamlFileLoadException e) {
             this.plugin.getLogger().log(Level.SEVERE, String.format(
                     "Cannot load the data file of the user %s", this.uuid
             ), e);
@@ -64,7 +70,7 @@ public class PlayerFlatData extends PlayerData {
     @Override
     public void save() {
         try {
-            this.flatFile.save();
+            this.configuration.save();
         } catch (IOException e) {
             this.plugin.getLogger().log(Level.SEVERE, String.format(
                     "Cannot save the data file of the user %s", this.uuid
@@ -79,8 +85,8 @@ public class PlayerFlatData extends PlayerData {
     public ConcurrentMap<Integer, ItemStack> getEnderchestContents(EnderChest chest) {
         String path = PREFIX + "." + chest.getNum() + ".contents";
 
-        if (this.flatFile.getConfiguration().contains(path)) {
-            return this.deserializeItems(chest, this.flatFile.getConfiguration().getString(path));
+        if (this.configuration.get().contains(path)) {
+            return this.deserializeItems(chest, this.configuration.get().getString(path));
         }
 
         return new ConcurrentHashMap<>();
@@ -92,8 +98,8 @@ public class PlayerFlatData extends PlayerData {
     @Override
     public int getEnderchestRows(EnderChest chest) {
         String path = PREFIX + "." + chest.getNum() + ".rows";
-        return this.flatFile.getConfiguration().contains(path) ?
-                this.flatFile.getConfiguration().getInt(path) : 3;
+        return this.configuration.get().contains(path) ?
+                this.configuration.get().getInt(path) : 3;
     }
 
     /**
@@ -105,9 +111,9 @@ public class PlayerFlatData extends PlayerData {
         String contents = !chest.getContents().isEmpty() ?
                 this.serializeChestContents(chest) : null;
 
-        this.flatFile.getConfiguration().set(path + ".rows", chest.getRows());
-        this.flatFile.getConfiguration().set(path + ".position", chest.getNum());
-        this.flatFile.getConfiguration().set(path + ".contents", contents);
+        this.configuration.get().set(path + ".rows", chest.getRows());
+        this.configuration.get().set(path + ".position", chest.getNum());
+        this.configuration.get().set(path + ".contents", contents);
     }
 
 }

@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.command.CommandManager;
 import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
@@ -52,12 +53,13 @@ public class EnderContainers extends JavaPlugin {
         instance = this;
 
         // Load config files
-        if (!Files.initConfiguration(this)) {
-            this.getLogger().log(Level.SEVERE, "Cannot load the configuration. Please check the above log. Plugin loading failed.");
-            return;
-        }
-        if (!Files.initLocale(this)) {
-            this.getLogger().log(Level.SEVERE, "Cannot load the locale. Please check the above log. Plugin loading failed.");
+        try {
+            Files.initConfiguration(this);
+            Files.initLocale(this);
+        } catch (YamlFileLoadException e) {
+            this.getLogger().log(Level.SEVERE,
+                    "Cannot load plugin configuration or messages file", e);
+            this.getPluginLoader().disablePlugin(this);
             return;
         }
 

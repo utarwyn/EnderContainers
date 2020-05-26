@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers;
 
 import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.mock.ItemFactoryMock;
 import fr.utarwyn.endercontainers.mock.ItemMetaMock;
 import fr.utarwyn.endercontainers.mock.v1_12.ServerMock;
@@ -75,8 +76,8 @@ public class TestHelper {
     /**
      * Setup a mocked version of configuration files.
      */
-    public static synchronized void setUpFiles() throws IOException,
-            InvalidConfigurationException, ReflectiveOperationException {
+    public static synchronized void setUpFiles() throws IOException, YamlFileLoadException,
+            ReflectiveOperationException, InvalidConfigurationException {
         if (!filesReady) {
             // Initialize the configuration object
             EnderContainers plugin = TestHelper.getPlugin();

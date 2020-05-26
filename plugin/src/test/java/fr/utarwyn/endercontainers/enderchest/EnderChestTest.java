@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.menu.MenuManager;
 import fr.utarwyn.endercontainers.menu.enderchest.EnderChestMenu;
@@ -36,7 +37,7 @@ public class EnderChestTest {
     private EnderChest chest;
 
     @Before
-    public void setUp() throws ReflectiveOperationException,
+    public void setUp() throws ReflectiveOperationException, YamlFileLoadException,
             IOException, InvalidConfigurationException {
         TestHelper.setUpServer();
         TestHelper.setUpFiles();

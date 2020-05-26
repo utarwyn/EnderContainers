@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.configuration;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.junit.BeforeClass;
@@ -11,19 +12,26 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocaleTest {
 
     @BeforeClass
-    public static void setupClass() throws InvalidConfigurationException,
+    public static void setupClass() throws InvalidConfigurationException, YamlFileLoadException,
             ReflectiveOperationException, IOException {
         TestHelper.setUpFiles();
     }
 
     @Test
     public void load() {
-        assertThat(Files.getLocale().load()).isTrue();
+        try {
+            Files.getLocale().load();
+        } catch (YamlFileLoadException e) {
+            fail("locale loading should not thrown an exception", e);
+        }
     }
 
     @Test
@@ -35,21 +43,9 @@ public class LocaleTest {
                 .isEqualTo(ChatColor.GOLD + "CHEST MAIN TITLE");
 
         // Undefined key in the file
-        assertThat(Files.getLocale().getMessage(LocaleKey.MENU_CHEST_LOCKED))
-                .isNull();
-    }
-
-    @Test
-    public void parseValue() {
-        // Parse a random value
-        assertThat(Files.getLocale().parseValue("key", 50))
-                .isNotNull()
-                .isEqualTo(50);
-
-        // Parse a string with a random color
-        assertThat(Files.getLocale().parseValue("key", "&6test"))
-                .isNotNull()
-                .isEqualTo("§6test");
+        LocaleKey localeKey = mock(LocaleKey.class);
+        when(localeKey.getKey()).thenReturn("UNKNOWN_KEY");
+        assertThat(Files.getLocale().getMessage(localeKey)).isNull();
     }
 
 }

@@ -1,10 +1,12 @@
 package fr.utarwyn.endercontainers.configuration;
 
 import fr.utarwyn.endercontainers.compatibility.ServerVersion;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileWrapper;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,23 +17,34 @@ import java.util.Map;
  * @author Utarwyn
  * @since 2.0.0
  */
-public class Locale extends YamlFile {
+public class Locale extends YamlFileWrapper {
 
     /**
-     * Bukkit configuration object which contains all messages
+     * Cache map with all messages retrieved from the configuration
      */
-    private Configuration configuration;
+    private final Map<String, String> cache;
 
     /**
-     * Localized message cache
+     * Constructs the locale object.
+     *
+     * @param plugin java plugin object
      */
-    private Map<String, String> cache;
-
     Locale(JavaPlugin plugin) {
-        super(plugin, "locale.yml");
+        super(
+                new File(plugin.getDataFolder(), "locale.yml"),
+                plugin.getClass().getResource("/locales/en.yml")
+        );
 
         this.cache = new HashMap<>();
-        this.setDefaultFilename("locales/en.yml");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void load() throws YamlFileLoadException {
+        super.load();
+        this.cache.clear();
     }
 
     /**
@@ -42,34 +55,23 @@ public class Locale extends YamlFile {
      */
     public String getMessage(LocaleKey key) {
         return this.cache.computeIfAbsent(key.getKey(), k ->
-                (String) this.parseValue(k, this.configuration.getString(k)));
+                this.formatMessage(this.configuration.getString(k)));
     }
 
     /**
-     * {@inheritDoc}
+     * Format a message from the locale configuration file before using it.
+     *
+     * @param message message to format
+     * @return formatted message from the configuration
      */
-    @Override
-    public boolean load() {
-        this.configuration = this.getFileConfiguration();
-        return this.configuration != null;
-    }
+    private String formatMessage(String message) {
+        if (message == null) return null;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Object parseValue(String key, Object value) {
-        if (value instanceof String) {
-            String message = String.valueOf(value);
-
-            if (ServerVersion.isOlderThan(ServerVersion.V1_9)) {
-                message = new String(message.getBytes(), StandardCharsets.UTF_8);
-            }
-
-            return ChatColor.translateAlternateColorCodes('&', message);
+        if (ServerVersion.isOlderThan(ServerVersion.V1_9)) {
+            message = new String(message.getBytes(), StandardCharsets.UTF_8);
         }
 
-        return value;
+        return ChatColor.translateAlternateColorCodes('&', message);
     }
 
 }

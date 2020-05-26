@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.configuration;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.junit.BeforeClass;
@@ -17,21 +18,21 @@ import static org.mockito.Mockito.mock;
 public class FilesTest {
 
     @BeforeClass
-    public static void setUpClass() throws IOException,
+    public static void setUpClass() throws IOException, YamlFileLoadException,
             InvalidConfigurationException, ReflectiveOperationException {
         TestHelper.setUpFiles();
     }
 
     @Test
-    public void configuration() {
+    public void configuration() throws YamlFileLoadException {
         assertThat(Files.getConfiguration()).isNotNull();
-        assertThat(Files.initConfiguration(mock(JavaPlugin.class))).isFalse();
+        Files.initConfiguration(mock(JavaPlugin.class));
     }
 
     @Test
-    public void locale() {
+    public void locale() throws YamlFileLoadException {
         assertThat(Files.getLocale()).isNotNull();
-        assertThat(Files.initLocale(mock(JavaPlugin.class))).isFalse();
+        Files.initLocale(mock(JavaPlugin.class));
     }
 
 }

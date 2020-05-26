@@ -2,9 +2,10 @@ package fr.utarwyn.endercontainers.storage.backups;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.backup.Backup;
-import fr.utarwyn.endercontainers.storage.FlatFile;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileWrapper;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,19 +16,22 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 
 /**
- * Storage wrapper for backups (flatfile)
+ * Storage wrapper to manage backups through a Yaml file.
  *
  * @author Utarwyn
  * @since 2.0.0
  */
 public class BackupsFlatData extends BackupsData {
 
+    /**
+     * Prefix used in the config file to store backups
+     */
     private static final String PREFIX = "backups";
 
     /**
-     * Object which manages interaction with a flat file
+     * Object which manages backups configuration
      */
-    private FlatFile flatFile;
+    private final YamlFileWrapper configuration;
 
     /**
      * Construct a new backup storage wrapper with a flat file.
@@ -36,21 +40,13 @@ public class BackupsFlatData extends BackupsData {
      */
     public BackupsFlatData(EnderContainers plugin) {
         super(plugin);
-        this.backups = new ArrayList<>();
-        this.load();
-    }
 
-    /**
-     * Get the folder which used to store files of a specific backup.
-     *
-     * @param backup Backup used to get the folder path
-     * @return Folder where backup files are stored
-     */
-    private static File getBackupFolder(Backup backup) {
-        return new File(
-                EnderContainers.getInstance().getDataFolder(),
-                PREFIX + File.separator + backup.getName()
+        this.backups = new ArrayList<>();
+        this.configuration = new YamlFileWrapper(
+                new File(this.plugin.getDataFolder(), "backups.yml")
         );
+
+        this.load();
     }
 
     /**
@@ -59,23 +55,23 @@ public class BackupsFlatData extends BackupsData {
     @Override
     protected void load() {
         try {
-            this.flatFile = new FlatFile("backups.yml");
-        } catch (IOException e) {
+            this.configuration.load();
+        } catch (YamlFileLoadException e) {
             this.plugin.getLogger().log(Level.SEVERE, "Cannot load the backups file", e);
+            return;
         }
 
-        if (!this.flatFile.getConfiguration().isConfigurationSection(PREFIX)) {
-            this.flatFile.getConfiguration().set(PREFIX, new ArrayList<>());
+        if (!this.configuration.get().isConfigurationSection(PREFIX)) {
+            this.configuration.get().set(PREFIX, new ArrayList<>());
         }
 
-        YamlConfiguration config = this.flatFile.getConfiguration();
-        ConfigurationSection section = config.getConfigurationSection(PREFIX);
+        ConfigurationSection section = this.configuration.get().getConfigurationSection(PREFIX);
 
         if (section != null) {
             for (String key : section.getKeys(false)) {
-                String name = config.getString(PREFIX + "." + key + ".name");
-                Timestamp date = new Timestamp(config.getLong(PREFIX + "." + key + ".date"));
-                String createdBy = config.getString(PREFIX + "." + key + ".createdBy");
+                String name = section.getString(key + ".name");
+                Timestamp date = new Timestamp(section.getLong(key + ".date"));
+                String createdBy = section.getString(key + ".createdBy");
 
                 this.backups.add(new Backup(name, date, createdBy));
             }
@@ -88,7 +84,7 @@ public class BackupsFlatData extends BackupsData {
     @Override
     protected void save() {
         try {
-            this.flatFile.save();
+            this.configuration.save();
         } catch (IOException e) {
             this.plugin.getLogger().log(Level.SEVERE, "Cannot save the backups file", e);
         }
@@ -99,7 +95,7 @@ public class BackupsFlatData extends BackupsData {
      */
     @Override
     public boolean saveNewBackup(Backup backup) {
-        YamlConfiguration config = this.flatFile.getConfiguration();
+        Configuration config = this.configuration.get();
         String name = backup.getName();
 
         config.set(PREFIX + "." + name + ".name", name);
@@ -115,13 +111,13 @@ public class BackupsFlatData extends BackupsData {
      */
     @Override
     public boolean executeStorage(Backup backup) {
-        File folder = BackupsFlatData.getBackupFolder(backup);
+        File folder = this.getBackupFolder(backup);
 
         if (!folder.exists() && !folder.mkdirs()) {
             return false;
         }
 
-        File enderFolder = new File(EnderContainers.getInstance().getDataFolder(), "data");
+        File enderFolder = new File(this.plugin.getDataFolder(), "data");
         return this.copyFolderFiles(enderFolder, folder);
     }
 
@@ -130,10 +126,10 @@ public class BackupsFlatData extends BackupsData {
      */
     @Override
     public boolean applyBackup(Backup backup) {
-        File folder = BackupsFlatData.getBackupFolder(backup);
+        File folder = this.getBackupFolder(backup);
 
         if (folder.exists()) {
-            File enderFolder = new File(EnderContainers.getInstance().getDataFolder(), "data");
+            File enderFolder = new File(this.plugin.getDataFolder(), "data");
             return this.copyFolderFiles(folder, enderFolder);
         }
 
@@ -145,14 +141,14 @@ public class BackupsFlatData extends BackupsData {
      */
     @Override
     public boolean removeBackup(Backup backup) {
-        File folder = BackupsFlatData.getBackupFolder(backup);
+        File folder = this.getBackupFolder(backup);
 
         try {
-            if (folder.exists()) {
-                this.deleteFolder(folder);
+            if (folder.isDirectory()) {
+                deleteFolder(folder);
             }
 
-            this.flatFile.getConfiguration().set(PREFIX + "." + backup.getName(), null);
+            this.configuration.get().set(PREFIX + "." + backup.getName(), null);
             this.save();
 
             return true;
@@ -162,6 +158,17 @@ public class BackupsFlatData extends BackupsData {
         }
 
         return false;
+    }
+
+    /**
+     * Get the folder which used to store files of a specific backup.
+     *
+     * @param backup Backup used to get the folder path
+     * @return Folder where backup files are stored
+     */
+    private File getBackupFolder(Backup backup) {
+        return new File(this.plugin.getDataFolder(),
+                PREFIX + File.separator + backup.getName());
     }
 
     /**
@@ -202,7 +209,7 @@ public class BackupsFlatData extends BackupsData {
      * @param folder folder to delete
      * @throws IOException if a folder or file cannot be deleted
      */
-    private void deleteFolder(File folder) throws IOException {
+    private static void deleteFolder(File folder) throws IOException {
         File[] files = folder.listFiles();
         if (files == null) {
             Files.delete(folder.toPath());
@@ -211,7 +218,7 @@ public class BackupsFlatData extends BackupsData {
 
         for (File file : files) {
             if (file.isDirectory()) {
-                this.deleteFolder(file);
+                deleteFolder(file);
             } else {
                 Files.delete(file.toPath());
             }

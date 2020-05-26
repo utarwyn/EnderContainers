@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
@@ -32,7 +33,7 @@ public class EnderChestManagerTest {
     private EnderChestManager manager;
 
     @BeforeClass
-    public static void setUpClass() throws IOException,
+    public static void setUpClass() throws IOException, YamlFileLoadException,
             InvalidConfigurationException, ReflectiveOperationException {
         TestHelper.setUpServer();
         TestHelper.setUpFiles();

@@ -1,8 +1,12 @@
 package fr.utarwyn.endercontainers.configuration;
 
+import fr.utarwyn.endercontainers.configuration.wrapper.ConfigurableFileWrapper;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -11,7 +15,12 @@ import java.util.List;
  * @author Utarwyn
  * @since 2.0.0
  */
-public class Configuration extends YamlFile {
+public class Configuration extends ConfigurableFileWrapper {
+
+    /**
+     * EnderContainers plugin instance
+     */
+    private final Plugin plugin;
 
     @Configurable
     private boolean debug;
@@ -89,19 +98,26 @@ public class Configuration extends YamlFile {
      * @param plugin the Bukkit plugin
      */
     Configuration(JavaPlugin plugin) {
-        super(plugin, null);
+        super(null);
+        this.plugin = plugin;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected FileConfiguration getFileConfiguration() {
+    protected FileConfiguration createConfiguration(File file) {
         this.plugin.saveDefaultConfig();
         return this.plugin.getConfig();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean reload() {
+    public void load() throws YamlFileLoadException {
         this.plugin.reloadConfig();
-        return this.load();
+        super.load();
     }
 
     public boolean isDebug() {
