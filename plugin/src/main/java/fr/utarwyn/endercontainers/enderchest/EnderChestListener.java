@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.enderchest;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
+import fr.utarwyn.endercontainers.dependency.ServerVersion;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.PluginMsg;
@@ -65,9 +66,13 @@ public class EnderChestListener implements Listener {
         // Right click on an ender chest?
         if (block != null && block.getType().equals(Material.ENDER_CHEST)) {
             // Player is in sneaking mode with item in the hand?
-            if (player.isSneaking() && !player.getInventory().getItemInMainHand().getType().equals(Material.AIR)) {
+        	if (ServerVersion.isServerVersionAtLeast(ServerVersion.V1_8)) {
+        		if (player.isSneaking() && !player.getInventory().getItemInHand().getType().equals(Material.AIR)) {
+                    return;
+        		} else if (player.isSneaking() && !player.getInventory().getItemInMainHand().getType().equals(Material.AIR)) {
                 return;
-            }
+            			}
+        		}
 
             // Plugin not enabled or world disabled in config?
             if (Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName())) {
