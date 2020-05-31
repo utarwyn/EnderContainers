@@ -65,7 +65,7 @@ public class EnderChestListener implements Listener {
         // Right click on an ender chest?
         if (block != null && block.getType().equals(Material.ENDER_CHEST)) {
             // Player is in sneaking mode with item in the hand?
-            if (player.isSneaking() && !player.getInventory().getItemInMainHand().getType().equals(Material.AIR)) {
+            if (player.isSneaking() && !player.getInventory().getItemInHand().getType().equals(Material.AIR)) {
                 return;
             }
 
