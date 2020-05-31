@@ -6,6 +6,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Objects;
+
 /**
  * Miscellaneous utility class of the plugin.
  *
@@ -31,7 +33,8 @@ public class MiscUtil {
         Sound sound = MiscUtil.generateSound(sound18, sound19);
         if (sound == null) return;
 
-        location.getWorld().playSound(location, sound, 1f, 1f);
+        Objects.requireNonNull(location.getWorld())
+                .playSound(location, sound, 1f, 1f);
     }
 
     /**

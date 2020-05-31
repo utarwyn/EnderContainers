@@ -172,7 +172,7 @@ public class EnderChestHubMenu extends AbstractMenu {
         if (this.context.openEnderchestFor(player, this.getFirstChestIndex() + slot)) {
             MiscUtil.playSound(player, "CLICK", "UI_BUTTON_CLICK");
         } else {
-            MiscUtil.playSound(player, "ANVIL_BREAK", "BLOCK_ANVIL_BREAK");
+            MiscUtil.playSound(player, "VILLAGER_NO", "ENTITY_VILLAGER_NO");
         }
     }
 
