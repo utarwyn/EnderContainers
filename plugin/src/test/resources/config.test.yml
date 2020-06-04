@@ -12,11 +12,11 @@ enderchests:
   useVanillaEnderchest: true
 mysql:
   enabled: false
-  host: ''
+  host: 'localhost'
   port: 3306
-  user: ''
-  password: ''
-  database: ''
+  user: 'username'
+  password: 'password'
+  database: 'database'
   tablePrefix: ''
   ssl:
     enabled: false

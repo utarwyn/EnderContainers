@@ -1,15 +1,12 @@
 package fr.utarwyn.endercontainers.database;
 
 import fr.utarwyn.endercontainers.AbstractManager;
-import fr.utarwyn.endercontainers.configuration.Configuration;
 import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.database.adapter.MySQLAdapter;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -61,17 +58,19 @@ public class DatabaseManager extends AbstractManager {
             try {
                 long beginTime = System.currentTimeMillis();
 
-                // Open a new connection to the SQL server
-                this.database.open();
+                // Initialize the database connection handler
+                this.database.initialize();
 
-                // Initialize the tables if needed
+                // Create the tables if needed
                 this.createTables();
 
                 // Log the successful connection into the console
                 this.logConnection(beginTime);
             } catch (SQLException e) {
-                this.logger.log(Level.SEVERE, "Unable to connect to your database. Please verify your credentials.", e);
-                this.logger.warning("SQL supports disabled because of an error during the connection.");
+                this.logger.log(Level.SEVERE, "Unable to connect to your " +
+                        "database. Please verify your credentials.", e);
+                this.logger.warning("SQL supports disabled because of an " +
+                        "error during the connection.");
                 this.database = null;
             }
         } else {
@@ -84,22 +83,18 @@ public class DatabaseManager extends AbstractManager {
      */
     @Override
     protected synchronized void unload() {
-        try {
-            if (this.database != null) {
-                this.database.close();
-            }
-        } catch (SQLException e) {
-            this.logger.log(Level.SEVERE, "Cannot close the database connection.", e);
+        if (this.database != null) {
+            this.database.close();
         }
     }
 
     /**
-     * Allow to know if the database is ready to perform statement or not.
+     * Allow to know if the database is ready to perform statements or not.
      *
-     * @return True if the database is connected and ready.
+     * @return true if the driver is running, false otherwise
      */
     public boolean isReady() {
-        return this.database != null && this.database.isConnected();
+        return this.database != null && this.database.isRunning();
     }
 
     /**
@@ -110,8 +105,10 @@ public class DatabaseManager extends AbstractManager {
      * @param num      The num of the chest
      * @param rows     The number of rows of the chest
      * @param contents All contents of the chest
+     * @throws SQLException thrown if the enderchest cannot be saved
      */
-    public void saveEnderchest(boolean insert, UUID owner, int num, int rows, String contents) throws SQLException {
+    public void saveEnderchest(boolean insert, UUID owner, int num, int rows, String contents)
+            throws SQLException {
         if (insert) {
             this.database.update(formatTable(CHEST_TABLE))
                     .fields("num", "owner", "rows", "contents")
@@ -131,6 +128,7 @@ public class DatabaseManager extends AbstractManager {
      * List of database rows which contains all saved chests
      *
      * @return The list of saved enderchests
+     * @throws SQLException thrown if enderchests cannot be retrieved
      */
     public List<DatabaseSet> getAllEnderchests() throws SQLException {
         return this.database.select()
@@ -143,6 +141,7 @@ public class DatabaseManager extends AbstractManager {
      *
      * @param owner The owner of chests
      * @return The list of all chests for a player
+     * @throws SQLException thrown if the enderchest cannot be resolved
      */
     public List<DatabaseSet> getEnderchestsOf(UUID owner) throws SQLException {
         return this.database.select().from(formatTable(CHEST_TABLE))
@@ -155,6 +154,7 @@ public class DatabaseManager extends AbstractManager {
      * by a list of new enderchests.
      *
      * @param datasets The list of enderchests to save
+     * @throws SQLException thrown if enderchest cannot be replaced
      */
     public void replaceEnderchests(List<DatabaseSet> datasets) throws SQLException {
         String chestTable = formatTable(CHEST_TABLE);
@@ -175,6 +175,7 @@ public class DatabaseManager extends AbstractManager {
      * List of database rows which contains all saved backups
      *
      * @return The list of saved backups
+     * @throws SQLException thrown if backups cannot be retrieved
      */
     public List<DatabaseSet> getBackups() throws SQLException {
         return this.database.select().from(formatTable(BACKUP_TABLE)).findAll();
@@ -185,6 +186,7 @@ public class DatabaseManager extends AbstractManager {
      *
      * @param name Name of a backup to get
      * @return The found backup (or null if not found)
+     * @throws SQLException thrown if the backup cannot be resolved
      */
     public Optional<DatabaseSet> getBackup(String name) throws SQLException {
         return Optional.ofNullable(this.database.select()
@@ -200,8 +202,10 @@ public class DatabaseManager extends AbstractManager {
      * @param date      backup creation date
      * @param data      backup data
      * @param createdBy name of the entity who created the backup
+     * @throws SQLException thrown if the backup cannot be saved
      */
-    public void saveBackup(String name, long date, String data, String createdBy) throws SQLException {
+    public void saveBackup(String name, long date, String data, String createdBy)
+            throws SQLException {
         this.database.update(formatTable(BACKUP_TABLE))
                 .fields("name", "date", "data", "created_by")
                 .values(name, new Timestamp(date), data, createdBy)
@@ -213,6 +217,7 @@ public class DatabaseManager extends AbstractManager {
      *
      * @param name Name of the backup to remove
      * @return True if the backup was successfully removed.
+     * @throws SQLException thrown if the backup cannot be removed
      */
     public boolean removeBackup(String name) throws SQLException {
         Optional<DatabaseSet> backup = this.getBackup(name);
@@ -227,31 +232,19 @@ public class DatabaseManager extends AbstractManager {
      * Setup the database connection from user configuration.
      */
     private void setupDatabase() {
-        Configuration config = Files.getConfiguration();
-
-        // Setup the database object
-        this.database = new Database(
-                config.getMysqlHost(), config.getMysqlPort(),
-                config.getMysqlUser(), config.getMysqlPassword(), config.getMysqlDatabase()
-        );
+        DatabaseSecureCredentials credentials = null;
 
         // Connection over SSL?
-        if (config.isMysqlSsl()) {
-            DatabaseSecureCredentials credentials = new DatabaseSecureCredentials();
-
-            try {
-                credentials.setClientKeystore(config.getMysqlSslKeystoreFile(), config.getMysqlSslKeystorePassword());
-            } catch (NullPointerException e) {
-                this.logger.log(Level.SEVERE, "keystore file or password from your configuration seems to be null", e);
-                return;
-            }
-
-            if (config.getMysqlSslTrustKeystoreFile() != null && config.getMysqlSslTrustKeystorePassword() != null) {
-                credentials.setTrustKeystore(config.getMysqlSslTrustKeystoreFile(), config.getMysqlSslTrustKeystorePassword());
-            }
-
-            this.database.setSecureCredentials(credentials);
+        try {
+            credentials = DatabaseSecureCredentials.fromConfig(Files.getConfiguration())
+                    .orElse(null);
+        } catch (NullPointerException e) {
+            this.logger.log(Level.SEVERE, "keystore file or password from " +
+                    "your configuration seems to be null", e);
         }
+
+        // Setup the database object, for now only supports MySQL connections
+        this.database = new Database(new MySQLAdapter(), credentials);
     }
 
     /**
@@ -260,16 +253,20 @@ public class DatabaseManager extends AbstractManager {
      * @param beginTime timestamp where the connection has started
      */
     private void logConnection(long beginTime) {
-        this.logger.log(Level.INFO, "MySQL enabled and ready. Connected to database {0}", this.database.getEndpoint());
+        this.logger.log(Level.INFO, "MySQL enabled and ready. Connected to database {0}",
+                this.database.getServerUrl());
 
-        if (this.database.isSecured()) {
-            this.logger.info("Good news! You are using a secure connection to your database server.");
+        if (this.database.isSecure()) {
+            this.logger.info("Good news! You are using a secure connection " +
+                    "to your database server.");
         } else {
-            this.logger.warning("You are using an unsecure connection to your database server. Be careful!");
+            this.logger.warning("You are using an unsecure connection " +
+                    "to your database server. Be careful!");
         }
 
         if (Files.getConfiguration().isDebug()) {
-            this.logger.log(Level.INFO, "Connection time: {0}ms", System.currentTimeMillis() - beginTime);
+            this.logger.log(Level.INFO, "Connection time: {0}ms",
+                    System.currentTimeMillis() - beginTime);
         }
     }
 
@@ -278,7 +275,7 @@ public class DatabaseManager extends AbstractManager {
      */
     private void createTables() throws SQLException {
         String collation = this.database.getServerVersion() >= 5.5 ? "utf8mb4_unicode_ci" : "utf8_unicode_ci";
-        List<String> tables = this.database.getTables();
+        Set<String> tables = this.database.getTables();
 
         if (!tables.contains(formatTable(CHEST_TABLE))) {
             database.request("CREATE TABLE `" + formatTable(CHEST_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `num` TINYINT(2) NOT NULL DEFAULT '0', `owner` VARCHAR(36) NULL, `contents` MEDIUMTEXT NULL, `rows` INT(1) NOT NULL DEFAULT 0, PRIMARY KEY (`id`), UNIQUE KEY `NUM OWNER` (`num`,`owner`), INDEX `USER KEY` (`num`, `owner`)) COLLATE='" + collation + "' ENGINE=InnoDB;");

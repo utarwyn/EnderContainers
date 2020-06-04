@@ -14,7 +14,8 @@
     <name>EnderContainers Plugin</name>
 
     <properties>
-        <dbcp.version>2.7.0</dbcp.version>
+        <hikaricp.version>3.4.5</hikaricp.version>
+        <slf4j.version>1.7.25</slf4j.version>
         <bstats.version>1.7</bstats.version>
         <junit.version>4.13</junit.version>
         <mockito.version>3.3.3</mockito.version>
@@ -66,9 +67,17 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-dbcp2</artifactId>
-            <version>${dbcp.version}</version>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikaricp.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -111,9 +120,9 @@
                     <artifactSet>
                         <includes>
                             <include>${project.groupId}:*</include>
+                            <include>com.zaxxer:HikariCP</include>
+                            <include>org.slf4j</include>
                             <include>org.bstats</include>
-                            <include>org.apache.commons:commons-*</include>
-                            <include>commons-logging:*</include>
                         </includes>
                     </artifactSet>
                     <filters>
@@ -127,7 +136,15 @@
                     <relocations>
                         <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>fr.utarwyn.endercontainers</shadedPattern>
+                            <shadedPattern>fr.utarwyn.endercontainers.shade.bstats</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.zaxxer.hikari</pattern>
+                            <shadedPattern>fr.utarwyn.endercontainers.shade.hikari</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.slf4j</pattern>
+                            <shadedPattern>fr.utarwyn.endercontainers.shade.slf4j</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>

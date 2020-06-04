@@ -1,134 +1,187 @@
 package fr.utarwyn.endercontainers.database;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+import com.zaxxer.hikari.HikariDataSource;
+import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.database.adapter.MySQLAdapter;
+import fr.utarwyn.endercontainers.database.request.DeleteRequest;
+import fr.utarwyn.endercontainers.database.request.SavingRequest;
+import fr.utarwyn.endercontainers.database.request.SelectRequest;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.IOException;
+import java.sql.*;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DatabaseTest {
 
+    @Mock(answer = Answers.CALLS_REAL_METHODS)
     private Database database;
+
+    @BeforeClass
+    public static void setUpClass() throws InvalidConfigurationException,
+            ReflectiveOperationException, IOException {
+        TestHelper.setUpFiles();
+    }
 
     @Before
     public void setUp() {
-        this.database = new Database(
-                "localhost", 3306,
-                "myusername", "mypassword", "endercontainers"
-        );
+        this.database.source = mock(HikariDataSource.class);
     }
 
     @Test
-    public void openConnection() throws SQLException {
-        assertThat(this.database.getEndpoint()).isEqualTo("localhost:3306");
-
-        // The JDBC driver is not loaded in the test environment
-        assertThatExceptionOfType(SQLException.class)
-                .isThrownBy(() -> this.database.open())
-                .withMessage("Cannot load JDBC driver class 'com.mysql.jdbc.Driver'");
-
-        // Mock the connection and try
-        BasicDataSource dataSource = this.mockConnection();
-        this.database.open();
-
-        verify(dataSource).setDriverClassName("com.mysql.jdbc.Driver");
-        verify(dataSource).setUrl(anyString());
-        verify(dataSource).setUsername("myusername");
-        verify(dataSource).setPassword("mypassword");
-        verify(dataSource.getConnection()).close();
+    public void serverUrl() {
+        Database mySQLDatabase = new Database(new MySQLAdapter(), null);
+        assertThat(mySQLDatabase.getServerUrl()).isEqualTo("localhost:3306");
     }
 
     @Test
-    public void openASecuredConnection() throws SQLException {
-        assertThat(this.database.isSecured()).isFalse();
+    public void withSecureCredentials() {
+        DatabaseSecureCredentials credentials = new DatabaseSecureCredentials();
+        credentials.setClientKeystore("client.p12", "changeit");
+        credentials.setTrustKeystore("trust.p12", "changeit");
+        Database secureDatabase = new Database(new MySQLAdapter(), credentials);
 
-        BasicDataSource dataSource = this.mockConnection();
-        this.setUpSecureCredentials();
-        this.database.open();
-
-        assertThat(this.database.isSecured()).isTrue();
-        verify(dataSource).addConnectionProperty("useSSL", "true");
-        verify(dataSource).addConnectionProperty("requireSSL", "true");
-        verify(dataSource).addConnectionProperty("clientCertificateKeyStorePassword", "changeit");
-        verify(dataSource).addConnectionProperty("clientCertificateKeyStoreType", "PKCS12");
+        assertThat(secureDatabase.isSecure()).isTrue();
     }
 
     @Test
-    public void isConnected() throws SQLException {
-        // Default state is not connected
-        assertThat(this.database.isConnected()).isFalse();
-
-        // Not connected after a connection error
-        try {
-            this.database.open();
-            fail("database connection should not be opened");
-        } catch (SQLException e) {
-            assertThat(this.database.isConnected()).isFalse();
-        }
-
-        // Connected after a successful connection
-        this.mockConnection();
-        this.database.open();
-        assertThat(this.database.isConnected()).isTrue();
+    public void initializationErrors() {
+        // With a MySQL adapter
+        Database mySQLDatabase = new Database(new MySQLAdapter(), null);
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(mySQLDatabase::initialize)
+                .withCauseInstanceOf(SQLException.class)
+                .withMessage("Failed to get driver instance for " +
+                        "jdbcUrl=jdbc:mysql://localhost:3306/database");
     }
 
     @Test
-    public void closeConnection() throws SQLException {
+    public void isRunning() {
+        // Not connected if the connection pool is not running
+        when(this.database.source.isRunning()).thenReturn(false);
+        assertThat(this.database.isRunning()).isFalse();
+
+        // Running if the connection pool is running
+        when(this.database.source.isRunning()).thenReturn(true);
+        assertThat(this.database.isRunning()).isTrue();
+    }
+
+    @Test
+    public void close() {
         // Can call the close method without a valid opened connection
         this.database.close();
 
         // Call the data source close method
-        BasicDataSource dataSource = this.mockConnection();
-        this.database.open();
+        when(this.database.isRunning()).thenReturn(true);
         this.database.close();
-        verify(dataSource).close();
+        verify(this.database.source).close();
     }
 
     @Test
-    public void performRequest() throws SQLException {
-        BasicDataSource dataSource = this.mockConnection();
-        Statement statement = mock(Statement.class);
-        String request = "SELECT * FROM test";
+    public void getServerVersion() throws SQLException {
+        Connection connection = mock(Connection.class);
+        DatabaseMetaData metaData = mock(DatabaseMetaData.class);
 
-        when(dataSource.getConnection().createStatement()).thenReturn(statement);
+        when(connection.getMetaData()).thenReturn(metaData);
+        when(this.database.source.getConnection()).thenReturn(connection);
+
+        when(metaData.getDatabaseProductVersion()).thenReturn("5.5.8-MySQL");
+        assertThat(this.database.getServerVersion()).isEqualTo(5.5);
+        when(metaData.getDatabaseProductVersion()).thenReturn("4.9.2");
+        assertThat(this.database.getServerVersion()).isEqualTo(4.9);
+    }
+
+    @Test
+    public void getTables() throws SQLException {
+        Connection connection = mock(Connection.class);
+        DatabaseMetaData metaData = mock(DatabaseMetaData.class);
+        ResultSet resultSet = mock(ResultSet.class);
+
+        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
+        when(resultSet.getString(3)).thenReturn("table1").thenReturn("table2");
+
+        when(metaData.getTables(null, null, "%", null)).thenReturn(resultSet);
+        when(connection.getMetaData()).thenReturn(metaData);
+        when(this.database.source.getConnection()).thenReturn(connection);
+
+        assertThat(this.database.getTables()).containsExactlyInAnyOrder("table1", "table2");
+    }
+
+    @Test
+    public void performSelect() throws SQLException {
+        PreparedStatement statement = this.createFakeStatement();
+
+        SelectRequest request = this.database.select("any", "field", "here")
+                .from("table1").where("id = ?").attributes(1);
+        request.find();
+
+        verify(this.database, times(1)).execQueryStatement(request);
+        verify(statement, times(1)).executeQuery();
+    }
+
+    @Test
+    public void performUpdate() throws SQLException {
+        PreparedStatement statement = this.createFakeStatement();
+
+        when(statement.executeUpdate()).thenReturn(1);
+
+        SavingRequest request = this.database.update("table1")
+                .fields("field").values("test");
+        assertThat(request.execute()).isTrue();
+
+        verify(this.database, times(1)).execUpdateStatement(request);
+        verify(statement, times(1)).executeUpdate();
+    }
+
+    @Test
+    public void performDelete() throws SQLException {
+        PreparedStatement statement = this.createFakeStatement();
+
+        when(statement.executeUpdate()).thenReturn(1);
+
+        DeleteRequest request = this.database.delete("field1 = ?")
+                .from("table2").attributes("test");
+        assertThat(request.execute()).isTrue();
+
+        verify(this.database, times(1)).execUpdateStatement(request);
+        verify(statement, times(1)).executeUpdate();
+    }
+
+    @Test
+    public void performCustomRequest() throws SQLException {
+        Statement statement = mock(Statement.class);
+        String request = "SELECT * FROM dual";
+
+        when(this.database.source.getConnection()).thenReturn(mock(Connection.class));
+        when(this.database.source.getConnection().createStatement()).thenReturn(statement);
         this.database.request(request);
         verify(statement).executeUpdate(request);
     }
 
-    /**
-     * Setup credentials to simulate a secure connection over SSL.
-     */
-    private void setUpSecureCredentials() {
-        DatabaseSecureCredentials credentials = new DatabaseSecureCredentials();
-        credentials.setClientKeystore("client.p12", "changeit");
-        credentials.setTrustKeystore("ca.p12", "changeit");
-        this.database.setSecureCredentials(credentials);
-    }
-
-    /**
-     * Generates a mock of the data source used to connect to a database.
-     * Also put this object inside the database test instance.
-     *
-     * @return the generated mock
-     * @throws SQLException thrown if the datasource cannot be instantiated
-     */
-    private BasicDataSource mockConnection() throws SQLException {
-        BasicDataSource dataSource = mock(BasicDataSource.class);
+    private PreparedStatement createFakeStatement() throws SQLException {
+        PreparedStatement statement = mock(PreparedStatement.class);
         Connection connection = mock(Connection.class);
+        ResultSet resultSet = mock(ResultSet.class);
+        ResultSetMetaData resultSetMetaData = mock(ResultSetMetaData.class);
 
-        when(dataSource.getConnection()).thenReturn(connection);
-        when(dataSource.isClosed()).thenReturn(false);
+        when(resultSetMetaData.getColumnCount()).thenReturn(0);
+        when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
+        when(statement.executeQuery()).thenReturn(resultSet);
+        when(connection.prepareStatement(anyString())).thenReturn(statement);
+        when(this.database.source.getConnection()).thenReturn(connection);
 
-        this.database.source = dataSource;
-        return dataSource;
+        return statement;
     }
 
 }
