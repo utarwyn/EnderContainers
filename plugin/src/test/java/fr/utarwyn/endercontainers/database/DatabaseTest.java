@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.database;
 
 import com.zaxxer.hikari.HikariDataSource;
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.database.adapter.MySQLAdapter;
 import fr.utarwyn.endercontainers.database.request.DeleteRequest;
 import fr.utarwyn.endercontainers.database.request.SavingRequest;
@@ -30,7 +31,7 @@ public class DatabaseTest {
 
     @BeforeClass
     public static void setUpClass() throws InvalidConfigurationException,
-            ReflectiveOperationException, IOException {
+            ReflectiveOperationException, IOException, YamlFileLoadException {
         TestHelper.setUpFiles();
     }
 
