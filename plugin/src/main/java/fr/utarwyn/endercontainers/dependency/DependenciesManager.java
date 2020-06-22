@@ -95,7 +95,7 @@ public class DependenciesManager extends AbstractManager implements DependencyVa
         // PlotSquared
         new DependencyResolver(this.pluginManager)
                 .name("PlotSquared")
-                .use(PlotSquaredDependency.class)
+                .matchVersion("^5.*", PlotSquaredDependency.class)
                 .resolve().ifPresent(this::enableDependency);
 
         // WorldGuard
