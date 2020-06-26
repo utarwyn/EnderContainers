@@ -21,7 +21,7 @@
     <repositories>
         <repository>
             <id>utarwyn</id>
-            <url>http://213.32.65.249:6006/</url>
+            <url>https://repo.utarwyn.fr</url>
         </repository>
     </repositories>
 
