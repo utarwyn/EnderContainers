@@ -83,8 +83,10 @@ public class EnderChestManagerTest {
     }
 
     @Test
-    public void isContextUnused() {
+    public void isContextUnused() throws ReflectiveOperationException {
         UUID uuid = UUID.randomUUID();
+
+        TestHelper.setupManager(this.manager);
 
         assertThat(this.manager.isContextUnused(uuid)).isFalse();
 
@@ -125,8 +127,10 @@ public class EnderChestManagerTest {
     }
 
     @Test
-    public void registerPlayerContext() {
+    public void registerPlayerContext() throws ReflectiveOperationException {
         UUID uuid = UUID.randomUUID();
+
+        TestHelper.setupManager(this.manager);
 
         assertThat(this.manager.contextMap).isEmpty();
         this.registerPlayerContext(uuid);
