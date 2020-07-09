@@ -32,8 +32,6 @@ Works with Bukkit/Spigot 1.8 to 1.16!
     <img src="https://i.imgur.com/VCz4kFS.gif" alt="demo">
 </p>
 
-> :warning: Latest stable version available on Spigot is **NOT compatible** with **1.13-1.16 versions** of Minecraft yet. You **have to download a development build** from this repo to get this support.
-
 > :wave: Need help about the plugin? Go to the [official wiki](https://github.com/utarwyn/EnderContainers/wiki). \
 > It contains guides to **configure** and **use** the plugin in few minutes.
 
