@@ -33,7 +33,7 @@ Works with Bukkit/Spigot 1.8 to 1.16!
 </p>
 
 > :wave: Need help about the plugin? Go to the [official wiki](https://github.com/utarwyn/EnderContainers/wiki). \
-> It contains guides to **configure** and **use** the plugin in few minutes.
+> :fire: **NEW!** Download development builds of the plugin from my [personal integration service](https://ci.utarwyn.fr/job/EnderContainers).
 
 
 ## Key Features
