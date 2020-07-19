@@ -47,7 +47,7 @@ public class Base64ItemSerializer implements ItemSerializer {
     public ConcurrentMap<Integer, ItemStack> deserialize(String data) throws IOException {
         ConcurrentMap<Integer, ItemStack> items = new ConcurrentHashMap<>();
 
-        byte[] bytes = Base64.getDecoder().decode(data.replaceAll("\n", ""));
+        byte[] bytes = Base64.getMimeDecoder().decode(data);
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
         BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
 
