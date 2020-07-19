@@ -16,11 +16,12 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Serialize a list of items into a legacy string.
  * A custom serializer which is not powerful/efficient but creates tiny strings.
- * TODO remove this old and unefficient serializer.
  *
  * @author Utarwyn <maximemalgorn@gmail.com>
  * @since 2.2.0
+ * @deprecated this serializer is old and unefficient
  */
+@Deprecated
 public class LegacyItemSerializer implements ItemSerializer {
 
     /**
