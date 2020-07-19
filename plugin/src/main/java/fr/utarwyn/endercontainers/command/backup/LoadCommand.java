@@ -26,7 +26,7 @@ public class LoadCommand extends AbstractBackupCommand {
         this.manager.applyBackup(name, result -> {
             if (Boolean.TRUE.equals(result)) {
                 PluginMsg.messageWithPrefix(sender, LocaleKey.CMD_BACKUP_LOADED,
-                        Collections.singletonMap("backup", "name"));
+                        Collections.singletonMap("backup", name));
             } else {
                 PluginMsg.errorMessageWithPrefix(sender, LocaleKey.CMD_BACKUP_UNKNOWN,
                         Collections.singletonMap("backup", name));

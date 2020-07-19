@@ -34,12 +34,12 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
     /**
      * List all parameters of this command
      */
-    private List<Parameter<?>> parameters;
+    private final List<Parameter<?>> parameters;
 
     /**
      * List all sub-commands of this command
      */
-    private List<AbstractCommand> subCommands;
+    private final List<AbstractCommand> subCommands;
 
     /**
      * List all arguments for this command

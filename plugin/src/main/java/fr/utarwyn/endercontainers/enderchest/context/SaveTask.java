@@ -12,7 +12,7 @@ public class SaveTask implements Runnable {
     /**
      * The player context to save
      */
-    private PlayerContext context;
+    private final PlayerContext context;
 
     /**
      * Construct a new saving task.
