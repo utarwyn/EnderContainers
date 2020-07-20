@@ -18,7 +18,7 @@
         <slf4j.version>1.7.30</slf4j.version>
         <bstats.version>1.7</bstats.version>
         <junit.version>4.13</junit.version>
-        <mockito.version>3.4.2</mockito.version>
+        <mockito.version>3.4.4</mockito.version>
         <assertj.version>3.16.1</assertj.version>
     </properties>
 
