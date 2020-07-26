@@ -2,6 +2,8 @@ package fr.utarwyn.endercontainers.menu;
 
 import fr.utarwyn.endercontainers.AbstractManager;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -47,7 +49,7 @@ public class MenuManager extends AbstractManager {
         if (menu.isPresent()) {
             // A restricted move is when player clicks in the menu or uses shift click
             boolean restrictedMove = validSlot || event.isShiftClick();
-            event.setCancelled(menu.get().isItemMovingRestricted() && restrictedMove);
+            event.setCancelled(this.isMoveItemRestricted(event.getWhoClicked(), menu.get()) && restrictedMove);
 
             // Perform the action only when player clicks on a valid slot of the menu
             if (validSlot) {
@@ -67,7 +69,8 @@ public class MenuManager extends AbstractManager {
         Inventory inventory = event.getView().getTopInventory();
         Optional<AbstractMenu> menu = this.getMenuFromInventory(inventory);
 
-        if (menu.isPresent() && menu.get().isItemMovingRestricted()) {
+        if (event.getWhoClicked() instanceof Player && menu.isPresent()
+                && this.isMoveItemRestricted(event.getWhoClicked(), menu.get())) {
             boolean itemInMenu = event.getRawSlots().stream()
                     .anyMatch(slot -> slot < inventory.getSize());
 
@@ -116,6 +119,17 @@ public class MenuManager extends AbstractManager {
     private Optional<AbstractMenu> getMenuFromInventory(Inventory inventory) {
         boolean isCustom = inventory.getHolder() instanceof AbstractMenu;
         return isCustom ? Optional.of((AbstractMenu) inventory.getHolder()) : Optional.empty();
+    }
+
+    /**
+     * Checks if a player can move an item in a specific menu or not.
+     *
+     * @param human human entity instance
+     * @param menu  menu where the item wants to be moved
+     * @return false if the move is retricted for the player, false otherwise
+     */
+    private boolean isMoveItemRestricted(HumanEntity human, AbstractMenu menu) {
+        return menu.isItemMovingRestricted() || GameMode.SPECTATOR == human.getGameMode();
     }
 
 }

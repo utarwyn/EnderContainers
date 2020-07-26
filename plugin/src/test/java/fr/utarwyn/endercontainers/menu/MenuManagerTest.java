@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.TestHelper;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -43,6 +44,7 @@ public class MenuManagerTest {
     public void setUp() {
         this.manager = new MenuManager();
 
+        when(this.player.getGameMode()).thenReturn(GameMode.SURVIVAL);
         when(this.inventory.getHolder()).thenReturn(this.menu);
         when(this.inventoryView.getTopInventory()).thenReturn(this.inventory);
         when(this.inventoryView.getPlayer()).thenReturn(this.player);
@@ -117,6 +119,22 @@ public class MenuManagerTest {
     }
 
     @Test
+    public void inventoryClickSpectateMode() {
+        when(this.inventory.getSize()).thenReturn(27);
+
+        InventoryClickEvent event = new InventoryClickEvent(
+                this.inventoryView, InventoryType.SlotType.CONTAINER, 2,
+                ClickType.LEFT, InventoryAction.NOTHING
+        );
+
+        // Event cancelled but click triggered in spectate mode
+        when(this.player.getGameMode()).thenReturn(GameMode.SPECTATOR);
+        this.manager.onInventoryClick(event);
+        assertThat(event.isCancelled()).isTrue();
+        verify(menu).onClick(player, event.getRawSlot());
+    }
+
+    @Test
     public void inventoryDragInside() {
         when(this.inventory.getSize()).thenReturn(27);
 
@@ -166,6 +184,20 @@ public class MenuManagerTest {
 
         this.manager.onInventoryDrag(event);
         assertThat(event.getResult()).isEqualTo(Event.Result.DEFAULT);
+    }
+
+    @Test
+    public void inventoryDragSpectateMode() {
+        when(this.inventory.getSize()).thenReturn(27);
+
+        InventoryDragEvent event = new InventoryDragEvent(
+                this.inventoryView, null, new ItemStack(Material.STONE), false,
+                ImmutableMap.of(25, new ItemStack(Material.STONE), 34, new ItemStack(Material.STONE))
+        );
+
+        when(this.player.getGameMode()).thenReturn(GameMode.SPECTATOR);
+        this.manager.onInventoryDrag(event);
+        assertThat(event.isCancelled()).isTrue();
     }
 
     @Test
