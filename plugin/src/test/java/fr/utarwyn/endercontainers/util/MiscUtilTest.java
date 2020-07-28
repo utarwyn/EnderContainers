@@ -50,9 +50,13 @@ public class MiscUtilTest {
         MiscUtil.playSound(player, UNKNOWN_SOUND, UNKNOWN_SOUND);
         verify(player, never()).playSound(player.getLocation(), sound, 1f, 1f);
 
-        // Exisiting sound
-        MiscUtil.playSound(player, EXISITING_SOUND, EXISITING_SOUND);
+        // First existing sound
+        MiscUtil.playSound(player, EXISITING_SOUND);
         verify(player).playSound(player.getLocation(), sound, 1f, 1f);
+
+        // Second existing sound
+        MiscUtil.playSound(player, UNKNOWN_SOUND, EXISITING_SOUND);
+        verify(player, times(2)).playSound(player.getLocation(), sound, 1f, 1f);
     }
 
     @Test

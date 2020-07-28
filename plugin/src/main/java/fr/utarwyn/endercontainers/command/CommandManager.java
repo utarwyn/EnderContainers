@@ -30,7 +30,7 @@ public class CommandManager extends AbstractManager {
      */
     public void registerCommands() {
         try {
-            this.register(new MainCommand());
+            this.register(new MainCommand(this.plugin));
             this.register(new EnderchestCommand());
         } catch (ReflectiveOperationException e) {
             this.logger.log(Level.SEVERE, "Cannot instanciate a command class", e);

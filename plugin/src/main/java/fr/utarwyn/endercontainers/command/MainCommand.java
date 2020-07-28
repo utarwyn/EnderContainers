@@ -1,27 +1,32 @@
 package fr.utarwyn.endercontainers.command;
 
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.command.main.*;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.Plugin;
 
+/**
+ * Main command. Display some information about the plugin.
+ *
+ * @author Utarwyn
+ * @since 2.0.0
+ */
 public class MainCommand extends AbstractCommand {
 
     /**
      * Stores the main author of the plugin
      */
-    private String mainAuthor;
+    private final String mainAuthor;
 
     /**
      * Stores the current version of the plugin
      */
-    private String version;
+    private final String version;
 
     /**
      * Construct the main command of the plugin.
      */
-    public MainCommand() {
+    public MainCommand(Plugin plugin) {
         super("endercontainers", "ecp");
 
         this.addSubCommand(new HelpCommand());
@@ -31,9 +36,8 @@ public class MainCommand extends AbstractCommand {
         this.addSubCommand(new UpdateCommand());
 
         // Get all needed informations of the plugin in the description file
-        PluginDescriptionFile descriptionFile = EnderContainers.getInstance().getDescription();
-        this.mainAuthor = descriptionFile.getAuthors().get(0);
-        this.version = descriptionFile.getVersion();
+        this.mainAuthor = plugin.getDescription().getAuthors().get(0);
+        this.version = plugin.getDescription().getVersion();
     }
 
     /**

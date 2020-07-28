@@ -134,8 +134,7 @@ public class EnderChestManagerTest {
 
         assertThat(this.manager.contextMap).isEmpty();
         this.registerPlayerContext(uuid);
-        assertThat(this.manager.contextMap).isNotEmpty();
-        assertThat(this.manager.contextMap).containsOnlyKeys(uuid);
+        assertThat(this.manager.contextMap).isNotEmpty().containsOnlyKeys(uuid);
     }
 
     @Test

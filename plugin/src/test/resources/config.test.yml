@@ -4,7 +4,8 @@
 
 debug: false
 locale: en
-disabledWorlds: []
+disabledWorlds:
+  - disabled
 enderchests:
   max: 27
   default: 1

@@ -65,8 +65,8 @@ public class EnderChestTest {
     @Test
     public void size() {
         // Default size
-        assertThat(this.chest.getSize()).isEqualTo(0);
-        assertThat(this.chest.getFillPercentage()).isEqualTo(0);
+        assertThat(this.chest.getSize()).isZero();
+        assertThat(this.chest.getFillPercentage()).isZero();
         assertThat(this.chest.isEmpty()).isTrue();
         assertThat(this.chest.isFull()).isFalse();
 

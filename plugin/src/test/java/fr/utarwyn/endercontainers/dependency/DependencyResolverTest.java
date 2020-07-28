@@ -69,8 +69,10 @@ public class DependencyResolverTest {
         assertThat(dependency).isNotEmpty();
         assertThat(dependency.get().getPlugin())
                 .isNotNull().isEqualTo(this.plugin);
+
+        Dependency dep = dependency.get();
         assertThatExceptionOfType(UnsupportedOperationException.class)
-                .isThrownBy(() -> dependency.get().validateBlockChestOpening(null, null))
+                .isThrownBy(() -> dep.validateBlockChestOpening(null, null))
                 .withNoCause().withMessage(null);
     }
 

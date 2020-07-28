@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 public class EnderchestCommand extends AbstractCommand {
 
-    private EnderChestManager manager;
+    private final EnderChestManager manager;
 
     public EnderchestCommand() {
         super("enderchest", "ec", "endchest");

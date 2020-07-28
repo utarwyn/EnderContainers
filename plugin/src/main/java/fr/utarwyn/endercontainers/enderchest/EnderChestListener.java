@@ -135,12 +135,12 @@ public class EnderChestListener implements Listener {
         if (inventory.getType().equals(InventoryType.ENDER_CHEST) && Files.getConfiguration().isUseVanillaEnderchest()) {
             Optional<VanillaEnderChest> vanilla = this.manager.getVanillaEnderchestUsedBy(player);
 
-            // When closing the default enderchest, save it ...
-            if (vanilla.isPresent() && !vanilla.get().getOwnerAsPlayer().equals(player)) {
+            // When closing the default enderchest ...
+            if (vanilla.isPresent()) {
                 Player ownerObj = vanilla.get().getOwnerAsPlayer();
 
-                // ... and delete the context from memory if the player is offline.
-                if (!ownerObj.isOnline()) {
+                // ... save and delete the context from memory if the player is offline.
+                if (!ownerObj.equals(player) && !ownerObj.isOnline()) {
                     this.manager.savePlayerContext(vanilla.get().getOwner(), true);
                     ownerObj.saveData();
                 }
