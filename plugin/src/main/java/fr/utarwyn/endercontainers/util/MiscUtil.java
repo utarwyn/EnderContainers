@@ -25,12 +25,11 @@ public class MiscUtil {
     /**
      * Plays a sound at a specific location with support of 1.8 sound and 1.9+ sound.
      *
-     * @param location Location where to play the sound
-     * @param sound18  Sound string for 1.8 versions
-     * @param sound19  Sound string for 1.9 versions
+     * @param location  Location where to play the sound
+     * @param soundKeys list of sound keys to try for playing the wanted sound
      */
-    public static void playSound(Location location, String sound18, String sound19) {
-        Sound sound = MiscUtil.generateSound(sound18, sound19);
+    public static void playSound(Location location, String... soundKeys) {
+        Sound sound = MiscUtil.searchSound(soundKeys);
         if (sound == null) return;
 
         Objects.requireNonNull(location.getWorld())
@@ -41,12 +40,11 @@ public class MiscUtil {
      * Plays a sound at a specific location with support of 1.8 sound and 1.9+ sound.
      * Plays the sound only for a specific player.
      *
-     * @param player  Player which will receive the sound
-     * @param sound18 Sound string for 1.8 versions
-     * @param sound19 Sound string for 1.9 versions
+     * @param player    Player which will receive the sound
+     * @param soundKeys list of sound keys to try for playing the wanted sound
      */
-    public static void playSound(Player player, String sound18, String sound19) {
-        Sound sound = MiscUtil.generateSound(sound18, sound19);
+    public static void playSound(Player player, String... soundKeys) {
+        Sound sound = MiscUtil.searchSound(soundKeys);
         if (sound == null) return;
 
         player.playSound(player.getLocation(), sound, 1f, 1f);
@@ -77,39 +75,23 @@ public class MiscUtil {
     }
 
     /**
-     * Returns the existance of a sound by its name
+     * Searches a sound from its key.
+     * This method takes a list of sound names to validate in order to play the sound.
      *
-     * @param soundName Sound name to check
-     * @return True if the sound with the given name exists
+     * @param soundKeys list of sound keys to try for playing the wanted sound
+     * @return sound type if found, null otherwise
      */
-    private static boolean soundExists(String soundName) {
-        for (Sound sound : Sound.values())
-            if (sound.name().equals(soundName))
-                return true;
+    private static Sound searchSound(String... soundKeys) {
+        for (String soundKey : soundKeys) {
+            // Maybe be a little bit trick, but its the fatest way of checking for equality
+            try {
+                return Sound.valueOf(soundKey);
+            } catch (IllegalArgumentException ignored) {
+                // Not catched
+            }
+        }
 
-        return false;
-    }
-
-    /**
-     * Generates a sound from two string (one for 1.8 and one for 1.9+).
-     * The method tries to generate the 1.8 sound, and if its not working it tries to
-     * generate the 1.9+ sound, and if its not working too it generate nothing, without error.
-     *
-     * @param sound18 Sound key for MC 1.8 version.
-     * @param sound19 Sound key for MC 1.9+ versions.
-     * @return The generated sound, null otherwise.
-     */
-    private static Sound generateSound(String sound18, String sound19) {
-        Sound sound;
-
-        if (MiscUtil.soundExists(sound18))
-            sound = Sound.valueOf(sound18);   // 1.8
-        else if (MiscUtil.soundExists(sound19))
-            sound = Sound.valueOf(sound19);   // 1.9+
-        else
-            return null;                      // Else? Not supported.
-
-        return sound;
+        return null;
     }
 
 }

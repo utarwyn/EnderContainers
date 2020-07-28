@@ -101,7 +101,7 @@ public class EnderChestListener implements Listener {
 
         // Send update message to the player is he has the permission.
         if (MiscUtil.playerHasPerm(player, "update") && Managers.get(Updater.class).notifyPlayer(player)) {
-            MiscUtil.playSound(player, "NOTE_PLING", "BLOCK_NOTE_PLING");
+            MiscUtil.playSound(player, "NOTE_PLING", "BLOCK_NOTE_PLING", "BLOCK_NOTE_BLOCK_PLING");
         }
     }
 
