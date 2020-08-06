@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentMap;
  * Use to store them easier than with the {@link ItemStack#toString()} format.
  *
  * @author Utarwyn <maximemalgorn@gmail.com>
- * @version 2.2.0
+ * @since 2.2.0
  */
 public interface ItemSerializer {
 
