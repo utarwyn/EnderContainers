@@ -90,8 +90,8 @@ public class VanillaEnderChest extends EnderChest {
      * {@inheritDoc}
      */
     @Override
-    protected int calculateRowCount() {
-        return 3;
+    public void updateRowCount() {
+        this.rows = 3;
     }
 
     /**

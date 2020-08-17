@@ -99,6 +99,18 @@ public class AbstractMenuTest {
     }
 
     @Test
+    public void close() {
+        Player player = mock(Player.class);
+
+        this.menu.inventory = this.inventory;
+        when(this.menu.inventory.getViewers()).thenReturn(Collections.singletonList(player));
+
+        this.menu.close();
+
+        verify(player).closeInventory();
+    }
+
+    @Test
     public void filledSlotsNb() {
         this.menu.inventory = this.inventory;
 

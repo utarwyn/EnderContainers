@@ -1,11 +1,13 @@
 package fr.utarwyn.endercontainers.menu;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -117,6 +119,15 @@ public abstract class AbstractMenu implements InventoryHolder {
      */
     public void open(Player player) {
         player.openInventory(this.inventory);
+    }
+
+    /**
+     * Closes the menu for all viewers.
+     */
+    public void close() {
+        if (this.inventory != null) {
+            new ArrayList<>(this.inventory.getViewers()).forEach(HumanEntity::closeInventory);
+        }
     }
 
     /**

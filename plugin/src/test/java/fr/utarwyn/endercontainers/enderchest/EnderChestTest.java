@@ -9,6 +9,7 @@ import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Before;
 import org.junit.Test;
@@ -126,6 +127,10 @@ public class EnderChestTest {
     @Test
     public void container() {
         this.chest.container = mock(EnderChestMenu.class);
+        Inventory inventory = mock(Inventory.class);
+
+        when(inventory.getSize()).thenReturn(27);
+        when(this.chest.container.getInventory()).thenReturn(inventory);
 
         // is container used?
         assertThat(this.chest.isContainerUsed()).isFalse();

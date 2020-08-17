@@ -112,6 +112,7 @@ public class EnderChestHubMenu extends AbstractMenu {
             Optional<EnderChest> chest = this.context.getChest(num);
 
             if (chest.isPresent() && (chest.get().isAccessible() || !Files.getConfiguration().isOnlyShowAccessibleEnderchests())) {
+                chest.get().updateRowCount();
                 this.inventory.setItem(num - min, this.getItemStackOf(chest.get()));
             }
         }

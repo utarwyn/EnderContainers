@@ -29,14 +29,14 @@ public class EnderChest {
     protected PlayerContext context;
 
     /**
+     * Amount of rows of the enderchest
+     */
+    protected int rows;
+
+    /**
      * The number of the enderchest
      */
     private final int num;
-
-    /**
-     * The number of rows of the chest's menu
-     */
-    private final int rows;
 
     /**
      * Construct a new enderchest.
@@ -47,8 +47,7 @@ public class EnderChest {
     public EnderChest(PlayerContext context, int num) {
         this.context = context;
         this.num = num;
-        this.rows = this.calculateRowCount();
-        this.container = new EnderChestMenu(this);
+        this.updateContainer();
     }
 
     /**
@@ -176,36 +175,53 @@ public class EnderChest {
      * @param player The player who wants to open the container
      */
     public void openContainerFor(Player player) {
+        this.updateContainer();
         this.container.open(player);
     }
 
     /**
-     * Get the number of rows accessible if the player
-     * is connected on the server. This number is generated in terms
-     * of permissions of the player.
-     * (That's why it have to be connected)
-     *
-     * @return The number of rows generated or null if the player is not connected
+     * Retrieves the amount of rows accessible by a player.
+     * Computes player permissions if connected, or the cache otherwise.
      */
-    protected int calculateRowCount() {
-        int row = 3;
-
+    public void updateRowCount() {
+        int count = 3;
         Player player = this.context.getOwnerAsObject();
 
-        // No player connected for this chest, use the cache instead.
+        // player not connected, retrieve the amount from the cache
         if (player == null) {
-            return this.context.getData().getEnderchestRows(this);
+            this.rows = this.context.getData().getEnderchestRows(this);
+            return;
         }
 
-        for (int iRow = 6; iRow > 0; iRow--) {
-            if (MiscUtil.playerHasPerm(player, "slot" + this.num + ".row" + iRow)
-                    || MiscUtil.playerHasPerm(player, "slots.row" + iRow)) {
-                row = iRow;
+        // check player permissions to compute the row count for this slot
+        for (int perm = 6; perm > 0; perm--) {
+            if ((MiscUtil.playerHasPerm(player, "slot" + this.num + ".row" + perm)) ||
+                    (MiscUtil.playerHasPerm(player, "slots.row" + perm))) {
+                count = perm;
                 break;
             }
         }
 
-        return row;
+        this.rows = count;
+    }
+
+    /**
+     * Updates the chest's container if needed.
+     */
+    public void updateContainer() {
+        this.updateRowCount();
+
+        // update needed if container size if outdated
+        boolean updateNeeded = this.container == null
+                || this.container.getInventory().getSize() != getMaxSize();
+
+        if (updateNeeded) {
+            if (this.container != null) {
+                this.container.close();
+                this.container = null;
+            }
+            this.container = new EnderChestMenu(this);
+        }
     }
 
 }
