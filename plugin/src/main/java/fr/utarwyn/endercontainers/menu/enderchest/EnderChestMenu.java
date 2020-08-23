@@ -10,8 +10,11 @@ import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Represents a custom enderchest with all contents.
@@ -25,6 +28,11 @@ public class EnderChestMenu extends AbstractMenu {
      * Enderchest who generated this menu
      */
     private final EnderChest chest;
+
+    /**
+     * Internal map to cache all contents of the chest (even those not displayed in the container).
+     */
+    private ConcurrentMap<Integer, ItemStack> contents;
 
     /**
      * Construct a menu whiches contain contents of an enderchest.
@@ -44,11 +52,34 @@ public class EnderChestMenu extends AbstractMenu {
     @Override
     protected void prepare() {
         int size = this.chest.getMaxSize();
-        this.chest.getContents().forEach((index, item) -> {
+        this.contents = this.chest.getContents();
+
+        // Add all items in the container (only those which can be displayed)
+        this.contents.forEach((index, item) -> {
             if (index < size) {
                 this.inventory.setItem(index, item);
             }
         });
+    }
+
+    /**
+     * Gets contents of this menu in a concurrent map.
+     * Check first for all items in the container, but take also those which are in cache (not displayed).
+     *
+     * @return generated map with contents
+     */
+    public ConcurrentMap<Integer, ItemStack> getMapContents() {
+        ItemStack[] containerContents = this.inventory.getContents();
+        ConcurrentMap<Integer, ItemStack> mapContents = new ConcurrentHashMap<>(this.contents);
+
+        // Replace cache contents with container contents if filled
+        for (int i = 0; i < containerContents.length; i++) {
+            if (containerContents[i] != null) {
+                mapContents.put(i, containerContents[i]);
+            }
+        }
+
+        return mapContents;
     }
 
     /**

@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Collections;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -116,19 +115,6 @@ public class AbstractMenuTest {
 
         when(this.menu.inventory.getContents()).thenReturn(this.getFakeItemList());
         assertThat(this.menu.getFilledSlotsNb()).isEqualTo(3);
-    }
-
-    @Test
-    public void mapContents() {
-        this.menu.inventory = this.inventory;
-        when(this.menu.inventory.getContents()).thenReturn(this.getFakeItemList());
-
-        Map<Integer, ItemStack> map = this.menu.getMapContents();
-
-        assertThat(map).isNotNull().hasSize(3);
-        assertThat(map.get(0)).isNull();
-        assertThat(map.get(2)).isNotNull();
-        assertThat(map.get(8)).isNotNull();
     }
 
     /**
