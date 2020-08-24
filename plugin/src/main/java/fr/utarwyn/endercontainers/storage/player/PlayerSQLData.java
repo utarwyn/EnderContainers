@@ -32,7 +32,7 @@ public class PlayerSQLData extends PlayerData {
     /**
      * List of all enderchest datasets retreived from the database.
      */
-    private List<DatabaseSet> enderchestSets;
+    private List<DatabaseSet> databaseSets;
 
     /**
      * Construct a new player storage wrapper with a SQL database.
@@ -53,7 +53,7 @@ public class PlayerSQLData extends PlayerData {
     @Override
     protected void load() {
         try {
-            this.enderchestSets = this.databaseManager.getEnderchestsOf(this.uuid);
+            this.databaseSets = this.databaseManager.getEnderchestsOf(this.uuid);
         } catch (SQLException e) {
             this.plugin.getLogger().log(Level.SEVERE, String.format(
                     "Cannot retrieve enderchests of user %s from the database", this.uuid
@@ -74,9 +74,15 @@ public class PlayerSQLData extends PlayerData {
      */
     @Override
     public ConcurrentMap<Integer, ItemStack> getEnderchestContents(EnderChest chest) {
-        for (DatabaseSet set : this.enderchestSets) {
+        for (DatabaseSet set : this.databaseSets) {
             if (set.getInteger("num") == chest.getNum()) {
-                return this.deserializeItems(chest, set.getString("contents"));
+                String contents = set.getString("contents");
+
+                if (contents != null) {
+                    return this.deserializeItems(chest, contents);
+                } else {
+                    break;
+                }
             }
         }
 
@@ -88,7 +94,7 @@ public class PlayerSQLData extends PlayerData {
      */
     @Override
     public int getEnderchestRows(EnderChest chest) {
-        Optional<Integer> rows = this.enderchestSets.stream()
+        Optional<Integer> rows = this.databaseSets.stream()
                 .filter(set -> set.getInteger("num") == chest.getNum())
                 .map(set -> set.getInteger("rows"))
                 .findFirst();
@@ -100,21 +106,22 @@ public class PlayerSQLData extends PlayerData {
      * {@inheritDoc}
      */
     @Override
-    protected void saveEnderchest(EnderChest enderChest) {
-        boolean insert = this.enderchestSets.stream()
-                .noneMatch(set -> set.getInteger("num") == enderChest.getNum()
-                        && set.getString("owner").equals(enderChest.getOwner().toString()));
+    protected void saveEnderchest(EnderChest chest) {
+        boolean insert = this.databaseSets.stream()
+                .noneMatch(set -> set.getInteger("num") == chest.getNum()
+                        && set.getString("owner").equals(chest.getOwner().toString()));
 
-        String contents = this.serializeChestContents(enderChest);
+        String contents = !chest.getContents().isEmpty() ?
+                this.serializeChestContents(chest) : null;
 
         try {
-            this.databaseManager.saveEnderchest(insert,
-                    enderChest.getOwner(), enderChest.getNum(),
-                    enderChest.getRows(), contents
+            this.databaseManager.saveEnderchest(
+                    insert, chest.getOwner(),
+                    chest.getNum(), chest.getRows(), contents
             );
         } catch (SQLException e) {
             this.plugin.getLogger().log(Level.SEVERE, String.format(
-                    "Cannot save the enderchest for user %s in the database", enderChest.getOwner()
+                    "Cannot save the enderchest for user %s in the database", chest.getOwner()
             ), e);
             return;
         }
@@ -122,12 +129,12 @@ public class PlayerSQLData extends PlayerData {
         // If this is a new enderchest, we need to store it in memory.
         if (insert) {
             DatabaseSet set = new DatabaseSet();
-            set.setObject("num", enderChest.getNum());
-            set.setObject("owner", enderChest.getOwner().toString());
+            set.setObject("num", chest.getNum());
+            set.setObject("owner", chest.getOwner().toString());
             set.setObject("contents", contents);
-            set.setObject("rows", enderChest.getRows());
+            set.setObject("rows", chest.getRows());
 
-            this.enderchestSets.add(set);
+            this.databaseSets.add(set);
         }
     }
 
