@@ -86,7 +86,8 @@ public class EnderContainers extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-        Managers.unregisterAll();
+        Managers.unloadAll();
+        Managers.clear();
     }
 
     /**

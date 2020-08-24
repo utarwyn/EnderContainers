@@ -61,10 +61,11 @@ public class Managers {
     }
 
     /**
-     * Reload all managers
+     * Unload all managers and load them.
      */
     public static void reloadAll() {
-        instances.keySet().forEach(Managers::reload);
+        Managers.unloadAll();
+        instances.values().forEach(AbstractManager::load);
     }
 
     /**
@@ -95,15 +96,18 @@ public class Managers {
     }
 
     /**
-     * Unload and unregister all managers.
+     * Unload all managers in a reverse order.
      */
-    static void unregisterAll() {
+    static void unloadAll() {
         List<AbstractManager> managers = new ArrayList<>(instances.values());
-
-        // Unload managers by reverting their order
         Collections.reverse(managers);
         managers.forEach(AbstractManager::unload);
+    }
 
+    /**
+     * Clears the cache with all managers instances.
+     */
+    static void clear() {
         instances.clear();
     }
 
