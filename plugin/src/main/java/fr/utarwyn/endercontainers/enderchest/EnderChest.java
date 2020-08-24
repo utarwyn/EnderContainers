@@ -47,7 +47,8 @@ public class EnderChest {
     public EnderChest(PlayerContext context, int num) {
         this.context = context;
         this.num = num;
-        this.updateContainer();
+        this.updateRowCount();
+        this.container = new EnderChestMenu(this);
     }
 
     /**
@@ -111,7 +112,7 @@ public class EnderChest {
      */
     public ConcurrentMap<Integer, ItemStack> getContents() {
         if (this.container != null && this.container.isInitialized()) {
-            return this.container.getMapContents();
+            return this.container.getContents();
         } else {
             return this.context.getData().getEnderchestContents(this);
         }
@@ -175,7 +176,10 @@ public class EnderChest {
      * @param player The player who wants to open the container
      */
     public void openContainerFor(Player player) {
+        // update chest metadata before opening
+        this.updateRowCount();
         this.updateContainer();
+
         this.container.open(player);
     }
 
@@ -206,21 +210,14 @@ public class EnderChest {
     }
 
     /**
-     * Updates the chest's container if needed.
+     * Updates container of the chest if needed.
      */
     public void updateContainer() {
-        this.updateRowCount();
-
         // update needed if container size if outdated
-        boolean updateNeeded = this.container == null
-                || this.container.getInventory().getSize() != getMaxSize();
-
-        if (updateNeeded) {
-            if (this.container != null) {
-                this.container.close();
-                this.container = null;
-            }
-            this.container = new EnderChestMenu(this);
+        if (this.container != null && this.container.getInventory().getSize() != getMaxSize()) {
+            this.container.close();
+            this.container.updateContentsFromContainer();
+            this.container.reloadInventory();
         }
     }
 

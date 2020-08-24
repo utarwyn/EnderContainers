@@ -113,7 +113,7 @@ public abstract class AbstractMenu implements InventoryHolder {
     /**
      * Reload the menu by replacing the current inventory.
      */
-    protected void reloadInventory() {
+    public void reloadInventory() {
         String title = this.getTitle();
         int size = this.getRows() * 9;
         ItemStack[] itemStacks = new ItemStack[size];
@@ -123,7 +123,8 @@ public abstract class AbstractMenu implements InventoryHolder {
         }
 
         if (this.inventory != null) {
-            itemStacks = this.inventory.getContents();
+            ItemStack[] oldContents = this.inventory.getContents();
+            itemStacks = Arrays.copyOfRange(oldContents, 0, Math.min(oldContents.length, size));
         }
 
         this.inventory = Bukkit.createInventory(this, size, title);

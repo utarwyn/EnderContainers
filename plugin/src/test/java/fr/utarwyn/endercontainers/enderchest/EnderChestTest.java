@@ -105,7 +105,7 @@ public class EnderChestTest {
         }};
 
         when(this.chest.container.isInitialized()).thenReturn(true);
-        when(this.chest.container.getMapContents()).thenReturn(fakeContents);
+        when(this.chest.container.getContents()).thenReturn(fakeContents);
 
         assertThat(this.chest.getContents()).isEqualTo(fakeContents);
     }

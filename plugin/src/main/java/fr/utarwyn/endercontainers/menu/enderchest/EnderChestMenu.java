@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.menu.enderchest;
 
+import com.google.common.base.Preconditions;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
@@ -13,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -51,10 +51,10 @@ public class EnderChestMenu extends AbstractMenu {
      */
     @Override
     protected void prepare() {
-        int size = this.chest.getMaxSize();
         this.contents = this.chest.getContents();
 
         // Add all items in the container (only those which can be displayed)
+        int size = this.chest.getMaxSize();
         this.contents.forEach((index, item) -> {
             if (index < size) {
                 this.inventory.setItem(index, item);
@@ -63,23 +63,32 @@ public class EnderChestMenu extends AbstractMenu {
     }
 
     /**
-     * Gets contents of this menu in a concurrent map.
-     * Check first for all items in the container, but take also those which are in cache (not displayed).
+     * Retrieve all contents of the chest.
      *
-     * @return generated map with contents
+     * @return map with all items (even those which are out of bounds)
      */
-    public ConcurrentMap<Integer, ItemStack> getMapContents() {
+    public ConcurrentMap<Integer, ItemStack> getContents() {
+        return this.contents;
+    }
+
+    /**
+     * Updates the whole content of this chest, based on its container.
+     * Check first for all items in the container, but take also those which are in cache (not displayed).
+     */
+    public void updateContentsFromContainer() {
+        Preconditions.checkNotNull(this.inventory, "container seems to be null");
+        Preconditions.checkNotNull(this.contents, "internal contents map seems to be null");
+
         ItemStack[] containerContents = this.inventory.getContents();
-        ConcurrentMap<Integer, ItemStack> mapContents = new ConcurrentHashMap<>(this.contents);
 
         // Replace cache contents with container contents if filled
         for (int i = 0; i < containerContents.length; i++) {
             if (containerContents[i] != null) {
-                mapContents.put(i, containerContents[i]);
+                this.contents.put(i, containerContents[i]);
+            } else {
+                this.contents.remove(i);
             }
         }
-
-        return mapContents;
     }
 
     /**
