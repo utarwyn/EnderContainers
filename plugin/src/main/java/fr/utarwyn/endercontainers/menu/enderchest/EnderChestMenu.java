@@ -117,9 +117,6 @@ public class EnderChestMenu extends AbstractMenu {
      */
     @Override
     public void onClose(Player player) {
-        // Update the cache from the closed container
-        this.updateContentsFromContainer();
-
         // Save and delete the player context if the owner of the chest is offline
         Player owner = Bukkit.getPlayer(this.chest.getOwner());
         if (owner == null || !owner.isOnline()) {

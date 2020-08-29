@@ -213,11 +213,20 @@ public class EnderChest {
      * Updates container of the chest if needed.
      */
     public void updateContainer() {
-        // update needed if container size if outdated
-        if (this.container != null && this.container.getInventory().getSize() != getMaxSize()) {
-            this.container.close();
+        if (this.container != null) {
+            // if chest row count has changed, also reload the container
+            boolean needReload = this.container.getInventory().getSize() != getMaxSize();
+
+            if (needReload) {
+                this.container.close();
+            }
+
+            // at least we would like to update container contents
             this.container.updateContentsFromContainer();
-            this.container.reloadInventory();
+
+            if (needReload) {
+                this.container.reloadInventory();
+            }
         }
     }
 
