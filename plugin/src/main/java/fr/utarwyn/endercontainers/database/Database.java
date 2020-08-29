@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.pool.HikariPool;
 import fr.utarwyn.endercontainers.configuration.Configuration;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.database.adapter.DatabaseAdapter;
@@ -84,7 +85,7 @@ public class Database implements AutoCloseable {
      * @return true if the source is running, false otherwise
      */
     public boolean isRunning() {
-        return this.source.isRunning();
+        return this.source != null && this.source.isRunning();
     }
 
     /**
@@ -100,12 +101,15 @@ public class Database implements AutoCloseable {
      * Initialize the connection pool from the registered configuration.
      * If the pool has already been initialized, does nothing.
      *
-     * @throws SQLException thrown if the connection pool cannot connect to the database
+     * @throws DatabaseConnectException thrown if the connection pool cannot connect to the database
      */
-    public void initialize() throws SQLException {
+    public void initialize() throws DatabaseConnectException {
         if (this.source == null) {
-            this.source = new HikariDataSource(this.configuration);
-            this.source.getConnection().close();
+            try {
+                this.source = new HikariDataSource(this.configuration);
+            } catch (HikariPool.PoolInitializationException e) {
+                throw new DatabaseConnectException(e);
+            }
         }
     }
 

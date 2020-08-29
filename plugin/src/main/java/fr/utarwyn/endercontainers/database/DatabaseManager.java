@@ -66,11 +66,9 @@ public class DatabaseManager extends AbstractManager {
 
                 // Log the successful connection into the console
                 this.logConnection(beginTime);
-            } catch (SQLException e) {
-                this.logger.log(Level.SEVERE, "Unable to connect to your " +
-                        "database. Please verify your credentials.", e);
-                this.logger.warning("SQL supports disabled because of an " +
-                        "error during the connection.");
+            } catch (DatabaseConnectException | SQLException e) {
+                this.logger.log(Level.SEVERE,
+                        "SQL supports disabled because of an error during the connection.", e);
                 this.database = null;
             }
         } else {
