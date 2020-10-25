@@ -55,7 +55,7 @@ public class Updater extends AbstractManager implements Runnable {
     public synchronized void load() {
         // Check for updates if enabled by the server administrator
         if (Files.getConfiguration().isUpdateChecker()) {
-            this.plugin.getServer().getScheduler().runTask(this.plugin, this);
+            this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, this);
         } else {
             this.plugin.getLogger().warning("You have disabled update checking. Please be sure that the plugin is up to date.");
         }

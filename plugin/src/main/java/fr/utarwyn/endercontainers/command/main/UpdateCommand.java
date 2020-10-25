@@ -12,7 +12,7 @@ public class UpdateCommand extends AbstractCommand {
     /**
      * The updater used to check for a new plugin version
      */
-    private Updater updater;
+    private final Updater updater;
 
     public UpdateCommand() {
         super("update");
