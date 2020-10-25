@@ -152,7 +152,7 @@ public class NMSHologramUtil extends NMSUtil {
      * @throws ReflectiveOperationException error with reflection
      */
     public static void destroyEntity(int entityId, Player observer) throws ReflectiveOperationException {
-        sendPacket(observer, destroyPacketConstructor.newInstance((Object) new int[]{entityId}));
+        sendPacket(observer, destroyPacketConstructor.newInstance(new int[]{entityId}));
     }
 
     /**
@@ -208,16 +208,17 @@ public class NMSHologramUtil extends NMSUtil {
             setCustomName.invoke(entityObject, text);
         }
 
-        Method setCustomNameVisible = entityClass.getMethod("setCustomNameVisible", boolean.class);
-        setCustomNameVisible.invoke(entityObject, true);
-
-        if (ServerVersion.isOlderThan(ServerVersion.V1_10)) {   // 1.8 / 1.9
-            Method setGravity = entityObject.getClass().getMethod("setGravity", boolean.class);
-            setGravity.invoke(entityObject, false);
-        } else {                                                // 1.10+
+        // In 1.10+ versions, setGravity has been replaced with setNoGravity
+        if (ServerVersion.isNewerThan(ServerVersion.V1_9)) {
             Method setNoGravity = entityObject.getClass().getMethod("setNoGravity", boolean.class);
             setNoGravity.invoke(entityObject, true);
+        } else {
+            Method setGravity = entityObject.getClass().getMethod("setGravity", boolean.class);
+            setGravity.invoke(entityObject, false);
         }
+
+        Method setCustomNameVisible = entityClass.getMethod("setCustomNameVisible", boolean.class);
+        setCustomNameVisible.invoke(entityObject, true);
 
         Method setLocation = entityObject.getClass().getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
         setLocation.invoke(entityObject, x, y, z, 0.0F, 0.0F);
