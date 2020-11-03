@@ -16,7 +16,7 @@
 
     <properties>
         <plotsquared.version>5.1</plotsquared.version>
-        <worldedit.version>7.2.0-SNAPSHOT</worldedit.version>
+        <worldedit.version>7.2.0</worldedit.version>
     </properties>
 
     <repositories>
