@@ -49,11 +49,15 @@ public class NMSPlayerUtil extends NMSUtil {
 
             // Prepare a PlayerInteractManager
             if (ServerVersion.isNewerThan(ServerVersion.V1_8)) {
-                Class<?> dimensionManagerClass = getNMSClass("DimensionManager");
-                Object dimension = dimensionManagerClass.getDeclaredField("OVERWORLD").get(null);
-                Method method = minecraftServerClass.getMethod("getWorldServer", dimensionManagerClass);
+                if (ServerVersion.isNewerThan(ServerVersion.V1_15)) {
+                    worldServer = getWorldServer116(minecraftServer);
+                } else {
+                    Class<?> dimensionManagerClass = getNMSClass("DimensionManager");
+                    Object dimension = dimensionManagerClass.getDeclaredField("OVERWORLD").get(null);
+                    Method method = minecraftServerClass.getMethod("getWorldServer", dimensionManagerClass);
+                    worldServer = method.invoke(minecraftServer, dimension);
+                }
 
-                worldServer = method.invoke(minecraftServer, dimension);
                 playerInteractManager = playerInteractManagerClass.getDeclaredConstructor(worldServerClass).newInstance(worldServer);
             } else {
                 Class<?> worldClass = getNMSClass("World");
@@ -96,6 +100,24 @@ public class NMSPlayerUtil extends NMSUtil {
         }
 
         return player;
+    }
+
+    private static Object getWorldServer116(Object minecraftServer) throws ReflectiveOperationException {
+        Class<?> minecraftServerClass = getNMSClass("MinecraftServer");
+        Class<?> genericResourceKey = getNMSClass("ResourceKey");
+        Class<?> minecraftKey = getNMSClass("MinecraftKey");
+
+        Method constructResourceKey = genericResourceKey.getDeclaredMethod("a", minecraftKey, minecraftKey);
+        constructResourceKey.setAccessible(true);
+
+        Constructor<?> minecraftKeyConstructor = minecraftKey.getConstructor(String.class);
+        Object overworldKey = minecraftKeyConstructor.newInstance("overworld");
+        Object dimensionKey = minecraftKeyConstructor.newInstance("dimension");
+        Object resourceKey = constructResourceKey.invoke(null, dimensionKey, overworldKey);
+        constructResourceKey.setAccessible(false);
+
+        Method getWorldServer = minecraftServerClass.getDeclaredMethod("getWorldServer", genericResourceKey);
+        return getWorldServer.invoke(minecraftServer, resourceKey);
     }
 
 }
