@@ -121,7 +121,8 @@ public class PlayerSQLData extends PlayerData {
             );
         } catch (SQLException e) {
             this.plugin.getLogger().log(Level.SEVERE, String.format(
-                    "Cannot save the enderchest for user %s in the database", chest.getOwner()
+                    "Cannot save enderchest %d of user %s in the database",
+                    chest.getNum(), chest.getOwner()
             ), e);
             return;
         }

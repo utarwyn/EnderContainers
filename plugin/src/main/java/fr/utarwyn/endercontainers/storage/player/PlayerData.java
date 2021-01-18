@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.storage.player;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
+import fr.utarwyn.endercontainers.enderchest.VanillaEnderChest;
 import fr.utarwyn.endercontainers.storage.StorageWrapper;
 import fr.utarwyn.endercontainers.storage.serialization.ItemSerializer;
 import org.bukkit.inventory.ItemStack;
@@ -38,7 +39,7 @@ public abstract class PlayerData extends StorageWrapper {
      * @param plugin         plugin instance object
      * @param itemSerializer serializer object to use with this storage object
      */
-    public PlayerData(UUID uuid, EnderContainers plugin, ItemSerializer itemSerializer) {
+    protected PlayerData(UUID uuid, EnderContainers plugin, ItemSerializer itemSerializer) {
         super(plugin);
         this.uuid = uuid;
         this.itemSerializer = itemSerializer;
@@ -50,7 +51,9 @@ public abstract class PlayerData extends StorageWrapper {
      * @param chests chests to save
      */
     public void saveContext(Set<EnderChest> chests) {
-        chests.forEach(this::saveEnderchest);
+        chests.stream().filter(chest -> !(chest instanceof VanillaEnderChest))
+                .forEach(this::saveEnderchest);
+
         this.save();
     }
 
