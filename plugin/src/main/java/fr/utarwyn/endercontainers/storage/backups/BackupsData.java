@@ -24,7 +24,7 @@ public abstract class BackupsData extends StorageWrapper {
      *
      * @param plugin plugin instance object
      */
-    public BackupsData(EnderContainers plugin) {
+    protected BackupsData(EnderContainers plugin) {
         super(plugin);
     }
 

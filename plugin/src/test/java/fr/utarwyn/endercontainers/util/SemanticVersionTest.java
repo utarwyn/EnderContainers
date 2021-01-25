@@ -37,35 +37,44 @@ public class SemanticVersionTest {
     }
 
     @Test
-    public void compareMajor() {
+    public void compareStableBuild() {
         SemanticVersion v1 = new SemanticVersion("1.0.0");
         SemanticVersion v2 = new SemanticVersion("2.0.0");
-        assertThat(v2.compareTo(v1)).isEqualTo(1);
-    }
+        SemanticVersion v3 = new SemanticVersion("1.1.0");
+        SemanticVersion v4 = new SemanticVersion("1.0.1");
 
-    @Test
-    public void compareMinor() {
-        SemanticVersion v1 = new SemanticVersion("1.0.0");
-        SemanticVersion v2 = new SemanticVersion("1.1.0");
-        assertThat(v2.compareTo(v1)).isEqualTo(1);
-    }
-
-    @Test
-    public void comparePatch() {
-        SemanticVersion v1 = new SemanticVersion("1.0.0");
-        SemanticVersion v2 = new SemanticVersion("1.0.1");
-        assertThat(v2.compareTo(v1)).isEqualTo(1);
+        assertThat(v2).isGreaterThan(v1);
+        assertThat(v3).isGreaterThan(v1).isLessThan(v2);
+        assertThat(v4).isGreaterThan(v1).isLessThan(v2).isLessThan(v3);
     }
 
     @Test
     public void compareDevBuild() {
         SemanticVersion vStable = new SemanticVersion("1.1.0");
         SemanticVersion vDev = new SemanticVersion("1.1.0-dev");
-        assertThat(vStable.compareTo(vDev)).isEqualTo(1);
+        assertThat(vStable).isGreaterThan(vDev);
 
         vStable = new SemanticVersion("1.1.1");
         vDev = new SemanticVersion("1.1.0-dev");
-        assertThat(vStable.compareTo(vDev)).isEqualTo(1);
+        assertThat(vStable).isGreaterThan(vDev);
+    }
+
+    @Test
+    public void equal() {
+        SemanticVersion v1 = new SemanticVersion("2.2.2");
+        SemanticVersion v2 = new SemanticVersion("2.2.2");
+
+        assertThat(v1)
+                .isEqualTo(v1).isEqualTo(v2)
+                .isEqualByComparingTo(v2).hasSameHashCodeAs(v2)
+                .isNotEqualTo(null).isNotEqualTo("test");
+        assertThat(v1.hashCode()).isEqualTo(986324);
+    }
+
+    @Test
+    public void string() {
+        assertThat(new SemanticVersion("3.3.3")).hasToString("3.3.3");
+        assertThat(new SemanticVersion("1.3.2-dev")).hasToString("1.3.2-dev");
     }
 
 }

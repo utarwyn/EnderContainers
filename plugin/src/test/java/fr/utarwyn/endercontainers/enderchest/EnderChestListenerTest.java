@@ -96,7 +96,7 @@ public class EnderChestListenerTest {
         // Check context consumer after interaction
         PlayerContext context = mock(PlayerContext.class);
         consumer.getValue().accept(context);
-        verify(context).openHubMenuFor(eq(this.player), eq(this.block));
+        verify(context).openHubMenuFor(this.player, this.block);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class EnderChestListenerTest {
         assertThat(event.useInteractedBlock()).isEqualTo(Event.Result.DENY);
         assertThat(event.useItemInHand()).isEqualTo(Event.Result.DENY);
 
-        verify(this.player).sendMessage(eq("§c§l(!) §cYou can't use the enderchest in awesome_faction§c's territory!"));
+        verify(this.player).sendMessage("§c§l(!) §cYou can't use the enderchest in awesome_faction§c's territory!");
     }
 
     @Test

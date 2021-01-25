@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
@@ -158,6 +159,7 @@ public class TestHelper {
             staticAccess.setAccessible(false);
 
             lenient().when(plugin.getServer()).thenReturn(server);
+            lenient().when(plugin.getDescription()).thenReturn(mock(PluginDescriptionFile.class));
             lenient().doReturn(server.getLogger()).when(plugin).getLogger();
             lenient().doAnswer(answer -> {
                 answer.getArgument(0, Runnable.class).run();

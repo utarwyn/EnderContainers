@@ -14,6 +14,11 @@ import java.util.function.Consumer;
 public abstract class BackupAbstractTask implements Runnable {
 
     /**
+     * The EnderContainers plugin
+     */
+    private final EnderContainers plugin;
+
+    /**
      * The backup manager
      */
     protected BackupManager manager;
@@ -24,19 +29,14 @@ public abstract class BackupAbstractTask implements Runnable {
     protected Consumer<Boolean> callback;
 
     /**
-     * The EnderContainers plugin
-     */
-    private EnderContainers plugin;
-
-    /**
      * Construct a new backup abstract task
      *
      * @param plugin   the EnderContainers plugin
      * @param manager  the backup manager
      * @param consumer object consumed at the end of the task
      */
-    public BackupAbstractTask(EnderContainers plugin, BackupManager manager,
-                              Consumer<Boolean> consumer) {
+    protected BackupAbstractTask(EnderContainers plugin, BackupManager manager,
+                                 Consumer<Boolean> consumer) {
         this.plugin = plugin;
         this.manager = manager;
         this.callback = consumer;

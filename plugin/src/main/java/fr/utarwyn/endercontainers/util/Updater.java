@@ -114,7 +114,7 @@ public class Updater extends AbstractManager implements Runnable {
             logger.warning(" ");
             logger.log(Level.WARNING, "  1. Download the new version here: {0}", DOWNLOAD_LINK);
             logger.log(Level.WARNING, "  2. Then follow the upgrade guide {0} here: {1}",
-                    new String[]{this.latestVersion.toString(), WIKI_LINK});
+                    new Object[]{this.latestVersion, WIKI_LINK});
             logger.warning(" ");
         } else if (this.currentVersion.isDevelopment()) {
             logger.warning("**** IMPORTANT!");

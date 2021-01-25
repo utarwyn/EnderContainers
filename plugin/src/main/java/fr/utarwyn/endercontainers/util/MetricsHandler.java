@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.util;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.DrilldownPie;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
@@ -31,7 +32,7 @@ public class MetricsHandler {
         Metrics metrics = new Metrics(plugin, PLUGIN_ID);
 
         // Add custom metrics
-        metrics.addCustomChart(new Metrics.DrilldownPie(
+        metrics.addCustomChart(new DrilldownPie(
                 "dependenciesUsage", this::getDependenciesUsage
         ));
     }

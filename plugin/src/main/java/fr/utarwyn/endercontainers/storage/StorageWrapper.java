@@ -21,7 +21,7 @@ public abstract class StorageWrapper {
      *
      * @param plugin plugin instance object
      */
-    public StorageWrapper(EnderContainers plugin) {
+    protected StorageWrapper(EnderContainers plugin) {
         this.plugin = plugin;
     }
 

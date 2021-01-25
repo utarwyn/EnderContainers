@@ -14,20 +14,13 @@
     <name>EnderContainers Plugin</name>
 
     <properties>
-        <hikaricp.version>3.4.5</hikaricp.version>
+        <hikaricp.version>4.0.0</hikaricp.version>
         <slf4j.version>1.7.30</slf4j.version>
-        <bstats.version>1.8</bstats.version>
+        <bstats.version>2.1.0</bstats.version>
         <junit.version>4.13.1</junit.version>
         <mockito.version>3.7.7</mockito.version>
-        <assertj.version>3.18.1</assertj.version>
+        <assertj.version>3.19.0</assertj.version>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>bstats</id>
-            <url>https://repo.codemc.org/repository/maven-public</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
