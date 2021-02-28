@@ -1,11 +1,8 @@
 package fr.utarwyn.endercontainers.hologram;
 
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.compatibility.nms.NMSHologramUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-
-import java.util.logging.Level;
 
 /**
  * This class is used to display a text above an enderchest block
@@ -41,7 +38,7 @@ class Hologram {
     /**
      * Identifier of the spawned entity for the observer
      */
-    private int entityId;
+    private Integer entityId;
 
     /**
      * Construct an hologram and spawn it directly
@@ -49,12 +46,12 @@ class Hologram {
      * @param observer The observer who has to receive the hologram
      * @param title    The title/content of the hologram
      * @param location The location of the hologram
+     * @throws HologramException thrown if cannot spawn the hologram
      */
-    Hologram(Player observer, String title, Location location) {
+    Hologram(Player observer, String title, Location location) throws HologramException {
         this.observer = observer;
         this.title = title;
         this.location = location;
-        this.entityId = -1;
 
         this.spawn();
     }
@@ -64,31 +61,35 @@ class Hologram {
      *
      * @return True if the player is online
      */
-    boolean isPlayerOnline() {
+    boolean isObserverOnline() {
         return this.observer != null && this.observer.isOnline();
     }
 
     /**
      * Destroy the hologram for the observer with the stored entity id.
+     *
+     * @throws HologramException thrown if cannot destroy the hologram
      */
-    void destroy() {
-        if (this.entityId > -1) {
+    void destroy() throws HologramException {
+        if (this.entityId != null && this.entityId >= 0) {
             try {
-                NMSHologramUtil.destroyEntity(this.entityId, this.observer);
-            } catch (ReflectiveOperationException e) {
-                EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot destroy the hologram", e);
+                NMSHologramUtil.get().destroyEntity(this.entityId, this.observer);
+            } catch (ReflectiveOperationException cause) {
+                throw new HologramException("cannot destroy hologram entity", cause);
             }
         }
     }
 
     /**
-     * Spawn the hologram
+     * Spawn the hologram.
+     *
+     * @throws HologramException thrown if cannot spawn the hologram
      */
-    private void spawn() {
+    private void spawn() throws HologramException {
         try {
-            this.entityId = NMSHologramUtil.spawnHologram(this.location, this.title, this.observer);
-        } catch (ReflectiveOperationException e) {
-            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot spawn the hologram", e);
+            this.entityId = NMSHologramUtil.get().spawnHologram(this.location, this.title, this.observer);
+        } catch (ReflectiveOperationException cause) {
+            throw new HologramException("cannot spawn hologram entity", cause);
         }
     }
 

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Level;
 
 /**
  * The hologram manager. It runs automatically a task to show/hide
@@ -42,12 +43,12 @@ public class HologramManager extends AbstractManager implements Runnable {
     /**
      * All stored holograms by owner
      */
-    private ConcurrentMap<UUID, Hologram> holograms;
+    ConcurrentMap<UUID, Hologram> holograms;
 
     /**
      * The BukkitTask object which manage the spawning/dispawning of holograms
      */
-    private BukkitTask task;
+    BukkitTask task;
 
     /**
      * Generate a title with custom data for a block nametag.
@@ -89,7 +90,7 @@ public class HologramManager extends AbstractManager implements Runnable {
             this.task = null;
         }
 
-        this.holograms.values().forEach(Hologram::destroy);
+        this.holograms.values().forEach(this::destroyHologram);
         this.holograms.clear();
     }
 
@@ -106,7 +107,7 @@ public class HologramManager extends AbstractManager implements Runnable {
                 .forEach(this::checkHologramStatus);
 
         // Unused holograms can be cleared
-        this.holograms.entrySet().removeIf(entry -> !entry.getValue().isPlayerOnline());
+        this.holograms.entrySet().removeIf(entry -> !entry.getValue().isObserverOnline());
     }
 
     /**
@@ -129,8 +130,7 @@ public class HologramManager extends AbstractManager implements Runnable {
                 }
             }
         } else if (this.holograms.containsKey(uuid)) {
-            this.holograms.get(uuid).destroy();
-            this.holograms.remove(uuid);
+            this.destroyHologram(this.holograms.remove(uuid));
         }
     }
 
@@ -144,9 +144,26 @@ public class HologramManager extends AbstractManager implements Runnable {
     private void spawnHologram(PlayerContext context, Player observer, Block block) {
         int count = context.getAccessibleChestCount();
         String title = HologramManager.generateNametagTitle(count);
-        Location location = block.getLocation().clone().add(.5, Hologram.LINE_HEIGHT - 1.25D, .5);
+        Location location = block.getLocation().clone().add(.5, -0.79D - Hologram.LINE_HEIGHT, .5);
 
-        this.holograms.put(observer.getUniqueId(), new Hologram(observer, title, location));
+        try {
+            this.holograms.put(observer.getUniqueId(), new Hologram(observer, title, location));
+        } catch (HologramException e) {
+            this.plugin.getLogger().log(Level.WARNING, "cannot create hologram instance", e);
+        }
+    }
+
+    /**
+     * Destroys a specific hologram by despawning its entity.
+     *
+     * @param hologram hologram instance to destroy
+     */
+    private void destroyHologram(Hologram hologram) {
+        try {
+            hologram.destroy();
+        } catch (HologramException e) {
+            this.plugin.getLogger().log(Level.WARNING, "cannot remove hologram instance", e);
+        }
     }
 
 }

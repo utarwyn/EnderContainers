@@ -22,7 +22,7 @@ mysql:
   ssl:
     enabled: false
 others:
-  blockNametag: false
+  blockNametag: true
   updateChecker: true
   useExperimentalSavingSystem: false
   globalSound: true

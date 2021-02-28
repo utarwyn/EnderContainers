@@ -1,14 +1,12 @@
 package fr.utarwyn.endercontainers;
 
+import fr.utarwyn.endercontainers.compatibility.nms.NMSHologramUtil;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.mock.ItemFactoryMock;
 import fr.utarwyn.endercontainers.mock.ItemMetaMock;
 import fr.utarwyn.endercontainers.mock.v1_12.ServerMock;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Server;
-import org.bukkit.UnsafeValues;
+import org.bukkit.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -26,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -46,7 +45,7 @@ public class TestHelper {
 
     private static EnderContainers plugin = null;
 
-    private static Player player = null;
+    private static UUID playerIdentifier = null;
 
     private TestHelper() {
 
@@ -165,6 +164,12 @@ public class TestHelper {
                 answer.getArgument(0, Runnable.class).run();
                 return null;
             }).when(plugin).executeTaskOnMainThread(any());
+
+            // Also setup NMS classes
+            Field hologramUtilStaticAccess = NMSHologramUtil.class.getDeclaredField("instance");
+            hologramUtilStaticAccess.setAccessible(true);
+            hologramUtilStaticAccess.set(null, mock(NMSHologramUtil.class));
+            hologramUtilStaticAccess.setAccessible(false);
         }
 
         return plugin;
@@ -176,18 +181,21 @@ public class TestHelper {
      * @return mocked instance of a player
      */
     public static Player getPlayer() {
-        if (player == null) {
+        if (playerIdentifier == null) {
             TestHelper.setUpServer();
-
-            UUID uuid = UUID.randomUUID();
-            player = mock(Player.class);
-
-            when(player.isOnline()).thenReturn(true);
-            when(player.getUniqueId()).thenReturn(uuid);
-            when(player.getName()).thenReturn("Utarwyn");
-
-            when(Bukkit.getServer().getPlayer(uuid)).thenReturn(player);
+            playerIdentifier = UUID.randomUUID();
         }
+
+        World world = mock(World.class);
+        Player player = mock(Player.class);
+
+        lenient().when(world.getName()).thenReturn("world");
+        lenient().when(player.getWorld()).thenReturn(world);
+        lenient().when(player.isOnline()).thenReturn(true);
+        lenient().when(player.getUniqueId()).thenReturn(playerIdentifier);
+        lenient().when(player.getName()).thenReturn("Utarwyn");
+        lenient().when(Bukkit.getServer().getPlayer(playerIdentifier)).thenReturn(player);
+        doReturn(Collections.singletonList(player)).when(Bukkit.getServer()).getOnlinePlayers();
 
         return player;
     }
@@ -208,6 +216,13 @@ public class TestHelper {
 
         lenient().when(server.getScheduler().runTaskAsynchronously(
                 any(), any(Runnable.class)
+        )).then(answer -> {
+            answer.getArgument(1, Runnable.class).run();
+            return mock(BukkitTask.class);
+        });
+
+        lenient().when(server.getScheduler().runTaskTimer(
+                any(), any(Runnable.class), anyLong(), anyLong()
         )).then(answer -> {
             answer.getArgument(1, Runnable.class).run();
             return mock(BukkitTask.class);

@@ -57,7 +57,7 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
      * @param name    Name of ths command
      * @param aliases Aliases of the command
      */
-    public AbstractCommand(String name, String... aliases) {
+    protected AbstractCommand(String name, String... aliases) {
         super(name);
 
         this.parameters = new ArrayList<>();
