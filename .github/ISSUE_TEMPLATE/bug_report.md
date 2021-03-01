@@ -2,7 +2,7 @@
 name: Bug report
 about: Report a way in which EnderContainers is not working as intended
 title: ''
-labels: bug
+labels: 'bug: unconfirmed'
 assignees: ''
 
 ---
