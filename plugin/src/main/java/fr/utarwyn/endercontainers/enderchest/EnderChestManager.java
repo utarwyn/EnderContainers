@@ -53,7 +53,7 @@ public class EnderChestManager extends AbstractManager {
         this.plugin.executeTaskOnMainThread(() -> Managers.get(MenuManager.class).closeAll());
 
         // Save and unload all data
-        this.contextMap.values().forEach(context -> new SaveTask(context).run());
+        this.contextMap.values().forEach(PlayerContext::save);
         this.contextMap.clear();
     }
 
@@ -132,7 +132,7 @@ public class EnderChestManager extends AbstractManager {
     public void savePlayerContext(UUID owner, boolean delete) {
         if (this.contextMap.containsKey(owner)) {
             SaveTask saveTask = new SaveTask(this.contextMap.get(owner));
-            this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, saveTask);
+            this.plugin.executeTaskOnOtherThread(saveTask);
 
             if (delete) {
                 this.contextMap.remove(owner);

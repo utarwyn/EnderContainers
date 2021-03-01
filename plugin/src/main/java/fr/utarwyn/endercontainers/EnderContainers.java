@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers;
 
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.command.CommandManager;
+import fr.utarwyn.endercontainers.compatibility.nms.NMSUtil;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
@@ -91,7 +92,7 @@ public class EnderContainers extends JavaPlugin {
     }
 
     /**
-     * Execute a task in the primary thread of the server.
+     * Executes a task in the primary thread of the server.
      *
      * @param runnable task to execute in the main thread
      */
@@ -100,6 +101,19 @@ public class EnderContainers extends JavaPlugin {
             runnable.run();
         } else {
             getServer().getScheduler().scheduleSyncDelayedTask(this, runnable);
+        }
+    }
+
+    /**
+     * Executes a task in another thread of the server.
+     *
+     * @param runnable task to execute in another thread
+     */
+    public void executeTaskOnOtherThread(Runnable runnable) {
+        if (NMSUtil.isAsyncDisabled()) {
+            runnable.run();
+        } else {
+            getServer().getScheduler().runTaskAsynchronously(this, runnable);
         }
     }
 

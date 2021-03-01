@@ -2,6 +2,8 @@ package fr.utarwyn.endercontainers.compatibility.nms;
 
 import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 
+import java.lang.reflect.Field;
+
 /**
  * Base class to perform reflection things on current server net classes.
  *
@@ -20,10 +22,22 @@ public abstract class NMSUtil {
      */
     private static final String CRAFTBUKKIT_PACKAGE;
 
+    /**
+     * Field whiches stores enabling state of asynchronous tasks in Spigot
+     */
+    private static Field spigotAsyncCatcherEnabled;
+
     static {
         String version = ServerVersion.getBukkitVersion();
         NMS_PACKAGE = "net.minecraft.server." + version;
         CRAFTBUKKIT_PACKAGE = "org.bukkit.craftbukkit." + version;
+
+        try {
+            Class<?> asyncCatcher = Class.forName("org.spigotmc.AsyncCatcher");
+            spigotAsyncCatcherEnabled = asyncCatcher.getField("enabled");
+        } catch (ReflectiveOperationException ignored) {
+            // Ignore this.. we don't use Spigot!
+        }
     }
 
     /**
@@ -57,4 +71,17 @@ public abstract class NMSUtil {
         return Class.forName(NMS_PACKAGE + "." + className);
     }
 
+    /**
+     * Checks if usage of asynchronous tasks is disabled.
+     * This can occurs when using Spigot with the restart command for example.
+     *
+     * @return true if usage asynchronous tasks disabled
+     */
+    public static boolean isAsyncDisabled() {
+        try {
+            return spigotAsyncCatcherEnabled != null && !((boolean) spigotAsyncCatcherEnabled.get(null));
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

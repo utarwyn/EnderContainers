@@ -20,7 +20,7 @@ public abstract class Dependency implements DependencyValidator {
      *
      * @param plugin plugin instance
      */
-    public Dependency(Plugin plugin) {
+    protected Dependency(Plugin plugin) {
         this.plugin = plugin;
     }
 

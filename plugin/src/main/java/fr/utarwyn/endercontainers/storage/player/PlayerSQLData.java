@@ -111,8 +111,7 @@ public class PlayerSQLData extends PlayerData {
                 .noneMatch(set -> set.getInteger("num") == chest.getNum()
                         && set.getString("owner").equals(chest.getOwner().toString()));
 
-        String contents = !chest.getContents().isEmpty() ?
-                this.serializeChestContents(chest) : null;
+        String contents = !chest.getContents().isEmpty() ? this.serializeChestContents(chest) : null;
 
         try {
             this.databaseManager.saveEnderchest(

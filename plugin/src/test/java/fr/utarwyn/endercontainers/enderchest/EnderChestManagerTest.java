@@ -151,9 +151,7 @@ public class EnderChestManagerTest {
         // Check saving without deletion
         this.manager.savePlayerContext(uuid, false);
         assertThat(this.manager.contextMap).containsKey(uuid);
-
-        verify(Bukkit.getServer().getScheduler())
-                .runTaskAsynchronously(any(EnderContainers.class), any(SaveTask.class));
+        verify(TestHelper.getPlugin()).executeTaskOnOtherThread(any(SaveTask.class));
 
         // Check deletion of a context
         this.manager.savePlayerContext(uuid, true);
