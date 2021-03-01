@@ -1,6 +1,5 @@
 package fr.utarwyn.endercontainers.compatibility.nms;
 
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -8,7 +7,6 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.UUID;
-import java.util.logging.Level;
 
 /**
  * This class is used to perform reflection things
@@ -19,64 +17,77 @@ import java.util.logging.Level;
  */
 public class NMSPlayerUtil extends NMSUtil {
 
-    private static Constructor<?> entityPlayerConstructor;
+    private static final String GET_WORLD_SERVER_METHOD = "getWorldServer";
 
-    private static Constructor<?> gameProfileContructor;
+    /**
+     * Singleton instance of the utility class.
+     */
+    private static NMSPlayerUtil instance;
 
-    private static Method getBukkitEntityMethod;
+    private final Constructor<?> entityPlayerConstructor;
 
-    private static Object minecraftServer;
+    private final Constructor<?> gameProfileContructor;
 
-    private static Object worldServer;
+    private final Method getBukkitEntityMethod;
 
-    private static Object playerInteractManager;
+    private final Object minecraftServer;
 
-    static {
-        try {
-            Class<?> entityPlayerClass = getNMSClass("EntityPlayer");
-            Class<?> minecraftServerClass = getNMSClass("MinecraftServer");
-            Class<?> gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
-            Class<?> worldServerClass = getNMSClass("WorldServer");
-            Class<?> playerInteractManagerClass = getNMSClass("PlayerInteractManager");
+    private final Object worldServer;
 
-            gameProfileContructor = gameProfileClass.getDeclaredConstructor(UUID.class, String.class);
-            entityPlayerConstructor = entityPlayerClass.getDeclaredConstructor(
-                    minecraftServerClass, worldServerClass,
-                    gameProfileClass, playerInteractManagerClass
-            );
-            minecraftServer = minecraftServerClass.getMethod("getServer").invoke(null);
-            getBukkitEntityMethod = entityPlayerClass.getDeclaredMethod("getBukkitEntity");
+    private final Object playerInteractManager;
 
-            // Prepare a PlayerInteractManager
-            if (ServerVersion.isNewerThan(ServerVersion.V1_8)) {
-                if (ServerVersion.isNewerThan(ServerVersion.V1_15)) {
-                    worldServer = getWorldServer116(minecraftServer);
-                } else {
-                    Class<?> dimensionManagerClass = getNMSClass("DimensionManager");
-                    Object dimension = dimensionManagerClass.getDeclaredField("OVERWORLD").get(null);
-                    Method method = minecraftServerClass.getMethod("getWorldServer", dimensionManagerClass);
-                    worldServer = method.invoke(minecraftServer, dimension);
-                }
+    /**
+     * Constructs the utility class.
+     *
+     * @throws ReflectiveOperationException thrown if cannot instanciate NMS objects
+     */
+    private NMSPlayerUtil() throws ReflectiveOperationException {
+        Class<?> entityPlayerClass = getNMSClass("EntityPlayer");
+        Class<?> minecraftServerClass = getNMSClass("MinecraftServer");
+        Class<?> gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
+        Class<?> worldServerClass = getNMSClass("WorldServer");
+        Class<?> playerInteractManagerClass = getNMSClass("PlayerInteractManager");
 
-                playerInteractManager = playerInteractManagerClass.getDeclaredConstructor(worldServerClass).newInstance(worldServer);
+        gameProfileContructor = gameProfileClass.getDeclaredConstructor(UUID.class, String.class);
+        entityPlayerConstructor = entityPlayerClass.getDeclaredConstructor(
+                minecraftServerClass, worldServerClass,
+                gameProfileClass, playerInteractManagerClass
+        );
+        minecraftServer = minecraftServerClass.getMethod("getServer").invoke(null);
+        getBukkitEntityMethod = entityPlayerClass.getDeclaredMethod("getBukkitEntity");
+
+        // Prepare a PlayerInteractManager
+        if (ServerVersion.isNewerThan(ServerVersion.V1_8)) {
+            if (ServerVersion.isNewerThan(ServerVersion.V1_15)) {
+                worldServer = getWorldServer116(minecraftServer);
             } else {
-                Class<?> worldClass = getNMSClass("World");
-                Method method = minecraftServerClass.getMethod("getWorldServer", int.class);
-
-                worldServer = method.invoke(minecraftServer, 0);
-                playerInteractManager = playerInteractManagerClass.getDeclaredConstructor(worldClass).newInstance(worldServer);
+                Class<?> dimensionManagerClass = getNMSClass("DimensionManager");
+                Object dimension = dimensionManagerClass.getDeclaredField("OVERWORLD").get(null);
+                Method method = minecraftServerClass.getMethod(GET_WORLD_SERVER_METHOD, dimensionManagerClass);
+                worldServer = method.invoke(minecraftServer, dimension);
             }
-        } catch (ReflectiveOperationException e) {
-            EnderContainers.getInstance().getLogger().log(Level.SEVERE,
-                    "Cannot initialize the NMS player utility class", e);
+
+            playerInteractManager = playerInteractManagerClass.getDeclaredConstructor(worldServerClass).newInstance(worldServer);
+        } else {
+            Class<?> worldClass = getNMSClass("World");
+            Method method = minecraftServerClass.getMethod(GET_WORLD_SERVER_METHOD, int.class);
+
+            worldServer = method.invoke(minecraftServer, 0);
+            playerInteractManager = playerInteractManagerClass.getDeclaredConstructor(worldClass).newInstance(worldServer);
         }
     }
 
     /**
-     * Utility class.
+     * Retrieves or creates an instance of the utility class.
+     *
+     * @return utility class instance
+     * @throws ReflectiveOperationException thrown if cannot instanciate NMS objects
      */
-    private NMSPlayerUtil() {
-        // Not implemented
+    public static NMSPlayerUtil get() throws ReflectiveOperationException {
+        if (instance == null) {
+            instance = new NMSPlayerUtil();
+        }
+        return instance;
     }
 
     /**
@@ -86,7 +97,7 @@ public class NMSPlayerUtil extends NMSUtil {
      * @return base object of the offline player
      * @throws ReflectiveOperationException thrown if the player profile cannot be decoded
      */
-    public static Player loadPlayer(OfflinePlayer offline) throws ReflectiveOperationException {
+    public Player loadPlayer(OfflinePlayer offline) throws ReflectiveOperationException {
         if (!offline.hasPlayedBefore()) {
             return null;
         }
@@ -102,7 +113,7 @@ public class NMSPlayerUtil extends NMSUtil {
         return player;
     }
 
-    private static Object getWorldServer116(Object minecraftServer) throws ReflectiveOperationException {
+    private Object getWorldServer116(Object minecraftServer) throws ReflectiveOperationException {
         Class<?> minecraftServerClass = getNMSClass("MinecraftServer");
         Class<?> genericResourceKey = getNMSClass("ResourceKey");
         Class<?> minecraftKey = getNMSClass("MinecraftKey");
@@ -116,7 +127,7 @@ public class NMSPlayerUtil extends NMSUtil {
         Object resourceKey = constructResourceKey.invoke(null, dimensionKey, overworldKey);
         constructResourceKey.setAccessible(false);
 
-        Method getWorldServer = minecraftServerClass.getDeclaredMethod("getWorldServer", genericResourceKey);
+        Method getWorldServer = minecraftServerClass.getDeclaredMethod(GET_WORLD_SERVER_METHOD, genericResourceKey);
         return getWorldServer.invoke(minecraftServer, resourceKey);
     }
 

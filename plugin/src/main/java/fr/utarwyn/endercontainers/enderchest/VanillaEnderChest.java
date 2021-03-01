@@ -106,13 +106,11 @@ public class VanillaEnderChest extends EnderChest {
         if (this.owner == null) {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(context.getOwner());
             try {
-                this.owner = NMSPlayerUtil.loadPlayer(offlinePlayer);
+                this.owner = NMSPlayerUtil.get().loadPlayer(offlinePlayer);
             } catch (ReflectiveOperationException e) {
-                EnderContainers.getInstance().getLogger().log(
-                        Level.SEVERE,
-                        String.format("Cannot get the profile of player %s", context.getOwner()),
-                        e
-                );
+                EnderContainers.getInstance().getLogger().log(Level.SEVERE, String.format(
+                        "Cannot get the profile of player %s", context.getOwner()
+                ), e);
             }
         }
     }

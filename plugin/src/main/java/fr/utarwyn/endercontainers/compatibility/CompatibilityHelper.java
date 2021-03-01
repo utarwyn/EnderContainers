@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers.compatibility;
 
 import com.google.common.base.Preconditions;
-import fr.utarwyn.endercontainers.EnderContainers;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -9,7 +8,6 @@ import org.bukkit.enchantments.Enchantment;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 
 import static fr.utarwyn.endercontainers.compatibility.ServerVersion.V1_12;
 
@@ -95,10 +93,7 @@ public class CompatibilityHelper {
             try {
                 Method getMethod = Material.class.getMethod("getMaterial", Integer.class);
                 foundMaterial = (Material) getMethod.invoke(null, id);
-            } catch (Exception e) {
-                EnderContainers.getInstance().getLogger().log(
-                        Level.WARNING, "Cannot retrieve the getMaterial method from the Material class", e
-                );
+            } catch (Exception ignored) {
             }
         } else {
             // We may not use material ids in this versions of Bukkit!
