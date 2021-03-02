@@ -2,7 +2,7 @@ name: Java Integration
 
 on:
   push:
-    branches: [master]
+    branches: [ master, next ]
     paths:
       - 'api/**'
       - 'dependencies/**'
