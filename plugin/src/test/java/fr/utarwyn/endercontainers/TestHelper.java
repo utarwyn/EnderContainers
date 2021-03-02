@@ -195,7 +195,7 @@ public class TestHelper {
         lenient().when(player.getUniqueId()).thenReturn(playerIdentifier);
         lenient().when(player.getName()).thenReturn("Utarwyn");
         lenient().when(Bukkit.getServer().getPlayer(playerIdentifier)).thenReturn(player);
-        doReturn(Collections.singletonList(player)).when(Bukkit.getServer()).getOnlinePlayers();
+        lenient().doReturn(Collections.singletonList(player)).when(Bukkit.getServer()).getOnlinePlayers();
 
         return player;
     }
