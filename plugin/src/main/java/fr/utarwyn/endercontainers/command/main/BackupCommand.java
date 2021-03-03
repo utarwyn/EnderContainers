@@ -38,15 +38,15 @@ public class BackupCommand extends AbstractCommand {
         PluginMsg.pluginBar(sender);
 
         sender.sendMessage(" ");
-        sender.sendMessage("  " + HelpCommand.formatCommandFor(sender, "§6/ecp backup list", "backups.view"));
+        sender.sendMessage("  " + HelpCommand.formatCommandFor(sender, "§6/ecp backup list", "backup.list"));
         sender.sendMessage("  §7   ⏩ List all created backups");
-        sender.sendMessage("  " + HelpCommand.formatCommandFor(sender, "§6/ecp backup info §e[name]", "backups.info"));
+        sender.sendMessage("  " + HelpCommand.formatCommandFor(sender, "§6/ecp backup info §e[name]", "backup.info"));
         sender.sendMessage("  §7   ⏩ Get information about a backup");
-        sender.sendMessage("  " + HelpCommand.formatCommandFor(sender, "§6/ecp backup create §e[name]", "backups.create"));
+        sender.sendMessage("  " + HelpCommand.formatCommandFor(sender, "§6/ecp backup create §e[name]", "backup.create"));
         sender.sendMessage("  §7   ⏩ Create a new backup");
-        sender.sendMessage("  " + HelpCommand.formatCommandFor(sender, "§6/ecp backup load §e[name]", "backups.apply"));
+        sender.sendMessage("  " + HelpCommand.formatCommandFor(sender, "§6/ecp backup load §e[name]", "backup.load"));
         sender.sendMessage("  §7   ⏩ Replace all saved data by the backup");
-        sender.sendMessage("  " + HelpCommand.formatCommandFor(sender, "§6/ecp backup remove §e[name]", "backups.remove"));
+        sender.sendMessage("  " + HelpCommand.formatCommandFor(sender, "§6/ecp backup remove §e[name]", "backup.remove"));
         sender.sendMessage("  §7   ⏩ Delete a backup with all its data");
         sender.sendMessage(" ");
     }

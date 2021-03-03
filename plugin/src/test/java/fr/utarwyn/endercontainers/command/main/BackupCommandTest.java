@@ -48,8 +48,8 @@ public class BackupCommandTest extends CommandTestHelper<BackupCommand> {
 
     @Test
     public void withPermission() {
-        when(this.player.hasPermission("endercontainers.backups.view")).thenReturn(true);
-        when(this.player.hasPermission("endercontainers.backups.remove")).thenReturn(true);
+        when(this.player.hasPermission("endercontainers.backup.list")).thenReturn(true);
+        when(this.player.hasPermission("endercontainers.backup.remove")).thenReturn(true);
 
         this.run(this.player);
         verify(this.player).sendMessage(contains("EnderContainers"));
