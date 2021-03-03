@@ -1,6 +1,7 @@
-package fr.utarwyn.endercontainers.command;
+package fr.utarwyn.endercontainers.command.main;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.command.CommandTestHelper;
 import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
@@ -22,7 +23,7 @@ import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class EnderchestCommandTest extends CommandTestHelper<EnderchestCommand> {
+public class OpenCommandTest extends CommandTestHelper<OpenCommand> {
 
     @Mock
     private EnderChestManager manager;
@@ -42,8 +43,8 @@ public class EnderchestCommandTest extends CommandTestHelper<EnderchestCommand> 
     public void setUp() throws ReflectiveOperationException {
         TestHelper.registerManagers(this.manager);
         this.player = TestHelper.getPlayer();
-        this.command = new EnderchestCommand();
-        this.permission = "endercontainers.cmd.enderchests";
+        this.command = new OpenCommand();
+        this.permission = "endercontainers.openchests";
 
         doAnswer(answer -> {
             ((Consumer<PlayerContext>) answer.getArgument(1)).accept(this.context);
@@ -53,21 +54,23 @@ public class EnderchestCommandTest extends CommandTestHelper<EnderchestCommand> 
 
     @Test
     public void create() {
-        assertThat(this.command.getName()).isEqualTo("enderchest");
-        assertThat(this.command.getAliases()).containsExactly("ec", "endchest");
+        assertThat(this.command.getName()).isEqualTo("open");
     }
 
     @Test
     public void disableInConsole() {
         ConsoleCommandSender sender = mock(ConsoleCommandSender.class);
-        this.run(sender);
+        this.run(sender, "test");
         verify(sender).sendMessage(contains("player"));
     }
 
     @Test
     public void disabledWorld() {
+        this.givePermission(this.player);
         when(this.player.getWorld().getName()).thenReturn("disabled");
-        this.run(this.player);
+
+        this.run(this.player, "test");
+
         verify(this.player).sendMessage(contains("disabled"));
         verify(this.manager, never()).loadPlayerContext(any(), any());
     }
@@ -75,54 +78,39 @@ public class EnderchestCommandTest extends CommandTestHelper<EnderchestCommand> 
     @Test
     public void openMainChest() {
         this.givePermission(this.player);
-        this.run(this.player);
+        this.run(this.player, this.player.getName());
         verify(this.context).openHubMenuFor(this.player);
     }
 
     @Test
-    public void openSpecificChest() {
-        // With global permission
-        this.givePermission(this.player);
-        this.run(this.player, "10");
-        verify(this.context).openEnderchestFor(this.player, 9);
+    public void tabCompletion() {
+        // No completions without permission
+        assertThat(this.tabComplete(this.player, "")).isEmpty();
 
-        // With chest specific permission
-        this.setPermissionState(this.player, false);
-        when(this.player.hasPermission("endercontainers.cmd.enderchest.4")).thenReturn(true);
-        this.run(this.player, "5");
-        verify(this.context).openEnderchestFor(this.player, 4);
+        // Only current player is available
+        this.givePermission(this.player);
+        assertThat(this.tabComplete(this.player, "")).containsExactly("Utarwyn");
+        assertThat(this.tabComplete(this.player, "Uta")).containsExactly("Utarwyn");
+        assertThat(this.tabComplete(this.player, "nyw")).isEmpty();
     }
 
     @Test
     public void noPermission() {
-        // No permission for all chests
+        this.run(this.player, "test");
+        this.verifyNoPerm(this.player);
+    }
+
+    @Test
+    public void errorArgumentCount() {
         this.run(this.player);
-
-        // No permission for specific chest
-        this.run(this.player, "5");
-
-        verify(this.player).hasPermission("endercontainers.cmd.enderchest.4");
-        this.verifyNoPerm(this.player, 2);
+        verify(this.player).sendMessage(contains("argument count"));
     }
 
     @Test
-    public void errorEnderchestNumber() {
+    public void errorPlayerNotFound() {
         this.givePermission(this.player);
-        this.run(this.player, "-20");
-        this.run(this.player, "0");
-        this.run(this.player, "500");
-        this.verifyNoPerm(this.player, 3);
-
-        this.run(this.player, "ezaeza");
-        verify(this.player).sendMessage(contains("not valid"));
-    }
-
-    @Test
-    public void errorEnderchestNotAccessible() {
-        this.givePermission(this.player);
-        when(this.context.openEnderchestFor(this.player, 4)).thenReturn(false);
-        this.run(this.player, "5");
-        verify(this.player).sendMessage(contains("open"));
+        this.run(this.player, "unknown");
+        verify(this.player).sendMessage(contains("not found"));
     }
 
 }

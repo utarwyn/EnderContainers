@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public class OpenCommand extends AbstractCommand {
 
-    private EnderChestManager manager;
+    private final EnderChestManager manager;
 
     public OpenCommand() {
         super("open");

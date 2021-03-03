@@ -64,6 +64,7 @@ public class TestHelper {
             lenient().when(server.getLogger()).thenReturn(logger);
             lenient().when(server.getScheduler()).thenReturn(scheduler);
             lenient().when(server.getPluginManager()).thenReturn(pluginManager);
+            lenient().when(server.getOfflinePlayer(anyString())).thenReturn(mock(OfflinePlayer.class));
 
             TestHelper.mockSchedulers(server);
             TestHelper.mockInventoryObjects(server);
@@ -194,7 +195,10 @@ public class TestHelper {
         lenient().when(player.isOnline()).thenReturn(true);
         lenient().when(player.getUniqueId()).thenReturn(playerIdentifier);
         lenient().when(player.getName()).thenReturn("Utarwyn");
+        lenient().when(player.getServer()).thenReturn(Bukkit.getServer());
+        lenient().when(player.canSee(any())).thenReturn(true);
         lenient().when(Bukkit.getServer().getPlayer(playerIdentifier)).thenReturn(player);
+        lenient().when(Bukkit.getServer().getPlayer("Utarwyn")).thenReturn(player);
         lenient().doReturn(Collections.singletonList(player)).when(Bukkit.getServer()).getOnlinePlayers();
 
         return player;
