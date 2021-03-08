@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.storage.serialization;
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.mock.EnchantmentMock;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -21,6 +22,8 @@ public class LegacyItemSerializerTest {
 
     private ItemSerializer serializer;
 
+    private Enchantment enchantment;
+
     @BeforeClass
     public static void setUpClass() {
         TestHelper.setUpServer();
@@ -29,6 +32,7 @@ public class LegacyItemSerializerTest {
     @Before
     public void setUp() {
         this.serializer = new LegacyItemSerializer();
+        this.enchantment = new EnchantmentMock("DAMAGE_ALL");
     }
 
     @Test
@@ -40,7 +44,7 @@ public class LegacyItemSerializerTest {
         if (logMeta != null) {
             ((Damageable) logMeta).setDamage(5);
             logMeta.setDisplayName("AWESOME TEST LOG @#");
-            logMeta.addEnchant(new EnchantmentMock("DAMAGE_ALL"), 1, false);
+            logMeta.addEnchant(this.enchantment, 1, false);
             logMeta.setLore(Arrays.asList("first line", "second line"));
             log.setItemMeta(logMeta);
         }
@@ -49,7 +53,7 @@ public class LegacyItemSerializerTest {
         map.put(17, new ItemStack(Material.GRASS, 20));
 
         assertThat(this.serializer.serialize(map)).isNotNull()
-                .isEqualTo("2;1#t@OAK_LOG:d@5:a@10:e@DAMAGE_ALL@1:n@AWESOME=TEST=LOG=\\\\@\\\\#=" +
+                .isEqualTo("2;1#t@OAK_LOG:d@5:a@10:e@minecraft!damage_all@1:n@AWESOME=TEST=LOG=\\\\@\\\\#=" +
                         ":l@first line=second line=;17#t@GRASS:a@20:l@;");
     }
 
@@ -67,7 +71,7 @@ public class LegacyItemSerializerTest {
         if (grassMeta != null) {
             ((Damageable) grassMeta).setDamage(2);
             grassMeta.setDisplayName("AMAZING GRASS");
-            grassMeta.addEnchant(new EnchantmentMock("DAMAGE_ALL"), 1, false);
+            grassMeta.addEnchant(this.enchantment, 1, false);
             grassMeta.setLore(Arrays.asList("first line", "second line"));
             grass.setItemMeta(grassMeta);
         }

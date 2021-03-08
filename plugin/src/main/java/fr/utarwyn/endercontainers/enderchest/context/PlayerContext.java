@@ -130,7 +130,11 @@ public class PlayerContext {
      * @param block  Block which has triggered the opening, can be null
      */
     public void openHubMenuFor(Player viewer, Block block) {
-        new EnderChestHubMenu(this).open(viewer);
+        if (this.getAccessibleChestCount() > 1) {
+            new EnderChestHubMenu(this).open(viewer);
+        } else {
+            this.openEnderchestFor(viewer, 0);
+        }
 
         if (block != null && Files.getConfiguration().isGlobalSound()) {
             MiscUtil.playSound(block.getLocation(), "CHEST_OPEN", "BLOCK_CHEST_OPEN");

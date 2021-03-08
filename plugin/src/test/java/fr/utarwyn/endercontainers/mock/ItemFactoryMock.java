@@ -15,7 +15,11 @@ public class ItemFactoryMock implements ItemFactory {
 
     @Override
     public ItemMeta getItemMeta(Material material) {
-        return new ItemMetaMock();
+        if (material == Material.PLAYER_HEAD) {
+            return new SkullItemMetaMock();
+        } else {
+            return new ItemMetaMock();
+        }
     }
 
     @Override
@@ -40,7 +44,11 @@ public class ItemFactoryMock implements ItemFactory {
 
     @Override
     public ItemMeta asMetaFor(ItemMeta meta, Material material) throws IllegalArgumentException {
-        return new ItemMetaMock(meta);
+        if (material == Material.PLAYER_HEAD) {
+            return new SkullItemMetaMock(meta);
+        } else {
+            return new ItemMetaMock(meta);
+        }
     }
 
     @Override

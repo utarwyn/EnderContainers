@@ -1,0 +1,146 @@
+package fr.utarwyn.endercontainers.enderchest.context;
+
+import com.google.common.collect.Maps;
+import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.menu.enderchest.EnderChestHubMenu;
+import fr.utarwyn.endercontainers.storage.StorageManager;
+import fr.utarwyn.endercontainers.storage.player.PlayerData;
+import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@RunWith(MockitoJUnitRunner.class)
+public class PlayerContextTest {
+
+    private static final int ENDERCHEST_AMOUNT = 27;
+
+    private PlayerContext context;
+
+    private Player player;
+
+    @Mock
+    private StorageManager storageManager;
+
+    @Mock
+    private PlayerData playerData;
+
+    @BeforeClass
+    public static void setUpClass() throws ReflectiveOperationException, YamlFileLoadException,
+            InvalidConfigurationException, IOException {
+        TestHelper.setUpFiles();
+    }
+
+    @Before
+    public void setUp() throws ReflectiveOperationException {
+        this.player = TestHelper.getPlayer();
+
+        TestHelper.registerManagers(this.storageManager);
+        when(this.storageManager.createPlayerDataStorage(this.player.getUniqueId())).thenReturn(this.playerData);
+        when(this.playerData.getEnderchestContents(any())).thenReturn(Maps.newConcurrentMap());
+
+        this.context = new PlayerContext(this.player.getUniqueId());
+        this.context.loadEnderchests(ENDERCHEST_AMOUNT);
+    }
+
+    @Test
+    public void create() {
+        assertThat(this.context.getOwner()).isEqualTo(this.player.getUniqueId());
+        assertThat(this.context.getOwnerAsObject()).isEqualTo(this.player);
+        assertThat(this.context.getData()).isEqualTo(this.playerData);
+    }
+
+    @Test
+    public void offlineOwner() {
+        assertThat(new PlayerContext(UUID.randomUUID()).getOwnerAsObject()).isNull();
+    }
+
+    @Test
+    public void getChest() {
+        assertThat(this.context.getChest(0)).isPresent();
+        assertThat(this.context.getChest(ENDERCHEST_AMOUNT - 1)).isPresent();
+        assertThat(this.context.getChest(ENDERCHEST_AMOUNT)).isNotPresent();
+    }
+
+    @Test
+    public void getAccessibleChestCount() {
+        assertThat(this.context.getAccessibleChestCount()).isEqualTo(1);
+        when(this.player.isOp()).thenReturn(true);
+        assertThat(this.context.getAccessibleChestCount()).isEqualTo(ENDERCHEST_AMOUNT);
+    }
+
+    @Test
+    public void isChestsUnused() {
+        assertThat(this.context.isChestsUnused()).isTrue();
+
+        when(this.player.getEnderChest().getViewers()).thenReturn(Collections.singletonList(this.player));
+        assertThat(this.context.isChestsUnused()).isFalse();
+    }
+
+    @Test
+    public void openHubMenu() {
+        // With permission, main menu has to be opened
+        when(this.player.isOp()).thenReturn(true);
+        this.context.openHubMenuFor(this.player);
+
+        ArgumentCaptor<Inventory> captor = ArgumentCaptor.forClass(Inventory.class);
+        verify(this.player).openInventory(captor.capture());
+        assertThat(captor.getValue().getHolder()).isInstanceOf(EnderChestHubMenu.class);
+    }
+
+    @Test
+    public void openHubMenuWithOneChest() {
+        // If only 1 chest accessible, open it directly
+        this.context.openHubMenuFor(this.player);
+        verify(this.player).openInventory(this.player.getEnderChest());
+    }
+
+    @Test
+    public void openHubMenuSound() {
+        Block block = mock(Block.class);
+        Location location = mock(Location.class);
+        World world = mock(World.class);
+
+        when(block.getLocation()).thenReturn(location);
+        when(location.getWorld()).thenReturn(world);
+
+        this.context.openHubMenuFor(this.player, block);
+
+        verify(world).playSound(eq(location), eq(Sound.BLOCK_CHEST_OPEN), anyFloat(), anyFloat());
+    }
+
+    @Test
+    public void openEnderchest() {
+        assertThat(this.context.openEnderchestFor(this.player, 0)).isTrue();
+        assertThat(this.context.openEnderchestFor(this.player, 2)).isFalse();
+        when(this.player.isOp()).thenReturn(true);
+        assertThat(this.context.openEnderchestFor(this.player, 2)).isTrue();
+        assertThat(this.context.openEnderchestFor(this.player, ENDERCHEST_AMOUNT)).isFalse();
+    }
+
+    @Test
+    public void save() {
+        this.context.save();
+        verify(this.playerData).saveContext(any());
+    }
+
+}

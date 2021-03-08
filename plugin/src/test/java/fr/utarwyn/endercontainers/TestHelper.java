@@ -5,7 +5,7 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.mock.ItemFactoryMock;
 import fr.utarwyn.endercontainers.mock.ItemMetaMock;
-import fr.utarwyn.endercontainers.mock.v1_12.ServerMock;
+import fr.utarwyn.endercontainers.mock.v1_15.ServerMock;
 import org.bukkit.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -189,6 +189,7 @@ public class TestHelper {
 
         World world = mock(World.class);
         Player player = mock(Player.class);
+        Inventory enderChest = mock(Inventory.class);
 
         lenient().when(world.getName()).thenReturn("world");
         lenient().when(player.getWorld()).thenReturn(world);
@@ -197,6 +198,9 @@ public class TestHelper {
         lenient().when(player.getName()).thenReturn("Utarwyn");
         lenient().when(player.getServer()).thenReturn(Bukkit.getServer());
         lenient().when(player.canSee(any())).thenReturn(true);
+        lenient().when(enderChest.getContents()).thenReturn(new ItemStack[0]);
+        lenient().when(player.getEnderChest()).thenReturn(enderChest);
+
         lenient().when(Bukkit.getServer().getPlayer(playerIdentifier)).thenReturn(player);
         lenient().when(Bukkit.getServer().getPlayer("Utarwyn")).thenReturn(player);
         lenient().doReturn(Collections.singletonList(player)).when(Bukkit.getServer()).getOnlinePlayers();
@@ -245,6 +249,7 @@ public class TestHelper {
         )).thenAnswer(answer -> {
             Inventory inventory = mock(Inventory.class);
             lenient().when(inventory.getContents()).thenReturn(new ItemStack[0]);
+            lenient().when(inventory.getHolder()).thenReturn(answer.getArgument(0, InventoryHolder.class));
             return inventory;
         });
 

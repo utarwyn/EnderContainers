@@ -10,7 +10,7 @@ public class EnchantmentMock extends Enchantment {
     private final String name;
 
     public EnchantmentMock(String name) {
-        super(NamespacedKey.randomKey());
+        super(NamespacedKey.minecraft(name.toLowerCase()));
         this.name = name;
     }
 
