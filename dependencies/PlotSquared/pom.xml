@@ -15,7 +15,7 @@
     <name>EnderContainers Dependency PlotSquared</name>
 
     <properties>
-        <plotsquared.version>5.1</plotsquared.version>
+        <plotsquared.version>5.13.3</plotsquared.version>
         <worldedit.version>7.2.2</worldedit.version>
     </properties>
 
@@ -26,7 +26,7 @@
         </repository>
         <repository>
             <id>plotsquared</id>
-            <url>https://plotsquared.com/mvn/</url>
+            <url>https://mvn.intellectualsites.com/content/repositories/releases/</url>
         </repository>
     </repositories>
 
@@ -38,8 +38,14 @@
         </dependency>
         <dependency>
             <groupId>com.plotsquared</groupId>
-            <artifactId>PlotSquared</artifactId>
+            <artifactId>PlotSquared-Core</artifactId>
             <version>${plotsquared.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-core</artifactId>
+            <version>${worldedit.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -47,12 +53,6 @@
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.sk89q.worldedit</groupId>
-            <artifactId>worldedit-bukkit</artifactId>
-            <version>${worldedit.version}</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 
