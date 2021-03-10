@@ -17,6 +17,7 @@
     <properties>
         <plotsquared.version>5.13.3</plotsquared.version>
         <worldedit.version>7.2.2</worldedit.version>
+        <prtree.version>1.7.0-SNAPSHOT</prtree.version>
     </properties>
 
     <repositories>
@@ -25,8 +26,12 @@
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
         <repository>
-            <id>plotsquared</id>
+            <id>plotsquared-releases</id>
             <url>https://mvn.intellectualsites.com/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>plotsquared-snapshots</id>
+            <url>https://mvn.intellectualsites.com/content/repositories/snapshots/</url>
         </repository>
     </repositories>
 
@@ -41,6 +46,12 @@
             <artifactId>PlotSquared-Core</artifactId>
             <version>${plotsquared.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.khelekore</groupId>
+            <artifactId>prtree</artifactId>
+            <version>${prtree.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
