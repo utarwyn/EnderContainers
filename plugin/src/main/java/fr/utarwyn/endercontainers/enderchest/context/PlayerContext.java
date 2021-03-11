@@ -130,10 +130,10 @@ public class PlayerContext {
      * @param block  block which has triggered the opening, can be null
      */
     public void openListInventory(Player viewer, Block block) {
-        if (this.getAccessibleChestCount() > 1) {
-            new EnderChestListMenu(this).open(viewer);
-        } else {
+        if (this.getAccessibleChestCount() == 1 && Files.getConfiguration().isOnlyShowAccessibleEnderchests()) {
             this.openEnderchestInventory(viewer, 0);
+        } else {
+            new EnderChestListMenu(this).open(viewer);
         }
 
         if (block != null && Files.getConfiguration().isGlobalSound()) {

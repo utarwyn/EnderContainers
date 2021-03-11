@@ -102,14 +102,23 @@ public class PlayerContextTest {
         when(this.player.isOp()).thenReturn(true);
         this.context.openListInventory(this.player);
 
-        ArgumentCaptor<Inventory> captor = ArgumentCaptor.forClass(Inventory.class);
-        verify(this.player).openInventory(captor.capture());
-        assertThat(captor.getValue().getHolder()).isInstanceOf(EnderChestListMenu.class);
+        assertThatPlayerOpenListInventory();
     }
 
     @Test
-    public void openListInventoryWithOneChest() {
+    public void openListInventoryWithOneChest()
+            throws ReflectiveOperationException, YamlFileLoadException, InvalidConfigurationException, IOException {
+        // If only 1 chest accessible, but can see other enderchests, so open list inventory
+        TestHelper.overrideConfigurationValue("onlyShowAccessibleEnderchests", false);
+        this.context.openListInventory(this.player);
+        assertThatPlayerOpenListInventory();
+    }
+
+    @Test
+    public void openListInventoryWithOneChestAndOthersAreHidden()
+            throws ReflectiveOperationException, YamlFileLoadException, InvalidConfigurationException, IOException {
         // If only 1 chest accessible, open it directly
+        TestHelper.overrideConfigurationValue("onlyShowAccessibleEnderchests", true);
         this.context.openListInventory(this.player);
         verify(this.player).openInventory(this.player.getEnderChest());
     }
@@ -141,6 +150,12 @@ public class PlayerContextTest {
     public void save() {
         this.context.save();
         verify(this.playerData).saveContext(any());
+    }
+
+    private void assertThatPlayerOpenListInventory() {
+        ArgumentCaptor<Inventory> captor = ArgumentCaptor.forClass(Inventory.class);
+        verify(this.player).openInventory(captor.capture());
+        assertThat(captor.getValue().getHolder()).isNotNull().isInstanceOf(EnderChestListMenu.class);
     }
 
 }

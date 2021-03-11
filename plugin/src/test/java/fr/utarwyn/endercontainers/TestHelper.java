@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers;
 
 import fr.utarwyn.endercontainers.compatibility.nms.NMSHologramUtil;
+import fr.utarwyn.endercontainers.configuration.Configuration;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.mock.ItemFactoryMock;
@@ -206,6 +207,25 @@ public class TestHelper {
         lenient().doReturn(Collections.singletonList(player)).when(Bukkit.getServer()).getOnlinePlayers();
 
         return player;
+    }
+
+    /**
+     * Overrides a configuration value in a specific unit test.
+     *
+     * @param fieldName field to override
+     * @param value     value which will replace the current one
+     * @throws ReflectiveOperationException thrown if cannot override configuration key
+     */
+    public static void overrideConfigurationValue(String fieldName, Object value)
+            throws ReflectiveOperationException, YamlFileLoadException, InvalidConfigurationException, IOException {
+        setUpFiles();
+
+        Field field = Configuration.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(Files.getConfiguration(), value);
+        field.setAccessible(false);
+
+        filesReady = false;
     }
 
     /**
