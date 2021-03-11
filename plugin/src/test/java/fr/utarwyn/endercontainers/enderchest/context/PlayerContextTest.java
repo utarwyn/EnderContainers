@@ -3,7 +3,7 @@ package fr.utarwyn.endercontainers.enderchest.context;
 import com.google.common.collect.Maps;
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
-import fr.utarwyn.endercontainers.menu.enderchest.EnderChestHubMenu;
+import fr.utarwyn.endercontainers.inventory.menu.EnderChestListMenu;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import org.bukkit.Location;
@@ -97,25 +97,25 @@ public class PlayerContextTest {
     }
 
     @Test
-    public void openHubMenu() {
+    public void openListInventory() {
         // With permission, main menu has to be opened
         when(this.player.isOp()).thenReturn(true);
-        this.context.openHubMenuFor(this.player);
+        this.context.openListInventory(this.player);
 
         ArgumentCaptor<Inventory> captor = ArgumentCaptor.forClass(Inventory.class);
         verify(this.player).openInventory(captor.capture());
-        assertThat(captor.getValue().getHolder()).isInstanceOf(EnderChestHubMenu.class);
+        assertThat(captor.getValue().getHolder()).isInstanceOf(EnderChestListMenu.class);
     }
 
     @Test
-    public void openHubMenuWithOneChest() {
+    public void openListInventoryWithOneChest() {
         // If only 1 chest accessible, open it directly
-        this.context.openHubMenuFor(this.player);
+        this.context.openListInventory(this.player);
         verify(this.player).openInventory(this.player.getEnderChest());
     }
 
     @Test
-    public void openHubMenuSound() {
+    public void openListInventorySound() {
         Block block = mock(Block.class);
         Location location = mock(Location.class);
         World world = mock(World.class);
@@ -123,18 +123,18 @@ public class PlayerContextTest {
         when(block.getLocation()).thenReturn(location);
         when(location.getWorld()).thenReturn(world);
 
-        this.context.openHubMenuFor(this.player, block);
+        this.context.openListInventory(this.player, block);
 
         verify(world).playSound(eq(location), eq(Sound.BLOCK_CHEST_OPEN), anyFloat(), anyFloat());
     }
 
     @Test
-    public void openEnderchest() {
-        assertThat(this.context.openEnderchestFor(this.player, 0)).isTrue();
-        assertThat(this.context.openEnderchestFor(this.player, 2)).isFalse();
+    public void openEnderchestInventory() {
+        assertThat(this.context.openEnderchestInventory(this.player, 0)).isTrue();
+        assertThat(this.context.openEnderchestInventory(this.player, 2)).isFalse();
         when(this.player.isOp()).thenReturn(true);
-        assertThat(this.context.openEnderchestFor(this.player, 2)).isTrue();
-        assertThat(this.context.openEnderchestFor(this.player, ENDERCHEST_AMOUNT)).isFalse();
+        assertThat(this.context.openEnderchestInventory(this.player, 2)).isTrue();
+        assertThat(this.context.openEnderchestInventory(this.player, ENDERCHEST_AMOUNT)).isFalse();
     }
 
     @Test

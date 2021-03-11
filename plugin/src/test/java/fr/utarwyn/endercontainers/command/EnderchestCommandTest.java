@@ -73,24 +73,24 @@ public class EnderchestCommandTest extends CommandTestHelper<EnderchestCommand> 
     }
 
     @Test
-    public void openMainChest() {
+    public void openChestListInventory() {
         this.givePermission(this.player);
         this.run(this.player);
-        verify(this.context).openHubMenuFor(this.player);
+        verify(this.context).openListInventory(this.player);
     }
 
     @Test
-    public void openSpecificChest() {
+    public void openSpecificChestInventory() {
         // With global permission
         this.givePermission(this.player);
         this.run(this.player, "10");
-        verify(this.context).openEnderchestFor(this.player, 9);
+        verify(this.context).openEnderchestInventory(this.player, 9);
 
         // With chest specific permission
         this.setPermissionState(this.player, false);
         when(this.player.hasPermission("endercontainers.cmd.enderchest.4")).thenReturn(true);
         this.run(this.player, "5");
-        verify(this.context).openEnderchestFor(this.player, 4);
+        verify(this.context).openEnderchestInventory(this.player, 4);
     }
 
     @Test
@@ -120,7 +120,7 @@ public class EnderchestCommandTest extends CommandTestHelper<EnderchestCommand> 
     @Test
     public void errorEnderchestNotAccessible() {
         this.givePermission(this.player);
-        when(this.context.openEnderchestFor(this.player, 4)).thenReturn(false);
+        when(this.context.openEnderchestInventory(this.player, 4)).thenReturn(false);
         this.run(this.player, "5");
         verify(this.player).sendMessage(contains("open"));
     }

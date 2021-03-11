@@ -9,7 +9,7 @@ import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.hologram.HologramManager;
-import fr.utarwyn.endercontainers.menu.MenuManager;
+import fr.utarwyn.endercontainers.inventory.InventoryManager;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.util.MetricsHandler;
 import fr.utarwyn.endercontainers.util.Updater;
@@ -66,7 +66,7 @@ public class EnderContainers extends JavaPlugin {
 
         // Load all managers
         Managers.register(this, CommandManager.class);
-        Managers.register(this, MenuManager.class);
+        Managers.register(this, InventoryManager.class);
         Managers.register(this, DependenciesManager.class);
         Managers.register(this, DatabaseManager.class);
         Managers.register(this, StorageManager.class);

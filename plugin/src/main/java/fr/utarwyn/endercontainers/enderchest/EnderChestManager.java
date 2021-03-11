@@ -6,7 +6,7 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.enderchest.context.SaveTask;
-import fr.utarwyn.endercontainers.menu.MenuManager;
+import fr.utarwyn.endercontainers.inventory.InventoryManager;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -49,8 +49,8 @@ public class EnderChestManager extends AbstractManager {
      */
     @Override
     protected synchronized void unload() {
-        // Close all menus
-        this.plugin.executeTaskOnMainThread(() -> Managers.get(MenuManager.class).closeAll());
+        // Close all inventories
+        this.plugin.executeTaskOnMainThread(() -> Managers.get(InventoryManager.class).closeAll());
 
         // Save and unload all data
         this.contextMap.values().forEach(PlayerContext::save);

@@ -3,8 +3,8 @@ package fr.utarwyn.endercontainers.enderchest;
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
-import fr.utarwyn.endercontainers.menu.MenuManager;
-import fr.utarwyn.endercontainers.menu.enderchest.EnderChestMenu;
+import fr.utarwyn.endercontainers.inventory.EnderChestInventory;
+import fr.utarwyn.endercontainers.inventory.InventoryManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -42,7 +42,7 @@ public class EnderChestTest {
             IOException, InvalidConfigurationException {
         TestHelper.setUpServer();
         TestHelper.setUpFiles();
-        TestHelper.registerManagers(mock(MenuManager.class));
+        TestHelper.registerManagers(mock(InventoryManager.class));
 
         Player player = TestHelper.getPlayer();
         UUID uuid = player.getUniqueId();
@@ -72,7 +72,7 @@ public class EnderChestTest {
         assertThat(this.chest.isFull()).isFalse();
 
         // With a specific size
-        this.chest.container = mock(EnderChestMenu.class);
+        this.chest.container = mock(EnderChestInventory.class);
         when(this.chest.container.getFilledSlotsNb()).thenReturn(6);
 
         assertThat(this.chest.getSize()).isEqualTo(6);
@@ -92,7 +92,7 @@ public class EnderChestTest {
         assertThat(this.chest.getContents()).isNotNull().isEmpty();
 
         // Custom already initialized container
-        this.chest.container = mock(EnderChestMenu.class);
+        this.chest.container = mock(EnderChestInventory.class);
 
         // With non-initialized container
         this.chest.getContents();
@@ -126,7 +126,7 @@ public class EnderChestTest {
 
     @Test
     public void container() {
-        this.chest.container = mock(EnderChestMenu.class);
+        this.chest.container = mock(EnderChestInventory.class);
         Inventory inventory = mock(Inventory.class);
 
         when(inventory.getSize()).thenReturn(27);

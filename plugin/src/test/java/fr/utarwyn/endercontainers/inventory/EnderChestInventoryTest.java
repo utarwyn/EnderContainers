@@ -1,4 +1,4 @@
-package fr.utarwyn.endercontainers.menu.enderchest;
+package fr.utarwyn.endercontainers.inventory;
 
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
@@ -31,9 +31,9 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class EnderChestMenuTest {
+public class EnderChestInventoryTest {
 
-    private EnderChestMenu menu;
+    private EnderChestInventory inventory;
 
     @Mock
     private EnderChest chest;
@@ -49,7 +49,7 @@ public class EnderChestMenuTest {
         when(this.chest.getMaxSize()).thenReturn(27);
         when(this.chest.getContents()).thenReturn(new ConcurrentHashMap<>());
 
-        this.menu = new EnderChestMenu(chest);
+        this.inventory = new EnderChestInventory(chest);
     }
 
     @Test
@@ -67,24 +67,24 @@ public class EnderChestMenuTest {
         }});
 
         // Mock both inventory methods
-        when(this.menu.getInventory().getContents())
+        when(this.inventory.getInventory().getContents())
                 .thenReturn(containerItems);
         doAnswer(answer -> containerItems[answer.getArgument(0, Integer.class)] = answer.getArgument(1, ItemStack.class))
-                .when(this.menu.getInventory()).setItem(anyInt(), any());
+                .when(this.inventory.getInventory()).setItem(anyInt(), any());
 
         // inventory and internal map empty
-        assertThat(this.menu.getContents()).isEmpty();
-        assertThat(this.menu.getInventory().getContents()).containsOnlyNulls();
+        assertThat(this.inventory.getContents()).isEmpty();
+        assertThat(this.inventory.getInventory().getContents()).containsOnlyNulls();
 
         // Call the real method here!
-        this.menu.prepare();
+        this.inventory.prepare();
 
         // all items that are in bounds must be added to the container, but all in the internal map
-        assertThat(this.menu.getContents())
+        assertThat(this.inventory.getContents())
                 .isNotEmpty().hasSize(3)
                 .contains(entry(4, item1), entry(7, item2), entry(38, item3));
 
-        assertThat(this.menu.getInventory().getContents())
+        assertThat(this.inventory.getInventory().getContents())
                 .areExactly(2, new Condition<>(Objects::nonNull, "non null item"))
                 .contains(item1, item2)
                 .doesNotContain(item3);
@@ -97,7 +97,7 @@ public class EnderChestMenuTest {
         itemList[2] = new ItemStack(Material.ENDER_CHEST);
         itemList[8] = new ItemStack(Material.IRON_BLOCK, 2);
         itemList[9] = new ItemStack(Material.GRASS, 20);
-        when(this.menu.getInventory().getContents()).thenReturn(itemList);
+        when(this.inventory.getInventory().getContents()).thenReturn(itemList);
 
         // Reload items of the chest
         when(this.chest.getContents()).thenReturn(new ConcurrentHashMap<Integer, ItemStack>() {{
@@ -107,10 +107,10 @@ public class EnderChestMenuTest {
             put(35, new ItemStack(Material.SPRUCE_FENCE, 16));
         }});
 
-        this.menu.prepare();
-        this.menu.updateContentsFromContainer();
+        this.inventory.prepare();
+        this.inventory.updateContentsFromContainer();
 
-        Map<Integer, ItemStack> map = this.menu.getContents();
+        Map<Integer, ItemStack> map = this.inventory.getContents();
 
         assertThat(map).isNotNull().hasSize(4);
         assertThat(map.get(0)).isNull(); // no item here
@@ -134,13 +134,13 @@ public class EnderChestMenuTest {
         TestHelper.registerManagers(manager);
 
         // do not save if the owner is connected
-        this.menu.onClose(viewer);
+        this.inventory.onClose(viewer);
         verify(manager, never()).savePlayerContext(any(), eq(true));
 
         // save if owner not connected
         UUID offline = UUID.fromString("62dcb385-f2ac-472f-9d88-a0cc0d957082");
         when(this.chest.getOwner()).thenReturn(offline);
-        this.menu.onClose(viewer);
+        this.inventory.onClose(viewer);
         verify(manager).savePlayerContext(this.chest.getOwner(), true);
     }
 
@@ -153,7 +153,7 @@ public class EnderChestMenuTest {
         when(location.getWorld()).thenReturn(world);
         when(viewer.getLocation()).thenReturn(location);
 
-        this.menu.onClose(viewer);
+        this.inventory.onClose(viewer);
         verify(world).playSound(location, Sound.BLOCK_CHEST_CLOSE, 1f, 1f);
     }
 

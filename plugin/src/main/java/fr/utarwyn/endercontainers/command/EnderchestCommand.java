@@ -32,12 +32,12 @@ public class EnderchestCommand extends AbstractCommand {
 
         if (chestNumber != null) {
             if (chestNumber > 0 && chestNumber <= Files.getConfiguration().getMaxEnderchests()) {
-                this.openChestMenu(player, chestNumber - 1);
+                this.openChestInventory(player, chestNumber - 1);
             } else {
                 PluginMsg.accessDenied(player);
             }
         } else {
-            this.openHubMenu(player);
+            this.openListInventory(player);
         }
     }
 
@@ -46,18 +46,18 @@ public class EnderchestCommand extends AbstractCommand {
         PluginMsg.errorMessageWithPrefix(sender, LocaleKey.ERR_NOPERM_CONSOLE);
     }
 
-    private void openHubMenu(Player player) {
+    private void openListInventory(Player player) {
         if (MiscUtil.playerHasPerm(player, "cmd.enderchests")) {
-            this.manager.loadPlayerContext(player.getUniqueId(), context -> context.openHubMenuFor(player));
+            this.manager.loadPlayerContext(player.getUniqueId(), context -> context.openListInventory(player));
         } else {
             PluginMsg.accessDenied(player);
         }
     }
 
-    private void openChestMenu(Player player, int num) {
+    private void openChestInventory(Player player, int num) {
         if (MiscUtil.playerHasPerm(player, "cmd.enderchests") || MiscUtil.playerHasPerm(player, "cmd.enderchest." + num)) {
             this.manager.loadPlayerContext(player.getUniqueId(), context -> {
-                if (!context.openEnderchestFor(player, num)) {
+                if (!context.openEnderchestInventory(player, num)) {
                     PluginMsg.errorMessageWithPrefix(player, LocaleKey.ERR_NOPERM_OPEN_CHEST);
                 }
             });

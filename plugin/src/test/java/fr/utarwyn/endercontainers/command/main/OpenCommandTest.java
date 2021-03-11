@@ -79,7 +79,7 @@ public class OpenCommandTest extends CommandTestHelper<OpenCommand> {
     public void openMainChest() {
         this.givePermission(this.player);
         this.run(this.player, this.player.getName());
-        verify(this.context).openHubMenuFor(this.player);
+        verify(this.context).openListInventory(this.player);
     }
 
     @Test
