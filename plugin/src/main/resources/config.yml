@@ -18,22 +18,18 @@ disabledWorlds:
 # Enderchests configuration
 enderchests:
 
-  # Here, you can choose the max number of enderchests available in the main menu.
-  # Authorized range: 1 - infinite
+  # Max number of enderchests available
+  # Range: 1 to infinite
   max: 27
 
-  # With this option you can choose the default number of
-  # enderchests available for all users, without any permission.
-  # Authorized range: 1 - max
+  # Number of enderchests available for all users without any permission
+  # Range: 1 to max
   default: 1
 
-  # By changing this you can hide all inaccessible enderchests
-  # in the chests' list menu.
+  # Show/Hide all inaccessible enderchests in the main menu.
   onlyShowAccessible: false
 
-  # You can choose here if you want to use the vanilla enderchest
-  # for the first slot in the list menu.
-  # If not, the first enderchest will be saved in EnderContainers database (or flat file).
+  # Use the vanilla enderchest as the first one. Otherwise it will be managed by EnderContainers.
   useVanillaEnderchest: true
 
 
@@ -74,4 +70,3 @@ others:
 
   # Use a global sound when a player opens/closes an enderchest
   globalSound: true
-
