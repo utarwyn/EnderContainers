@@ -7,7 +7,7 @@
     <parent>
         <groupId>fr.utarwyn</groupId>
         <artifactId>endercontainers</artifactId>
-        <version>2.2.1-dev</version>
+        <version>2.2.1</version>
     </parent>
 
     <artifactId>endercontainers-plugin</artifactId>
@@ -23,37 +23,37 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-api</artifactId>
-            <version>2.2.1-dev</version>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-dependency-factions1</artifactId>
-            <version>2.2.1-dev</version>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-dependency-factions2</artifactId>
-            <version>2.2.1-dev</version>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-dependency-plotsquared</artifactId>
-            <version>2.2.1-dev</version>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-dependency-worldguard6</artifactId>
-            <version>2.2.1-dev</version>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-dependency-worldguard7</artifactId>
-            <version>2.2.1-dev</version>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>

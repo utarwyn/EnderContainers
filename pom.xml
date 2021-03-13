@@ -6,11 +6,11 @@
 
     <groupId>fr.utarwyn</groupId>
     <artifactId>endercontainers</artifactId>
-    <version>2.2.1-dev</version>
+    <version>2.2.1</version>
     <packaging>pom</packaging>
 
     <name>EnderContainers</name>
-    <description>A Bukkit plugin to create multiple enderchests in one simply</description>
+    <description>A modern and customizable Bukkit plugin to divide enderchest into multiple inventories.</description>
     <url>https://github.com/utarwyn/EnderContainers</url>
     <inceptionYear>2015</inceptionYear>
 
