@@ -96,7 +96,7 @@ public class EnderChestListenerTest {
         // Check context consumer after interaction
         PlayerContext context = mock(PlayerContext.class);
         consumer.getValue().accept(context);
-        verify(context).openHubMenuFor(this.player, this.block);
+        verify(context).openListInventory(this.player, this.block);
     }
 
     @Test
@@ -249,7 +249,7 @@ public class EnderChestListenerTest {
         this.listener.onInventoryClose(event);
         verify(this.player, never()).playSound(any(), any(Sound.class), anyFloat(), anyFloat());
 
-        // try with an enderchest managed by the plugin -> no sound (integrated in the menu system)
+        // try with an enderchest managed by the plugin -> no sound (integrated in the inventory system)
         when(event.getInventory().getType()).thenReturn(InventoryType.ENDER_CHEST);
         when(this.manager.getVanillaEnderchestUsedBy(this.player)).thenReturn(Optional.empty());
         this.listener.onInventoryClose(event);

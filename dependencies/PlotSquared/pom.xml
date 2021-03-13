@@ -7,7 +7,7 @@
     <parent>
         <groupId>fr.utarwyn</groupId>
         <artifactId>endercontainers</artifactId>
-        <version>2.2.1-dev</version>
+        <version>2.2.1</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -15,8 +15,9 @@
     <name>EnderContainers Dependency PlotSquared</name>
 
     <properties>
-        <plotsquared.version>5.1</plotsquared.version>
-        <worldedit.version>7.2.2</worldedit.version>
+        <plotsquared.version>5.13.3</plotsquared.version>
+        <worldedit.version>7.2.3</worldedit.version>
+        <prtree.version>1.7.0-SNAPSHOT</prtree.version>
     </properties>
 
     <repositories>
@@ -25,8 +26,12 @@
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
         <repository>
-            <id>plotsquared</id>
-            <url>https://plotsquared.com/mvn/</url>
+            <id>plotsquared-releases</id>
+            <url>https://mvn.intellectualsites.com/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>plotsquared-snapshots</id>
+            <url>https://mvn.intellectualsites.com/content/repositories/snapshots/</url>
         </repository>
     </repositories>
 
@@ -34,12 +39,24 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-api</artifactId>
-            <version>2.2.1-dev</version>
+            <version>2.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.plotsquared</groupId>
-            <artifactId>PlotSquared</artifactId>
+            <artifactId>PlotSquared-Core</artifactId>
             <version>${plotsquared.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.khelekore</groupId>
+            <artifactId>prtree</artifactId>
+            <version>${prtree.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-core</artifactId>
+            <version>${worldedit.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -47,12 +64,6 @@
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.sk89q.worldedit</groupId>
-            <artifactId>worldedit-bukkit</artifactId>
-            <version>${worldedit.version}</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

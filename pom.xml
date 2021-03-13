@@ -6,11 +6,11 @@
 
     <groupId>fr.utarwyn</groupId>
     <artifactId>endercontainers</artifactId>
-    <version>2.2.1-dev</version>
+    <version>2.2.1</version>
     <packaging>pom</packaging>
 
     <name>EnderContainers</name>
-    <description>A Bukkit plugin to create multiple enderchests in one simply</description>
+    <description>A modern and customizable Bukkit plugin to divide enderchest into multiple inventories.</description>
     <url>https://github.com/utarwyn/EnderContainers</url>
     <inceptionYear>2015</inceptionYear>
 
@@ -36,6 +36,9 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <bukkit-api.version>1.16.1-R0.1-SNAPSHOT</bukkit-api.version>
+        <junit.version>4.13.1</junit.version>
+        <mockito.version>3.8.0</mockito.version>
+        <assertj.version>3.19.0</assertj.version>
     </properties>
 
     <modules>
@@ -61,6 +64,27 @@
             <artifactId>spigot-api</artifactId>
             <version>${bukkit-api.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

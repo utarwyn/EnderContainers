@@ -1,4 +1,4 @@
-package fr.utarwyn.endercontainers.menu;
+package fr.utarwyn.endercontainers.inventory;
 
 import com.google.common.collect.ImmutableMap;
 import fr.utarwyn.endercontainers.EnderContainers;
@@ -24,12 +24,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MenuManagerTest {
+public class InventoryManagerTest {
 
-    private MenuManager manager;
+    private InventoryManager manager;
 
     @Mock
-    private AbstractMenu menu;
+    private AbstractInventoryHolder holder;
 
     @Mock
     private Inventory inventory;
@@ -42,10 +42,10 @@ public class MenuManagerTest {
 
     @Before
     public void setUp() {
-        this.manager = new MenuManager();
+        this.manager = new InventoryManager();
 
         when(this.player.getGameMode()).thenReturn(GameMode.SURVIVAL);
-        when(this.inventory.getHolder()).thenReturn(this.menu);
+        when(this.inventory.getHolder()).thenReturn(this.holder);
         when(this.inventoryView.getTopInventory()).thenReturn(this.inventory);
         when(this.inventoryView.getPlayer()).thenReturn(this.player);
     }
@@ -71,33 +71,33 @@ public class MenuManagerTest {
         );
 
         // Default behavior (no interaction)
-        when(this.menu.isItemMovingRestricted()).thenReturn(true);
+        when(this.holder.isItemMovingRestricted()).thenReturn(true);
         this.manager.onInventoryClick(event);
         assertThat(event.isCancelled()).isTrue();
-        verify(menu).onClick(player, event.getRawSlot());
+        verify(holder).onClick(player, event.getRawSlot());
 
         // With interaction allowed
-        when(this.menu.isItemMovingRestricted()).thenReturn(false);
+        when(this.holder.isItemMovingRestricted()).thenReturn(false);
         this.manager.onInventoryClick(event);
         assertThat(event.isCancelled()).isFalse();
-        verify(menu, times(2)).onClick(player, event.getRawSlot());
+        verify(holder, times(2)).onClick(player, event.getRawSlot());
     }
 
     @Test
     public void inventoryClickOutside() {
         when(this.inventory.getSize()).thenReturn(27);
 
-        // With an unvalid slot position in the menu
+        // With an unvalid slot position in the inventory
         InventoryClickEvent event = new InventoryClickEvent(
                 this.inventoryView, InventoryType.SlotType.CONTAINER, -1,
                 ClickType.LEFT, InventoryAction.NOTHING
         );
 
-        when(this.menu.isItemMovingRestricted()).thenReturn(true);
+        when(this.holder.isItemMovingRestricted()).thenReturn(true);
         this.manager.onInventoryClick(event);
         assertThat(event.isCancelled()).isFalse();
 
-        // With an unvalid slot position in the menu + a shift clic
+        // With an unvalid slot position in the inventory + a shift clic
         event = new InventoryClickEvent(
                 this.inventoryView, InventoryType.SlotType.CONTAINER, 36,
                 ClickType.SHIFT_LEFT, InventoryAction.NOTHING
@@ -105,9 +105,9 @@ public class MenuManagerTest {
 
         this.manager.onInventoryClick(event);
         assertThat(event.isCancelled()).isTrue();
-        verify(menu, never()).onClick(player, event.getRawSlot());
+        verify(holder, never()).onClick(player, event.getRawSlot());
 
-        // Without a custom menu
+        // Without a custom inventory
         when(this.inventory.getHolder()).thenReturn(null);
         event = new InventoryClickEvent(
                 this.inventoryView, InventoryType.SlotType.CONTAINER, -1,
@@ -131,7 +131,7 @@ public class MenuManagerTest {
         when(this.player.getGameMode()).thenReturn(GameMode.SPECTATOR);
         this.manager.onInventoryClick(event);
         assertThat(event.isCancelled()).isTrue();
-        verify(menu).onClick(player, event.getRawSlot());
+        verify(holder).onClick(player, event.getRawSlot());
     }
 
     @Test
@@ -144,14 +144,14 @@ public class MenuManagerTest {
         );
 
         // With the restriction enabled
-        when(this.menu.isItemMovingRestricted()).thenReturn(true);
+        when(this.holder.isItemMovingRestricted()).thenReturn(true);
         this.manager.onInventoryDrag(event);
         assertThat(event.isCancelled()).isTrue();
 
         event.setResult(Event.Result.DEFAULT); // reset the event result
 
         // With the restriction disabled
-        when(this.menu.isItemMovingRestricted()).thenReturn(false);
+        when(this.holder.isItemMovingRestricted()).thenReturn(false);
         this.manager.onInventoryDrag(event);
         assertThat(event.isCancelled()).isFalse();
     }
@@ -166,16 +166,16 @@ public class MenuManagerTest {
         );
 
         // With the restriction enabled
-        when(this.menu.isItemMovingRestricted()).thenReturn(true);
+        when(this.holder.isItemMovingRestricted()).thenReturn(true);
         this.manager.onInventoryDrag(event);
         assertThat(event.isCancelled()).isFalse();
 
         // With the restriction disabled
-        when(this.menu.isItemMovingRestricted()).thenReturn(false);
+        when(this.holder.isItemMovingRestricted()).thenReturn(false);
         this.manager.onInventoryDrag(event);
         assertThat(event.isCancelled()).isFalse();
 
-        // Without a custom menu
+        // Without a custom inventory
         when(this.inventory.getHolder()).thenReturn(null);
         event = new InventoryDragEvent(
                 this.inventoryView, null, new ItemStack(Material.STONE), false,
@@ -205,7 +205,7 @@ public class MenuManagerTest {
         InventoryCloseEvent event = new InventoryCloseEvent(inventoryView);
 
         this.manager.onInventoryClose(event);
-        verify(this.menu).onClose(player);
+        verify(this.holder).onClose(player);
     }
 
     @Test
@@ -219,12 +219,12 @@ public class MenuManagerTest {
         TestHelper.setUpServer();
         doReturn(Collections.singletonList(player)).when(Bukkit.getServer()).getOnlinePlayers();
 
-        // Check that all menus are closed by the method
+        // Check that all inventories are closed by the method
         this.manager.closeAll();
         verify(player).closeInventory();
-        verify(this.menu).onClose(player);
+        verify(this.holder).onClose(player);
 
-        // Check also that enderchest inventories are closed
+        // Check also that vanilla enderchest inventories are closed
         when(enderchestInv.getType()).thenReturn(InventoryType.ENDER_CHEST);
         when(enderchestView.getTopInventory()).thenReturn(enderchestInv);
         when(player.getOpenInventory()).thenReturn(enderchestView);

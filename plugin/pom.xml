@@ -7,56 +7,53 @@
     <parent>
         <groupId>fr.utarwyn</groupId>
         <artifactId>endercontainers</artifactId>
-        <version>2.2.1-dev</version>
+        <version>2.2.1</version>
     </parent>
 
     <artifactId>endercontainers-plugin</artifactId>
     <name>EnderContainers Plugin</name>
 
     <properties>
-        <hikaricp.version>4.0.2</hikaricp.version>
+        <hikaricp.version>4.0.3</hikaricp.version>
         <slf4j.version>1.7.30</slf4j.version>
         <bstats.version>2.2.1</bstats.version>
-        <junit.version>4.13.1</junit.version>
-        <mockito.version>3.8.0</mockito.version>
-        <assertj.version>3.19.0</assertj.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-api</artifactId>
-            <version>2.2.1-dev</version>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-dependency-factions1</artifactId>
-            <version>2.2.1-dev</version>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-dependency-factions2</artifactId>
-            <version>2.2.1-dev</version>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-dependency-plotsquared</artifactId>
-            <version>2.2.1-dev</version>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-dependency-worldguard6</artifactId>
-            <version>2.2.1-dev</version>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-dependency-worldguard7</artifactId>
-            <version>2.2.1-dev</version>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>
@@ -77,27 +74,6 @@
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
             <version>${bstats.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>${assertj.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

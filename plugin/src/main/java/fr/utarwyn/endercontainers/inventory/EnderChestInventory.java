@@ -1,4 +1,4 @@
-package fr.utarwyn.endercontainers.menu.enderchest;
+package fr.utarwyn.endercontainers.inventory;
 
 import com.google.common.base.Preconditions;
 import fr.utarwyn.endercontainers.Managers;
@@ -6,7 +6,6 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
-import fr.utarwyn.endercontainers.menu.AbstractMenu;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.Bukkit;
@@ -22,10 +21,10 @@ import java.util.concurrent.ConcurrentMap;
  * @author Utarwyn
  * @since 2.0.0
  */
-public class EnderChestMenu extends AbstractMenu {
+public class EnderChestInventory extends AbstractInventoryHolder {
 
     /**
-     * Enderchest who generated this menu
+     * Enderchest who generated this inventory
      */
     private final EnderChest chest;
 
@@ -35,11 +34,11 @@ public class EnderChestMenu extends AbstractMenu {
     private ConcurrentMap<Integer, ItemStack> contents;
 
     /**
-     * Construct a menu whiches contain contents of an enderchest.
+     * Constructs an inventory which contains contents of an enderchest.
      *
      * @param chest The enderchest
      */
-    public EnderChestMenu(EnderChest chest) {
+    public EnderChestInventory(EnderChest chest) {
         this.chest = chest;
         this.itemMovingRestricted = false;
 

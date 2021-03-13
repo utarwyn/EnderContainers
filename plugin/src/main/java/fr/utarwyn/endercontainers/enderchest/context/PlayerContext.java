@@ -4,7 +4,7 @@ import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.VanillaEnderChest;
-import fr.utarwyn.endercontainers.menu.enderchest.EnderChestHubMenu;
+import fr.utarwyn.endercontainers.inventory.menu.EnderChestListMenu;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import fr.utarwyn.endercontainers.util.MiscUtil;
@@ -123,14 +123,18 @@ public class PlayerContext {
     }
 
     /**
-     * Permits to open the Hub menu with the list of enderchests
+     * Permits to open the inventory with all enderchests
      * of a specific player to another human.
      *
-     * @param viewer The player whom to send the menu
-     * @param block  Block which has triggered the opening, can be null
+     * @param viewer player who want to open the inventory
+     * @param block  block which has triggered the opening, can be null
      */
-    public void openHubMenuFor(Player viewer, Block block) {
-        new EnderChestHubMenu(this).open(viewer);
+    public void openListInventory(Player viewer, Block block) {
+        if (this.getAccessibleChestCount() == 1 && Files.getConfiguration().isOnlyShowAccessibleEnderchests()) {
+            this.openEnderchestInventory(viewer, 0);
+        } else {
+            new EnderChestListMenu(this).open(viewer);
+        }
 
         if (block != null && Files.getConfiguration().isGlobalSound()) {
             MiscUtil.playSound(block.getLocation(), "CHEST_OPEN", "BLOCK_CHEST_OPEN");
@@ -140,23 +144,23 @@ public class PlayerContext {
     }
 
     /**
-     * Permits to open the Hub menu with the list of enderchests
+     * Permits to open the inventory with all enderchests
      * of a specific player to another human.
      *
-     * @param viewer The player whom to send the menu
+     * @param viewer player who want to open the inventory
      */
-    public void openHubMenuFor(Player viewer) {
-        this.openHubMenuFor(viewer, null);
+    public void openListInventory(Player viewer) {
+        this.openListInventory(viewer, null);
     }
 
     /**
-     * Permits to open an enderchest to a viewer.
+     * Permits to open an enderchest inventory to a viewer.
      *
-     * @param viewer The viewer for which the enderchest will be displayed
-     * @param num    The number of the enderchest to open
+     * @param viewer viewer who want to open the enderchest inventory
+     * @param num    number of the enderchest to open
      * @return true if the enderchest has been opened
      */
-    public boolean openEnderchestFor(Player viewer, int num) {
+    public boolean openEnderchestInventory(Player viewer, int num) {
         Optional<EnderChest> chest = this.getChest(num);
         boolean accessible = false;
 

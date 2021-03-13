@@ -1,11 +1,12 @@
 package fr.utarwyn.endercontainers;
 
 import fr.utarwyn.endercontainers.compatibility.nms.NMSHologramUtil;
+import fr.utarwyn.endercontainers.configuration.Configuration;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.mock.ItemFactoryMock;
 import fr.utarwyn.endercontainers.mock.ItemMetaMock;
-import fr.utarwyn.endercontainers.mock.v1_12.ServerMock;
+import fr.utarwyn.endercontainers.mock.v1_15.ServerMock;
 import org.bukkit.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -64,6 +65,7 @@ public class TestHelper {
             lenient().when(server.getLogger()).thenReturn(logger);
             lenient().when(server.getScheduler()).thenReturn(scheduler);
             lenient().when(server.getPluginManager()).thenReturn(pluginManager);
+            lenient().when(server.getOfflinePlayer(anyString())).thenReturn(mock(OfflinePlayer.class));
 
             TestHelper.mockSchedulers(server);
             TestHelper.mockInventoryObjects(server);
@@ -188,16 +190,42 @@ public class TestHelper {
 
         World world = mock(World.class);
         Player player = mock(Player.class);
+        Inventory enderChest = mock(Inventory.class);
 
         lenient().when(world.getName()).thenReturn("world");
         lenient().when(player.getWorld()).thenReturn(world);
         lenient().when(player.isOnline()).thenReturn(true);
         lenient().when(player.getUniqueId()).thenReturn(playerIdentifier);
         lenient().when(player.getName()).thenReturn("Utarwyn");
+        lenient().when(player.getServer()).thenReturn(Bukkit.getServer());
+        lenient().when(player.canSee(any())).thenReturn(true);
+        lenient().when(enderChest.getContents()).thenReturn(new ItemStack[0]);
+        lenient().when(player.getEnderChest()).thenReturn(enderChest);
+
         lenient().when(Bukkit.getServer().getPlayer(playerIdentifier)).thenReturn(player);
-        doReturn(Collections.singletonList(player)).when(Bukkit.getServer()).getOnlinePlayers();
+        lenient().when(Bukkit.getServer().getPlayer("Utarwyn")).thenReturn(player);
+        lenient().doReturn(Collections.singletonList(player)).when(Bukkit.getServer()).getOnlinePlayers();
 
         return player;
+    }
+
+    /**
+     * Overrides a configuration value in a specific unit test.
+     *
+     * @param fieldName field to override
+     * @param value     value which will replace the current one
+     * @throws ReflectiveOperationException thrown if cannot override configuration key
+     */
+    public static void overrideConfigurationValue(String fieldName, Object value)
+            throws ReflectiveOperationException, YamlFileLoadException, InvalidConfigurationException, IOException {
+        setUpFiles();
+
+        Field field = Configuration.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(Files.getConfiguration(), value);
+        field.setAccessible(false);
+
+        filesReady = false;
     }
 
     /**
@@ -241,6 +269,7 @@ public class TestHelper {
         )).thenAnswer(answer -> {
             Inventory inventory = mock(Inventory.class);
             lenient().when(inventory.getContents()).thenReturn(new ItemStack[0]);
+            lenient().when(inventory.getHolder()).thenReturn(answer.getArgument(0, InventoryHolder.class));
             return inventory;
         });
 

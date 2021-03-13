@@ -66,8 +66,9 @@ public class CommandManager extends AbstractManager {
      * This method is called by the AsbtractCommand class.
      *
      * @param command command to register inside the Bukkit server
+     * @throws ReflectiveOperationException if cannot retrieve server command map
      */
-    private void register(AbstractCommand command) throws ReflectiveOperationException {
+    public void register(AbstractCommand command) throws ReflectiveOperationException {
         CommandMap commandMap = getCommandMap();
 
         if (commandMap != null) {
@@ -85,11 +86,8 @@ public class CommandManager extends AbstractManager {
         // Get the command map of the server first!
         if (cachedCommandMap == null) {
             Server server = this.plugin.getServer();
-            Field fMap = server.getClass().getDeclaredField("commandMap");
-
-            fMap.setAccessible(true);
-            cachedCommandMap = (CommandMap) fMap.get(server);
-            fMap.setAccessible(false);
+            Method mapMethod = server.getClass().getDeclaredMethod("getCommandMap");
+            cachedCommandMap = (CommandMap) mapMethod.invoke(server);
         }
 
         return cachedCommandMap;

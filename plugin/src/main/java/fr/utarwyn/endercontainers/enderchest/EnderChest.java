@@ -2,7 +2,7 @@ package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
-import fr.utarwyn.endercontainers.menu.enderchest.EnderChestMenu;
+import fr.utarwyn.endercontainers.inventory.EnderChestInventory;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -19,24 +19,22 @@ import java.util.concurrent.ConcurrentMap;
 public class EnderChest {
 
     /**
-     * Menu whiches can contain contents of this enderchest
+     * The number of the enderchest.
      */
-    EnderChestMenu container;
-
+    private final int num;
     /**
-     * Player context for which the enderchest has been loaded
+     * Player context for which the enderchest has been loaded.
      */
     protected PlayerContext context;
 
     /**
-     * Amount of rows of the enderchest
+     * Amount of rows of the enderchest.
      */
     protected int rows;
-
     /**
-     * The number of the enderchest
+     * Inventory which contains contents of this enderchest.
      */
-    private final int num;
+    EnderChestInventory container;
 
     /**
      * Construct a new enderchest.
@@ -48,7 +46,7 @@ public class EnderChest {
         this.context = context;
         this.num = num;
         this.updateRowCount();
-        this.container = new EnderChestMenu(this);
+        this.container = new EnderChestInventory(this);
     }
 
     /**

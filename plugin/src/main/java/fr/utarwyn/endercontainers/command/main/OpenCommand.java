@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public class OpenCommand extends AbstractCommand {
 
-    private EnderChestManager manager;
+    private final EnderChestManager manager;
 
     public OpenCommand() {
         super("open");
@@ -38,7 +38,7 @@ public class OpenCommand extends AbstractCommand {
         UUID uuid = UUIDFetcher.getUUID(playername);
 
         if (uuid != null) {
-            this.manager.loadPlayerContext(uuid, context -> context.openHubMenuFor(player));
+            this.manager.loadPlayerContext(uuid, context -> context.openListInventory(player));
         } else {
             player.sendMessage(EnderContainers.PREFIX + "§cPlayer §6" + playername + " §cnot found.");
         }

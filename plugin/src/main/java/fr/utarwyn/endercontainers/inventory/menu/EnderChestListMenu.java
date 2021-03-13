@@ -1,4 +1,4 @@
-package fr.utarwyn.endercontainers.menu.enderchest;
+package fr.utarwyn.endercontainers.inventory.menu;
 
 import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.compatibility.ServerVersion;
@@ -6,7 +6,7 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
-import fr.utarwyn.endercontainers.menu.AbstractMenu;
+import fr.utarwyn.endercontainers.inventory.AbstractInventoryHolder;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.ChatColor;
@@ -28,7 +28,7 @@ import java.util.Optional;
  * @author Utarwyn
  * @since 2.0.0
  */
-public class EnderChestHubMenu extends AbstractMenu {
+public class EnderChestListMenu extends AbstractInventoryHolder {
 
     /**
      * Static fields which represents the maximum number of items per page
@@ -79,16 +79,16 @@ public class EnderChestHubMenu extends AbstractMenu {
     private final PlayerContext context;
 
     /**
-     * Current page for the player who has opened the menu
+     * Current page for the player who has opened the inventory
      */
     private int page;
 
     /**
-     * Construct the Hub menu for a player
+     * Constructs the list menu based on a player context.
      *
-     * @param context context used for the preparation of the menu
+     * @param context context used for the preparation of the inventory
      */
-    public EnderChestHubMenu(PlayerContext context) {
+    public EnderChestListMenu(PlayerContext context) {
         this.context = context;
         this.page = 1;
 
@@ -170,7 +170,7 @@ public class EnderChestHubMenu extends AbstractMenu {
         }
 
         // Open the selected chest
-        if (this.context.openEnderchestFor(player, this.getFirstChestIndex() + slot)) {
+        if (this.context.openEnderchestInventory(player, this.getFirstChestIndex() + slot)) {
             MiscUtil.playSound(player, "CLICK", "UI_BUTTON_CLICK");
         } else {
             MiscUtil.playSound(player, "VILLAGER_NO", "ENTITY_VILLAGER_NO");
@@ -229,11 +229,11 @@ public class EnderChestHubMenu extends AbstractMenu {
     }
 
     /**
-     * Format the pane title from the configuration to have info about an enderchest.
+     * Formats the pane title from the configuration to have info about an enderchest.
      *
-     * @param chest Enderchest represented by the pane
-     * @param title Original title got from the configuration
-     * @return Formatted title ready to be displayed in the menu
+     * @param chest enderchest represented by the pane
+     * @param title original title got from the configuration
+     * @return formatted title ready to be displayed in the container
      */
     private String formatPaneTitle(EnderChest chest, String title) {
         ChatColor fillingColor = this.getPercentageColor(chest.getFillPercentage());

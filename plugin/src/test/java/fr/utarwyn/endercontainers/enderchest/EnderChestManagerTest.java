@@ -7,7 +7,7 @@ import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.enderchest.context.SaveTask;
-import fr.utarwyn.endercontainers.menu.MenuManager;
+import fr.utarwyn.endercontainers.inventory.InventoryManager;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import org.bukkit.Bukkit;
@@ -47,9 +47,9 @@ public class EnderChestManagerTest {
 
     @Test
     public void initialize() throws ReflectiveOperationException {
-        DependenciesManager menuManager = mock(DependenciesManager.class);
+        DependenciesManager dependenciesManager = mock(DependenciesManager.class);
 
-        TestHelper.registerManagers(menuManager);
+        TestHelper.registerManagers(dependenciesManager);
         TestHelper.setupManager(this.manager);
 
         this.manager.initialize();
@@ -61,10 +61,10 @@ public class EnderChestManagerTest {
 
     @Test
     public void unload() throws ReflectiveOperationException {
-        MenuManager menuManager = mock(MenuManager.class);
+        InventoryManager inventoryManager = mock(InventoryManager.class);
         PlayerContext context = mock(PlayerContext.class);
 
-        TestHelper.registerManagers(menuManager);
+        TestHelper.registerManagers(inventoryManager);
         TestHelper.setupManager(this.manager);
 
         this.manager.contextMap.put(UUID.randomUUID(), context);
@@ -72,7 +72,7 @@ public class EnderChestManagerTest {
         this.manager.unload();
 
         verify(context).save();
-        verify(menuManager).closeAll();
+        verify(inventoryManager).closeAll();
         assertThat(this.manager.contextMap).isEmpty();
     }
 

@@ -17,7 +17,7 @@ public class Parameter<T> {
     /**
      * Function used to convert the sent argument to the needed type
      */
-    private Function<String, T> converter;
+    private final Function<String, T> converter;
 
     /**
      * List of elements sent to users who want auto-completion on their argument

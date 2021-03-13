@@ -81,7 +81,7 @@ public class EnderChestListener implements Listener {
                 this.dependenciesManager.validateBlockChestOpening(block, player);
 
                 this.manager.loadPlayerContext(player.getUniqueId(),
-                        context -> context.openHubMenuFor(player, block));
+                        context -> context.openListInventory(player, block));
             } catch (BlockChestOpeningException e) {
                 if (e.getKey() != null) {
                     PluginMsg.errorMessage(player, e.getKey(), e.getParameters());
