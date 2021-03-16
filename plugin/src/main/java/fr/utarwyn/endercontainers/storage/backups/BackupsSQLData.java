@@ -5,15 +5,14 @@ import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
-import org.apache.commons.lang.StringUtils;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Storage wrapper for backups (MySQL)
@@ -43,35 +42,43 @@ public class BackupsSQLData extends BackupsData {
     }
 
     /**
-     * Create a list of enderchests from a string.
+     * Formats an enderchest stored in the database into a string
      *
-     * @param data string to use to generate enderchest datasets
-     * @return list of generated datasets
+     * @param set enderchest as a database row
+     * @return string representation of the enderchest to be backuped
      */
-    private static List<DatabaseSet> getEnderchestsFromString(String data) {
-        List<DatabaseSet> sets = new ArrayList<>();
-        DatabaseSet set;
+    private static String formatDatabaseSet(DatabaseSet set) {
+        Integer id = set.getInteger("id");
+        Integer num = set.getInteger("num");
+        String owner = Base64Coder.encodeString(Optional.ofNullable(set.getString("owner")).orElse(""));
+        String contents = Base64Coder.encodeString(Optional.ofNullable(set.getString("contents")).orElse(""));
+        Integer rows = set.getInteger("rows");
 
-        for (String backupData : data.split(";")) {
-            String[] info = backupData.split(":");
+        return String.format("%d:%d:%s:%s:%d", id, num, owner, contents, rows);
+    }
 
-            int id = Integer.parseInt(info[0]);
-            int num = Integer.parseInt(info[1]);
-            String owner = Base64Coder.decodeString(info[2]);
-            String contents = Base64Coder.decodeString(info[3]);
-            int rows = Integer.parseInt(info[4]);
+    /**
+     * Formats an enderchest stored as a string into a database row object
+     *
+     * @param str enderchest as a string
+     * @return database row object with chest information
+     */
+    private static DatabaseSet formatString(String str) {
+        String[] info = str.split(":");
 
-            set = new DatabaseSet();
-            set.setObject("id", id);
-            set.setObject("num", num);
-            set.setObject("owner", owner);
-            set.setObject("contents", contents);
-            set.setObject("rows", rows);
+        int id = Integer.parseInt(info[0]);
+        int num = Integer.parseInt(info[1]);
+        String owner = !info[2].isEmpty() ? Base64Coder.decodeString(info[2]) : null;
+        String contents = !info[3].isEmpty() ? Base64Coder.decodeString(info[3]) : null;
+        int rows = Integer.parseInt(info[4]);
 
-            sets.add(set);
-        }
-
-        return sets;
+        DatabaseSet set = new DatabaseSet();
+        set.setObject("id", id);
+        set.setObject("num", num);
+        set.setObject("owner", owner);
+        set.setObject("contents", contents);
+        set.setObject("rows", rows);
+        return set;
     }
 
     /**
@@ -112,10 +119,14 @@ public class BackupsSQLData extends BackupsData {
     @Override
     public boolean saveNewBackup(Backup backup) {
         try {
+            String data = this.databaseManager.getAllEnderchests().stream()
+                    .map(BackupsSQLData::formatDatabaseSet)
+                    .collect(Collectors.joining(";"));
+
             this.databaseManager.saveBackup(
-                    backup.getName(), backup.getDate().getTime(),
-                    this.getEnderchestsStringData(), backup.getCreatedBy()
+                    backup.getName(), backup.getDate().getTime(), data, backup.getCreatedBy()
             );
+
             return true;
         } catch (SQLException e) {
             this.plugin.getLogger().log(Level.SEVERE, String.format(
@@ -142,7 +153,11 @@ public class BackupsSQLData extends BackupsData {
         if (backupSet.isPresent()) {
             try {
                 String backupData = backupSet.get().getString("data");
-                this.databaseManager.replaceEnderchests(getEnderchestsFromString(backupData));
+
+                this.databaseManager.replaceEnderchests(Stream.of(backupData.split(";"))
+                        .map(BackupsSQLData::formatString)
+                        .collect(Collectors.toList()));
+
                 return true;
             } catch (SQLException e) {
                 this.plugin.getLogger().log(Level.SEVERE,
@@ -166,33 +181,6 @@ public class BackupsSQLData extends BackupsData {
             ), e);
             return false;
         }
-    }
-
-    /**
-     * Get all saved enderchests in the database as a string.
-     *
-     * @return all enderchests as a string
-     */
-    private String getEnderchestsStringData() {
-        List<DatabaseSet> sets;
-
-        try {
-            sets = this.databaseManager.getAllEnderchests();
-        } catch (SQLException e) {
-            this.plugin.getLogger().log(Level.SEVERE,
-                    "Cannot retrieve all enderchests from the database", e);
-            return "";
-        }
-
-        List<String> dataElementList = sets.stream()
-                .map(set -> set.getInteger("id") + ":"
-                        + set.getInteger("num") + ":"
-                        + Base64Coder.encodeString(set.getString("owner")) + ":"
-                        + Base64Coder.encodeString(set.getString("contents")) + ":"
-                        + set.getInteger("rows"))
-                .collect(Collectors.toList());
-
-        return StringUtils.join(dataElementList, ";");
     }
 
 }

@@ -126,6 +126,9 @@ public class DatabaseSet {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder("{DatabaseSet #" + this.hashCode() + " (");
@@ -141,6 +144,22 @@ public class DatabaseSet {
         s.append(")}");
 
         return s.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof DatabaseSet && this.set.equals(((DatabaseSet) obj).set);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return this.set.hashCode();
     }
 
 }
