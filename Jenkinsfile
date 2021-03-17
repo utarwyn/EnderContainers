@@ -20,7 +20,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                withMaven(options: [artifactsPublisher(disabled: true)]) {
+                withMaven(options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
                     sh "mvn -DskipTests deploy " +
                             "-DaltReleaseDeploymentRepository=utarwyn::default::https://repo.utarwyn.fr/releases/ " +
                             "-DaltSnapshotDeploymentRepository=utarwyn::default::https://repo.utarwyn.fr/snapshots/"
