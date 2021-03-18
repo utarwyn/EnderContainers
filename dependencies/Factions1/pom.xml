@@ -13,6 +13,7 @@
 
     <artifactId>endercontainers-dependency-factions1</artifactId>
     <name>EnderContainers Dependency Factions1</name>
+    <packaging>pom</packaging>
 
     <properties>
         <factions.version>1.6.9.5-U0.2.2</factions.version>
