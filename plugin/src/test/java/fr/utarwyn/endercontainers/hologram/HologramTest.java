@@ -11,8 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HologramTest {
@@ -55,6 +55,32 @@ public class HologramTest {
         assertThat(hologram.isObserverOnline()).isTrue();
         when(this.observer.isOnline()).thenReturn(false);
         assertThat(hologram.isObserverOnline()).isFalse();
+    }
+
+    @Test
+    public void spawnError() throws ReflectiveOperationException {
+        when(NMSHologramUtil.get().spawnHologram(this.location, TITLE, this.observer))
+                .thenThrow(ReflectiveOperationException.class);
+
+        try {
+            new Hologram(this.observer, TITLE, this.location);
+            fail("spawn method must fail");
+        } catch (HologramException ignored) {
+        }
+    }
+
+    @Test
+    public void destroyError() throws HologramException, ReflectiveOperationException {
+        when(NMSHologramUtil.get().spawnHologram(this.location, TITLE, this.observer)).thenReturn(ENTITY_ID);
+        doThrow(ReflectiveOperationException.class).when(NMSHologramUtil.get()).destroyEntity(ENTITY_ID, this.observer);
+
+        Hologram h = new Hologram(this.observer, TITLE, this.location);
+
+        try {
+            h.destroy();
+            fail("destroy method must fail");
+        } catch (HologramException ignored) {
+        }
     }
 
 }

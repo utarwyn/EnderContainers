@@ -117,7 +117,7 @@ public class DatabaseManager extends AbstractManager {
                     .fields("rows", "contents")
                     .values(rows, contents)
                     .where("`num` = ?", "`owner` = ?")
-                    .attributes(String.valueOf(num), owner.toString())
+                    .attributes(num, owner.toString())
                     .execute();
         }
     }

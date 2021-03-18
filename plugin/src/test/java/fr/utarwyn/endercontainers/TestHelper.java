@@ -58,9 +58,8 @@ public class TestHelper {
     public static synchronized void setUpServer() {
         if (!serverReady) {
             Server server = mock(ServerMock.class);
-            Logger logger = Logger.getGlobal();
 
-            lenient().when(server.getLogger()).thenReturn(logger);
+            lenient().when(server.getLogger()).thenReturn(Logger.getGlobal());
             lenient().when(server.getScheduler()).thenReturn(mock(BukkitScheduler.class));
             lenient().when(server.getPluginManager()).thenReturn(mock(PluginManager.class));
             lenient().when(server.getOfflinePlayer(anyString())).thenReturn(mock(OfflinePlayer.class));

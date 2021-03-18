@@ -55,7 +55,7 @@ public class EnderChestManagerTest {
         this.manager.initialize();
 
         // Verify that the enderchest listener has been registered
-        verify(Bukkit.getServer().getPluginManager())
+        verify(Bukkit.getServer().getPluginManager(), atLeast(1))
                 .registerEvents(any(EnderChestListener.class), any(EnderContainers.class));
     }
 
