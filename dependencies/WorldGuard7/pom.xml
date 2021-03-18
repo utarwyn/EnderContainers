@@ -13,7 +13,6 @@
 
     <artifactId>endercontainers-dependency-worldguard7</artifactId>
     <name>EnderContainers Dependency Worldguard7</name>
-    <packaging>pom</packaging>
 
     <properties>
         <worldguard.version>7.0.4</worldguard.version>
