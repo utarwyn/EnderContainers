@@ -13,7 +13,6 @@
 
     <artifactId>endercontainers-dependency-plotsquared</artifactId>
     <name>EnderContainers Dependency PlotSquared</name>
-    <packaging>pom</packaging>
 
     <properties>
         <plotsquared.version>5.13.3</plotsquared.version>

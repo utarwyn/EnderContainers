@@ -13,7 +13,6 @@
 
     <artifactId>endercontainers-dependency-worldguard6</artifactId>
     <name>EnderContainers Dependency Worldguard6</name>
-    <packaging>pom</packaging>
 
     <properties>
         <worldguard.version>6.1.1-SNAPSHOT</worldguard.version>
