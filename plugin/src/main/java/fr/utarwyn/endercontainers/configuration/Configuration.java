@@ -85,9 +85,6 @@ public class Configuration extends ConfigurableFileWrapper {
     @Configurable(key = "others.updateChecker")
     private boolean updateChecker;
 
-    @Configurable(key = "others.useExperimentalSavingSystem")
-    private boolean useExperimentalSavingSystem;
-
     @Configurable(key = "others.globalSound")
     private boolean globalSound;
 
@@ -202,10 +199,6 @@ public class Configuration extends ConfigurableFileWrapper {
 
     public boolean isUpdateChecker() {
         return this.updateChecker;
-    }
-
-    public boolean isUseExperimentalSavingSystem() {
-        return this.useExperimentalSavingSystem;
     }
 
     public boolean isGlobalSound() {

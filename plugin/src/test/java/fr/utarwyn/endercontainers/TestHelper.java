@@ -59,12 +59,10 @@ public class TestHelper {
         if (!serverReady) {
             Server server = mock(ServerMock.class);
             Logger logger = Logger.getGlobal();
-            BukkitScheduler scheduler = mock(BukkitScheduler.class);
-            PluginManager pluginManager = mock(PluginManager.class);
 
             lenient().when(server.getLogger()).thenReturn(logger);
-            lenient().when(server.getScheduler()).thenReturn(scheduler);
-            lenient().when(server.getPluginManager()).thenReturn(pluginManager);
+            lenient().when(server.getScheduler()).thenReturn(mock(BukkitScheduler.class));
+            lenient().when(server.getPluginManager()).thenReturn(mock(PluginManager.class));
             lenient().when(server.getOfflinePlayer(anyString())).thenReturn(mock(OfflinePlayer.class));
 
             TestHelper.mockSchedulers(server);
@@ -262,6 +260,7 @@ public class TestHelper {
      *
      * @param server mocked server
      */
+    @SuppressWarnings("deprecation")
     private static void mockInventoryObjects(Server server) {
         // Inventory creation
         lenient().when(server.createInventory(
