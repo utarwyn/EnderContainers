@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.command;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.mock.v1_15.ServerMock;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
@@ -35,7 +36,7 @@ public class CommandManagerTest {
     }
 
     @Before
-    public void setUp() throws ReflectiveOperationException {
+    public void setUp() throws TestInitializationException {
         this.manager = new CommandManager();
         TestHelper.setupManager(this.manager);
     }

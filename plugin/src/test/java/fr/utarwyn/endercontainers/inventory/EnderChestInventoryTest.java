@@ -1,7 +1,7 @@
 package fr.utarwyn.endercontainers.inventory;
 
 import fr.utarwyn.endercontainers.TestHelper;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import org.assertj.core.api.Condition;
@@ -9,7 +9,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Before;
@@ -18,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -39,8 +37,7 @@ public class EnderChestInventoryTest {
     private EnderChest chest;
 
     @Before
-    public void setUp() throws ReflectiveOperationException, YamlFileLoadException,
-            InvalidConfigurationException, IOException {
+    public void setUp() throws TestInitializationException {
         TestHelper.setUpFiles();
 
         UUID uuid = TestHelper.getPlayer().getUniqueId();
@@ -124,7 +121,7 @@ public class EnderChestInventoryTest {
     }
 
     @Test
-    public void saveOnClose() throws ReflectiveOperationException {
+    public void saveOnClose() throws TestInitializationException {
         EnderChestManager manager = mock(EnderChestManager.class);
         Player viewer = mock(Player.class);
         Location location = mock(Location.class);

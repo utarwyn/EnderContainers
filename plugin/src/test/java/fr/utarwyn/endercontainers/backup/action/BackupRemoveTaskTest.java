@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.backup.action;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.storage.backups.BackupsData;
@@ -19,7 +20,7 @@ import static org.mockito.Mockito.*;
 public class BackupRemoveTaskTest {
 
     @Test
-    public void run() throws ReflectiveOperationException {
+    public void run() throws TestInitializationException {
         EnderContainers plugin = TestHelper.getPlugin();
         BackupManager manager = mock(BackupManager.class);
         Backup backup = mock(Backup.class);

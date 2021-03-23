@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.storage.backups;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
@@ -58,7 +59,7 @@ public class BackupsSQLDataTest {
     }
 
     @Before
-    public void setUp() throws ReflectiveOperationException {
+    public void setUp() throws TestInitializationException {
         when(this.backup.getName()).thenReturn(NAME);
         when(this.backup.getDate()).thenReturn(CURRENT);
         when(this.backup.getCreatedBy()).thenReturn(AUTHOR);

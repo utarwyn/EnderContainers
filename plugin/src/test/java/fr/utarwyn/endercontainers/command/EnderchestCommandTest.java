@@ -1,11 +1,10 @@
 package fr.utarwyn.endercontainers.command;
 
 import fr.utarwyn.endercontainers.TestHelper;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -14,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,13 +31,12 @@ public class EnderchestCommandTest extends CommandTestHelper<EnderchestCommand> 
     private Player player;
 
     @BeforeClass
-    public static void setUpClass() throws ReflectiveOperationException, YamlFileLoadException,
-            InvalidConfigurationException, IOException {
+    public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 
     @Before
-    public void setUp() throws ReflectiveOperationException {
+    public void setUp() throws TestInitializationException {
         TestHelper.registerManagers(this.manager);
         this.player = TestHelper.getPlayer();
         this.command = new EnderchestCommand();

@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.hologram;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.compatibility.nms.NMSHologramUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -28,7 +29,7 @@ public class HologramTest {
     private Location location;
 
     @BeforeClass
-    public static void setUpClass() throws ReflectiveOperationException {
+    public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpServer();
         TestHelper.getPlugin();
     }

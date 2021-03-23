@@ -1,9 +1,8 @@
 package fr.utarwyn.endercontainers.command.backup;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.backup.BackupManager;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +11,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,8 +26,7 @@ public class RemoveCommandTest {
     private Player player;
 
     @Before
-    public void setUp() throws ReflectiveOperationException, YamlFileLoadException,
-            InvalidConfigurationException, IOException {
+    public void setUp() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 

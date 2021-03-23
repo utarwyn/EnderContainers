@@ -74,22 +74,27 @@ public class TestHelper {
 
     /**
      * Setup a mocked version of configuration files.
+     *
+     * @throws TestInitializationException thrown if cannot setup files properly
      */
-    public static synchronized void setUpFiles() throws IOException, YamlFileLoadException,
-            ReflectiveOperationException, InvalidConfigurationException {
+    public static synchronized void setUpFiles() throws TestInitializationException {
         if (!filesReady) {
-            // Initialize the configuration object
-            EnderContainers plugin = TestHelper.getPlugin();
-            FileConfiguration config = new YamlConfiguration();
-            String localePath = TestHelper.class.getResource("/locale.yml").getPath();
+            try {
+                // Initialize the configuration object
+                EnderContainers plugin = TestHelper.getPlugin();
+                FileConfiguration config = new YamlConfiguration();
+                String localePath = TestHelper.class.getResource("/locale.yml").getPath();
 
-            config.load(new InputStreamReader(TestHelper.class.getResourceAsStream("/config.test.yml")));
+                config.load(new InputStreamReader(TestHelper.class.getResourceAsStream("/config.test.yml")));
 
-            when(plugin.getConfig()).thenReturn(config);
-            when(plugin.getDataFolder()).thenReturn(new File(localePath).getParentFile());
+                when(plugin.getConfig()).thenReturn(config);
+                when(plugin.getDataFolder()).thenReturn(new File(localePath).getParentFile());
 
-            Files.initConfiguration(plugin);
-            Files.initLocale(plugin);
+                Files.initConfiguration(plugin);
+                Files.initLocale(plugin);
+            } catch (IOException | YamlFileLoadException | InvalidConfigurationException e) {
+                throw new TestInitializationException(e);
+            }
 
             filesReady = true;
         }
@@ -99,44 +104,52 @@ public class TestHelper {
      * Setup a mocked version of an abstract manager.
      *
      * @param manager manager to mock
-     * @throws ReflectiveOperationException thrown if cannot setup the manager correctly
+     * @throws TestInitializationException thrown if cannot setup the manager correctly
      */
-    public static void setupManager(AbstractManager manager) throws ReflectiveOperationException {
-        TestHelper.setUpServer();
+    public static void setupManager(AbstractManager manager) throws TestInitializationException {
+        try {
+            TestHelper.setUpServer();
 
-        EnderContainers plugin = TestHelper.getPlugin();
-        Field pluginField = manager.getClass().getSuperclass().getDeclaredField("plugin");
-        Field loggerField = manager.getClass().getSuperclass().getDeclaredField("logger");
+            EnderContainers plugin = TestHelper.getPlugin();
+            Field pluginField = manager.getClass().getSuperclass().getDeclaredField("plugin");
+            Field loggerField = manager.getClass().getSuperclass().getDeclaredField("logger");
 
-        pluginField.setAccessible(true);
-        pluginField.set(manager, plugin);
-        pluginField.setAccessible(false);
+            pluginField.setAccessible(true);
+            pluginField.set(manager, plugin);
+            pluginField.setAccessible(false);
 
-        loggerField.setAccessible(true);
-        loggerField.set(manager, plugin.getLogger());
-        loggerField.setAccessible(false);
+            loggerField.setAccessible(true);
+            loggerField.set(manager, plugin.getLogger());
+            loggerField.setAccessible(false);
+        } catch (ReflectiveOperationException e) {
+            throw new TestInitializationException(e);
+        }
     }
 
     /**
      * Register fake managers.
      *
      * @param managers managers to register
-     * @throws ReflectiveOperationException thrown if cannot register managers
+     * @throws TestInitializationException thrown if cannot register managers
      */
     @SuppressWarnings("unchecked")
-    public static void registerManagers(AbstractManager... managers) throws ReflectiveOperationException {
-        Field field = Managers.class.getDeclaredField("instances");
+    public static void registerManagers(AbstractManager... managers) throws TestInitializationException {
+        try {
+            Field field = Managers.class.getDeclaredField("instances");
 
-        field.setAccessible(true);
+            field.setAccessible(true);
 
-        Map<Class<?>, AbstractManager> instances = (Map<Class<?>, AbstractManager>) field.get(null);
-        instances.clear();
+            Map<Class<?>, AbstractManager> instances = (Map<Class<?>, AbstractManager>) field.get(null);
+            instances.clear();
 
-        for (AbstractManager manager : managers) {
-            instances.put(manager.getClass(), manager);
+            for (AbstractManager manager : managers) {
+                instances.put(manager.getClass(), manager);
+            }
+
+            field.setAccessible(false);
+        } catch (ReflectiveOperationException e) {
+            throw new TestInitializationException(e);
         }
-
-        field.setAccessible(false);
     }
 
     /**
@@ -144,17 +157,21 @@ public class TestHelper {
      *
      * @return mocked instance of the plugin
      */
-    public static EnderContainers getPlugin() throws ReflectiveOperationException {
+    public static EnderContainers getPlugin() throws TestInitializationException {
         if (plugin == null) {
             TestHelper.setUpServer();
             Server server = Bukkit.getServer();
 
             plugin = mock(EnderContainers.class);
 
-            Field staticAccess = EnderContainers.class.getDeclaredField("instance");
-            staticAccess.setAccessible(true);
-            staticAccess.set(null, plugin);
-            staticAccess.setAccessible(false);
+            try {
+                Field staticAccess = EnderContainers.class.getDeclaredField("instance");
+                staticAccess.setAccessible(true);
+                staticAccess.set(null, plugin);
+                staticAccess.setAccessible(false);
+            } catch (ReflectiveOperationException e) {
+                throw new TestInitializationException(e);
+            }
 
             lenient().when(plugin.getServer()).thenReturn(server);
             lenient().when(plugin.getDescription()).thenReturn(mock(PluginDescriptionFile.class));
@@ -165,10 +182,14 @@ public class TestHelper {
             }).when(plugin).executeTaskOnMainThread(any());
 
             // Also setup NMS classes
-            Field hologramUtilStaticAccess = NMSHologramUtil.class.getDeclaredField("instance");
-            hologramUtilStaticAccess.setAccessible(true);
-            hologramUtilStaticAccess.set(null, mock(NMSHologramUtil.class));
-            hologramUtilStaticAccess.setAccessible(false);
+            try {
+                Field hologramUtilStaticAccess = NMSHologramUtil.class.getDeclaredField("instance");
+                hologramUtilStaticAccess.setAccessible(true);
+                hologramUtilStaticAccess.set(null, mock(NMSHologramUtil.class));
+                hologramUtilStaticAccess.setAccessible(false);
+            } catch (ReflectiveOperationException e) {
+                throw new TestInitializationException(e);
+            }
         }
 
         return plugin;
@@ -211,16 +232,20 @@ public class TestHelper {
      *
      * @param fieldName field to override
      * @param value     value which will replace the current one
-     * @throws ReflectiveOperationException thrown if cannot override configuration key
+     * @throws TestInitializationException thrown if cannot override configuration key
      */
     public static void overrideConfigurationValue(String fieldName, Object value)
-            throws ReflectiveOperationException, YamlFileLoadException, InvalidConfigurationException, IOException {
+            throws TestInitializationException {
         setUpFiles();
 
-        Field field = Configuration.class.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(Files.getConfiguration(), value);
-        field.setAccessible(false);
+        try {
+            Field field = Configuration.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(Files.getConfiguration(), value);
+            field.setAccessible(false);
+        } catch (ReflectiveOperationException e) {
+            throw new TestInitializationException(e);
+        }
 
         filesReady = false;
     }

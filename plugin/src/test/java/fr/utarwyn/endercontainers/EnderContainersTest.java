@@ -1,8 +1,6 @@
 package fr.utarwyn.endercontainers;
 
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -11,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.logging.Logger;
 
@@ -24,8 +21,7 @@ public class EnderContainersTest {
     private EnderContainers plugin;
 
     @BeforeClass
-    public static void setUpClass() throws ReflectiveOperationException, YamlFileLoadException,
-            InvalidConfigurationException, IOException {
+    public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 

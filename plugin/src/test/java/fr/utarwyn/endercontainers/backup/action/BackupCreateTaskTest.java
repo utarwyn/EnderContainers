@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.backup.action;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.storage.backups.BackupsData;
 import org.junit.Before;
@@ -28,7 +29,7 @@ public class BackupCreateTaskTest {
     private BackupsData storage;
 
     @Before
-    public void setUp() throws ReflectiveOperationException {
+    public void setUp() throws TestInitializationException {
         TestHelper.setUpServer();
 
         this.plugin = TestHelper.getPlugin();

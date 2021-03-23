@@ -1,13 +1,12 @@
 package fr.utarwyn.endercontainers.storage;
 
 import fr.utarwyn.endercontainers.TestHelper;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.storage.backups.BackupsFlatData;
 import fr.utarwyn.endercontainers.storage.backups.BackupsSQLData;
 import fr.utarwyn.endercontainers.storage.player.PlayerFlatData;
 import fr.utarwyn.endercontainers.storage.player.PlayerSQLData;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -15,7 +14,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,13 +28,12 @@ public class StorageManagerTest {
     private DatabaseManager databaseManager;
 
     @BeforeClass
-    public static void setUpClass() throws IOException, YamlFileLoadException,
-            InvalidConfigurationException, ReflectiveOperationException {
+    public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 
     @Before
-    public void setUp() throws ReflectiveOperationException {
+    public void setUp() throws TestInitializationException {
         this.manager = new StorageManager();
         TestHelper.setupManager(this.manager);
         TestHelper.registerManagers(this.databaseManager);

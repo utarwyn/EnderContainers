@@ -2,7 +2,7 @@ package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.TestHelper;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
@@ -11,7 +11,6 @@ import fr.utarwyn.endercontainers.inventory.InventoryManager;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -19,7 +18,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -33,8 +31,7 @@ public class EnderChestManagerTest {
     private EnderChestManager manager;
 
     @BeforeClass
-    public static void setUpClass() throws IOException, YamlFileLoadException,
-            InvalidConfigurationException, ReflectiveOperationException {
+    public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpServer();
         TestHelper.setUpFiles();
     }
@@ -46,7 +43,7 @@ public class EnderChestManagerTest {
     }
 
     @Test
-    public void initialize() throws ReflectiveOperationException {
+    public void initialize() throws TestInitializationException {
         DependenciesManager dependenciesManager = mock(DependenciesManager.class);
 
         TestHelper.registerManagers(dependenciesManager);
@@ -60,7 +57,7 @@ public class EnderChestManagerTest {
     }
 
     @Test
-    public void unload() throws ReflectiveOperationException {
+    public void unload() throws TestInitializationException {
         InventoryManager inventoryManager = mock(InventoryManager.class);
         PlayerContext context = mock(PlayerContext.class);
 
@@ -83,7 +80,7 @@ public class EnderChestManagerTest {
     }
 
     @Test
-    public void isContextUnused() throws ReflectiveOperationException {
+    public void isContextUnused() throws TestInitializationException {
         UUID uuid = UUID.randomUUID();
 
         TestHelper.setupManager(this.manager);
@@ -100,7 +97,7 @@ public class EnderChestManagerTest {
     }
 
     @Test
-    public void loadPlayerContext() throws ReflectiveOperationException {
+    public void loadPlayerContext() throws TestInitializationException {
         // Setup the manager correctly
         StorageManager manager = mock(StorageManager.class);
         PlayerData storage = mock(PlayerData.class);
@@ -127,7 +124,7 @@ public class EnderChestManagerTest {
     }
 
     @Test
-    public void registerPlayerContext() throws ReflectiveOperationException {
+    public void registerPlayerContext() throws TestInitializationException {
         UUID uuid = UUID.randomUUID();
 
         TestHelper.setupManager(this.manager);
@@ -138,7 +135,7 @@ public class EnderChestManagerTest {
     }
 
     @Test
-    public void savePlayerContext() throws ReflectiveOperationException {
+    public void savePlayerContext() throws TestInitializationException {
         UUID uuid = UUID.randomUUID();
 
         // Setup the manager correctly

@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.backup;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.backup.action.BackupApplyTask;
 import fr.utarwyn.endercontainers.backup.action.BackupCreateTask;
 import fr.utarwyn.endercontainers.backup.action.BackupRemoveTask;
@@ -29,7 +30,7 @@ public class BackupManagerTest {
     }
 
     @Test
-    public void loadAndGetters() throws ReflectiveOperationException {
+    public void loadAndGetters() throws TestInitializationException {
         StorageManager storageManager = mock(StorageManager.class);
         BackupsData storage = mock(BackupsData.class);
         List<Backup> backupList = new ArrayList<>();
@@ -48,7 +49,7 @@ public class BackupManagerTest {
     }
 
     @Test
-    public void getBackupByName() throws ReflectiveOperationException {
+    public void getBackupByName() throws TestInitializationException {
         Backup backup = mock(Backup.class);
         List<Backup> backupList = new ArrayList<>();
 
@@ -62,7 +63,7 @@ public class BackupManagerTest {
     }
 
     @Test
-    public void createBackup() throws ReflectiveOperationException {
+    public void createBackup() throws TestInitializationException {
         List<Backup> backupList = new ArrayList<>();
 
         TestHelper.setUpServer();
@@ -86,7 +87,7 @@ public class BackupManagerTest {
     }
 
     @Test
-    public void applyBackup() throws ReflectiveOperationException {
+    public void applyBackup() throws TestInitializationException {
         List<Backup> backupList = new ArrayList<>();
 
         TestHelper.setUpServer();
@@ -109,7 +110,7 @@ public class BackupManagerTest {
     }
 
     @Test
-    public void removeBackup() throws ReflectiveOperationException {
+    public void removeBackup() throws TestInitializationException {
         List<Backup> backupList = new ArrayList<>();
 
         TestHelper.setUpServer();
@@ -137,10 +138,10 @@ public class BackupManagerTest {
      * @param storageManager mocked storage manager
      * @param storage        mocked storage object
      * @param backupList     fake backup list where backups will be saved
-     * @throws ReflectiveOperationException thrown if the manager cannot be registered
+     * @throws TestInitializationException thrown if the manager cannot be registered
      */
     private void loadManager(StorageManager storageManager, BackupsData storage,
-                             List<Backup> backupList) throws ReflectiveOperationException {
+                             List<Backup> backupList) throws TestInitializationException {
         TestHelper.registerManagers(storageManager);
         when(storageManager.createBackupDataStorage()).thenReturn(storage);
         when(storage.getCachedBackups()).thenReturn(backupList);

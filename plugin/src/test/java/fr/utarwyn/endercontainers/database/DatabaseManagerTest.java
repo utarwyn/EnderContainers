@@ -1,11 +1,10 @@
 package fr.utarwyn.endercontainers.database;
 
 import fr.utarwyn.endercontainers.TestHelper;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.database.request.DeleteRequest;
 import fr.utarwyn.endercontainers.database.request.SavingRequest;
 import fr.utarwyn.endercontainers.database.request.SelectRequest;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -15,7 +14,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -38,20 +36,18 @@ public class DatabaseManagerTest {
     private Database database;
 
     @BeforeClass
-    public static void setUpClass() throws ReflectiveOperationException, YamlFileLoadException,
-            InvalidConfigurationException, IOException {
+    public static void setUpClass() throws TestInitializationException {
         TestHelper.overrideConfigurationValue("mysql", true);
         TestHelper.setUpFiles();
     }
 
     @AfterClass
-    public static void tearDown() throws ReflectiveOperationException, YamlFileLoadException,
-            InvalidConfigurationException, IOException {
+    public static void tearDown() throws TestInitializationException {
         TestHelper.overrideConfigurationValue("mysql", false);
     }
 
     @Before
-    public void setUp() throws ReflectiveOperationException {
+    public void setUp() throws TestInitializationException, ReflectiveOperationException {
         this.databaseManager = new DatabaseManager();
         TestHelper.setupManager(this.databaseManager);
 

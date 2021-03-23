@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.storage.player;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
@@ -47,7 +48,7 @@ public class PlayerSQLDataTest {
     private ItemSerializer itemSerializer;
 
     @Before
-    public void setUp() throws ReflectiveOperationException, IOException, SQLException {
+    public void setUp() throws TestInitializationException, IOException, SQLException {
         TestHelper.registerManagers(this.databaseManager);
 
         this.player = TestHelper.getPlayer();

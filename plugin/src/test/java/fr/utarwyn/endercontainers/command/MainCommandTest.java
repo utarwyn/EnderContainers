@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.command;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.Updater;
@@ -30,7 +31,7 @@ public class MainCommandTest {
     private Player player;
 
     @Before
-    public void setUp() throws ReflectiveOperationException {
+    public void setUp() throws TestInitializationException {
         TestHelper.registerManagers(new EnderChestManager(), new BackupManager(), new Updater());
 
         PluginDescriptionFile descriptionFile = mock(PluginDescriptionFile.class);

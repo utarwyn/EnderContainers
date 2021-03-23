@@ -1,15 +1,13 @@
 package fr.utarwyn.endercontainers.configuration;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -20,8 +18,7 @@ import static org.mockito.Mockito.when;
 public class LocaleTest {
 
     @BeforeClass
-    public static void setupClass() throws InvalidConfigurationException, YamlFileLoadException,
-            ReflectiveOperationException, IOException {
+    public static void setupClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 

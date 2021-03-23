@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.backup.action;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
@@ -20,7 +21,7 @@ public class BackupApplyTaskTest {
     private EnderChestManager enderChestManager;
 
     @Before
-    public void setUp() throws ReflectiveOperationException {
+    public void setUp() throws TestInitializationException {
         this.enderChestManager = mock(EnderChestManager.class);
 
         TestHelper.setUpServer();
@@ -28,7 +29,7 @@ public class BackupApplyTaskTest {
     }
 
     @Test
-    public void run() throws ReflectiveOperationException {
+    public void run() throws TestInitializationException {
         EnderContainers plugin = TestHelper.getPlugin();
         BackupManager manager = mock(BackupManager.class);
         Backup backup = mock(Backup.class);

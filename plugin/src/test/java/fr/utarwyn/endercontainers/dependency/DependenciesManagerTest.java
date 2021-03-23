@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.dependency;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import org.bukkit.Bukkit;
@@ -33,7 +34,7 @@ public class DependenciesManagerTest {
     }
 
     @Before
-    public void setUp() throws ReflectiveOperationException {
+    public void setUp() throws TestInitializationException {
         this.manager = new DependenciesManager();
         TestHelper.setupManager(this.manager);
     }

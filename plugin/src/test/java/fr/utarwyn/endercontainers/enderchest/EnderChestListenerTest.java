@@ -1,8 +1,8 @@
 package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
@@ -13,7 +13,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -34,7 +33,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
@@ -66,8 +64,7 @@ public class EnderChestListenerTest {
     private World world;
 
     @Before
-    public void setUp() throws ReflectiveOperationException, YamlFileLoadException,
-            InvalidConfigurationException, IOException {
+    public void setUp() throws TestInitializationException {
         TestHelper.registerManagers(this.manager, this.dependenciesManager);
         TestHelper.setUpFiles();
 
@@ -162,7 +159,7 @@ public class EnderChestListenerTest {
     }
 
     @Test
-    public void playerJoinUpdateNotification() throws ReflectiveOperationException {
+    public void playerJoinUpdateNotification() throws TestInitializationException {
         PlayerJoinEvent event = new PlayerJoinEvent(this.player, "");
 
         // Register a fake updater

@@ -2,12 +2,11 @@ package fr.utarwyn.endercontainers.database;
 
 import com.zaxxer.hikari.HikariDataSource;
 import fr.utarwyn.endercontainers.TestHelper;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.database.adapter.MySQLAdapter;
 import fr.utarwyn.endercontainers.database.request.DeleteRequest;
 import fr.utarwyn.endercontainers.database.request.SavingRequest;
 import fr.utarwyn.endercontainers.database.request.SelectRequest;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -16,7 +15,6 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.sql.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,8 +28,7 @@ public class DatabaseTest {
     private Database database;
 
     @BeforeClass
-    public static void setUpClass() throws InvalidConfigurationException,
-            ReflectiveOperationException, IOException, YamlFileLoadException {
+    public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 

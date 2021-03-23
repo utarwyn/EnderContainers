@@ -2,17 +2,14 @@ package fr.utarwyn.endercontainers.util;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.TestHelper;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -35,13 +32,12 @@ public class UpdaterTest {
     private CommandSender sender;
 
     @BeforeClass
-    public static void setUpClass() throws IOException, YamlFileLoadException,
-            InvalidConfigurationException, ReflectiveOperationException {
+    public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 
     @Before
-    public void setUp() throws ReflectiveOperationException {
+    public void setUp() throws TestInitializationException {
         this.updater = new Updater();
         this.plugin = TestHelper.getPlugin();
         TestHelper.setupManager(this.updater);

@@ -1,15 +1,13 @@
 package fr.utarwyn.endercontainers.configuration;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -18,8 +16,7 @@ import static org.mockito.Mockito.mock;
 public class FilesTest {
 
     @BeforeClass
-    public static void setUpClass() throws IOException, YamlFileLoadException,
-            InvalidConfigurationException, ReflectiveOperationException {
+    public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 

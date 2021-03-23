@@ -1,9 +1,8 @@
 package fr.utarwyn.endercontainers.command.main;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.command.CommandTestHelper;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -11,8 +10,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.contains;
@@ -25,8 +22,7 @@ public class ReloadCommandTest extends CommandTestHelper<ReloadCommand> {
     private Player player;
 
     @BeforeClass
-    public static void setUpClass() throws ReflectiveOperationException, YamlFileLoadException,
-            InvalidConfigurationException, IOException {
+    public static void setUpClass() throws TestInitializationException {
         TestHelper.registerManagers();
         TestHelper.setUpFiles();
     }

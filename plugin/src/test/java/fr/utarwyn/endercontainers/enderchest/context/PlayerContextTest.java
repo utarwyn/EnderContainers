@@ -2,7 +2,7 @@ package fr.utarwyn.endercontainers.enderchest.context;
 
 import com.google.common.collect.Maps;
 import fr.utarwyn.endercontainers.TestHelper;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.inventory.menu.EnderChestListMenu;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
@@ -10,7 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.junit.Before;
@@ -21,7 +20,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -45,13 +43,12 @@ public class PlayerContextTest {
     private PlayerData playerData;
 
     @BeforeClass
-    public static void setUpClass() throws ReflectiveOperationException, YamlFileLoadException,
-            InvalidConfigurationException, IOException {
+    public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 
     @Before
-    public void setUp() throws ReflectiveOperationException {
+    public void setUp() throws TestInitializationException {
         this.player = TestHelper.getPlayer();
 
         TestHelper.registerManagers(this.storageManager);
@@ -106,8 +103,7 @@ public class PlayerContextTest {
     }
 
     @Test
-    public void openListInventoryWithOneChest()
-            throws ReflectiveOperationException, YamlFileLoadException, InvalidConfigurationException, IOException {
+    public void openListInventoryWithOneChest() throws TestInitializationException {
         // If only 1 chest accessible, but can see other enderchests, so open list inventory
         TestHelper.overrideConfigurationValue("onlyShowAccessibleEnderchests", false);
         this.context.openListInventory(this.player);
@@ -115,8 +111,7 @@ public class PlayerContextTest {
     }
 
     @Test
-    public void openListInventoryWithOneChestAndOthersAreHidden()
-            throws ReflectiveOperationException, YamlFileLoadException, InvalidConfigurationException, IOException {
+    public void openListInventoryWithOneChestAndOthersAreHidden() throws TestInitializationException {
         // If only 1 chest accessible, open it directly
         TestHelper.overrideConfigurationValue("onlyShowAccessibleEnderchests", true);
         this.context.openListInventory(this.player);

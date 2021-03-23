@@ -1,7 +1,7 @@
 package fr.utarwyn.endercontainers.hologram;
 
 import fr.utarwyn.endercontainers.TestHelper;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
@@ -11,7 +11,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -20,7 +19,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,15 +45,14 @@ public class HologramManagerTest {
     private EnderChestManager enderChestManager;
 
     @BeforeClass
-    public static void setUpClass() throws IOException, YamlFileLoadException,
-            InvalidConfigurationException, ReflectiveOperationException {
+    public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpServer();
         TestHelper.setUpFiles();
     }
 
     @Before
     @SuppressWarnings("unchecked")
-    public void setUp() throws ReflectiveOperationException {
+    public void setUp() throws TestInitializationException {
         this.observer = TestHelper.getPlayer();
         this.manager = new HologramManager();
 
@@ -72,7 +69,7 @@ public class HologramManagerTest {
     }
 
     @Test
-    public void taskTimer() throws ReflectiveOperationException {
+    public void taskTimer() throws TestInitializationException {
         this.manager.load();
         verify(Bukkit.getServer().getScheduler()).runTaskTimer(
                 eq(TestHelper.getPlugin()), eq(this.manager), anyLong(), anyLong()

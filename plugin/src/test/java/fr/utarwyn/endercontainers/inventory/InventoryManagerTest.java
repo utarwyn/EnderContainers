@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.inventory;
 import com.google.common.collect.ImmutableMap;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -51,7 +52,7 @@ public class InventoryManagerTest {
     }
 
     @Test
-    public void initialize() throws ReflectiveOperationException {
+    public void initialize() throws TestInitializationException {
         TestHelper.setupManager(this.manager);
 
         this.manager.initialize();

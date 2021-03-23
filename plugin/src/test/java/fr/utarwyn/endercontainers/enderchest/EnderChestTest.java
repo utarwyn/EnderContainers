@@ -1,13 +1,12 @@
 package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.TestHelper;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.inventory.EnderChestInventory;
 import fr.utarwyn.endercontainers.inventory.InventoryManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import org.bukkit.Material;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -38,8 +36,7 @@ public class EnderChestTest {
     private EnderChest chest;
 
     @Before
-    public void setUp() throws ReflectiveOperationException, YamlFileLoadException,
-            IOException, InvalidConfigurationException {
+    public void setUp() throws TestInitializationException {
         TestHelper.setUpServer();
         TestHelper.setUpFiles();
         TestHelper.registerManagers(mock(InventoryManager.class));
