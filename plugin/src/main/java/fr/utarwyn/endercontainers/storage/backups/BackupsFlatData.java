@@ -2,10 +2,9 @@ package fr.utarwyn.endercontainers.storage.backups;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.backup.Backup;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileWrapper;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,9 +28,14 @@ public class BackupsFlatData extends BackupsData {
     private static final String PREFIX = "backups";
 
     /**
-     * Object which manages backups configuration
+     * Storage file native object
      */
-    private final YamlFileWrapper configuration;
+    private final File file;
+
+    /**
+     * Configuration file object of backups
+     */
+    FileConfiguration configuration;
 
     /**
      * Construct a new backup storage wrapper with a flat file.
@@ -42,9 +46,7 @@ public class BackupsFlatData extends BackupsData {
         super(plugin);
 
         this.backups = new ArrayList<>();
-        this.configuration = new YamlFileWrapper(
-                new File(this.plugin.getDataFolder(), "backups.yml")
-        );
+        this.file = new File(this.plugin.getDataFolder(), "backups.yml");
 
         this.load();
     }
@@ -54,19 +56,9 @@ public class BackupsFlatData extends BackupsData {
      */
     @Override
     protected void load() {
-        try {
-            this.configuration.load();
-        } catch (YamlFileLoadException e) {
-            this.plugin.getLogger().log(Level.SEVERE, "Cannot load the backups file", e);
-            return;
-        }
+        this.configuration = YamlConfiguration.loadConfiguration(this.file);
 
-        if (!this.configuration.get().isConfigurationSection(PREFIX)) {
-            this.configuration.get().set(PREFIX, new ArrayList<>());
-        }
-
-        ConfigurationSection section = this.configuration.get().getConfigurationSection(PREFIX);
-
+        ConfigurationSection section = this.configuration.getConfigurationSection(PREFIX);
         if (section != null) {
             for (String key : section.getKeys(false)) {
                 String name = section.getString(key + ".name");
@@ -84,9 +76,11 @@ public class BackupsFlatData extends BackupsData {
     @Override
     protected void save() {
         try {
-            this.configuration.save();
+            this.configuration.save(this.file);
         } catch (IOException e) {
-            this.plugin.getLogger().log(Level.SEVERE, "Cannot save the backups file", e);
+            this.plugin.getLogger().log(Level.SEVERE, String.format(
+                    "Cannot save backups to %s", this.file.getPath()
+            ), e);
         }
     }
 
@@ -95,14 +89,13 @@ public class BackupsFlatData extends BackupsData {
      */
     @Override
     public boolean saveNewBackup(Backup backup) {
-        Configuration config = this.configuration.get();
         String name = backup.getName();
 
-        config.set(PREFIX + "." + name + ".name", name);
-        config.set(PREFIX + "." + name + ".date", backup.getDate().getTime());
-        config.set(PREFIX + "." + name + ".createdBy", backup.getCreatedBy());
-
+        this.configuration.set(PREFIX + "." + name + ".name", name);
+        this.configuration.set(PREFIX + "." + name + ".date", backup.getDate().getTime());
+        this.configuration.set(PREFIX + "." + name + ".createdBy", backup.getCreatedBy());
         this.save();
+
         return true;
     }
 
@@ -148,13 +141,14 @@ public class BackupsFlatData extends BackupsData {
                 deleteFolder(folder);
             }
 
-            this.configuration.get().set(PREFIX + "." + backup.getName(), null);
+            this.configuration.set(PREFIX + "." + backup.getName(), null);
             this.save();
 
             return true;
         } catch (IOException e) {
-            this.plugin.getLogger().log(Level.SEVERE,
-                    String.format("Cannot delete the folder: %s", folder), e);
+            this.plugin.getLogger().log(Level.SEVERE, String.format(
+                    "Cannot delete backup folder %s", folder.getPath()
+            ), e);
         }
 
         return false;
