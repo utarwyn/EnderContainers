@@ -15,6 +15,7 @@
     <name>EnderContainers Dependency Worldguard6</name>
 
     <properties>
+        <worldedit.version>5.5.8</worldedit.version>
         <worldguard.version>6.1.1-SNAPSHOT</worldguard.version>
     </properties>
 
@@ -37,6 +38,18 @@
             <artifactId>worldguard</artifactId>
             <version>${worldguard.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldedit</artifactId>
+            <version>${worldedit.version}</version>
+            <scope>runtime</scope>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>

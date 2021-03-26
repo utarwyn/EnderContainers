@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -64,10 +63,7 @@ public class EnderChestInventoryTest {
         }});
 
         // Mock both inventory methods
-        when(this.inventory.getInventory().getContents())
-                .thenReturn(containerItems);
-        doAnswer(answer -> containerItems[answer.getArgument(0, Integer.class)] = answer.getArgument(1, ItemStack.class))
-                .when(this.inventory.getInventory()).setItem(anyInt(), any());
+        this.inventory.getInventory().setContents(containerItems);
 
         // inventory and internal map empty
         assertThat(this.inventory.getContents()).isEmpty();
@@ -94,7 +90,6 @@ public class EnderChestInventoryTest {
         itemList[2] = new ItemStack(Material.ENDER_CHEST);
         itemList[8] = new ItemStack(Material.IRON_BLOCK, 2);
         itemList[9] = new ItemStack(Material.GRASS, 20);
-        when(this.inventory.getInventory().getContents()).thenReturn(itemList);
 
         // Reload items of the chest
         when(this.chest.getContents()).thenReturn(new ConcurrentHashMap<Integer, ItemStack>() {{
@@ -105,6 +100,7 @@ public class EnderChestInventoryTest {
         }});
 
         this.inventory.prepare();
+        this.inventory.getInventory().setContents(itemList);
         this.inventory.updateContentsFromContainer();
 
         Map<Integer, ItemStack> map = this.inventory.getContents();

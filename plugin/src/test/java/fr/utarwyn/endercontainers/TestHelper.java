@@ -4,6 +4,7 @@ import fr.utarwyn.endercontainers.compatibility.nms.NMSHologramUtil;
 import fr.utarwyn.endercontainers.configuration.Configuration;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.mock.InventoryMock;
 import fr.utarwyn.endercontainers.mock.ItemFactoryMock;
 import fr.utarwyn.endercontainers.mock.ItemMetaMock;
 import fr.utarwyn.endercontainers.mock.v1_15.ServerMock;
@@ -59,6 +60,7 @@ public class TestHelper {
         if (!serverReady) {
             Server server = mock(ServerMock.class);
 
+            lenient().when(server.getVersion()).thenReturn("(MC: 1.16.5)");
             lenient().when(server.getLogger()).thenReturn(Logger.getGlobal());
             lenient().when(server.getScheduler()).thenReturn(mock(BukkitScheduler.class));
             lenient().when(server.getPluginManager()).thenReturn(mock(PluginManager.class));
@@ -289,12 +291,10 @@ public class TestHelper {
         // Inventory creation
         lenient().when(server.createInventory(
                 any(InventoryHolder.class), anyInt(), anyString()
-        )).thenAnswer(answer -> {
-            Inventory inventory = mock(Inventory.class);
-            lenient().when(inventory.getContents()).thenReturn(new ItemStack[0]);
-            lenient().when(inventory.getHolder()).thenReturn(answer.getArgument(0, InventoryHolder.class));
-            return inventory;
-        });
+        )).thenAnswer(answer -> new InventoryMock(
+                answer.getArgument(0, InventoryHolder.class),
+                answer.getArgument(1, Integer.class)
+        ));
 
         // Register mocked item meta class in the serialization object
         ConfigurationSerialization.registerClass(ItemMetaMock.class);

@@ -116,6 +116,17 @@ public class DatabaseSetTest {
     }
 
     @Test
+    public void equals() {
+        DatabaseSet other = new DatabaseSet();
+        other.setObject(KEY, "test");
+
+        assertThat(this.set)
+                .isNotEqualTo(null)
+                .isNotEqualTo(other)
+                .isEqualTo(new DatabaseSet());
+    }
+
+    @Test
     public void resultSetToDatabaseSet() throws SQLException {
         ResultSet resultSet = mock(ResultSet.class);
         ResultSetMetaData metaData = mock(ResultSetMetaData.class);

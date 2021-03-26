@@ -78,11 +78,14 @@ public class AbstractInventoryHolderTest {
         verify(Bukkit.getServer()).createInventory(this.holder, rows * 9, title.substring(0, 32));
 
         // Reload an inventory with itemstacks
-        ItemStack[] itemList = this.getFakeItemList();
+        ItemStack[] itemList = this.getFakeItemList(rows * 9);
 
-        when(this.holder.inventory.getContents()).thenReturn(itemList);
+        Inventory old = this.holder.inventory;
+        old.setContents(itemList);
+
         this.holder.reloadInventory();
-        verify(this.holder.inventory).setContents(itemList);
+        assertThat(this.holder.inventory).isNotEqualTo(old);
+        assertThat(this.holder.inventory.getContents()).isEqualTo(itemList);
     }
 
     @Test
@@ -113,7 +116,7 @@ public class AbstractInventoryHolderTest {
     public void filledSlotsNb() {
         this.holder.inventory = this.inventory;
 
-        when(this.holder.inventory.getContents()).thenReturn(this.getFakeItemList());
+        when(this.holder.inventory.getContents()).thenReturn(this.getFakeItemList(27));
         assertThat(this.holder.getFilledSlotsNb()).isEqualTo(3);
     }
 
@@ -122,8 +125,8 @@ public class AbstractInventoryHolderTest {
      *
      * @return item list with a size of 10, but with 3 real itemstacks.
      */
-    private ItemStack[] getFakeItemList() {
-        ItemStack[] itemList = new ItemStack[10];
+    private ItemStack[] getFakeItemList(int size) {
+        ItemStack[] itemList = new ItemStack[size];
         itemList[2] = new ItemStack(Material.ENDER_CHEST);
         itemList[8] = new ItemStack(Material.ENDER_CHEST);
         itemList[9] = new ItemStack(Material.ENDER_CHEST);
