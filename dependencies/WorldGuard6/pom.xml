@@ -15,7 +15,7 @@
     <name>EnderContainers Dependency Worldguard6</name>
 
     <properties>
-        <worldedit.version>5.5.8</worldedit.version>
+        <worldedit.version>5.6.3</worldedit.version>
         <worldguard.version>6.1.1-SNAPSHOT</worldguard.version>
     </properties>
 
