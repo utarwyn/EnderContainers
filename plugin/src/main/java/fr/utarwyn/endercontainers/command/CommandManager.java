@@ -8,7 +8,9 @@ import org.bukkit.command.PluginCommand;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -47,13 +49,20 @@ public class CommandManager extends AbstractManager {
         try {
             CommandMap commandMap = this.getCommandMap();
             Map<String, Command> commands = this.getRegisteredCommands(commandMap);
+            List<String> toRemove = new ArrayList<>();
 
-            commands.remove(command.getName());
+            // Resolve all commands to remove
+            toRemove.add(command.getName());
             for (String alias : command.getAliases()) {
                 if (commands.containsKey(alias) && commands.get(alias).toString().contains(command.getName())) {
-                    commands.remove(alias);
+                    toRemove.add(alias);
                 }
             }
+
+            // Check if commands are not managed by EnderContainers and remove them if so
+            toRemove.stream()
+                    .filter(cmd -> !(commands.get(cmd) instanceof AbstractCommand))
+                    .forEach(commands::remove);
         } catch (ReflectiveOperationException e) {
             this.logger.log(Level.SEVERE, String.format(
                     "Cannot unregister the command %s from the server!", command.getName()
