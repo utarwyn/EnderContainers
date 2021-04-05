@@ -19,6 +19,9 @@ pipeline {
         }
 
         stage('Deploy') {
+            when {
+                anyOf { branch 'master'; branch 'next' }
+            }
             steps {
                 withMaven(options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
                     sh "mvn -DskipTests deploy " +
