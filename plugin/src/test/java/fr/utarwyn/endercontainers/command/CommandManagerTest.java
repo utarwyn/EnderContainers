@@ -70,4 +70,25 @@ public class CommandManagerTest {
         assertThat(commandMap.getCommand(ALIAS)).isNull();
     }
 
+    @Test
+    public void cannotUnregisterIfPluginCommand() {
+        CommandMap commandMap = new SimpleCommandMap(Bukkit.getServer());
+        registerCommandMap(commandMap);
+
+        PluginCommand command = mock(PluginCommand.class);
+        when(command.getName()).thenReturn(NAME);
+        when(command.getAliases()).thenReturn(Collections.singletonList(ALIAS));
+
+        AbstractCommand pluginCommand = mock(AbstractCommand.class);
+        when(pluginCommand.getName()).thenReturn(NAME);
+        when(pluginCommand.toString()).thenReturn(NAME);
+        when(pluginCommand.getAliases()).thenReturn(Collections.singletonList(ALIAS));
+        commandMap.register("endercontainers", pluginCommand);
+
+        this.manager.unregister(command);
+
+        assertThat(commandMap.getCommand(NAME)).isNotNull().isEqualTo(pluginCommand);
+        assertThat(commandMap.getCommand(ALIAS)).isNotNull().isEqualTo(pluginCommand);
+    }
+
 }
