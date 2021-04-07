@@ -30,8 +30,10 @@ public class InfoCommand extends AbstractBackupCommand {
         Optional<Backup> optionalBackup = this.manager.getBackupByName(name);
 
         if (!optionalBackup.isPresent()) {
-            PluginMsg.errorMessageWithPrefix(sender, LocaleKey.CMD_BACKUP_UNKNOWN,
-                    Collections.singletonMap("backup", name));
+            PluginMsg.errorMessage(
+                    sender, LocaleKey.CMD_BACKUP_UNKNOWN,
+                    Collections.singletonMap("backup", name)
+            );
             return;
         }
 

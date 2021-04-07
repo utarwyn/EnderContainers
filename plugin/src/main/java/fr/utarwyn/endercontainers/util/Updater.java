@@ -3,17 +3,18 @@ package fr.utarwyn.endercontainers.util;
 import com.google.gson.Gson;
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.configuration.Files;
-import org.bukkit.command.CommandSender;
+import fr.utarwyn.endercontainers.configuration.LocaleKey;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Collections;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static fr.utarwyn.endercontainers.EnderContainers.PREFIX;
 
 /**
  * Class used to check if there is any update for the plugin.
@@ -52,6 +53,14 @@ public class Updater extends AbstractManager implements Runnable {
      * {@inheritDoc}
      */
     @Override
+    public void initialize() {
+        this.registerListener(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized void load() {
         // Check for updates if enabled by the server administrator
         if (Files.getConfiguration().isUpdateChecker()) {
@@ -71,23 +80,6 @@ public class Updater extends AbstractManager implements Runnable {
     }
 
     /**
-     * Notify a command sender if the plugin needs to be updated.
-     *
-     * @param sender sender that has to be notified about an update
-     * @return true if the sender has been notified
-     */
-    public boolean notifyPlayer(CommandSender sender) {
-        boolean needUpdate = this.hasToBeUpdated();
-
-        if (needUpdate) {
-            sender.sendMessage(PREFIX + "§eA new version is available for download! " +
-                    "§7Follow instructions in your console to update the plugin.");
-        }
-
-        return needUpdate;
-    }
-
-    /**
      * Detects the latest version of the plugin and stores it.
      * Also notifies the console about the check.
      */
@@ -95,7 +87,7 @@ public class Updater extends AbstractManager implements Runnable {
     public void run() {
         try {
             this.retreiveVersions();
-            this.notifyConsole();
+            this.plugin.executeTaskOnMainThread(this::notifyConsole);
         } catch (IOException e) {
             this.plugin.getLogger().log(Level.SEVERE,
                     "Cannot retrieve the latest version of the plugin", e);
@@ -103,25 +95,66 @@ public class Updater extends AbstractManager implements Runnable {
     }
 
     /**
-     * Notify the console if the plugin have to be updated or not.
+     * Method called when a player joins the server
+     *
+     * @param event The join event
      */
-    private void notifyConsole() {
-        Logger logger = this.plugin.getLogger();
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
 
+        // Send update message to the player if it has the permission
+        if (MiscUtil.playerHasPerm(player, "update") && this.hasToBeUpdated()) {
+            this.notifyPlayer(player);
+        }
+    }
+
+    /**
+     * Notify the console if the plugin has to be updated or not.
+     */
+    public void notifyConsole() {
         if (this.hasToBeUpdated()) {
-            logger.log(Level.WARNING, "**** PLUGIN UPDATE {0}", this.latestVersion);
-            logger.log(Level.WARNING, "Your server is using the version {0} of EnderContainers.", this.currentVersion);
-            logger.warning(" ");
-            logger.log(Level.WARNING, "  1. Download the new version here: {0}", DOWNLOAD_LINK);
-            logger.log(Level.WARNING, "  2. Then follow the upgrade guide {0} here: {1}",
-                    new Object[]{this.latestVersion, WIKI_LINK});
-            logger.warning(" ");
-        } else if (this.currentVersion.isDevelopment()) {
-            logger.warning("**** IMPORTANT!");
-            logger.warning("You are using a development build. This means that the plugin can be unstable.");
-            logger.warning("If you have an issue during its execution, please report it on the Github repository.");
+            logger.warning("-----------[Plugin Update]----------");
+            logger.log(Level.WARNING, "  Your server is using v{0} of EnderContainers. Latest is v{1}.",
+                    new Object[]{this.currentVersion, this.latestVersion});
+            logger.warning("");
+            logger.log(Level.WARNING, "  Download the new version here: {0}", DOWNLOAD_LINK);
+
+            if (this.currentVersion.getMinor() != this.latestVersion.getMinor() || this.currentVersion.getMajor() != this.latestVersion.getMajor()) {
+                logger.log(Level.WARNING, "  Then follow the upgrade guide to v{0} here: {1}",
+                        new Object[]{this.latestVersion, WIKI_LINK});
+            }
+
+            logger.warning("------------------------------------");
         } else {
             logger.log(Level.INFO, "You are using the newest version of the plugin ({0}).", this.currentVersion);
+        }
+
+        if (this.currentVersion.isDevelopment()) {
+            logger.warning("----------[Unstable Build]----------");
+            logger.warning("  You are using a development build. This means that the plugin can be unstable.");
+            logger.warning("  If you have an issue during its execution, please report it on the Github repository.");
+            logger.warning("------------------------------------");
+        }
+    }
+
+    /**
+     * Notify player if the plugin has to be updated or not.
+     *
+     * @param player player that will be notified
+     */
+    public void notifyPlayer(Player player) {
+        if (this.hasToBeUpdated()) {
+            PluginMsg.errorMessage(
+                    player, LocaleKey.CMD_UPDATE,
+                    Collections.singletonMap("version", this.latestVersion.toString())
+            );
+            MiscUtil.playSound(player, "NOTE_PLING", "BLOCK_NOTE_PLING", "BLOCK_NOTE_BLOCK_PLING");
+        } else {
+            PluginMsg.infoMessage(
+                    player, LocaleKey.CMD_NO_UPDATE,
+                    Collections.singletonMap("version", this.latestVersion.toString())
+            );
         }
     }
 

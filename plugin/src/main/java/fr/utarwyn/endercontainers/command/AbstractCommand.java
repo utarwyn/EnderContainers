@@ -87,7 +87,7 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
 
         // Check argument count
         if (!this.checkArgLength(args.length)) {
-            PluginMsg.errorMessageWithPrefix(sender, LocaleKey.ERR_CMD_ARG_COUNT);
+            PluginMsg.errorMessage(sender, LocaleKey.ERR_CMD_ARG_COUNT);
             return true;
         }
 
@@ -95,7 +95,7 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
         int i = 0;
         for (Parameter<?> param : this.parameters) {
             if (i < args.length && !param.checkValue(args[i])) {
-                PluginMsg.errorMessageWithPrefix(sender, LocaleKey.ERR_CMD_INVALID_PARAM,
+                PluginMsg.errorMessage(sender, LocaleKey.ERR_CMD_INVALID_PARAM,
                         Collections.singletonMap("param", args[i]));
                 return true;
             }

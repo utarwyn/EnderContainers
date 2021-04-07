@@ -24,7 +24,7 @@ public class EnderchestCommand extends AbstractCommand {
     @Override
     public void performPlayer(Player player) {
         if (Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName())) {
-            PluginMsg.errorMessageWithPrefix(player, LocaleKey.ERR_WORLD_DISABLED);
+            PluginMsg.errorMessage(player, LocaleKey.ERR_WORLD_DISABLED);
             return;
         }
 
@@ -43,7 +43,7 @@ public class EnderchestCommand extends AbstractCommand {
 
     @Override
     public void performConsole(CommandSender sender) {
-        PluginMsg.errorMessageWithPrefix(sender, LocaleKey.ERR_NOPERM_CONSOLE);
+        PluginMsg.errorMessage(sender, LocaleKey.ERR_NOPERM_CONSOLE);
     }
 
     private void openListInventory(Player player) {
@@ -58,7 +58,7 @@ public class EnderchestCommand extends AbstractCommand {
         if (MiscUtil.playerHasPerm(player, "cmd.enderchests") || MiscUtil.playerHasPerm(player, "cmd.enderchest." + num)) {
             this.manager.loadPlayerContext(player.getUniqueId(), context -> {
                 if (!context.openEnderchestInventory(player, num)) {
-                    PluginMsg.errorMessageWithPrefix(player, LocaleKey.ERR_NOPERM_OPEN_CHEST);
+                    PluginMsg.errorMessage(player, LocaleKey.ERR_NOPERM_OPEN_CHEST);
                 }
             });
         } else {

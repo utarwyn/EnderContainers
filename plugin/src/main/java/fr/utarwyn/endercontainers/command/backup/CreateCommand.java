@@ -21,15 +21,19 @@ public class CreateCommand extends AbstractBackupCommand {
     public void perform(CommandSender sender) {
         String name = this.readArg();
 
-        PluginMsg.messageWithPrefix(sender, LocaleKey.CMD_BACKUP_CREATION_STARTED);
+        PluginMsg.infoMessage(sender, LocaleKey.CMD_BACKUP_CREATION_STARTED);
 
         this.manager.createBackup(name, sender.getName(), result -> {
             if (Boolean.TRUE.equals(result)) {
-                PluginMsg.messageWithPrefix(sender, LocaleKey.CMD_BACKUP_CREATED,
-                        Collections.singletonMap("backup", name));
+                PluginMsg.successMessage(
+                        sender, LocaleKey.CMD_BACKUP_CREATED,
+                        Collections.singletonMap("backup", name)
+                );
             } else {
-                PluginMsg.errorMessageWithPrefix(sender, LocaleKey.CMD_BACKUP_EXISTS,
-                        Collections.singletonMap("backup", name));
+                PluginMsg.errorMessage(
+                        sender, LocaleKey.CMD_BACKUP_EXISTS,
+                        Collections.singletonMap("backup", name)
+                );
             }
         });
     }

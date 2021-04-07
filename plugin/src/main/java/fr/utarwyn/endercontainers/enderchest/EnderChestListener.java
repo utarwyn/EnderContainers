@@ -6,7 +6,6 @@ import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.PluginMsg;
-import fr.utarwyn.endercontainers.util.Updater;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -16,7 +15,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 
@@ -87,21 +85,6 @@ public class EnderChestListener implements Listener {
                     PluginMsg.errorMessage(player, e.getKey(), e.getParameters());
                 }
             }
-        }
-    }
-
-    /**
-     * Method called when a player joins the server
-     *
-     * @param event The join event
-     */
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-
-        // Send update message to the player is he has the permission.
-        if (MiscUtil.playerHasPerm(player, "update") && Managers.get(Updater.class).notifyPlayer(player)) {
-            MiscUtil.playSound(player, "NOTE_PLING", "BLOCK_NOTE_PLING", "BLOCK_NOTE_BLOCK_PLING");
         }
     }
 

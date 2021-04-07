@@ -23,11 +23,15 @@ public class RemoveCommand extends AbstractBackupCommand {
 
         this.manager.removeBackup(name, result -> {
             if (Boolean.TRUE.equals(result)) {
-                PluginMsg.messageWithPrefix(sender, LocaleKey.CMD_BACKUP_REMOVED,
-                        Collections.singletonMap("backup", name));
+                PluginMsg.successMessage(
+                        sender, LocaleKey.CMD_BACKUP_REMOVED,
+                        Collections.singletonMap("backup", name)
+                );
             } else {
-                PluginMsg.errorMessageWithPrefix(sender, LocaleKey.CMD_BACKUP_UNKNOWN,
-                        Collections.singletonMap("backup", name));
+                PluginMsg.errorMessage(
+                        sender, LocaleKey.CMD_BACKUP_UNKNOWN,
+                        Collections.singletonMap("backup", name)
+                );
             }
         });
     }

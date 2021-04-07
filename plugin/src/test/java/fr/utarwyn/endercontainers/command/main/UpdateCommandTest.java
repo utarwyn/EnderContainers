@@ -4,6 +4,7 @@ import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.command.CommandTestHelper;
 import fr.utarwyn.endercontainers.util.Updater;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -13,8 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UpdateCommandTest extends CommandTestHelper<UpdateCommand> {
@@ -43,21 +44,16 @@ public class UpdateCommandTest extends CommandTestHelper<UpdateCommand> {
     }
 
     @Test
-    public void foundUpdate() {
+    public void sentByPlayer() {
         this.givePermission(this.player);
-        when(this.updater.notifyPlayer(this.player)).thenReturn(true);
-
         this.run(this.player);
-        verify(this.player, never()).sendMessage(anyString());
+        verify(this.updater).notifyPlayer(this.player);
     }
 
     @Test
-    public void noUpdate() {
-        this.givePermission(this.player);
-        when(this.updater.notifyPlayer(this.player)).thenReturn(false);
-
-        this.run(this.player);
-        verify(this.player).sendMessage(contains("no update"));
+    public void sentByConsole() {
+        this.run(mock(ConsoleCommandSender.class));
+        verify(this.updater).notifyConsole();
     }
 
     @Test

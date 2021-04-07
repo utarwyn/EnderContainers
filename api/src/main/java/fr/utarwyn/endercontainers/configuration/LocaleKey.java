@@ -23,6 +23,7 @@ public enum LocaleKey {
     CMD_BACKUP_LABEL_LOADCMD("commands.backups.label_loadcmd"),
     CMD_BACKUP_LABEL_RMCMD("commands.backups.label_rmcmd"),
     CMD_CONFIG_RELOADED("commands.config_reloaded"),
+    CMD_UPDATE("commands.update"),
     CMD_NO_UPDATE("commands.no_update"),
 
     MENU_MAIN_TITLE("menus.main_title"),
@@ -37,6 +38,8 @@ public enum LocaleKey {
     ERR_NOPERM_OPEN_CHEST("errors.noperm_open_chest"),
     ERR_NOPERM_CONSOLE("errors.noperm_console"),
     ERR_NOPERM_PLAYER("errors.noperm_player"),
+    ERR_PLAYER_NOT_FOUND("errors.player_not_found"),
+    ERR_RELOAD_ERROR("errors.plugin_reload_error"),
     ERR_WORLD_DISABLED("errors.plugin_world_disabled"),
     ERR_CMD_INVALID_PARAM("errors.cmd_invalid_parameter"),
     ERR_CMD_ARG_COUNT("errors.cmd_wrong_argument_count"),

@@ -2,11 +2,16 @@ package fr.utarwyn.endercontainers.command.main;
 
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.command.AbstractCommand;
-import fr.utarwyn.endercontainers.configuration.LocaleKey;
-import fr.utarwyn.endercontainers.util.PluginMsg;
 import fr.utarwyn.endercontainers.util.Updater;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
+/**
+ * Handles the update command (/endercontainers update).
+ *
+ * @author Utarwyn
+ * @since 2.0.0
+ */
 public class UpdateCommand extends AbstractCommand {
 
     /**
@@ -22,10 +27,13 @@ public class UpdateCommand extends AbstractCommand {
     }
 
     @Override
-    public void perform(CommandSender sender) {
-        if (!this.updater.notifyPlayer(sender)) {
-            PluginMsg.messageWithPrefix(sender, LocaleKey.CMD_NO_UPDATE);
-        }
+    public void performPlayer(Player player) {
+        this.updater.notifyPlayer(player);
+    }
+
+    @Override
+    public void performConsole(CommandSender sender) {
+        this.updater.notifyConsole();
     }
 
 }

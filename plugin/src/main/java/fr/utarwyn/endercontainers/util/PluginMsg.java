@@ -1,11 +1,11 @@
 package fr.utarwyn.endercontainers.util;
 
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -13,12 +13,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Utility class used to send various messages for players.
+ * Utility class used which sends various messages.
  *
  * @author Utarwyn
  * @since 1.0.0
  */
 public class PluginMsg {
+
+    private static final String PREFIX_ERROR = "✖ ";
+    private static final String PREFIX_SUCCESS = "✔ ";
+    private static final String PREFIX_INFO = "→ ";
+    private static final String PREFIX_CONSOLE = "[EnderContainers] ";
 
     private PluginMsg() {
         // Not implemented
@@ -45,72 +50,55 @@ public class PluginMsg {
      */
     public static void errorMessage(CommandSender receiver, LocaleKey key,
                                     Map<String, String> parameters) {
-        PluginMsg.sendLocalizedMessage(receiver, "§l(!) ", ChatColor.RED, key, parameters);
+        PluginMsg.sendLocalizedMessage(receiver, PREFIX_ERROR, ChatColor.RED, key, parameters);
     }
 
     /**
-     * Send a message with the plugin prefix
-     * from a locale key to a specific entity.
+     * Send a simple success message from
+     * a locale key to a specific entity.
      *
      * @param receiver receiver of the message
-     * @param key      key of the message to send with in an error state
+     * @param key      key of the message to send with in a success state
      */
-    public static void messageWithPrefix(CommandSender receiver, LocaleKey key) {
-        PluginMsg.sendLocalizedMessage(receiver, EnderContainers.PREFIX,
-                ChatColor.GRAY, key, null);
+    public static void successMessage(CommandSender receiver, LocaleKey key) {
+        PluginMsg.successMessage(receiver, key, null);
     }
 
     /**
-     * Send a message with the plugin prefix and a
-     * specific color from a locale key to a specific entity.
-     *
-     * @param receiver receiver of the message
-     * @param key      key of the message to send with in an error state
-     * @param color    color of the message
-     */
-    public static void messageWithPrefix(CommandSender receiver, LocaleKey key,
-                                         ChatColor color) {
-        PluginMsg.sendLocalizedMessage(receiver, EnderContainers.PREFIX,
-                color, key, null);
-    }
-
-    /**
-     * Send a message with the plugin prefix
-     * from a locale key to a specific entity.
+     * Send a simple success message from
+     * a locale key to a specific entity.
      *
      * @param receiver   receiver of the message
-     * @param key        key of the message to send with in an error state
+     * @param key        key of the message to send with in a success state
      * @param parameters parameters to replace in the message
      */
-    public static void messageWithPrefix(CommandSender receiver, LocaleKey key,
-                                         Map<String, String> parameters) {
-        PluginMsg.sendLocalizedMessage(receiver, EnderContainers.PREFIX,
-                ChatColor.GRAY, key, parameters);
+    public static void successMessage(CommandSender receiver, LocaleKey key,
+                                      Map<String, String> parameters) {
+        PluginMsg.sendLocalizedMessage(receiver, PREFIX_SUCCESS, ChatColor.GREEN, key, parameters);
     }
 
     /**
-     * Send an error message with the plugin prefix
-     * from a locale key to a specific entity.
+     * Send a simple informative message from
+     * a locale key to a specific entity.
      *
      * @param receiver receiver of the message
-     * @param key      key of the message to send with in an error state
+     * @param key      key of the message to send with in an info state
      */
-    public static void errorMessageWithPrefix(CommandSender receiver, LocaleKey key) {
-        PluginMsg.errorMessageWithPrefix(receiver, key, null);
+    public static void infoMessage(CommandSender receiver, LocaleKey key) {
+        PluginMsg.infoMessage(receiver, key, null);
     }
 
     /**
-     * Send an error message with the plugin prefix
-     * from a locale key to a specific entity.
+     * Send a simple informative message from
+     * a locale key to a specific entity.
      *
      * @param receiver   receiver of the message
-     * @param key        key of the message to send with in an error state
+     * @param key        key of the message to send with in an info state
      * @param parameters parameters to replace in the message
      */
-    public static void errorMessageWithPrefix(CommandSender receiver, LocaleKey key,
-                                              Map<String, String> parameters) {
-        PluginMsg.sendLocalizedMessage(receiver, EnderContainers.PREFIX,
-                ChatColor.RED, key, parameters);
+    public static void infoMessage(CommandSender receiver, LocaleKey key,
+                                   Map<String, String> parameters) {
+        PluginMsg.sendLocalizedMessage(receiver, PREFIX_INFO, ChatColor.GRAY, key, parameters);
     }
 
     /**
@@ -120,9 +108,9 @@ public class PluginMsg {
      */
     public static void accessDenied(CommandSender receiver) {
         if (receiver instanceof Player) {
-            errorMessageWithPrefix(receiver, LocaleKey.ERR_NOPERM_PLAYER);
+            errorMessage(receiver, LocaleKey.ERR_NOPERM_PLAYER);
         } else {
-            errorMessageWithPrefix(receiver, LocaleKey.ERR_NOPERM_CONSOLE);
+            errorMessage(receiver, LocaleKey.ERR_NOPERM_CONSOLE);
         }
     }
 
@@ -161,9 +149,14 @@ public class PluginMsg {
                                              LocaleKey key, Map<String, String> parameters) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(color);
-        sb.append(prefix);
-        sb.append(color);
+        // Add a specific prefix when displaying messages in console
+        if (receiver instanceof ConsoleCommandSender) {
+            sb.append(PREFIX_CONSOLE);
+            sb.append(color);
+        } else {
+            sb.append(color);
+            sb.append(prefix);
+        }
         sb.append(Files.getLocale().getMessage(key));
 
         if (parameters != null && !parameters.isEmpty()) {

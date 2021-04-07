@@ -102,6 +102,11 @@ public class BackupsFlatDataTest {
         FileTime beforeTime = getLastModifiedTime(this.file);
         assertThat(this.data.saveNewBackup(this.backup)).isTrue();
 
+        try {
+            Thread.sleep(200);
+        } catch (Exception ignored) {
+        }
+
         assertThat(beforeTime).isLessThan(getLastModifiedTime(this.file));
         assertThat(this.data.configuration.isConfigurationSection("backups.test")).isTrue();
         assertThat(this.data.configuration.get("backups.test.name")).isEqualTo("test");

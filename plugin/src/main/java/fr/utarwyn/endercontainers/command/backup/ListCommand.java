@@ -41,7 +41,7 @@ public class ListCommand extends AbstractBackupCommand {
             sender.sendMessage(" §r §8♣ Backup list (page 1)");
             PluginMsg.endBar(sender);
         } else {
-            PluginMsg.errorMessageWithPrefix(sender, LocaleKey.CMD_BACKUP_ZERO);
+            PluginMsg.errorMessage(sender, LocaleKey.CMD_BACKUP_ZERO);
         }
     }
 

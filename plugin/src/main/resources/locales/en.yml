@@ -27,7 +27,8 @@ commands:
     label_rmcmd: '&8To remove this backup'
 
   config_reloaded: 'Configuration reloaded!'
-  no_update: 'There is no update at this time. Retry later.'
+  update: '&6EnderContainers &cis not up-to-date! Latest version is &e%version%&c. Type &3ecp update &cin the console and follow instructions.'
+  no_update: 'Plugin is up-to-date! Your version is &e%version%&7.'
 
 
 ##              ##
@@ -55,6 +56,8 @@ errors:
   noperm_open_chest: 'You can''t open this EnderChest!'
   noperm_console: 'You must be a player to do this!'
   noperm_player: 'You don''t have the permission to do this!'
+  player_not_found: 'Player &6%playername% &cnot found.'
+  plugin_reload_error: 'Error when reloading configuration! Check server log for more info.'
   plugin_world_disabled: 'Plugin is disabled in this world.'
   cmd_invalid_parameter: 'Parameter &6%param% &cis not valid.'
   cmd_wrong_argument_count: 'Wrong argument count. &6/ecp help &cto show the plugin''s help!'

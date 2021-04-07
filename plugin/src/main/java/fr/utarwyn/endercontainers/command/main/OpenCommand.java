@@ -1,6 +1,5 @@
 package fr.utarwyn.endercontainers.command.main;
 
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.command.AbstractCommand;
 import fr.utarwyn.endercontainers.command.Parameter;
@@ -12,6 +11,7 @@ import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
 import java.util.UUID;
 
 public class OpenCommand extends AbstractCommand {
@@ -30,7 +30,7 @@ public class OpenCommand extends AbstractCommand {
     @Override
     public void performPlayer(Player player) {
         if (Files.getConfiguration().getDisabledWorlds().contains(player.getWorld().getName())) {
-            PluginMsg.errorMessageWithPrefix(player, LocaleKey.ERR_WORLD_DISABLED);
+            PluginMsg.errorMessage(player, LocaleKey.ERR_WORLD_DISABLED);
             return;
         }
 
@@ -40,13 +40,16 @@ public class OpenCommand extends AbstractCommand {
         if (uuid != null) {
             this.manager.loadPlayerContext(uuid, context -> context.openListInventory(player));
         } else {
-            player.sendMessage(EnderContainers.PREFIX + "§cPlayer §6" + playername + " §cnot found.");
+            PluginMsg.errorMessage(
+                    player, LocaleKey.ERR_PLAYER_NOT_FOUND,
+                    Collections.singletonMap("playername", playername)
+            );
         }
     }
 
     @Override
     public void performConsole(CommandSender sender) {
-        PluginMsg.errorMessageWithPrefix(sender, LocaleKey.ERR_NOPERM_CONSOLE);
+        PluginMsg.errorMessage(sender, LocaleKey.ERR_NOPERM_CONSOLE);
     }
 
 }

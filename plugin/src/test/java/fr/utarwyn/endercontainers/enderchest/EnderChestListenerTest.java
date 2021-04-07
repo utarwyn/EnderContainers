@@ -6,7 +6,6 @@ import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
-import fr.utarwyn.endercontainers.util.Updater;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -20,7 +19,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -108,7 +106,7 @@ public class EnderChestListenerTest {
         assertThat(event.useInteractedBlock()).isEqualTo(Event.Result.DENY);
         assertThat(event.useItemInHand()).isEqualTo(Event.Result.DENY);
 
-        verify(this.player).sendMessage("§c§l(!) §cYou can't use the enderchest in awesome_faction§c's territory!");
+        verify(this.player).sendMessage(contains("can't use the enderchest in awesome_faction"));
     }
 
     @Test
@@ -156,30 +154,6 @@ public class EnderChestListenerTest {
         PlayerInteractEvent event = this.createInteractEvent(RIGHT_CLICK_BLOCK);
         this.listener.onPlayerInteract(event);
         assertThat(event.useInteractedBlock()).isEqualTo(Event.Result.ALLOW);
-    }
-
-    @Test
-    public void playerJoinUpdateNotification() throws TestInitializationException {
-        PlayerJoinEvent event = new PlayerJoinEvent(this.player, "");
-
-        // Register a fake updater
-        Updater updater = mock(Updater.class);
-        TestHelper.registerManagers(updater);
-
-        // no permission
-        this.listener.onPlayerJoin(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), eq(1f), eq(1f));
-
-        // no update
-        when(this.player.isOp()).thenReturn(true);
-        when(updater.notifyPlayer(this.player)).thenReturn(false);
-        this.listener.onPlayerJoin(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), eq(1f), eq(1f));
-
-        // update and permission
-        when(updater.notifyPlayer(this.player)).thenReturn(true);
-        this.listener.onPlayerJoin(event);
-        verify(this.player).playSound(any(), eq(Sound.BLOCK_NOTE_BLOCK_PLING), eq(1f), eq(1f));
     }
 
     @Test

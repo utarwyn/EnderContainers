@@ -21,15 +21,19 @@ public class LoadCommand extends AbstractBackupCommand {
     public void perform(CommandSender sender) {
         String name = this.readArg();
 
-        PluginMsg.messageWithPrefix(sender, LocaleKey.CMD_BACKUP_LOADING_STARTED);
+        PluginMsg.infoMessage(sender, LocaleKey.CMD_BACKUP_LOADING_STARTED);
 
         this.manager.applyBackup(name, result -> {
             if (Boolean.TRUE.equals(result)) {
-                PluginMsg.messageWithPrefix(sender, LocaleKey.CMD_BACKUP_LOADED,
-                        Collections.singletonMap("backup", name));
+                PluginMsg.successMessage(
+                        sender, LocaleKey.CMD_BACKUP_LOADED,
+                        Collections.singletonMap("backup", name)
+                );
             } else {
-                PluginMsg.errorMessageWithPrefix(sender, LocaleKey.CMD_BACKUP_UNKNOWN,
-                        Collections.singletonMap("backup", name));
+                PluginMsg.errorMessage(
+                        sender, LocaleKey.CMD_BACKUP_UNKNOWN,
+                        Collections.singletonMap("backup", name)
+                );
             }
         });
     }

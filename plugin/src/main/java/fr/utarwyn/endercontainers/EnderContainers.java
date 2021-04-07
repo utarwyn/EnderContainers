@@ -28,11 +28,6 @@ import java.util.logging.Level;
 public class EnderContainers extends JavaPlugin {
 
     /**
-     * The plugin prefix
-     */
-    public static final String PREFIX = "§8[§6EnderContainers§8] §7";
-
-    /**
      * The Endercontainers instance
      */
     private static EnderContainers instance;
