@@ -1,8 +1,8 @@
 package fr.utarwyn.endercontainers.enderchest;
 
-import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.compatibility.nms.NMSPlayerUtil;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
+import fr.utarwyn.endercontainers.enderchest.context.PlayerOfflineLoadException;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -10,7 +10,6 @@ import org.bukkit.inventory.Inventory;
 
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.logging.Level;
 
 /**
  * Represents the Bukkit enderchest of a player.
@@ -29,10 +28,10 @@ public class VanillaEnderChest extends EnderChest {
     /**
      * Construct a new vanilla enderchest.
      *
-     * @param context context of the player's chest
+     * @param context player context object
      */
     public VanillaEnderChest(PlayerContext context) {
-        super(context, 0);
+        super(context);
         this.owner = context.getOwnerAsObject();
     }
 
@@ -97,14 +96,16 @@ public class VanillaEnderChest extends EnderChest {
     /**
      * Retrieves the offline player profile from server data.
      * MUST be called in a synchronous way.
+     *
+     * @throws PlayerOfflineLoadException thrown when cannot get player profile
      */
-    public void loadOfflinePlayer() {
+    public void loadOfflinePlayer() throws PlayerOfflineLoadException {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(context.getOwner());
         try {
             this.owner = NMSPlayerUtil.get().loadPlayer(offlinePlayer);
         } catch (ReflectiveOperationException e) {
-            EnderContainers.getInstance().getLogger().log(Level.SEVERE, String.format(
-                    "Cannot get the profile of player %s", context.getOwner()
+            throw new PlayerOfflineLoadException(String.format(
+                    "cannot get profile of player %s using reflection", this.context.getOwner()
             ), e);
         }
     }

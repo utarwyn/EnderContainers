@@ -3,7 +3,7 @@ package fr.utarwyn.endercontainers.enderchest;
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
-import fr.utarwyn.endercontainers.storage.player.PlayerData;
+import fr.utarwyn.endercontainers.enderchest.context.PlayerOfflineLoadException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -16,11 +16,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -42,17 +39,11 @@ public class VanillaEnderChestTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws PlayerOfflineLoadException {
         this.player = TestHelper.getPlayer();
 
-        UUID uuid = player.getUniqueId();
-        PlayerData data = mock(PlayerData.class);
-
-        when(data.getEnderchestContents(any(VanillaEnderChest.class))).thenReturn(new ConcurrentHashMap<>());
         when(this.player.getEnderChest()).thenReturn(inventory);
-        when(this.context.getOwner()).thenReturn(uuid);
         when(this.context.getOwnerAsObject()).thenReturn(this.player);
-        when(this.context.getData()).thenReturn(data);
 
         this.chest = new VanillaEnderChest(this.context);
     }
@@ -100,9 +91,14 @@ public class VanillaEnderChestTest {
     }
 
     @Test
-    public void offlineOwner() {
+    public void unknownPlayer() {
         when(this.context.getOwnerAsObject()).thenReturn(null);
         this.chest = new VanillaEnderChest(this.context);
+
+        try {
+            this.chest.loadOfflinePlayer();
+        } catch (PlayerOfflineLoadException ignored) {
+        }
 
         assertThat(this.chest.isContainerUsed()).isFalse();
         assertThat(this.chest.getSize()).isZero();

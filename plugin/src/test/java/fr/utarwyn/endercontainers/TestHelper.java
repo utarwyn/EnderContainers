@@ -175,15 +175,6 @@ public class TestHelper {
 
             plugin = mock(EnderContainers.class);
 
-            try {
-                Field staticAccess = EnderContainers.class.getDeclaredField("instance");
-                staticAccess.setAccessible(true);
-                staticAccess.set(null, plugin);
-                staticAccess.setAccessible(false);
-            } catch (ReflectiveOperationException e) {
-                throw new TestInitializationException(e);
-            }
-
             lenient().when(plugin.getServer()).thenReturn(server);
             lenient().when(plugin.getDescription()).thenReturn(mock(PluginDescriptionFile.class));
             lenient().doReturn(server.getLogger()).when(plugin).getLogger();

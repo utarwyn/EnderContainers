@@ -5,6 +5,7 @@ import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 
 /**
  * Represents the task which loads a memory context with
@@ -64,9 +65,13 @@ public class LoadTask implements Runnable {
 
         this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, () -> {
             // Load offline player profile in a synchronous way if needed
-            context.loadOfflinePlayerProfile();
+            try {
+                context.loadOfflinePlayerProfile();
+            } catch (PlayerOfflineLoadException e) {
+                this.plugin.getLogger().log(Level.SEVERE, "cannot load offline player profile", e);
+            }
 
-            // Register the player context in memory
+            // Register player context in memory
             this.manager.registerPlayerContext(context);
             this.consumer.accept(context);
         });

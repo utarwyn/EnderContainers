@@ -22,6 +22,7 @@ public class EnderChest {
      * The number of the enderchest.
      */
     private final int num;
+
     /**
      * Player context for which the enderchest has been loaded.
      */
@@ -31,15 +32,16 @@ public class EnderChest {
      * Amount of rows of the enderchest.
      */
     protected int rows;
+
     /**
      * Inventory which contains contents of this enderchest.
      */
     EnderChestInventory container;
 
     /**
-     * Construct a new enderchest.
+     * Constructs a new enderchest.
      *
-     * @param context context of the player's chest
+     * @param context player context object
      * @param num     number of the enderchest
      */
     public EnderChest(PlayerContext context, int num) {
@@ -47,6 +49,17 @@ public class EnderChest {
         this.num = num;
         this.updateRowCount();
         this.container = new EnderChestInventory(this);
+    }
+
+    /**
+     * Constructs a new enderchest handled by the server.
+     *
+     * @param context player context object
+     */
+    protected EnderChest(PlayerContext context) {
+        this.context = context;
+        this.num = 0;
+        this.updateRowCount();
     }
 
     /**

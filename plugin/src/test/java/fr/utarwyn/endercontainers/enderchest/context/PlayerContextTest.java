@@ -95,7 +95,7 @@ public class PlayerContextTest {
     }
 
     @Test
-    public void loadOfflinePlayerProfile() {
+    public void loadOfflinePlayerProfile() throws PlayerOfflineLoadException {
         // by default, method can be called but do nothing
         this.context.loadOfflinePlayerProfile();
 
@@ -109,7 +109,11 @@ public class PlayerContextTest {
 
         VanillaEnderChest chest = (VanillaEnderChest) this.context.getChest(0).get();
         assertThat(chest.getOwnerAsPlayer()).isNull();
-        this.context.loadOfflinePlayerProfile();
+
+        try {
+            this.context.loadOfflinePlayerProfile();
+        } catch (PlayerOfflineLoadException ignored) {
+        }
     }
 
     @Test

@@ -2,7 +2,6 @@ package fr.utarwyn.endercontainers.util.uuid;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import fr.utarwyn.endercontainers.EnderContainers;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -18,7 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
-import java.util.logging.Level;
 
 /**
  * Allows to convert an UUID to a playername and vice-versa
@@ -192,10 +190,8 @@ public class UUIDFetcher {
 
             return currentNameData.name;
         } catch (IOException e) {
-            EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot retrieve the player name from the Mojang Api", e);
+            return null;
         }
-
-        return null;
     }
 
     /**

@@ -32,7 +32,7 @@ public class MainCommand extends AbstractCommand {
         this.addSubCommand(new HelpCommand());
         this.addSubCommand(new OpenCommand());
         this.addSubCommand(new BackupCommand());
-        this.addSubCommand(new ReloadCommand());
+        this.addSubCommand(new ReloadCommand(plugin));
         this.addSubCommand(new UpdateCommand());
 
         // Get all needed informations of the plugin in the description file

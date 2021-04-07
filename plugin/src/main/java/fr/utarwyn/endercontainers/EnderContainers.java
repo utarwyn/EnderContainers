@@ -28,26 +28,10 @@ import java.util.logging.Level;
 public class EnderContainers extends JavaPlugin {
 
     /**
-     * The Endercontainers instance
-     */
-    private static EnderContainers instance;
-
-    /**
-     * Allows to get the main instance of the plugin from all classes of the plugin.
-     *
-     * @return The EnderContainers plugin instance.
-     */
-    public static EnderContainers getInstance() {
-        return EnderContainers.instance;
-    }
-
-    /**
      * Called when the plugin loads
      */
     @Override
     public void onEnable() {
-        instance = this;
-
         // Load config files
         try {
             Files.initConfiguration(this);

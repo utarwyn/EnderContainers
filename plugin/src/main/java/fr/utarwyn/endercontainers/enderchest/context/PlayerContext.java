@@ -13,8 +13,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * A context in which all enderchests of a player are loaded.
@@ -37,7 +35,7 @@ public class PlayerContext {
     /**
      * List of all chests loaded in the context
      */
-    private Set<EnderChest> chests;
+    private final Set<EnderChest> chests;
 
     /**
      * Construct a new player context.
@@ -117,19 +115,21 @@ public class PlayerContext {
      * @param count amount of chests to load
      */
     public void loadEnderchests(int count) {
-        this.chests = IntStream.rangeClosed(0, count - 1)
-                .mapToObj(this::createEnderchest)
-                .collect(Collectors.toSet());
+        this.chests.clear();
+        for (int i = 0; i < count; i++) {
+            this.chests.add(this.createEnderchest(i));
+        }
     }
 
     /**
      * Loads offline player profile if needed for its vanilla enderchest.
      */
-    public void loadOfflinePlayerProfile() {
+    public void loadOfflinePlayerProfile() throws PlayerOfflineLoadException {
         if (Files.getConfiguration().isUseVanillaEnderchest() && this.getOwnerAsObject() == null) {
-            this.getChest(0)
-                    .map(VanillaEnderChest.class::cast)
-                    .ifPresent(VanillaEnderChest::loadOfflinePlayer);
+            Optional<EnderChest> chest = this.getChest(0);
+            if (chest.isPresent() && chest.get() instanceof VanillaEnderChest) {
+                ((VanillaEnderChest) chest.get()).loadOfflinePlayer();
+            }
         }
     }
 
