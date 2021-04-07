@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.enderchest.context;
 import com.google.common.collect.Maps;
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
+import fr.utarwyn.endercontainers.enderchest.VanillaEnderChest;
 import fr.utarwyn.endercontainers.inventory.menu.EnderChestListMenu;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
@@ -94,6 +95,24 @@ public class PlayerContextTest {
 
         when(this.player.getEnderChest().getViewers()).thenReturn(Collections.singletonList(this.player));
         assertThat(this.context.isChestsUnused()).isFalse();
+    }
+
+    @Test
+    public void loadOfflinePlayerProfile() {
+        // by default, method can be called but do nothing
+        this.context.loadOfflinePlayerProfile();
+
+        // with an offline player, reload first enderchest context
+        UUID uuid = TestHelper.FAKE_OFFLINE_UUID;
+        when(this.storageManager.createPlayerDataStorage(uuid)).thenReturn(this.playerData);
+
+        this.context = new PlayerContext(uuid);
+        this.context.loadEnderchests(1);
+        assertThat(this.context.getChest(0)).isPresent();
+
+        VanillaEnderChest chest = (VanillaEnderChest) this.context.getChest(0).get();
+        assertThat(chest.getOwnerAsPlayer()).isNull();
+        this.context.loadOfflinePlayerProfile();
     }
 
     @Test

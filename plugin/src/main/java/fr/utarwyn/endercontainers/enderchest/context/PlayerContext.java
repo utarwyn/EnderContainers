@@ -112,7 +112,7 @@ public class PlayerContext {
     }
 
     /**
-     * Load a certain amount of enderchests in this player context.
+     * Loads a certain amount of enderchests in this player context.
      *
      * @param count amount of chests to load
      */
@@ -120,6 +120,17 @@ public class PlayerContext {
         this.chests = IntStream.rangeClosed(0, count - 1)
                 .mapToObj(this::createEnderchest)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * Loads offline player profile if needed for its vanilla enderchest.
+     */
+    public void loadOfflinePlayerProfile() {
+        if (Files.getConfiguration().isUseVanillaEnderchest() && this.getOwnerAsObject() == null) {
+            this.getChest(0)
+                    .map(VanillaEnderChest.class::cast)
+                    .ifPresent(VanillaEnderChest::loadOfflinePlayer);
+        }
     }
 
     /**
