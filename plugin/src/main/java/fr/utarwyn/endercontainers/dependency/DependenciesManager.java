@@ -110,22 +110,10 @@ public class DependenciesManager extends AbstractManager implements DependencyVa
      * Logs all dependencies in the console.
      */
     private void logDependencies() {
-        this.logger.info("-----------[Dependencies]-----------");
-
         this.dependencies.stream().map(Dependency::getPlugin).forEach(plugin ->
-                this.logger.log(Level.INFO, "  Use {0} (v{1}) as a dependency!",
+                this.logger.log(Level.INFO, "Hooked into {0} v{1}",
                         new Object[]{plugin.getName(), plugin.getDescription().getVersion()})
         );
-
-        int size = this.dependencies.size();
-        if (size > 0) {
-            String plural = size > 1 ? "ies" : "y";
-            this.logger.log(Level.INFO, "  {0} dependenc{1} loaded!", new Object[]{size, plural});
-        } else {
-            this.logger.info("  No dependency found.");
-        }
-
-        this.logger.info("------------------------------------");
     }
 
     /**
