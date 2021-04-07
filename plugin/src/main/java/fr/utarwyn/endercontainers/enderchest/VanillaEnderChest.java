@@ -33,7 +33,7 @@ public class VanillaEnderChest extends EnderChest {
      */
     public VanillaEnderChest(PlayerContext context) {
         super(context, 0);
-        this.reloadOwnerProfile();
+        this.owner = context.getOwnerAsObject();
     }
 
     /**
@@ -60,7 +60,7 @@ public class VanillaEnderChest extends EnderChest {
      * @return true if the player is using this container
      */
     public boolean isUsedBy(Player player) {
-        return this.owner.getEnderChest().getViewers().contains(player);
+        return this.owner != null && this.owner.getEnderChest().getViewers().contains(player);
     }
 
     /**
@@ -95,23 +95,17 @@ public class VanillaEnderChest extends EnderChest {
     }
 
     /**
-     * Reload the owner profile.
-     * It gets the player profile from internal classes when it is offline.
+     * Retrieves the offline player profile from server data.
+     * MUST be called in a synchronous way.
      */
-    private void reloadOwnerProfile() {
-        // Get the online player object ...
-        this.owner = context.getOwnerAsObject();
-
-        // ... or use the offline player object.
-        if (this.owner == null) {
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(context.getOwner());
-            try {
-                this.owner = NMSPlayerUtil.get().loadPlayer(offlinePlayer);
-            } catch (ReflectiveOperationException e) {
-                EnderContainers.getInstance().getLogger().log(Level.SEVERE, String.format(
-                        "Cannot get the profile of player %s", context.getOwner()
-                ), e);
-            }
+    public void loadOfflinePlayer() {
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(context.getOwner());
+        try {
+            this.owner = NMSPlayerUtil.get().loadPlayer(offlinePlayer);
+        } catch (ReflectiveOperationException e) {
+            EnderContainers.getInstance().getLogger().log(Level.SEVERE, String.format(
+                    "Cannot get the profile of player %s", context.getOwner()
+            ), e);
         }
     }
 

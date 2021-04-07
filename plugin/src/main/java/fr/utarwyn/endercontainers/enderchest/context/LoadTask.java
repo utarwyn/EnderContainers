@@ -62,8 +62,11 @@ public class LoadTask implements Runnable {
         // This task can take a certain amount of time to be executed
         context.loadEnderchests(count);
 
-        // Schedule the callback and register the player context in memory
         this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, () -> {
+            // Load offline player profile in a synchronous way if needed
+            context.loadOfflinePlayerProfile();
+
+            // Register the player context in memory
             this.manager.registerPlayerContext(context);
             this.consumer.accept(context);
         });

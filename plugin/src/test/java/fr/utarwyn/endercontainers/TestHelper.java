@@ -41,6 +41,8 @@ import static org.mockito.Mockito.*;
  */
 public class TestHelper {
 
+    public static final UUID FAKE_OFFLINE_UUID = UUID.randomUUID();
+
     private static boolean serverReady = false;
 
     private static boolean filesReady = false;
@@ -65,6 +67,13 @@ public class TestHelper {
             lenient().when(server.getScheduler()).thenReturn(mock(BukkitScheduler.class));
             lenient().when(server.getPluginManager()).thenReturn(mock(PluginManager.class));
             lenient().when(server.getOfflinePlayer(anyString())).thenReturn(mock(OfflinePlayer.class));
+            lenient().when(server.getOfflinePlayer(FAKE_OFFLINE_UUID)).thenAnswer(a -> {
+                OfflinePlayer player = mock(OfflinePlayer.class);
+                lenient().when(player.getName()).thenReturn("FakePlayer");
+                lenient().when(player.getUniqueId()).thenReturn(FAKE_OFFLINE_UUID);
+                lenient().when(player.hasPlayedBefore()).thenReturn(true);
+                return player;
+            });
 
             TestHelper.mockSchedulers(server);
             TestHelper.mockInventoryObjects(server);
