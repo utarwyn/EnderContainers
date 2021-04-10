@@ -9,6 +9,7 @@ import fr.utarwyn.endercontainers.mock.ItemFactoryMock;
 import fr.utarwyn.endercontainers.mock.ItemMetaMock;
 import fr.utarwyn.endercontainers.mock.v1_15.ServerMock;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -233,6 +234,7 @@ public class TestHelper {
         lenient().when(player.canSee(any())).thenReturn(true);
         lenient().when(enderChest.getContents()).thenReturn(new ItemStack[0]);
         lenient().when(player.getEnderChest()).thenReturn(enderChest);
+        lenient().when(player.getTargetBlock(isNull(), anyInt())).thenReturn(mock(Block.class));
 
         lenient().when(Bukkit.getServer().getPlayer(playerIdentifier)).thenReturn(player);
         lenient().when(Bukkit.getServer().getPlayer("Utarwyn")).thenReturn(player);

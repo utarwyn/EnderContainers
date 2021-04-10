@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -66,6 +67,12 @@ public class HologramManagerTest {
             ((Consumer<PlayerContext>) answer.getArgument(1)).accept(this.context);
             return null;
         }).when(this.enderChestManager).loadPlayerContext(any(), any());
+    }
+
+    @After
+    public void tearDown() {
+        lenient().when(this.observer.getWorld().getName()).thenReturn("world");
+        lenient().when(this.observer.getTargetBlock(isNull(), anyInt())).thenReturn(mock(Block.class));
     }
 
     @Test
