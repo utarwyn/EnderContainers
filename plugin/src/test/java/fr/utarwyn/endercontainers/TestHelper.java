@@ -1,9 +1,9 @@
 package fr.utarwyn.endercontainers;
 
 import fr.utarwyn.endercontainers.compatibility.nms.NMSHologramUtil;
+import fr.utarwyn.endercontainers.configuration.ConfigLoadingException;
 import fr.utarwyn.endercontainers.configuration.Configuration;
 import fr.utarwyn.endercontainers.configuration.Files;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.mock.InventoryMock;
 import fr.utarwyn.endercontainers.mock.ItemFactoryMock;
 import fr.utarwyn.endercontainers.mock.ItemMetaMock;
@@ -26,8 +26,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -42,6 +44,10 @@ import static org.mockito.Mockito.*;
 public class TestHelper {
 
     public static final UUID FAKE_OFFLINE_UUID = UUID.randomUUID();
+
+    private static final String CONFIG_TEST_FILE = "/config.test.yml";
+
+    private static final String LOCALE_TEST_FILE = "/locales/en.yml";
 
     private static boolean serverReady = false;
 
@@ -94,16 +100,20 @@ public class TestHelper {
                 // Initialize the configuration object
                 EnderContainers plugin = TestHelper.getPlugin();
                 FileConfiguration config = new YamlConfiguration();
-                String localePath = TestHelper.class.getResource("/locale.yml").getPath();
+                URL configUrl = TestHelper.class.getResource(CONFIG_TEST_FILE);
 
-                config.load(new InputStreamReader(TestHelper.class.getResourceAsStream("/config.test.yml")));
+                config.load(new InputStreamReader(Objects.requireNonNull(configUrl).openStream()));
 
-                when(plugin.getConfig()).thenReturn(config);
-                when(plugin.getDataFolder()).thenReturn(new File(localePath).getParentFile());
+                lenient().when(plugin.getConfig()).thenReturn(config);
+                lenient().when(plugin.getDataFolder()).thenReturn(
+                        new File(Objects.requireNonNull(configUrl).getPath()).getParentFile()
+                );
+                lenient().when(plugin.getResource(LOCALE_TEST_FILE.substring(1))).thenAnswer(
+                        a -> TestHelper.class.getResourceAsStream(LOCALE_TEST_FILE)
+                );
 
-                Files.initConfiguration(plugin);
-                Files.initLocale(plugin);
-            } catch (IOException | YamlFileLoadException | InvalidConfigurationException e) {
+                Files.reload(plugin);
+            } catch (IOException | ConfigLoadingException | InvalidConfigurationException e) {
                 throw new TestInitializationException(e);
             }
 
@@ -177,6 +187,8 @@ public class TestHelper {
 
             lenient().when(plugin.getServer()).thenReturn(server);
             lenient().when(plugin.getDescription()).thenReturn(mock(PluginDescriptionFile.class));
+            lenient().when(plugin.getDescription().getVersion()).thenReturn("2.0.0");
+            lenient().when(plugin.getDescription().getAuthors()).thenReturn(Collections.singletonList("Utarwyn"));
             lenient().doReturn(server.getLogger()).when(plugin).getLogger();
             lenient().doAnswer(answer -> {
                 answer.getArgument(0, Runnable.class).run();

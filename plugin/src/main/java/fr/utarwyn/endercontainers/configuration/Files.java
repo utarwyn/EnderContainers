@@ -1,13 +1,12 @@
 package fr.utarwyn.endercontainers.configuration;
 
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.Plugin;
 
 /**
- * A file handler which create and contains
- * a single instance of all config files.
+ * Manages all configurations of the plugin.
+ * Currently handles messages and global configs.
  *
- * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public class Files {
@@ -48,31 +47,14 @@ public class Files {
     }
 
     /**
-     * Constructs a new configuration instance.
-     * If the instance exists, it does not create a new one.
+     * Initialize all configuration files that the plugin uses.
      *
      * @param plugin java plugin object
-     * @throws YamlFileLoadException thrown if the configuration file cannot be loaded
+     * @throws ConfigLoadingException thrown if one configuration file cannot be loaded
      */
-    public static void initConfiguration(JavaPlugin plugin) throws YamlFileLoadException {
-        if (configuration == null) {
-            configuration = new Configuration(plugin);
-            configuration.load();
-        }
-    }
-
-    /**
-     * Constructs a new locale instance.
-     * If the instance exists, it does not create a new one.
-     *
-     * @param plugin java plugin object
-     * @throws YamlFileLoadException thrown if the configuration file cannot be loaded
-     */
-    public static void initLocale(JavaPlugin plugin) throws YamlFileLoadException {
-        if (locale == null) {
-            locale = new Locale(plugin);
-            locale.load();
-        }
+    public static void reload(Plugin plugin) throws ConfigLoadingException {
+        configuration = new Configuration(plugin);
+        locale = new Locale(plugin, configuration.getLocale());
     }
 
 }

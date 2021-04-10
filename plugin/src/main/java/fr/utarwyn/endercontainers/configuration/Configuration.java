@@ -1,21 +1,17 @@
 package fr.utarwyn.endercontainers.configuration;
 
-import fr.utarwyn.endercontainers.configuration.wrapper.ConfigurableFileWrapper;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
- * Configuration class. Reflects the config.yml
+ * Handles main plugin configuration.
  *
  * @author Utarwyn
  * @since 2.0.0
  */
-public class Configuration extends ConfigurableFileWrapper {
+public class Configuration {
 
     /**
      * EnderContainers plugin instance
@@ -93,28 +89,11 @@ public class Configuration extends ConfigurableFileWrapper {
      * We don't have to provide a file object because its managed by Bukkit.
      *
      * @param plugin the Bukkit plugin
+     * @throws ConfigLoadingException thrown if cannot load configuration
      */
-    Configuration(JavaPlugin plugin) {
-        super(null);
+    Configuration(Plugin plugin) throws ConfigLoadingException {
         this.plugin = plugin;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected FileConfiguration createConfiguration(File file) {
-        this.plugin.saveDefaultConfig();
-        return this.plugin.getConfig();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void load() throws YamlFileLoadException {
-        this.plugin.reloadConfig();
-        super.load();
+        this.load();
     }
 
     public boolean isDebug() {
@@ -203,6 +182,39 @@ public class Configuration extends ConfigurableFileWrapper {
 
     public boolean isGlobalSound() {
         return this.globalSound;
+    }
+
+    /**
+     * Loads configuration in instance fields.
+     *
+     * @throws ConfigLoadingException thrown if cannot load one value from config
+     */
+    private void load() throws ConfigLoadingException {
+        this.plugin.saveDefaultConfig();
+        this.plugin.reloadConfig();
+
+        // Load every needed config value dynamically!
+        for (Field field : this.getClass().getDeclaredFields()) {
+            Configurable conf = field.getAnnotation(Configurable.class);
+            if (conf == null) continue;
+
+            // Getting the config key associated with the field
+            String configKey = (conf.key().isEmpty()) ? field.getName() : conf.key();
+            Object value = this.plugin.getConfig().get(configKey);
+
+            // Changing the value of the field
+            try {
+                field.setAccessible(true);
+                field.set(this, value);
+                field.setAccessible(false);
+            } catch (ReflectiveOperationException | IllegalArgumentException e) {
+                String configName = getClass().getSimpleName().toLowerCase();
+                throw new ConfigLoadingException(String.format(
+                        "Cannot set the config value %s of key %s for %s",
+                        value, configKey, configName
+                ), e);
+            }
+        }
     }
 
 }

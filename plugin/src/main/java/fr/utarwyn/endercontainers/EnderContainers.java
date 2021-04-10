@@ -3,8 +3,8 @@ package fr.utarwyn.endercontainers;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.command.CommandManager;
 import fr.utarwyn.endercontainers.compatibility.nms.NMSUtil;
+import fr.utarwyn.endercontainers.configuration.ConfigLoadingException;
 import fr.utarwyn.endercontainers.configuration.Files;
-import fr.utarwyn.endercontainers.configuration.wrapper.YamlFileLoadException;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
@@ -34,9 +34,8 @@ public class EnderContainers extends JavaPlugin {
     public void onEnable() {
         // Load config files
         try {
-            Files.initConfiguration(this);
-            Files.initLocale(this);
-        } catch (YamlFileLoadException e) {
+            Files.reload(this);
+        } catch (ConfigLoadingException e) {
             this.getLogger().log(Level.SEVERE,
                     "Cannot load plugin configuration or messages file", e);
             this.getPluginLoader().disablePlugin(this);

@@ -6,7 +6,8 @@ import fr.utarwyn.endercontainers.configuration.Configuration;
 /**
  * The MySQL database adapter.
  *
- * @author Utarwyn <maximemalgorn@gmail.com>
+ * @author Utarwyn
+ * @since 2.2.0
  */
 public class MySQLAdapter implements DatabaseAdapter {
 

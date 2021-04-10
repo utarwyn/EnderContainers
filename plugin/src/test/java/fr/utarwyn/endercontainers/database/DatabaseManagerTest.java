@@ -38,7 +38,6 @@ public class DatabaseManagerTest {
     @BeforeClass
     public static void setUpClass() throws TestInitializationException {
         TestHelper.overrideConfigurationValue("mysql", true);
-        TestHelper.setUpFiles();
     }
 
     @AfterClass

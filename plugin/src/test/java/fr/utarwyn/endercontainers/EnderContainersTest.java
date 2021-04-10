@@ -1,16 +1,10 @@
 package fr.utarwyn.endercontainers;
 
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.io.File;
-import java.util.Collections;
-import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -26,15 +20,12 @@ public class EnderContainersTest {
     }
 
     @Before
-    public void setUp() {
-        this.plugin = mock(EnderContainers.class, CALLS_REAL_METHODS);
-        when(this.plugin.getServer()).thenReturn(Bukkit.getServer());
-        when(this.plugin.getServer().getOnlinePlayers()).thenReturn(Collections.emptyList());
-        when(this.plugin.getLogger()).thenReturn(Logger.getGlobal());
-        when(this.plugin.getDescription()).thenReturn(mock(PluginDescriptionFile.class));
-        when(this.plugin.getDescription().getVersion()).thenReturn("0.0.0");
-        when(this.plugin.getDescription().getAuthors()).thenReturn(Collections.singletonList("Utarwyn"));
-        when(this.plugin.getDataFolder()).thenReturn(new File(TestHelper.class.getResource("/bStats").getPath()));
+    public void setUp() throws TestInitializationException {
+        this.plugin = TestHelper.getPlugin();
+        doCallRealMethod().when(this.plugin).onEnable();
+        doCallRealMethod().when(this.plugin).onDisable();
+        doCallRealMethod().when(this.plugin).executeTaskOnMainThread(any());
+        doCallRealMethod().when(this.plugin).executeTaskOnOtherThread(any());
     }
 
     @Test

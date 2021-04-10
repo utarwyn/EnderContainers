@@ -81,7 +81,8 @@ public class EnderChestListMenuTest {
 
     @Test
     public void title() {
-        assertThat(this.menu.getTitle()).isEqualTo("§6CHEST MAIN TITLE");
+        String playerName = TestHelper.getPlayer().getName();
+        assertThat(this.menu.getTitle()).isEqualTo("Enderchests of " + playerName);
     }
 
 }

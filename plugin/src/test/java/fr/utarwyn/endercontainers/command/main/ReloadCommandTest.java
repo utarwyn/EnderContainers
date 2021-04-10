@@ -4,7 +4,6 @@ import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.command.CommandTestHelper;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -14,7 +13,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -30,8 +28,8 @@ public class ReloadCommandTest extends CommandTestHelper<ReloadCommand> {
     }
 
     @Before
-    public void setUp() {
-        this.command = new ReloadCommand(mock(Plugin.class));
+    public void setUp() throws TestInitializationException {
+        this.command = new ReloadCommand(TestHelper.getPlugin());
         this.permission = "endercontainers.reload";
     }
 
