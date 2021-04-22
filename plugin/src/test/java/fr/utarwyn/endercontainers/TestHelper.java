@@ -17,6 +17,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -224,6 +225,7 @@ public class TestHelper {
         World world = mock(World.class);
         Player player = mock(Player.class);
         Inventory enderChest = mock(Inventory.class);
+        InventoryView openInventoryView = mock(InventoryView.class);
 
         lenient().when(world.getName()).thenReturn("world");
         lenient().when(player.getWorld()).thenReturn(world);
@@ -235,6 +237,8 @@ public class TestHelper {
         lenient().when(enderChest.getContents()).thenReturn(new ItemStack[0]);
         lenient().when(player.getEnderChest()).thenReturn(enderChest);
         lenient().when(player.getTargetBlock(isNull(), anyInt())).thenReturn(mock(Block.class));
+        lenient().when(openInventoryView.getTopInventory()).thenReturn(mock(Inventory.class));
+        lenient().when(player.getOpenInventory()).thenReturn(openInventoryView);
 
         lenient().when(Bukkit.getServer().getPlayer(playerIdentifier)).thenReturn(player);
         lenient().when(Bukkit.getServer().getPlayer("Utarwyn")).thenReturn(player);

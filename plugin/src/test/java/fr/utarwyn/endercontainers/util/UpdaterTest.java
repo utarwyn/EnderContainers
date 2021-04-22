@@ -6,6 +6,7 @@ import fr.utarwyn.endercontainers.TestInitializationException;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,6 +31,8 @@ public class UpdaterTest {
 
     private EnderContainers plugin;
 
+    private String initialVersion;
+
     @Mock
     private Player player;
 
@@ -44,6 +47,12 @@ public class UpdaterTest {
         this.plugin = TestHelper.getPlugin();
         TestHelper.setupManager(this.updater);
         this.updater.initialize();
+        this.initialVersion = this.plugin.getDescription().getVersion();
+    }
+
+    @After
+    public void tearDown() {
+        lenient().when(this.plugin.getDescription().getVersion()).thenReturn(this.initialVersion);
     }
 
     @Test
