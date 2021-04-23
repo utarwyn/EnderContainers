@@ -16,7 +16,7 @@
 
     <properties>
         <plotsquared.version>5.13.11</plotsquared.version>
-        <worldedit.version>7.2.3</worldedit.version>
+        <worldedit.version>7.2.5</worldedit.version>
         <prtree.version>1.7.0-SNAPSHOT</prtree.version>
     </properties>
 
