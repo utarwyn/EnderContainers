@@ -1,0 +1,82 @@
+# # # # # # # # # # # # # # # # # # # # # #
+#   EnderContainers french locale         #
+#   Version: 2.3.0-dev                    #
+#   An enderchests plugin by Utarwyn      #
+# # # # # # # # # # # # # # # # # # # # # #
+
+##                 ##
+#  Commands locale  #
+##                 ##
+commands:
+
+  backups:
+    created: '&aSauvegarde &b%backup%&a créée avec succès.'
+    creation_starting: 'Création de la sauvegarde en tâche de fond...'
+    exists: 'La sauvegarde &6%backup% &cexiste déjà. Choisissez un autre nom.'
+    info: '&6%command% &7pour avoir plus d''infos sur une sauvegarde.'
+    loaded: '&aSauvegarde &b%backup%&a chargée avec succès !'
+    loading_starting: 'Chargement de la sauvegarde en tâche de fond...'
+    removed: '&aLa sauvegarde &b%backup%&a a été correctement supprimée avec ses données.'
+    unknown: 'Sauvegarde &6%backup%&c non trouvée.'
+    zero: '&cAucune sauvegarde trouvée. Créez-en une première maintenant !'
+
+    label_name: 'Nom'
+    label_date: 'Date de création'
+    label_by: 'Créée par'
+    label_loadcmd: '&8Pour appliquer cette sauvegarde'
+    label_rmcmd: '&8Pour supprimer cette sauvegarde'
+
+  config_reloaded: 'Configuration rechargée avec succès !'
+  update: '&6EnderContainers &cn''est pas à jour ! Dernière version : &e%version%&c. Tapez &3ecp update &cdans la console et suivez les instructions.'
+  no_update: 'Le plugin est à jour ! Vous utilisez la version &e%version%&7.'
+
+
+##              ##
+#  Menus locale  #
+##              ##
+menus:
+
+  main_title: 'Enderchests de %player%'
+  chest_title: 'Enderchest %num% de %player%'
+  pane_title: 'Enderchest %num% %counter%'
+
+  chest_empty: '&2Cet enderchest est vide !'
+  chest_full: '&cInventaire plein !'
+  chest_locked: '&8&o>> Enderchest verrouillé !'
+
+  previous_page: '&c≪ Page précédente'
+  next_page: '&cPage suivante ≫'
+
+
+##               ##
+#  Errors locale  #
+##               ##
+errors:
+
+  noperm_open_chest: 'Impossible d''ouvrir cet enderchest !'
+  noperm_console: 'Vous devez être un joueur pour faire ça !'
+  noperm_player: 'Vous n''avez pas la permission de faire ça !'
+  player_not_found: 'Joueur &6%playername% &cnon trouvé.'
+  plugin_reload_error: 'Erreur lors du rechargement de la configuration ! Vérifiez le log serveur pour plus d''infos.'
+  plugin_world_disabled: 'Le plugin est désactivé dans ce monde.'
+  cmd_invalid_parameter: 'Le paramètre &6%param% &cn''est pas valide.'
+  cmd_wrong_argument_count: 'Nombre de paramètres invalide. &6/ecp help &cpour afficher l''aide du plugin.'
+
+
+##                     ##
+#  Dependencies locale  #
+##                     ##
+dependencies:
+
+  # Factions plugin
+  access_denied_factions: 'Vous ne pouvez pas ouvrir cet enderchest dans le territoire de %faction% !'
+  # PlotSquared Plugin
+  access_denied_plotsq: 'Vous ne pouvez pas ouvrir cet enderchest dans ce plot !'
+
+
+##                      ##
+#  Miscellaneous locale  #
+##                      ##
+miscellaneous:
+
+  chest_nametag: '&6&l%enderchests%/%maxenderchests%&r&e enderchest%plural% disponible%plural%'
