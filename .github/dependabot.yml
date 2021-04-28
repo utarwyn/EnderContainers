@@ -1,0 +1,17 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  reviewers:
+  - utarwyn
+  ignore:
+  - dependency-name: org.mockito:mockito-core
+    versions:
+    - "> 3.5.0, < 3.6"
+  - dependency-name: com.sk89q.worldedit:worldedit-bukkit
+    versions:
+    - 7.2.3
