@@ -13,17 +13,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '8', '11', '16' ]
+    name: Build with Java ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Set up JDK
-        uses: actions/setup-java@v1
+      - name: Setup Java
+        uses: actions/setup-java@v2
         with:
-          java-version: 11
-          server-id: github
-          settings-path: ${{ github.workspace }}
+          distribution: adopt
+          java-version: ${{ matrix.java }}
 
       - uses: actions/cache@v1
         with:
@@ -32,12 +35,37 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Build and analyze with SonarCloud
+      - name: Build for Java
+        run: mvn --batch-mode clean verify
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  quality:
+    runs-on: ubuntu-latest
+    name: Check code quality
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: adopt
+          java-version: 11
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Check code quality with Sonar
         run: >
           mvn --batch-mode
           -Pcoverage
-          clean verify
-          sonar:sonar
+          package sonar:sonar
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.organization=utarwyn-github
           -Dsonar.projectKey=fr.utarwyn:endercontainers
