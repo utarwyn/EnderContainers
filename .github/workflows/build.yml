@@ -65,7 +65,7 @@ jobs:
         run: >
           mvn --batch-mode
           -Pcoverage
-          package sonar:sonar
+          clean verify sonar:sonar
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.organization=utarwyn-github
           -Dsonar.projectKey=fr.utarwyn:endercontainers

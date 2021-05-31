@@ -17,6 +17,7 @@ public class EnderContainersTest {
     @BeforeClass
     public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
+        Managers.instances.clear();
     }
 
     @Before
