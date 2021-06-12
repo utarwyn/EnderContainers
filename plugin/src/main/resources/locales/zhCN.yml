@@ -69,7 +69,7 @@ errors:
 dependencies:
 
   # Factions plugin
-  access_denied_factions: '你无法在 %faction%' 的领地里使用末影箱!'
+  access_denied_factions: '你无法在 %faction% 的领地里使用末影箱!'
   # PlotSquared Plugin
   access_denied_plotsq: '你不能在这个地皮使用末影箱!'
 
