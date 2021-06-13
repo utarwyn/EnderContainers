@@ -1,12 +1,12 @@
-# # # # # # # # # # # # # # # # # # # # # #
-# EnderContainers traditional Chinese locale #
-# Version: 2.3.0-dev #
-# An enderchests plugin by Utarwyn #
-# # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # #
+# EnderContainers traditional Chinese locale  #
+# Version: 2.3.0-dev                          #
+# An enderchests plugin by Utarwyn            #
+# # # # # # # # # # # # # # # # # # # # # # # #
 
-## ##
+##               ##
 # Commands locale #
-## ##
+##               ##
 commands:
 
   backups:
@@ -31,9 +31,9 @@ commands:
   no_update: '插件已經是最新版本! 你的版本是 &e%version%&7.'
 
 
-## ##
+##            ##
 # Menus locale #
-## ##
+##            ##
 menus:
 
   main_title: '玩家 %player% 的終界箱'
@@ -48,9 +48,9 @@ menus:
   next_page: '&c下一頁 ≫'
 
 
-## ##
+##             ##
 # Errors locale #
-## ##
+##             ##
 errors:
 
   noperm_open_chest: '你不能打開這個終界箱!'
@@ -63,9 +63,9 @@ errors:
   cmd_wrong_argument_count: '參數數量有誤. 請使用 &6/ecp help &c來查閱如何使用插件!'
 
 
-## ##
+##                   ##
 # Dependencies locale #
-## ##
+##                   ##
 dependencies:
 
   # Factions plugin
@@ -74,9 +74,9 @@ dependencies:
   access_denied_plotsq: '你不能在這個地皮使用終界箱!'
 
 
-## ##
+##                    ##
 # Miscellaneous locale #
-## ##
+##                    ##
 miscellaneous:
 
   chest_nametag: '&e終界箱數量: &6&l%enderchests%/%maxenderchests%&r&e' 
