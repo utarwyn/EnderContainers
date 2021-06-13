@@ -1,0 +1,82 @@
+# # # # # # # # # # # # # # # # # # # # # #
+# EnderContainers traditional Chinese locale #
+# Version: 2.3.0-dev #
+# An enderchests plugin by Utarwyn #
+# # # # # # # # # # # # # # # # # # # # # #
+
+## ##
+# Commands locale #
+## ##
+commands:
+
+  backups:
+    created: '&a成功創建備份 &b%backup%&a.'
+    creation_starting: '開始在後台創建備份...'
+    exists: '備份 &6%backup% &c已經存在, 請選擇一個不同的名稱.'
+    info: '&7使用 &6%command% &7來查詢關於備份更多的信息.'
+    loaded: '&a恭喜! 成功加載備份 &b%backup%&a!'
+    loading_starting: '開始在後台加載備份...'
+    removed: '&a備份 &b%backup%&a 已被刪除.'
+    unknown: '備份 &6%backup%&c 不存在.'
+    zero: '&c找不到任何備份. 立刻創建一個新備份!'
+
+    label_name: '名稱'
+    label_date: '創建時間'
+    label_by: '創建者'
+    label_loadcmd: '&8加載這個備份'
+    label_rmcmd: '&8刪除這個備份'
+
+  config_reloaded: '配置重載完成!'
+  update: '&6EnderContainers &c不是最新版的! 最新版本: &e%version%&c. 在後台輸入 &3ecp update &c並根據提示進行更新.'
+  no_update: '插件已經是最新版本! 你的版本是 &e%version%&7.'
+
+
+## ##
+# Menus locale #
+## ##
+menus:
+
+  main_title: '玩家 %player% 的終界箱'
+  chest_title: '玩家 %player% 的第 %num% 個終界箱'
+  pane_title: '終界箱 %num% %counter%'
+
+  chest_empty: '&2這個終界箱是空的!'
+  chest_full: '&c這個終界箱滿了!'
+  chest_locked: '&8&o>> 終界箱被鎖上了!'
+
+  previous_page: '&c≪ 上一頁'
+  next_page: '&c下一頁 ≫'
+
+
+## ##
+# Errors locale #
+## ##
+errors:
+
+  noperm_open_chest: '你不能打開這個終界箱!'
+  noperm_console: '請勿在後台這樣做!'
+  noperm_player: '你沒有權限這樣做!'
+  player_not_found: '玩家 &6%playername% &c不存在.'
+  plugin_reload_error: '重載配置時發生錯誤! 詳細情況請查看後台日誌.'
+  plugin_world_disabled: '在這個世界不能使用插件.'
+  cmd_invalid_parameter: '參數 &6%param% &c不合法.'
+  cmd_wrong_argument_count: '參數數量有誤. 請使用 &6/ecp help &c來查閱如何使用插件!'
+
+
+## ##
+# Dependencies locale #
+## ##
+dependencies:
+
+  # Factions plugin
+  access_denied_factions: '你無法在 %faction% 的領地裡使用終界箱!'
+  # PlotSquared Plugin
+  access_denied_plotsq: '你不能在這個地皮使用終界箱!'
+
+
+## ##
+# Miscellaneous locale #
+## ##
+miscellaneous:
+
+  chest_nametag: '&e終界箱數量: &6&l%enderchests%/%maxenderchests%&r&e' 
