@@ -6,7 +6,7 @@ pipeline {
     }
     options {
         buildDiscarder logRotator(
-                numToKeepStr: '10'
+                numToKeepStr: env.BRANCH_NAME ==~ /next|master/ ? '10' : ''
         )
     }
     stages {
