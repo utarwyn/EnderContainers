@@ -42,11 +42,11 @@ public class NMSPlayerUtil extends NMSUtil {
      * @throws ReflectiveOperationException thrown if cannot instanciate NMS objects
      */
     private NMSPlayerUtil() throws ReflectiveOperationException {
-        Class<?> entityPlayerClass = getNMSClass("EntityPlayer");
-        Class<?> minecraftServerClass = getNMSClass("MinecraftServer");
+        Class<?> entityPlayerClass = getNMSClass("EntityPlayer", "server.level");
+        Class<?> minecraftServerClass = getNMSClass("MinecraftServer", "server");
         Class<?> gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
-        Class<?> worldServerClass = getNMSClass("WorldServer");
-        Class<?> playerInteractManagerClass = getNMSClass("PlayerInteractManager");
+        Class<?> worldServerClass = getNMSClass("WorldServer", "server.level");
+        Class<?> playerInteractManagerClass = getNMSClass("PlayerInteractManager", "server.level");
 
         gameProfileContructor = gameProfileClass.getDeclaredConstructor(UUID.class, String.class);
         entityPlayerConstructor = entityPlayerClass.getDeclaredConstructor(
@@ -61,7 +61,7 @@ public class NMSPlayerUtil extends NMSUtil {
             if (ServerVersion.isNewerThan(ServerVersion.V1_15)) {
                 worldServer = getWorldServer116(minecraftServer);
             } else {
-                Class<?> dimensionManagerClass = getNMSClass("DimensionManager");
+                Class<?> dimensionManagerClass = getNMSClass("DimensionManager", "world.level.dimension");
                 Object dimension = dimensionManagerClass.getDeclaredField("OVERWORLD").get(null);
                 Method method = minecraftServerClass.getMethod(GET_WORLD_SERVER_METHOD, dimensionManagerClass);
                 worldServer = method.invoke(minecraftServer, dimension);
@@ -69,7 +69,7 @@ public class NMSPlayerUtil extends NMSUtil {
 
             playerInteractManager = playerInteractManagerClass.getDeclaredConstructor(worldServerClass).newInstance(worldServer);
         } else {
-            Class<?> worldClass = getNMSClass("World");
+            Class<?> worldClass = getNMSClass("World", "world.level");
             Method method = minecraftServerClass.getMethod(GET_WORLD_SERVER_METHOD, int.class);
 
             worldServer = method.invoke(minecraftServer, 0);
@@ -114,9 +114,9 @@ public class NMSPlayerUtil extends NMSUtil {
     }
 
     private Object getWorldServer116(Object minecraftServer) throws ReflectiveOperationException {
-        Class<?> minecraftServerClass = getNMSClass("MinecraftServer");
-        Class<?> genericResourceKey = getNMSClass("ResourceKey");
-        Class<?> minecraftKey = getNMSClass("MinecraftKey");
+        Class<?> minecraftServerClass = getNMSClass("MinecraftServer", "server");
+        Class<?> genericResourceKey = getNMSClass("ResourceKey", "resources");
+        Class<?> minecraftKey = getNMSClass("MinecraftKey", "resources");
 
         Method constructResourceKey = genericResourceKey.getDeclaredMethod("a", minecraftKey, minecraftKey);
         constructResourceKey.setAccessible(true);
