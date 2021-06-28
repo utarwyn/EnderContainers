@@ -6,7 +6,9 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 /**
  * This class is used to perform reflection things
@@ -48,11 +50,6 @@ public class NMSHologramUtil extends NMSUtil {
     private final Class<?> chatBaseComponentClass;
 
     /**
-     * EntityTypes class for 1.14+ holograms
-     */
-    private final Class<?> entityTypesClass;
-
-    /**
      * Constructor of the ArmorStand class
      */
     private final Constructor<?> armorStandConstructor;
@@ -73,25 +70,44 @@ public class NMSHologramUtil extends NMSUtil {
     private final Constructor<?> destroyPacketConstructor;
 
     /**
+     * EntityTypes invokation method for 1.14+ holograms
+     */
+    private final Method entityTypesInvokationMethod;
+
+    /**
+     * Field with a playerConnection
+     */
+    private final Field playerConnectionField;
+
+    /**
      * Utility class.
      */
     private NMSHologramUtil() throws ReflectiveOperationException {
-        Class<?> worldClass = getNMSClass("World");
-        Class<?> armorStandClass = getNMSClass("EntityArmorStand");
-        Class<?> destroyPacketClass = getNMSClass("PacketPlayOutEntityDestroy");
-        Class<?> spawnPacketClass = getNMSClass("PacketPlayOutSpawnEntityLiving");
+        Class<?> worldClass = getNMSClass("World", "world.level");
+        Class<?> armorStandClass = getNMSClass("EntityArmorStand", "world.entity.decoration");
+        Class<?> entityPlayerClass = getNMSClass("EntityPlayer", "server.level");
+        Class<?> destroyPacketClass = getNMSClass("PacketPlayOutEntityDestroy", "network.protocol.game");
+        Class<?> spawnPacketClass = getNMSClass("PacketPlayOutSpawnEntityLiving", "network.protocol.game");
 
-        this.packetClass = getNMSClass("Packet");
-        this.entityClass = getNMSClass("Entity");
+        this.packetClass = getNMSClass("Packet", "network.protocol");
+        this.entityClass = getNMSClass("Entity", "world.entity");
         this.craftWorldClass = getCraftbukkitClass("CraftWorld");
 
-        this.spawnPacketConstructor = spawnPacketClass.getConstructor(getNMSClass("EntityLiving"));
-        this.destroyPacketConstructor = destroyPacketClass.getConstructor(int[].class);
+        this.spawnPacketConstructor = spawnPacketClass.getConstructor(getNMSClass("EntityLiving", "world.entity"));
+
+        // 1.17+ :: only one int passed through packet constructor
+        if (ServerVersion.isNewerThan(ServerVersion.V1_16)) {
+            this.destroyPacketConstructor = destroyPacketClass.getConstructor(int.class);
+            this.playerConnectionField = entityPlayerClass.getField("b");
+        } else {
+            this.destroyPacketConstructor = destroyPacketClass.getConstructor(int[].class);
+            this.playerConnectionField = entityPlayerClass.getField("playerConnection");
+        }
 
         // 1.13+ :: text to display needed to be converted to a IChatBaseComponent component
         if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
             this.chatMessageClass = getCraftbukkitClass("util.CraftChatMessage");
-            this.chatBaseComponentClass = getNMSClass("IChatBaseComponent");
+            this.chatBaseComponentClass = getNMSClass("IChatBaseComponent", "network.chat");
         } else {
             this.chatMessageClass = null;
             this.chatBaseComponentClass = null;
@@ -99,17 +115,18 @@ public class NMSHologramUtil extends NMSUtil {
 
         // 1.14+ :: the living entity constructor must be called with the entity type
         if (ServerVersion.isNewerThan(ServerVersion.V1_13)) {
-            this.entityTypesClass = getNMSClass("EntityTypes");
+            Class<?> entityTypesClass = getNMSClass("EntityTypes", "world.entity");
+            this.entityTypesInvokationMethod = entityTypesClass.getMethod("a", String.class);
             this.armorStandConstructor = armorStandClass.getConstructor(entityTypesClass, worldClass);
         } else {
-            this.entityTypesClass = null;
+            this.entityTypesInvokationMethod = null;
             this.armorStandConstructor = armorStandClass.getConstructor(worldClass);
         }
 
         // 1.15+ :: entity metadatas have to be sent in separate packet
         if (ServerVersion.isNewerThan(ServerVersion.V1_14)) {
-            Class<?> packetMetadataClass = getNMSClass("PacketPlayOutEntityMetadata");
-            Class<?> dataWatcherClass = getNMSClass("DataWatcher");
+            Class<?> packetMetadataClass = getNMSClass("PacketPlayOutEntityMetadata", "network.protocol.game");
+            Class<?> dataWatcherClass = getNMSClass("DataWatcher", "network.syncher");
             this.metadataPacketConstructor = packetMetadataClass.getConstructor(int.class, dataWatcherClass, boolean.class);
         } else {
             this.metadataPacketConstructor = null;
@@ -166,7 +183,15 @@ public class NMSHologramUtil extends NMSUtil {
      * @throws ReflectiveOperationException error with reflection
      */
     public void destroyEntity(int entityId, Player observer) throws ReflectiveOperationException {
-        this.sendPacket(observer, this.destroyPacketConstructor.newInstance(new int[]{entityId}));
+        Object packet;
+
+        if (ServerVersion.isNewerThan(ServerVersion.V1_16)) {
+            packet = this.destroyPacketConstructor.newInstance(entityId);
+        } else {
+            packet = this.destroyPacketConstructor.newInstance(new int[]{entityId});
+        }
+
+        this.sendPacket(observer, packet);
     }
 
     /**
@@ -179,7 +204,7 @@ public class NMSHologramUtil extends NMSUtil {
     private void sendPacket(Player player, Object packet) throws ReflectiveOperationException {
         Method getHandle = player.getClass().getMethod("getHandle");
         Object entityPlayer = getHandle.invoke(player);
-        Object pConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
+        Object pConnection = this.playerConnectionField.get(entityPlayer);
         Method sendMethod = pConnection.getClass().getMethod("sendPacket", this.packetClass);
 
         sendMethod.invoke(pConnection, packet);
@@ -204,8 +229,10 @@ public class NMSHologramUtil extends NMSUtil {
 
         // In 1.14+ versions, we need to specify a type to create an instance of an ArmorStand.
         if (ServerVersion.isNewerThan(ServerVersion.V1_13)) {
-            Object armorStandType = this.entityTypesClass.getField("ARMOR_STAND").get(null);
-            entityObject = this.armorStandConstructor.newInstance(armorStandType, getHandleMethod.invoke(craftWorldObj));
+            Optional<Object> armorStandType = (Optional<Object>) this.entityTypesInvokationMethod.invoke(null, "armor_stand");
+            entityObject = this.armorStandConstructor.newInstance(
+                    armorStandType.orElseThrow(() -> new NullPointerException("ArmorStand entity type not found")), getHandleMethod.invoke(craftWorldObj)
+            );
         } else {
             entityObject = this.armorStandConstructor.newInstance(getHandleMethod.invoke(craftWorldObj));
         }

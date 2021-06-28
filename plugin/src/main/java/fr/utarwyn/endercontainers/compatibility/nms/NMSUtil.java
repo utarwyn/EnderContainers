@@ -13,9 +13,14 @@ import java.lang.reflect.Field;
 public abstract class NMSUtil {
 
     /**
-     * Package where NMS classes are stored
+     * Package where NMS classes are stored. Used before 1.17
      */
     private static final String NMS_PACKAGE;
+
+    /**
+     * Package where Minecraft classes are stored. Used in 1.17+
+     */
+    private static final String MC_PACKAGE;
 
     /**
      * Package where Craftbukkit classes are stored
@@ -29,8 +34,11 @@ public abstract class NMSUtil {
 
     static {
         String version = ServerVersion.getBukkitVersion();
-        NMS_PACKAGE = "net.minecraft.server." + version;
-        CRAFTBUKKIT_PACKAGE = "org.bukkit.craftbukkit." + version;
+
+        // Using remapped source code of Minecraft server? 1.17+
+        MC_PACKAGE = ServerVersion.isNewerThan(ServerVersion.V1_16) ? "net.minecraft." : null;
+        NMS_PACKAGE = "net.minecraft.server." + version + ".";
+        CRAFTBUKKIT_PACKAGE = "org.bukkit.craftbukkit." + version + ".";
 
         try {
             Class<?> asyncCatcher = Class.forName("org.spigotmc.AsyncCatcher");
@@ -56,19 +64,20 @@ public abstract class NMSUtil {
      */
     protected static Class<?> getCraftbukkitClass(String className)
             throws ClassNotFoundException {
-        return Class.forName(CRAFTBUKKIT_PACKAGE + "." + className);
+        return Class.forName(CRAFTBUKKIT_PACKAGE + className);
     }
 
     /**
      * Get an internal net Minecraft Server class.
      *
-     * @param className name of the class to get
+     * @param className   name of the class
+     * @param package1_17 name of the package to prefix before, for 1.17+
      * @return the internal class found by the name
      * @throws ClassNotFoundException thrown if the class is not found
      */
-    protected static Class<?> getNMSClass(String className)
+    protected static Class<?> getNMSClass(String className, String package1_17)
             throws ClassNotFoundException {
-        return Class.forName(NMS_PACKAGE + "." + className);
+        return Class.forName((MC_PACKAGE != null ? MC_PACKAGE + package1_17 + "." : NMS_PACKAGE) + className);
     }
 
     /**
