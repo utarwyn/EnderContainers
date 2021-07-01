@@ -15,7 +15,7 @@
     <name>EnderContainers Dependency Worldguard7</name>
 
     <properties>
-        <worldguard.version>7.0.4</worldguard.version>
+        <worldguard.version>7.0.5</worldguard.version>
     </properties>
 
     <repositories>
