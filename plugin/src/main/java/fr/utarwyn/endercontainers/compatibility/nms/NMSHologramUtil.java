@@ -67,7 +67,12 @@ public class NMSHologramUtil extends NMSUtil {
     /**
      * Constructor for the destroy packet
      */
-    private final Constructor<?> destroyPacketConstructor;
+    private Constructor<?> destroyPacketConstructor;
+
+    /**
+     * Stores if constructor for the destroy packet uses only one parameter
+     */
+    private boolean destroyPacketConstructorOneInt;
 
     /**
      * EntityTypes invokation method for 1.14+ holograms
@@ -95,12 +100,19 @@ public class NMSHologramUtil extends NMSUtil {
 
         this.spawnPacketConstructor = spawnPacketClass.getConstructor(getNMSClass("EntityLiving", "world.entity"));
 
-        // 1.17+ :: only one int passed through packet constructor
-        if (ServerVersion.isNewerThan(ServerVersion.V1_16)) {
+        // 1.17+ :: try to use only one int in packet constructor parameters
+        try {
+            this.destroyPacketConstructor = destroyPacketClass.getConstructor(int[].class);
+            this.destroyPacketConstructorOneInt = false;
+        } catch (NoSuchMethodException ignored) {
             this.destroyPacketConstructor = destroyPacketClass.getConstructor(int.class);
+            this.destroyPacketConstructorOneInt = true;
+        }
+
+        // 1.17+ :: New way of retrieving player connection instance
+        if (ServerVersion.isNewerThan(ServerVersion.V1_16)) {
             this.playerConnectionField = entityPlayerClass.getField("b");
         } else {
-            this.destroyPacketConstructor = destroyPacketClass.getConstructor(int[].class);
             this.playerConnectionField = entityPlayerClass.getField("playerConnection");
         }
 
@@ -185,7 +197,7 @@ public class NMSHologramUtil extends NMSUtil {
     public void destroyEntity(int entityId, Player observer) throws ReflectiveOperationException {
         Object packet;
 
-        if (ServerVersion.isNewerThan(ServerVersion.V1_16)) {
+        if (this.destroyPacketConstructorOneInt) {
             packet = this.destroyPacketConstructor.newInstance(entityId);
         } else {
             packet = this.destroyPacketConstructor.newInstance(new int[]{entityId});
