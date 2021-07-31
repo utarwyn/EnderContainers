@@ -97,7 +97,6 @@ public class HologramManagerTest {
         verify(this.dependenciesManager).validateBlockChestOpening(this.targetedBlock, this.observer);
         verify(this.enderChestManager).loadPlayerContext(eq(this.observer.getUniqueId()), any(Consumer.class));
         assertThat(this.manager.holograms).isNotEmpty().hasSize(1);
-        assertThat(this.manager.loadingPlayers).isEmpty();
     }
 
     @Test
@@ -113,18 +112,6 @@ public class HologramManagerTest {
     public void disabledWorld() {
         when(this.observer.getWorld().getName()).thenReturn("disabled");
         this.manager.load();
-        assertThat(this.manager.holograms).isEmpty();
-    }
-
-    @Test
-    public void disabledIfContextLoading() {
-        assertThat(this.manager.loadingPlayers).isNull();
-        this.manager.load();
-
-        this.manager.holograms.clear();
-        this.manager.loadingPlayers.add(this.observer.getUniqueId());
-        this.manager.run();
-
         assertThat(this.manager.holograms).isEmpty();
     }
 

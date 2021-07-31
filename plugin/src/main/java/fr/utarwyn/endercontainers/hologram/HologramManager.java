@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -32,29 +31,21 @@ import java.util.logging.Level;
 public class HologramManager extends AbstractManager implements Runnable {
 
     /**
-     * The enderchest manager
-     */
-    private EnderChestManager chestManager;
-
-    /**
-     * The dependencies manager
-     */
-    private DependenciesManager dependenciesManager;
-
-    /**
      * All stored holograms by owner
      */
     ConcurrentMap<UUID, Hologram> holograms;
-
-    /**
-     * Collection of player identifiers which are waiting for context loading
-     */
-    Set<UUID> loadingPlayers;
-
     /**
      * The BukkitTask object which manage the spawning/dispawning of holograms
      */
     BukkitTask task;
+    /**
+     * The enderchest manager
+     */
+    private EnderChestManager chestManager;
+    /**
+     * The dependencies manager
+     */
+    private DependenciesManager dependenciesManager;
 
     /**
      * Generate a title with custom data for a block nametag.
@@ -79,7 +70,6 @@ public class HologramManager extends AbstractManager implements Runnable {
         this.chestManager = Managers.get(EnderChestManager.class);
         this.dependenciesManager = Managers.get(DependenciesManager.class);
         this.holograms = new ConcurrentHashMap<>();
-        this.loadingPlayers = ConcurrentHashMap.newKeySet();
 
         // Start the task only if the block nametag is enabled
         if (Files.getConfiguration().isBlockNametag()) {
@@ -127,18 +117,15 @@ public class HologramManager extends AbstractManager implements Runnable {
         Block block = player.getTargetBlock(null, 6);
 
         if (Material.ENDER_CHEST.equals(block.getType())) {
-            if (!this.holograms.containsKey(uuid) && !this.loadingPlayers.contains(uuid)) {
+            if (!this.holograms.containsKey(uuid)) {
                 try {
                     this.dependenciesManager.validateBlockChestOpening(block, player);
                 } catch (BlockChestOpeningException ignored) {
                     return;
                 }
 
-                this.loadingPlayers.add(uuid);
-                this.chestManager.loadPlayerContext(player.getUniqueId(), context -> {
-                    this.loadingPlayers.remove(uuid);
-                    this.spawnHologram(context, player, block);
-                });
+                this.chestManager.loadPlayerContext(player.getUniqueId(),
+                        context -> this.spawnHologram(context, player, block));
             }
         } else if (this.holograms.containsKey(uuid)) {
             this.destroyHologram(this.holograms.remove(uuid));
