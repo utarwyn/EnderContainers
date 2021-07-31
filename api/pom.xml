@@ -6,7 +6,7 @@
     <parent>
         <groupId>fr.utarwyn</groupId>
         <artifactId>endercontainers</artifactId>
-        <version>2.2.1</version>
+        <version>2.2.2</version>
     </parent>
 
     <artifactId>endercontainers-api</artifactId>
