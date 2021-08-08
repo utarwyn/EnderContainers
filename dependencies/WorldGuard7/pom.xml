@@ -37,5 +37,17 @@
             <version>${worldguard.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.papermc</groupId>
+            <artifactId>paperlib</artifactId>
+            <version>1.0.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>1.8</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
