@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -29,6 +30,11 @@ public class EnderChestManager extends AbstractManager {
     Map<UUID, PlayerContext> contextMap;
 
     /**
+     * Collection of player identifiers which are waiting for context loading
+     */
+    Set<UUID> loadingContexts;
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -42,6 +48,7 @@ public class EnderChestManager extends AbstractManager {
     @Override
     public synchronized void load() {
         this.contextMap = new ConcurrentHashMap<>();
+        this.loadingContexts = ConcurrentHashMap.newKeySet();
     }
 
     /**
@@ -53,6 +60,7 @@ public class EnderChestManager extends AbstractManager {
         this.plugin.executeTaskOnMainThread(() -> Managers.get(InventoryManager.class).closeAll());
 
         // Save and unload all data
+        this.loadingContexts.clear();
         this.contextMap.values().forEach(PlayerContext::save);
         this.contextMap.clear();
     }
@@ -98,28 +106,33 @@ public class EnderChestManager extends AbstractManager {
     }
 
     /**
-     * Load all chests and data of a player asynchronously if needed
-     * and call a method when this work is done.
+     * Loads data context of a player asynchronously if needed and consume it when done.
+     * Uses a temporary collection to avoid duplication loading.
      *
      * @param owner    player for which the method has to load context
      * @param consumer method consumed at the end of the task
      */
     public void loadPlayerContext(UUID owner, Consumer<PlayerContext> consumer) {
-        if (!this.contextMap.containsKey(owner)) {
-            this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin,
-                    new LoadTask(this.plugin, this, owner, consumer));
-        } else {
-            consumer.accept(this.contextMap.get(owner));
+        if (!this.loadingContexts.contains(owner)) {
+            if (this.contextMap.containsKey(owner)) {
+                consumer.accept(this.contextMap.get(owner));
+            } else {
+                this.loadingContexts.add(owner);
+                this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin,
+                        new LoadTask(this.plugin, this, owner, consumer));
+            }
         }
     }
 
     /**
-     * Register a context of loaded enderchests for a specific player.
+     * Registers a context of loaded enderchests for a specific player.
+     * Also unsets context from loading state.
      *
      * @param context context to register
      */
     public void registerPlayerContext(PlayerContext context) {
         this.contextMap.put(context.getOwner(), context);
+        this.loadingContexts.remove(context.getOwner());
     }
 
     /**

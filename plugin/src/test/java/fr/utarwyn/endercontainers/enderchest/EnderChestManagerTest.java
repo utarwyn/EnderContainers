@@ -129,9 +129,32 @@ public class EnderChestManagerTest {
 
         TestHelper.setupManager(this.manager);
 
+        // Check before state
+        this.manager.loadingContexts.add(uuid);
         assertThat(this.manager.contextMap).isEmpty();
+
         this.registerPlayerContext(uuid);
+
+        // Check after state
         assertThat(this.manager.contextMap).isNotEmpty().containsOnlyKeys(uuid);
+        assertThat(this.manager.loadingContexts).isEmpty();
+    }
+
+    @Test
+    public void noDuplicateIfContextLoadingIsLong() throws TestInitializationException {
+        UUID uuid = UUID.randomUUID();
+        PlayerContext playerContext = mock(PlayerContext.class);
+        Consumer<PlayerContext> consumer = mock(Consumer.class);
+
+        TestHelper.setupManager(this.manager);
+
+        this.manager.contextMap.put(uuid, playerContext);
+        this.manager.loadingContexts.add(uuid);
+        this.manager.loadPlayerContext(uuid, consumer);
+
+        // Consumer should be never called due to loading state
+        assertThat(this.manager.loadingContexts).contains(uuid);
+        verify(consumer, never()).accept(playerContext);
     }
 
     @Test

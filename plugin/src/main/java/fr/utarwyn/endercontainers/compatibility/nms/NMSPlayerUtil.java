@@ -34,7 +34,7 @@ public class NMSPlayerUtil extends NMSUtil {
 
     private final Object worldServer;
 
-    private final Object playerInteractManager;
+    private Object playerInteractManager;
 
     /**
      * Constructs the utility class.
@@ -46,34 +46,26 @@ public class NMSPlayerUtil extends NMSUtil {
         Class<?> minecraftServerClass = getNMSClass("MinecraftServer", "server");
         Class<?> gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
         Class<?> worldServerClass = getNMSClass("WorldServer", "server.level");
-        Class<?> playerInteractManagerClass = getNMSClass("PlayerInteractManager", "server.level");
 
         gameProfileContructor = gameProfileClass.getDeclaredConstructor(UUID.class, String.class);
-        entityPlayerConstructor = entityPlayerClass.getDeclaredConstructor(
-                minecraftServerClass, worldServerClass,
-                gameProfileClass, playerInteractManagerClass
-        );
         minecraftServer = minecraftServerClass.getMethod("getServer").invoke(null);
         getBukkitEntityMethod = entityPlayerClass.getDeclaredMethod("getBukkitEntity");
+        worldServer = this.prepareWorldServer(minecraftServerClass);
 
-        // Prepare a PlayerInteractManager
-        if (ServerVersion.isNewerThan(ServerVersion.V1_8)) {
-            if (ServerVersion.isNewerThan(ServerVersion.V1_15)) {
-                worldServer = getWorldServer116(minecraftServer);
-            } else {
-                Class<?> dimensionManagerClass = getNMSClass("DimensionManager", "world.level.dimension");
-                Object dimension = dimensionManagerClass.getDeclaredField("OVERWORLD").get(null);
-                Method method = minecraftServerClass.getMethod(GET_WORLD_SERVER_METHOD, dimensionManagerClass);
-                worldServer = method.invoke(minecraftServer, dimension);
-            }
-
-            playerInteractManager = playerInteractManagerClass.getDeclaredConstructor(worldServerClass).newInstance(worldServer);
+        // 1.17+ :: we do not have to pass PlayerInteractManager to entity player constructor
+        if (ServerVersion.isNewerThan(ServerVersion.V1_16)) {
+            entityPlayerConstructor = entityPlayerClass.getDeclaredConstructor(
+                    minecraftServerClass, worldServerClass, gameProfileClass
+            );
         } else {
-            Class<?> worldClass = getNMSClass("World", "world.level");
-            Method method = minecraftServerClass.getMethod(GET_WORLD_SERVER_METHOD, int.class);
+            Class<?> playerInteractManagerClass = getNMSClass("PlayerInteractManager", "server.level");
+            entityPlayerConstructor = entityPlayerClass.getDeclaredConstructor(
+                    minecraftServerClass, worldServerClass,
+                    gameProfileClass, playerInteractManagerClass
+            );
 
-            worldServer = method.invoke(minecraftServer, 0);
-            playerInteractManager = playerInteractManagerClass.getDeclaredConstructor(worldClass).newInstance(worldServer);
+            // Prepare the PlayerInteractManager
+            playerInteractManager = this.preparePlayerInteractManager(worldServerClass, playerInteractManagerClass);
         }
     }
 
@@ -103,7 +95,15 @@ public class NMSPlayerUtil extends NMSUtil {
         }
 
         Object gameProfile = gameProfileContructor.newInstance(offline.getUniqueId(), offline.getName());
-        Object entityPlayer = entityPlayerConstructor.newInstance(minecraftServer, worldServer, gameProfile, playerInteractManager);
+        Object entityPlayer;
+
+        // 1.17+ :: we do not have to pass PlayerInteractManager to entity player constructor
+        if (playerInteractManager == null) {
+            entityPlayer = entityPlayerConstructor.newInstance(minecraftServer, worldServer, gameProfile);
+        } else {
+            entityPlayer = entityPlayerConstructor.newInstance(minecraftServer, worldServer, gameProfile, playerInteractManager);
+        }
+
         Player player = (Player) getBukkitEntityMethod.invoke(entityPlayer);
 
         if (player != null) {
@@ -129,6 +129,39 @@ public class NMSPlayerUtil extends NMSUtil {
 
         Method getWorldServer = minecraftServerClass.getDeclaredMethod(GET_WORLD_SERVER_METHOD, genericResourceKey);
         return getWorldServer.invoke(minecraftServer, resourceKey);
+    }
+
+    private Object prepareWorldServer(Class<?> minecraftServerClass) throws ReflectiveOperationException {
+        Object server;
+        if (ServerVersion.isNewerThan(ServerVersion.V1_8)) {
+            if (ServerVersion.isNewerThan(ServerVersion.V1_15)) {
+                server = getWorldServer116(minecraftServer);
+            } else {
+                Class<?> dimensionManagerClass = getNMSClass("DimensionManager", null);
+                Object dimension = dimensionManagerClass.getDeclaredField("OVERWORLD").get(null);
+                Method method = minecraftServerClass.getMethod(GET_WORLD_SERVER_METHOD, dimensionManagerClass);
+                server = method.invoke(minecraftServer, dimension);
+            }
+        } else {
+            Method method = minecraftServerClass.getMethod(GET_WORLD_SERVER_METHOD, int.class);
+            server = method.invoke(minecraftServer, 0);
+        }
+
+        return server;
+    }
+
+    private Object preparePlayerInteractManager(
+            Class<?> worldServerClass, Class<?> playerInteractManagerClass
+    ) throws ReflectiveOperationException {
+        Object manager;
+        if (ServerVersion.isNewerThan(ServerVersion.V1_8)) {
+            manager = playerInteractManagerClass.getDeclaredConstructor(worldServerClass).newInstance(worldServer);
+        } else {
+            Class<?> worldClass = getNMSClass("World", null);
+            manager = playerInteractManagerClass.getDeclaredConstructor(worldClass).newInstance(worldServer);
+        }
+
+        return manager;
     }
 
 }
