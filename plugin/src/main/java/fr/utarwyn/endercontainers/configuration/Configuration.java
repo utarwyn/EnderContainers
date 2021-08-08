@@ -39,6 +39,9 @@ public class Configuration {
     @Configurable(key = "enderchests.useVanillaEnderchest")
     private boolean useVanillaEnderchest;
 
+    @Configurable(key = "enderchests.numberingEnderchests")
+    private boolean numberingEnderchests;
+
     @Configurable(key = "mysql.enabled")
     private boolean mysql;
 
@@ -122,6 +125,10 @@ public class Configuration {
 
     public boolean isUseVanillaEnderchest() {
         return this.useVanillaEnderchest;
+    }
+
+    public boolean isNumberingEnderchests() {
+        return this.numberingEnderchests;
     }
 
     public boolean isMysql() {

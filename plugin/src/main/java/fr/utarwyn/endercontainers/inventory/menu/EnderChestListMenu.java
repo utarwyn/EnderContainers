@@ -194,13 +194,14 @@ public class EnderChestListMenu extends AbstractInventoryHolder {
      */
     private ItemStack getItemStackOf(EnderChest ec) {
         DyeColor dyeColor = ec.isAccessible() ? this.getDyePercentageColor(ec.getFillPercentage()) : DyeColor.BLACK;
+        int amount = Files.getConfiguration().isNumberingEnderchests() ? ec.getNum() + 1 : 1;
 
         ItemStack itemStack;
 
         if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
-            itemStack = new ItemStack(CompatibilityHelper.matchMaterial(dyeColor.name() + "_STAINED_GLASS_PANE"));
+            itemStack = new ItemStack(CompatibilityHelper.matchMaterial(dyeColor.name() + "_STAINED_GLASS_PANE"), amount);
         } else {
-            itemStack = new ItemStack(CompatibilityHelper.matchMaterial("STAINED_GLASS_PANE"), 1, dyeColor.getWoolData());
+            itemStack = new ItemStack(CompatibilityHelper.matchMaterial("STAINED_GLASS_PANE"), amount, dyeColor.getWoolData());
         }
 
         ItemMeta meta = itemStack.getItemMeta();

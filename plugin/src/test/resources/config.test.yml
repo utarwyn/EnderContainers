@@ -11,6 +11,7 @@ enderchests:
   default: 1
   onlyShowAccessible: false
   useVanillaEnderchest: true
+  numberingEnderchests: true
 mysql:
   enabled: false
   host: 'localhost'
@@ -24,5 +25,4 @@ mysql:
 others:
   blockNametag: true
   updateChecker: true
-  useExperimentalSavingSystem: false
   globalSound: true

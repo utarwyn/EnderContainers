@@ -30,6 +30,9 @@ public class ConfigurationTest {
         assertThat(this.config.isDebug()).isFalse();
         assertThat(this.config.getLocale()).isEqualTo("en");
         assertThat(this.config.getDisabledWorlds()).containsExactly("disabled");
+        assertThat(this.config.isOnlyShowAccessibleEnderchests()).isFalse();
+        assertThat(this.config.isUseVanillaEnderchest()).isTrue();
+        assertThat(this.config.isNumberingEnderchests()).isTrue();
         assertThat(this.config.getMysqlSslKeystoreFile()).isNull();
         assertThat(this.config.getMysqlSslKeystorePassword()).isNull();
         assertThat(this.config.getMysqlSslTrustKeystoreFile()).isNull();

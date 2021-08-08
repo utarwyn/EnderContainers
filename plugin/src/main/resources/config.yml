@@ -32,6 +32,9 @@ enderchests:
   # Use the vanilla enderchest as the first one. Otherwise it will be managed by EnderContainers.
   useVanillaEnderchest: true
 
+  # Number the items in the main menu so that they follow enderchests number
+  numberingEnderchests: false
+
 
 # Mysql/MariaDB configuration, if needed
 mysql:
