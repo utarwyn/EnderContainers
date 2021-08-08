@@ -1,0 +1,82 @@
+# # # # # # # # # # # # # # # # # # # # # # # #
+#   EnderContainers simplefied Chinese locale #
+#   Version: 2.3.0-dev                        #
+#   An enderchests plugin by Utarwyn          #
+# # # # # # # # # # # # # # # # # # # # # # # #
+
+##                 ##
+#  Commands locale  #
+##                 ##
+commands:
+
+  backups:
+    created: '&a成功创建备份 &b%backup%&a.'
+    creation_starting: '开始在后台创建备份...'
+    exists: '备份 &6%backup% &c已经存在, 请选择一个不同的名称.'
+    info: '&7使用 &6%command% &7来查询关于备份更多的信息.'
+    loaded: '&a恭喜! 成功加载备份 &b%backup%&a!'
+    loading_starting: '开始在后台加载备份...'
+    removed: '&a备份 &b%backup%&a 已被移除.'
+    unknown: '备份 &6%backup%&c 不存在.'
+    zero: '&c找不到任何备份. 立刻创建一个新备份!'
+
+    label_name: '名称'
+    label_date: '创建时间'
+    label_by: '创建者'
+    label_loadcmd: '&8加载这个备份'
+    label_rmcmd: '&8删除这个备份'
+
+  config_reloaded: '配置重载完成!'
+  update: '&6EnderContainers &c不是最新版的! 最新版本: &e%version%&c. 在后台输入 &3ecp update &c并根据提示进行更新.'
+  no_update: '插件已经是最新版本! 你的版本是 &e%version%&7.'
+
+
+##              ##
+#  Menus locale  #
+##              ##
+menus:
+
+  main_title: '玩家 %player% 的末影箱'
+  chest_title: '玩家 %player% 的第 %num% 个末影箱'
+  pane_title: '末影箱 %num% %counter%'
+
+  chest_empty: '&2这个末影箱是空的!'
+  chest_full: '&c这个末影箱满了!'
+  chest_locked: '&8&o>> 末影箱被锁上了!'
+
+  previous_page: '&c≪ 上一页'
+  next_page: '&c下一页 ≫'
+
+
+##               ##
+#  Errors locale  #
+##               ##
+errors:
+
+  noperm_open_chest: '你不能打开这个末影箱!'
+  noperm_console: '请勿在后台这样做!'
+  noperm_player: '你没有权限这样做!'
+  player_not_found: '玩家 &6%playername% &c不存在.'
+  plugin_reload_error: '重载配置时发生错误! 详细情况请查看后台日志.'
+  plugin_world_disabled: '在这个世界不能使用插件.'
+  cmd_invalid_parameter: '参数 &6%param% &c不合法.'
+  cmd_wrong_argument_count: '参数数量有误. 请使用 &6/ecp help &c来查阅如何使用插件!'
+
+
+##                     ##
+#  Dependencies locale  #
+##                     ##
+dependencies:
+
+  # Factions plugin
+  access_denied_factions: '你无法在 %faction% 的领地里使用末影箱!'
+  # PlotSquared Plugin
+  access_denied_plotsq: '你不能在这个地皮使用末影箱!'
+
+
+##                      ##
+#  Miscellaneous locale  #
+##                      ##
+miscellaneous:
+
+  chest_nametag: '&e末影箱数量: &6&l%enderchests%/%maxenderchests%&r&e'
