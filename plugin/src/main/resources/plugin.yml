@@ -1,6 +1,6 @@
 name: EnderContainers
 author: Utarwyn
-version: 2.2.1
+version: 2.2.2
 main: fr.utarwyn.endercontainers.EnderContainers
 api-version: "1.13"
 softdepend: [Factions, PlotSquared, Essentials, WorldGuard]

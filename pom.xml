@@ -6,7 +6,7 @@
 
     <groupId>fr.utarwyn</groupId>
     <artifactId>endercontainers</artifactId>
-    <version>2.2.1</version>
+    <version>2.2.2</version>
     <packaging>pom</packaging>
 
     <name>EnderContainers</name>
@@ -35,7 +35,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <bukkit-api.version>1.17-R0.1-SNAPSHOT</bukkit-api.version>
+        <bukkit-api.version>1.17.1-R0.1-SNAPSHOT</bukkit-api.version>
         <junit.version>4.13.1</junit.version>
         <mockito.version>3.8.0</mockito.version>
         <assertj.version>3.19.0</assertj.version>
