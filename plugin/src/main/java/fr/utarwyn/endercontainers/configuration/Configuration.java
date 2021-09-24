@@ -87,6 +87,9 @@ public class Configuration {
     @Configurable(key = "others.globalSound")
     private boolean globalSound;
 
+    @Configurable(key = "others.saveOnChestClose")
+    private boolean saveOnChestClose;
+
     /**
      * Create a configuration object.
      * We don't have to provide a file object because its managed by Bukkit.
@@ -189,6 +192,10 @@ public class Configuration {
 
     public boolean isGlobalSound() {
         return this.globalSound;
+    }
+
+    public boolean isSaveOnChestClose() {
+        return this.saveOnChestClose;
     }
 
     /**

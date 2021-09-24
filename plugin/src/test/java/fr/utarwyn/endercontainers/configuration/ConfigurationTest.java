@@ -37,6 +37,7 @@ public class ConfigurationTest {
         assertThat(this.config.getMysqlSslKeystorePassword()).isNull();
         assertThat(this.config.getMysqlSslTrustKeystoreFile()).isNull();
         assertThat(this.config.getMysqlSslTrustKeystorePassword()).isNull();
+        assertThat(this.config.isSaveOnChestClose()).isFalse();
     }
 
 }

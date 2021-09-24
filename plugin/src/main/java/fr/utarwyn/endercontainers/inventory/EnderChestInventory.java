@@ -118,8 +118,11 @@ public class EnderChestInventory extends AbstractInventoryHolder {
     public void onClose(Player player) {
         // Save and delete the player context if the owner of the chest is offline
         Player owner = Bukkit.getPlayer(this.chest.getOwner());
-        if (owner == null || !owner.isOnline()) {
-            Managers.get(EnderChestManager.class).savePlayerContext(this.chest.getOwner(), true);
+        boolean offlineOwner = owner == null || !owner.isOnline();
+
+        // Save chest inventory if owner is offline or forced by the configuration (experimental)
+        if (offlineOwner || Files.getConfiguration().isSaveOnChestClose()) {
+            Managers.get(EnderChestManager.class).savePlayerContext(this.chest.getOwner(), offlineOwner);
         }
 
         // Play the closing sound

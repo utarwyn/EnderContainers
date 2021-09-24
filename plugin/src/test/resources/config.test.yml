@@ -26,3 +26,4 @@ others:
   blockNametag: true
   updateChecker: true
   globalSound: true
+  saveOnChestClose: false
