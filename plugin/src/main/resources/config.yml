@@ -4,9 +4,6 @@
 #   An enderchests plugin by Utarwyn    #
 # # # # # # # # # # # # # # # # # # # # #
 
-# Show additional information in console
-debug: false
-
 # The locale of the plugin
 locale: en
 

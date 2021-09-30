@@ -65,7 +65,7 @@ public class DatabaseManager extends AbstractManager {
                 this.createTables();
 
                 // Log the successful connection into the console
-                this.logConnection(beginTime);
+                this.logConnection(System.currentTimeMillis() - beginTime);
             } catch (DatabaseConnectException | SQLException e) {
                 this.logger.log(Level.SEVERE,
                         "SQL supports disabled because of an error during the connection.", e);
@@ -246,11 +246,11 @@ public class DatabaseManager extends AbstractManager {
     /**
      * Log a successful database connection into the console.
      *
-     * @param beginTime timestamp where the connection has started
+     * @param connectionTime connection time in milliseconds
      */
-    private void logConnection(long beginTime) {
-        this.logger.log(Level.INFO, "MySQL enabled and ready. Connected to database {0}",
-                this.database.getServerUrl());
+    private void logConnection(long connectionTime) {
+        this.logger.log(Level.INFO, "MySQL enabled and ready. Connected to database {0} in {1}ms",
+                new Object[]{this.database.getServerUrl(), connectionTime});
 
         if (this.database.isSecure()) {
             this.logger.info("Good news! You are using a secure connection " +
@@ -258,11 +258,6 @@ public class DatabaseManager extends AbstractManager {
         } else {
             this.logger.warning("You are using an unsecure connection " +
                     "to your database server. Be careful!");
-        }
-
-        if (Files.getConfiguration().isDebug()) {
-            this.logger.log(Level.INFO, "Connection time: {0}ms",
-                    System.currentTimeMillis() - beginTime);
         }
     }
 
@@ -275,15 +270,10 @@ public class DatabaseManager extends AbstractManager {
 
         if (!tables.contains(formatTable(CHEST_TABLE))) {
             database.request("CREATE TABLE `" + formatTable(CHEST_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `num` TINYINT(2) NOT NULL DEFAULT '0', `owner` VARCHAR(36) NULL, `contents` MEDIUMTEXT NULL, `rows` INT(1) NOT NULL DEFAULT 0, PRIMARY KEY (`id`), UNIQUE KEY `NUM OWNER` (`num`,`owner`), INDEX `USER KEY` (`num`, `owner`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
-            if (Files.getConfiguration().isDebug()) {
-                this.logger.log(Level.INFO, "Table `{0}` created in the database.", formatTable(CHEST_TABLE));
-            }
         }
+
         if (!tables.contains(formatTable(BACKUP_TABLE))) {
             database.request("CREATE TABLE `" + formatTable(BACKUP_TABLE) + "` (`id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255) NOT NULL, `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `data` MEDIUMTEXT NULL, `created_by` VARCHAR(60) NULL, PRIMARY KEY (`id`)) COLLATE='" + collation + "' ENGINE=InnoDB;");
-            if (Files.getConfiguration().isDebug()) {
-                this.logger.log(Level.INFO, "Table `{0}` created in the database.", formatTable(BACKUP_TABLE));
-            }
         }
     }
 

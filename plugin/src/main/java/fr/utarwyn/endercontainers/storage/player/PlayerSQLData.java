@@ -10,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -94,12 +93,11 @@ public class PlayerSQLData extends PlayerData {
      */
     @Override
     public int getEnderchestRows(EnderChest chest) {
-        Optional<Integer> rows = this.databaseSets.stream()
+        return this.databaseSets.stream()
                 .filter(set -> set.getInteger("num") == chest.getNum())
                 .map(set -> set.getInteger("rows"))
-                .findFirst();
-
-        return rows.orElse(3);
+                .findFirst()
+                .orElse(3);
     }
 
     /**

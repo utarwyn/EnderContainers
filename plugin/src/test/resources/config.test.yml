@@ -1,8 +1,6 @@
 # # # # # # # # # # # # # # # # # # # # # # # #
 #   EnderContainers configuration for tests   #
 # # # # # # # # # # # # # # # # # # # # # # # #
-
-debug: false
 locale: en
 disabledWorlds:
   - disabled

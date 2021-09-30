@@ -19,9 +19,6 @@ public class Configuration {
     private final Plugin plugin;
 
     @Configurable
-    private boolean debug;
-
-    @Configurable
     private String locale;
 
     @Configurable
@@ -100,10 +97,6 @@ public class Configuration {
     Configuration(Plugin plugin) throws ConfigLoadingException {
         this.plugin = plugin;
         this.load();
-    }
-
-    public boolean isDebug() {
-        return this.debug;
     }
 
     public String getLocale() {

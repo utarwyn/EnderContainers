@@ -27,7 +27,6 @@ public class ConfigurationTest {
 
     @Test
     public void get() {
-        assertThat(this.config.isDebug()).isFalse();
         assertThat(this.config.getLocale()).isEqualTo("en");
         assertThat(this.config.getDisabledWorlds()).containsExactly("disabled");
         assertThat(this.config.isOnlyShowAccessibleEnderchests()).isFalse();
