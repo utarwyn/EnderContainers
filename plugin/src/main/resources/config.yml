@@ -25,7 +25,7 @@ enderchests:
   # Show/Hide all inaccessible enderchests in the main menu.
   onlyShowAccessible: false
 
-  # Use the vanilla enderchest as the first one. Otherwise it will be managed by EnderContainers.
+  # Use the vanilla enderchest as the first one. Otherwise, it will be managed by EnderContainers.
   useVanillaEnderchest: true
 
   # Number the items in the main menu so that they follow enderchests number
@@ -46,7 +46,7 @@ mysql:
   database: 'endercontainers'
 
   # Change this section if you want to connect over SSL, by default its disabled.
-  # Check our wiki on Github to know how to configure it!
+  # Check our wiki on GitHub to know how to configure it!
   ssl:
     enabled: false
 

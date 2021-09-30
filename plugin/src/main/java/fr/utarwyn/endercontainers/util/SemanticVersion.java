@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Represents a semantic version. Can be compared to an other version.
+ * Represents a semantic version. Can be compared to another version.
  * Supports major.minor.patch version with a suffix for dev builds.
  *
  * @author Utarwyn
@@ -50,7 +50,7 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
         Matcher matcher = Pattern.compile(REGEX).matcher(version);
 
         if (!matcher.matches()) {
-            throw new IllegalArgumentException("Malformated semantic version");
+            throw new IllegalArgumentException("Malformed semantic version");
         }
 
         this.major = Integer.parseInt(matcher.group(1));
@@ -96,7 +96,7 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
     }
 
     /**
-     * Compares all fiels of two semantic version.
+     * Compares all fields of two semantic version.
      *
      * @param other other semantic version to compare
      * @return difference between the two versions
@@ -144,7 +144,7 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
     }
 
     /**
-     * Converts the semantic version into a human readable string.
+     * Converts the semantic version into a human-readable string.
      *
      * @return human readable semantic version
      */

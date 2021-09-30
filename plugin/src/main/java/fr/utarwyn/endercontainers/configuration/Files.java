@@ -4,7 +4,7 @@ import org.bukkit.plugin.Plugin;
 
 /**
  * Manages all configurations of the plugin.
- * Currently handles messages and global configs.
+ * Currently, handles messages and global configs.
  *
  * @author Utarwyn
  * @since 2.2.0
@@ -22,14 +22,14 @@ public class Files {
     private static Locale locale;
 
     /**
-     * This class cannot be instancied, it just contains config file instances.
+     * This class cannot be instanced, it just contains config file instances.
      */
     private Files() {
         // Not implemented
     }
 
     /**
-     * Gets the global plugin configuration. Its a singleton through all the plugin.
+     * Gets the global plugin configuration. It's a singleton through all the plugin.
      *
      * @return The plugin's configuration
      */
@@ -38,7 +38,7 @@ public class Files {
     }
 
     /**
-     * Gets the global plugin locale. Its a singleton through all the plugin.
+     * Gets the global plugin locale. It's a singleton through all the plugin.
      *
      * @return The plugin's locale
      */
@@ -50,10 +50,13 @@ public class Files {
      * Initialize all configuration files that the plugin uses.
      *
      * @param plugin java plugin object
-     * @throws ConfigLoadingException thrown if one configuration file cannot be loaded
+     * @throws ConfigLoadingException thrown if a configuration file cannot be loaded
      */
     public static void reload(Plugin plugin) throws ConfigLoadingException {
-        configuration = new Configuration(plugin);
+        plugin.saveDefaultConfig();
+        plugin.reloadConfig();
+
+        configuration = new Configuration(plugin.getConfig());
         locale = new Locale(plugin, configuration.getLocale());
     }
 

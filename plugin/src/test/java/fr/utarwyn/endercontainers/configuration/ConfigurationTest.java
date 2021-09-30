@@ -22,7 +22,7 @@ public class ConfigurationTest {
 
     @Before
     public void setUp() throws TestInitializationException, ConfigLoadingException {
-        this.config = new Configuration(TestHelper.getPlugin());
+        this.config = new Configuration(TestHelper.getPlugin().getConfig());
     }
 
     @Test

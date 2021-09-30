@@ -1,102 +1,87 @@
 package fr.utarwyn.endercontainers.configuration;
 
-import org.bukkit.plugin.Plugin;
+import org.bukkit.configuration.file.FileConfiguration;
 
-import java.lang.reflect.Field;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
- * Handles main plugin configuration.
+ * Handles plugin configuration.
  *
  * @author Utarwyn
  * @since 2.0.0
  */
 public class Configuration {
 
-    /**
-     * EnderContainers plugin instance
-     */
-    private final Plugin plugin;
+    private final String locale;
+    private final List<String> disabledWorlds;
 
-    @Configurable
-    private String locale;
+    private final int maxEnderchests;
+    private final int defaultEnderchests;
+    private final boolean onlyShowAccessibleEnderchests;
+    private final boolean useVanillaEnderchest;
+    private final boolean numberingEnderchests;
 
-    @Configurable
-    private List<String> disabledWorlds;
+    private final boolean mysql;
+    private final String mysqlHost;
+    private final int mysqlPort;
+    private final String mysqlUser;
+    private final String mysqlPassword;
+    private final String mysqlDatabase;
+    private final boolean mysqlSsl;
+    private final String mysqlSslKeystoreFile;
+    private final String mysqlSslKeystorePassword;
+    private final String mysqlSslTrustKeystoreFile;
+    private final String mysqlSslTrustKeystorePassword;
+    private final String mysqlTablePrefix;
 
-    @Configurable(key = "enderchests.max")
-    private int maxEnderchests;
-
-    @Configurable(key = "enderchests.default")
-    private int defaultEnderchests;
-
-    @Configurable(key = "enderchests.onlyShowAccessible")
-    private boolean onlyShowAccessibleEnderchests;
-
-    @Configurable(key = "enderchests.useVanillaEnderchest")
-    private boolean useVanillaEnderchest;
-
-    @Configurable(key = "enderchests.numberingEnderchests")
-    private boolean numberingEnderchests;
-
-    @Configurable(key = "mysql.enabled")
-    private boolean mysql;
-
-    @Configurable(key = "mysql.host")
-    private String mysqlHost;
-
-    @Configurable(key = "mysql.port")
-    private int mysqlPort;
-
-    @Configurable(key = "mysql.user")
-    private String mysqlUser;
-
-    @Configurable(key = "mysql.password")
-    private String mysqlPassword;
-
-    @Configurable(key = "mysql.database")
-    private String mysqlDatabase;
-
-    @Configurable(key = "mysql.ssl.enabled")
-    private boolean mysqlSsl;
-
-    @Configurable(key = "mysql.ssl.keystore_file")
-    private String mysqlSslKeystoreFile;
-
-    @Configurable(key = "mysql.ssl.keystore_password")
-    private String mysqlSslKeystorePassword;
-
-    @Configurable(key = "mysql.ssl.ca_keystore_file")
-    private String mysqlSslTrustKeystoreFile;
-
-    @Configurable(key = "mysql.ssl.ca_keystore_password")
-    private String mysqlSslTrustKeystorePassword;
-
-    @Configurable(key = "mysql.tablePrefix")
-    private String mysqlTablePrefix;
-
-    @Configurable(key = "others.blockNametag")
-    private boolean blockNametag;
-
-    @Configurable(key = "others.updateChecker")
-    private boolean updateChecker;
-
-    @Configurable(key = "others.globalSound")
-    private boolean globalSound;
-
-    @Configurable(key = "others.saveOnChestClose")
-    private boolean saveOnChestClose;
+    private final boolean blockNametag;
+    private final boolean updateChecker;
+    private final boolean globalSound;
+    private final boolean saveOnChestClose;
 
     /**
-     * Create a configuration object.
-     * We don't have to provide a file object because its managed by Bukkit.
+     * Create a configuration object from plugin configuration.
      *
-     * @param plugin the Bukkit plugin
-     * @throws ConfigLoadingException thrown if cannot load configuration
+     * @param config plugin configuration object
+     * @throws ConfigLoadingException thrown if configuration cannot be loaded
      */
-    Configuration(Plugin plugin) throws ConfigLoadingException {
-        this.plugin = plugin;
-        this.load();
+    Configuration(FileConfiguration config) throws ConfigLoadingException {
+        this.locale = loadValue("locale", config::isString, config::getString);
+        this.disabledWorlds = loadValue("disabledWorlds", config::isList, config::getStringList);
+
+        this.maxEnderchests = loadValue("enderchests.max", config::isInt, config::getInt);
+        this.defaultEnderchests = loadValue("enderchests.default", config::isInt, config::getInt);
+        this.onlyShowAccessibleEnderchests = loadValue("enderchests.onlyShowAccessible", config::isBoolean, config::getBoolean);
+        this.useVanillaEnderchest = loadValue("enderchests.useVanillaEnderchest", config::isBoolean, config::getBoolean);
+        this.numberingEnderchests = loadValue("enderchests.numberingEnderchests", config::isBoolean, config::getBoolean);
+
+        this.mysql = loadValue("mysql.enabled", config::isBoolean, config::getBoolean);
+        this.mysqlHost = loadValue("mysql.host", config::isString, config::getString);
+        this.mysqlPort = loadValue("mysql.port", config::isInt, config::getInt);
+        this.mysqlUser = loadValue("mysql.user", config::isString, config::getString);
+        this.mysqlPassword = loadValue("mysql.password", config::isString, config::getString);
+        this.mysqlDatabase = loadValue("mysql.database", config::isString, config::getString);
+        this.mysqlSsl = loadValue("mysql.ssl.enabled", config::isBoolean, config::getBoolean);
+        this.mysqlTablePrefix = loadValue("mysql.tablePrefix", config::isString, config::getString);
+
+        if (this.mysqlSsl) {
+            this.mysqlSslKeystoreFile = loadValue("mysql.ssl.keystore_file", config::isString, config::getString);
+            this.mysqlSslKeystorePassword = loadValue("mysql.ssl.keystore_password", config::isString, config::getString);
+            this.mysqlSslTrustKeystoreFile = loadValue("mysql.ssl.ca_keystore_file", config::isString, config::getString);
+            this.mysqlSslTrustKeystorePassword = loadValue("mysql.ssl.ca_keystore_password", config::isString, config::getString);
+        } else {
+            this.mysqlSslKeystoreFile = null;
+            this.mysqlSslKeystorePassword = null;
+            this.mysqlSslTrustKeystoreFile = null;
+            this.mysqlSslTrustKeystorePassword = null;
+        }
+
+        this.blockNametag = loadValue("others.blockNametag", config::isBoolean, config::getBoolean);
+        this.updateChecker = loadValue("others.updateChecker", config::isBoolean, config::getBoolean);
+        this.globalSound = loadValue("others.globalSound", config::isBoolean, config::getBoolean);
+        this.saveOnChestClose = loadValue("others.saveOnChestClose", config::isBoolean, config::getBoolean);
     }
 
     public String getLocale() {
@@ -191,36 +176,14 @@ public class Configuration {
         return this.saveOnChestClose;
     }
 
-    /**
-     * Loads configuration in instance fields.
-     *
-     * @throws ConfigLoadingException thrown if cannot load one value from config
-     */
-    private void load() throws ConfigLoadingException {
-        this.plugin.saveDefaultConfig();
-        this.plugin.reloadConfig();
-
-        // Load every needed config value dynamically!
-        for (Field field : this.getClass().getDeclaredFields()) {
-            Configurable conf = field.getAnnotation(Configurable.class);
-            if (conf == null) continue;
-
-            // Getting the config key associated with the field
-            String configKey = (conf.key().isEmpty()) ? field.getName() : conf.key();
-            Object value = this.plugin.getConfig().get(configKey);
-
-            // Changing the value of the field
-            try {
-                field.setAccessible(true);
-                field.set(this, value);
-                field.setAccessible(false);
-            } catch (ReflectiveOperationException | IllegalArgumentException e) {
-                String configName = getClass().getSimpleName().toLowerCase();
-                throw new ConfigLoadingException(String.format(
-                        "Cannot set the config value %s of key %s for %s",
-                        value, configKey, configName
-                ), e);
-            }
+    private <T> T loadValue(String key, Predicate<String> checker, Function<String, T> getter) throws ConfigLoadingException {
+        if (checker.test(key)) {
+            return getter.apply(key);
+        } else {
+            throw new ConfigLoadingException(String.format(
+                    "Cannot set value of config key %s for %s",
+                    key, getClass().getSimpleName().toLowerCase()
+            ));
         }
     }
 

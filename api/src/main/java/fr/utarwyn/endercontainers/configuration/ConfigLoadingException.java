@@ -1,7 +1,7 @@
 package fr.utarwyn.endercontainers.configuration;
 
 /**
- * Thrown if an error occured during
+ * Thrown if an error occurred during
  * the loading of a configuration file.
  *
  * @author Utarwyn
