@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentMap;
  * Serialize a list of items into a base64 string.
  * A better way to store items than using a custom serializer.
  *
- * @author Utarwyn <maximemalgorn@gmail.com>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public class Base64ItemSerializer implements ItemSerializer {

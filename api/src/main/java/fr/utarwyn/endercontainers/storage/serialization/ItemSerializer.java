@@ -7,9 +7,9 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * Serialize a list of items into a formatted string and vice-versa.
- * Use to store them easier than with the {@link ItemStack#toString()} format.
+ * Used to store them easier than with the {@link ItemStack#toString()} format.
  *
- * @author Utarwyn <maximemalgorn@gmail.com>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public interface ItemSerializer {

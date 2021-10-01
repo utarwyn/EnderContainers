@@ -3,7 +3,7 @@ package fr.utarwyn.endercontainers.configuration;
 /**
  * Stores keys for locale-based messages.
  *
- * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public enum LocaleKey {

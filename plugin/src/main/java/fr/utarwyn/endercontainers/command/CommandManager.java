@@ -17,7 +17,7 @@ import java.util.logging.Level;
 /**
  * A manager to handle commands of the plugin.
  *
- * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public class CommandManager extends AbstractManager {

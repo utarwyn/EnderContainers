@@ -7,7 +7,7 @@ import fr.utarwyn.endercontainers.configuration.Configuration;
  * Represents a database adapter.
  * Can handle all types of SQL drivers and sources.
  *
- * @author Utarwyn <maximemalgorn@gmail.com>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public interface DatabaseAdapter {

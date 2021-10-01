@@ -9,7 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.Objects;
 
 /**
- * @author Utarwyn <maximemalgorn@gmail.com>
+ * @author Utarwyn
  */
 public class ItemFactoryMock implements ItemFactory {
 

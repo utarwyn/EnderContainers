@@ -14,7 +14,7 @@ import java.util.List;
  * Essentials dependency.
  * Removes /enderchest command if found.
  *
- * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public class EssentialsDependency extends Dependency {

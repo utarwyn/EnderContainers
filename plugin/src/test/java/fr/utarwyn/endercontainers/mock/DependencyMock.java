@@ -8,7 +8,7 @@ import org.bukkit.plugin.Plugin;
 /**
  * Fake object to test classes about dependencies.
  *
- * @author Utarwyn <maximemalgorn@gmail.com>
+ * @author Utarwyn
  */
 public class DependencyMock extends Dependency {
 

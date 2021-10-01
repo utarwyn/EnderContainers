@@ -5,7 +5,7 @@ import org.bukkit.plugin.Plugin;
 /**
  * Represents a dependency managed by the plugin.
  *
- * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public abstract class Dependency implements DependencyValidator {

@@ -19,7 +19,7 @@ import java.util.Set;
 /**
  * Manages connections to a SQL database.
  *
- * @author Utarwyn <maximemalgorn@gmail.com>
+ * @author Utarwyn
  * @since 1.0.5
  */
 public class Database implements AutoCloseable {

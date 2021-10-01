@@ -8,7 +8,7 @@ import java.sql.SQLException;
 /**
  * Builds a delete request to perform in the database.
  *
- * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public class DeleteRequest implements Request {

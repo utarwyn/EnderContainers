@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * Generic exception with a message from the locale file.
  *
- * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public class LocalizedException extends Exception {

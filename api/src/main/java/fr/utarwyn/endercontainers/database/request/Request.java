@@ -3,7 +3,7 @@ package fr.utarwyn.endercontainers.database.request;
 /**
  * Request interface.
  *
- * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public interface Request {

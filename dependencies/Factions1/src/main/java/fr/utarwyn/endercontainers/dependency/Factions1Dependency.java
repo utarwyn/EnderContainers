@@ -15,7 +15,7 @@ import java.util.Collections;
  * Factions dependency. Protect enderchests in enemy factions.
  * Support: Legacy Factions / FactionsUUID / SavageFactions
  *
- * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public class Factions1Dependency extends Dependency {

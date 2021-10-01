@@ -15,7 +15,7 @@ import java.util.Collections;
  * Factions v2 dependency. Protect enderchests in enemy factions.
  * Support: Factions with MassiveCore
  *
- * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public class Factions2Dependency extends Dependency {

@@ -17,7 +17,7 @@ import java.util.*;
 /**
  * Mocked item meta to manipulate items with test units.
  *
- * @author Utarwyn <maximemalgorn@gmail.com>
+ * @author Utarwyn
  */
 public class ItemMetaMock implements ItemMeta, Damageable {
 

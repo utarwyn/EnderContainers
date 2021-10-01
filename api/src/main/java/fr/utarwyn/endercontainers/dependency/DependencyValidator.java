@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 /**
  * Interface to validate specific actions through dependencies.
  *
- * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @author Utarwyn
  * @since 2.0.0
  */
 public interface DependencyValidator {

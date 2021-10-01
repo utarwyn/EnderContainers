@@ -14,7 +14,7 @@ import java.util.List;
  * Builds a saving request to perform in the database.
  * Can execute an INSERT or an UPDATE request on the database.
  *
- * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public class SavingRequest implements Request {

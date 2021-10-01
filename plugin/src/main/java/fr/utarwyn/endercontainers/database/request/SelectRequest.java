@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Builds a select request to perform in the database.
  *
- * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public class SelectRequest implements Request {

@@ -13,7 +13,7 @@ import java.util.Map;
  * Manages all metrics of the plugin.
  * Powered free of charge by bStats: https://bstats.org/
  *
- * @author Utarwyn <maximemalgorn@gmail.com>
+ * @author Utarwyn
  */
 public class MetricsHandler {
 

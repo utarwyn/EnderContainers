@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 /**
  * Resolve a dependency instance with a custom version matching.
  *
- * @author Utarwyn <maxime.malgorn@laposte.net>
+ * @author Utarwyn
  * @since 2.2.0
  */
 public class DependencyResolver {
