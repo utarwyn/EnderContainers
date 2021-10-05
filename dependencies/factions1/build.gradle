@@ -1,0 +1,10 @@
+plugins {
+    id 'fr.utarwyn.java-conventions'
+}
+
+dependencies {
+    implementation project(':api')
+    compileOnly('com.massivecraft:Factions:1.6.9.5-U0.2.2') {
+        exclude group: '*', module: '*'
+    }
+}

@@ -1,0 +1,12 @@
+plugins {
+    id 'fr.utarwyn.java-conventions'
+}
+
+publishing {
+    publications {
+        Api(MavenPublication) { publication ->
+            artifactId = 'endercontainers-api'
+            from components.java
+        }
+    }
+}

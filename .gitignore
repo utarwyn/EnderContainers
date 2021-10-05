@@ -12,8 +12,10 @@
 .DS_Store
 
 # Maven
-log/
-out/
-META-INF/
-target/
-dependency-reduced-pom.xml
+.gradle
+**/out/
+**/build/
+!src/**/build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache

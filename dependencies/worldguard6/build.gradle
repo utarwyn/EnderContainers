@@ -1,0 +1,13 @@
+plugins {
+    id 'fr.utarwyn.java-conventions'
+}
+
+dependencies {
+    implementation project(':api')
+    compileOnly('com.sk89q:worldguard:6.1.1-SNAPSHOT') {
+        exclude group: '*', module: '*'
+    }
+    testRuntimeOnly('com.sk89q:worldedit:5.6.3') {
+        exclude group: '*', module: '*'
+    }
+}

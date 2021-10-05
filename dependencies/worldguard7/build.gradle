@@ -1,0 +1,10 @@
+plugins {
+    id 'fr.utarwyn.java-conventions'
+}
+
+dependencies {
+    implementation project(':api')
+    compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.5'
+    testImplementation 'io.papermc:paperlib:1.0.6'
+    testImplementation 'org.bstats:bstats-bukkit:1.8'
+}
