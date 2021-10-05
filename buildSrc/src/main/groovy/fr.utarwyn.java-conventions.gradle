@@ -13,7 +13,7 @@ compileJava {
 }
 
 jar {
-    baseName "endercontainers-${project.name}"
+    archiveBaseName.set("endercontainers-${project.name}")
     from "${rootDir}/LICENSE"
 }
 
