@@ -48,7 +48,7 @@ jobs:
       - name: Archive plugin jars on GitHub
         uses: actions/upload-artifact@master
         with:
-          name: EssentialsX plugin jars
+          name: EnderContainers plugin jars
           path: jars/
 
   quality:
