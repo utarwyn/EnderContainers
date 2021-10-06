@@ -8,7 +8,7 @@ on:
       - 'dependencies/**'
       - 'plugin/**'
       - '.github/workflows/**'
-      - '*.gradle'
+      - '*.gradle*'
 
 jobs:
   build:

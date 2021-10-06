@@ -1,10 +1,14 @@
 package fr.utarwyn.endercontainers;
 
+import fr.utarwyn.endercontainers.command.CommandManager;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -31,9 +35,20 @@ public class EnderContainersTest {
 
     @Test
     public void enable() {
+        Map instances = mock(Map.class);
+        CommandManager commandManager = mock(CommandManager.class);
+
+        when(instances.containsKey(any())).thenReturn(true);
+        when(instances.get(CommandManager.class)).thenReturn(commandManager);
+
         System.setProperty("bstats.relocatecheck", "false");
+        Managers.instances = instances;
+
         this.plugin.onEnable();
-        assertThat(Managers.instances).isNotEmpty().hasSize(9);
+        verify(instances, times(9)).containsKey(any());
+        verify(commandManager).registerCommands();
+
+        Managers.instances = new LinkedHashMap<>();
     }
 
     @Test
