@@ -1,0 +1,29 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
+        maven { url 'https://repo.utarwyn.fr' }
+        maven { url 'https://ci.ender.zone/plugin/repository/everything/' }
+        maven { url 'https://maven.enginehub.org/repo/' }
+        maven { url 'https://mvn.intellectualsites.com/content/repositories/releases/' }
+        maven { url 'https://mvn.intellectualsites.com/content/repositories/snapshots/' }
+    }
+
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+}
+
+rootProject.name = 'EnderContainers'
+
+include 'api'
+include 'dependencies:factions1'
+include 'dependencies:factions2'
+include 'dependencies:plotsquared'
+include 'dependencies:worldguard6'
+include 'dependencies:worldguard7'
+include 'plugin'

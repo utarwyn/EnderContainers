@@ -1,0 +1,3 @@
+group 'fr.utarwyn'
+version '2.3.0-SNAPSHOT'
+description 'A modern and customizable Bukkit plugin to divide enderchest into multiple inventories.'

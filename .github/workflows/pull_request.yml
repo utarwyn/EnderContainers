@@ -7,31 +7,35 @@ on:
       - 'dependencies/**'
       - 'plugin/**'
       - '.github/workflows/**'
-      - 'pom.xml'
+      - '*.gradle*'
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Git repository
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Set up JDK
-        uses: actions/setup-java@v1
+      - name: Restore Gradle cache
+        uses: actions/cache@v2
         with:
-          java-version: 11
-          server-id: github
-          settings-path: ${{ github.workspace }}
-
-      - uses: actions/cache@v1
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
-            ${{ runner.os }}-maven-
+            ${{ runner.os }}-gradle-
 
-      - name: Verify Pull Request
-        run: mvn --batch-mode clean verify
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup JDK 11
+        uses: actions/setup-java@v2
+        with:
+          distribution: adopt
+          java-version: 11
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Build with Gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew build --stacktrace

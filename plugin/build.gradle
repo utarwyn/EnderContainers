@@ -1,0 +1,57 @@
+plugins {
+    id 'fr.utarwyn.java-conventions'
+    id 'jacoco'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+    id 'org.sonarqube' version '2.8'
+}
+
+dependencies {
+    implementation project(':api')
+    implementation project(':dependencies:factions1')
+    implementation project(':dependencies:factions2')
+    implementation project(':dependencies:plotsquared')
+    implementation project(':dependencies:worldguard6')
+    implementation project(':dependencies:worldguard7')
+    implementation 'com.zaxxer:HikariCP:4.0.3'
+    implementation 'org.slf4j:slf4j-nop:1.7.32'
+    implementation 'org.bstats:bstats-bukkit:2.2.1'
+}
+
+shadowJar {
+    archiveFileName = "${rootProject.name}-${rootProject.version}.jar"
+
+    dependencies {
+        exclude 'META-INF/**'
+    }
+
+    relocate 'org.bstats', 'fr.utarwyn.endercontainers.libs.bstats'
+    relocate 'com.zaxxer.hikari', 'fr.utarwyn.endercontainers.libs.hikari'
+    relocate 'org.slf4j', 'fr.utarwyn.endercontainers.libs.slf4j'
+}
+
+publishing {
+    publications {
+        Plugin(MavenPublication) { publication ->
+            artifactId = 'endercontainers-plugin'
+            project.shadow.component(publication)
+        }
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.required.set(true)
+    }
+}
+
+sonarqube {
+    properties {
+        property 'sonar.host.url', 'https://sonarcloud.io'
+        property 'sonar.organization', 'utarwyn-github'
+        property 'sonar.projectKey', 'fr.utarwyn:endercontainers'
+    }
+}
+
+artifacts {
+    archives shadowJar
+}

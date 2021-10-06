@@ -12,27 +12,30 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                withMaven {
-                    sh 'mvn clean package -U'
+                withGradle {
+                    sh 'chmod +x gradlew && ./gradlew build --stacktrace'
                 }
             }
         }
 
         stage('Deploy') {
+            environment {
+                PERSONAL_TOKEN = credentials('maven-repository-token-utarwyn')
+            }
             when {
                 anyOf { branch 'master'; branch 'next' }
             }
             steps {
-                withMaven(options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                    sh "mvn -DskipTests deploy " +
-                            "-DaltReleaseDeploymentRepository=utarwyn::default::https://repo.utarwyn.fr/releases/ " +
-                            "-DaltSnapshotDeploymentRepository=utarwyn::default::https://repo.utarwyn.fr/snapshots/"
+                withGradle {
+                    sh './gradlew publishToMavenLocal publishApiPublicationToPersonalRepository publishPluginPublicationToPersonalRepository --stacktrace'
                 }
             }
         }
     }
     post {
         always {
+            archiveArtifacts artifacts: 'api/build/libs/*.jar,plugin/build/libs/EnderContainers-*.jar', fingerprint: true
+            junit '**/test-results/**/*.xml'
             cleanWs()
         }
     }

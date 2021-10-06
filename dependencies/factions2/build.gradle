@@ -1,0 +1,9 @@
+plugins {
+    id 'fr.utarwyn.java-conventions'
+}
+
+dependencies {
+    implementation project(':api')
+    compileOnly 'com.massivecraft:MassiveCore:2.14.0'
+    compileOnly 'com.massivecraft:Factions:2.14.0'
+}
