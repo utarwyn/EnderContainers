@@ -1,3 +1,15 @@
+plugins {
+    id 'org.sonarqube'
+}
+
 group 'fr.utarwyn'
 version '2.3.0-SNAPSHOT'
 description 'A modern and customizable Bukkit plugin to divide enderchest into multiple inventories.'
+
+sonarqube {
+    properties {
+        property 'sonar.host.url', 'https://sonarcloud.io'
+        property 'sonar.organization', 'utarwyn-github'
+        property 'sonar.projectKey', 'fr.utarwyn:endercontainers'
+    }
+}

@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'maven-publish'
+    id 'jacoco'
 }
 
 group = rootProject.group
@@ -51,5 +52,11 @@ publishing {
                 password = project.findProperty('github.token') ?: System.getenv('GITHUB_TOKEN')
             }
         }
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.required.set(true)
     }
 }
