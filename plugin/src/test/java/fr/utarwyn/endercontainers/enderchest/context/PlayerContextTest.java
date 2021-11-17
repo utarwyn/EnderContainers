@@ -148,7 +148,7 @@ public class PlayerContextTest {
         World world = mock(World.class);
 
         when(block.getLocation()).thenReturn(location);
-        when(location.getWorld()).thenReturn(world);
+        when(block.getWorld()).thenReturn(world);
 
         this.context.openListInventory(this.player, block);
 

@@ -200,9 +200,16 @@ public class EnderChestListenerTest {
     }
 
     @Test
-    public void inventoryCloseSound() {
+    public void inventoryCloseGlobalSound() {
         this.listener.onInventoryClose(this.createInventoryCloseEvent());
         verify(this.world).playSound(this.player.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1f, 1f);
+    }
+
+    @Test
+    public void inventoryClosePlayerSound() throws TestInitializationException {
+        TestHelper.overrideConfigurationValue("globalSound", false);
+        this.listener.onInventoryClose(this.createInventoryCloseEvent());
+        verify(this.player).playSound(this.player.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1f, 1f);
     }
 
     @Test

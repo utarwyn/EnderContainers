@@ -2,8 +2,10 @@ package fr.utarwyn.endercontainers.util;
 
 import com.google.gson.Gson;
 import fr.utarwyn.endercontainers.AbstractManager;
+import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -149,7 +151,8 @@ public class Updater extends AbstractManager implements Runnable {
                     player, LocaleKey.CMD_UPDATE,
                     Collections.singletonMap("version", this.latestVersion.toString())
             );
-            MiscUtil.playSound(player, "NOTE_PLING", "BLOCK_NOTE_PLING", "BLOCK_NOTE_BLOCK_PLING");
+            Sound sound = CompatibilityHelper.searchSound("NOTE_PLING", "BLOCK_NOTE_PLING", "BLOCK_NOTE_BLOCK_PLING");
+            player.playSound(player.getLocation(), sound, 1f, 1f);
         } else {
             PluginMsg.infoMessage(
                     player, LocaleKey.CMD_NO_UPDATE,

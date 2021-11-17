@@ -1,14 +1,15 @@
 package fr.utarwyn.endercontainers.enderchest.context;
 
 import fr.utarwyn.endercontainers.Managers;
+import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.VanillaEnderChest;
 import fr.utarwyn.endercontainers.inventory.menu.EnderChestListMenu;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
-import fr.utarwyn.endercontainers.util.MiscUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -147,10 +148,11 @@ public class PlayerContext {
             new EnderChestListMenu(this).open(viewer);
         }
 
+        Sound sound = CompatibilityHelper.searchSound("CHEST_OPEN", "BLOCK_CHEST_OPEN");
         if (block != null && Files.getConfiguration().isGlobalSound()) {
-            MiscUtil.playSound(block.getLocation(), "CHEST_OPEN", "BLOCK_CHEST_OPEN");
+            block.getWorld().playSound(block.getLocation(), sound, 1f, 1f);
         } else {
-            MiscUtil.playSound(viewer, "CHEST_OPEN", "BLOCK_CHEST_OPEN");
+            viewer.playSound(viewer.getLocation(), sound, 1f, 1f);
         }
     }
 

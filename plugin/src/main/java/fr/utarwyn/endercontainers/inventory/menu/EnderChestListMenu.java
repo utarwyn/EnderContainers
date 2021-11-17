@@ -7,11 +7,11 @@ import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.inventory.AbstractInventoryHolder;
-import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -54,7 +54,7 @@ public class EnderChestListMenu extends AbstractInventoryHolder {
         if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
             SKULL_MATERIAL = Material.PLAYER_HEAD;
         } else {
-            SKULL_MATERIAL = CompatibilityHelper.matchMaterial("SKULL_ITEM");
+            SKULL_MATERIAL = CompatibilityHelper.searchMaterial("SKULL_ITEM");
         }
 
         PREV_PAGE_ITEM = new ItemStack(SKULL_MATERIAL, 1, (short) 3);
@@ -170,11 +170,13 @@ public class EnderChestListMenu extends AbstractInventoryHolder {
         }
 
         // Open the selected chest
+        Sound sound;
         if (this.context.openEnderchestInventory(player, this.getFirstChestIndex() + slot)) {
-            MiscUtil.playSound(player, "CLICK", "UI_BUTTON_CLICK");
+            sound = CompatibilityHelper.searchSound("CLICK", "UI_BUTTON_CLICK");
         } else {
-            MiscUtil.playSound(player, "VILLAGER_NO", "ENTITY_VILLAGER_NO");
+            sound = CompatibilityHelper.searchSound("VILLAGER_NO", "ENTITY_VILLAGER_NO");
         }
+        player.playSound(player.getLocation(), sound, 1f, 1f);
     }
 
     /**
@@ -199,9 +201,9 @@ public class EnderChestListMenu extends AbstractInventoryHolder {
         ItemStack itemStack;
 
         if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
-            itemStack = new ItemStack(CompatibilityHelper.matchMaterial(dyeColor.name() + "_STAINED_GLASS_PANE"), amount);
+            itemStack = new ItemStack(CompatibilityHelper.searchMaterial(dyeColor.name() + "_STAINED_GLASS_PANE"), amount);
         } else {
-            itemStack = new ItemStack(CompatibilityHelper.matchMaterial("STAINED_GLASS_PANE"), amount, dyeColor.getWoolData());
+            itemStack = new ItemStack(CompatibilityHelper.searchMaterial("STAINED_GLASS_PANE"), amount, dyeColor.getWoolData());
         }
 
         ItemMeta meta = itemStack.getItemMeta();

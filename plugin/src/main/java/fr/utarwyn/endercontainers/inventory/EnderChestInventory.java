@@ -2,13 +2,14 @@ package fr.utarwyn.endercontainers.inventory;
 
 import com.google.common.base.Preconditions;
 import fr.utarwyn.endercontainers.Managers;
+import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
-import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -126,10 +127,11 @@ public class EnderChestInventory extends AbstractInventoryHolder {
         }
 
         // Play the closing sound
+        Sound sound = CompatibilityHelper.searchSound("CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
         if (Files.getConfiguration().isGlobalSound()) {
-            MiscUtil.playSound(player.getLocation(), "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
+            player.getWorld().playSound(player.getLocation(), sound, 1f, 1f);
         } else {
-            MiscUtil.playSound(player, "CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
+            player.playSound(player.getLocation(), sound, 1f, 1f);
         }
     }
 

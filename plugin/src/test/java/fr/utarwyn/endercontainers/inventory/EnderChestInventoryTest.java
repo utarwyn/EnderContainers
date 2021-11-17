@@ -122,7 +122,7 @@ public class EnderChestInventoryTest {
         Player viewer = mock(Player.class);
         Location location = mock(Location.class);
 
-        when(location.getWorld()).thenReturn(mock(World.class));
+        when(viewer.getWorld()).thenReturn(mock(World.class));
         when(viewer.getLocation()).thenReturn(location);
         TestHelper.registerManagers(manager);
 
@@ -144,16 +144,28 @@ public class EnderChestInventoryTest {
     }
 
     @Test
-    public void soundOnClose() {
+    public void globalSoundOnClose() {
         Player viewer = mock(Player.class);
         Location location = mock(Location.class);
         World world = mock(World.class);
 
-        when(location.getWorld()).thenReturn(world);
+        when(viewer.getWorld()).thenReturn(world);
         when(viewer.getLocation()).thenReturn(location);
 
         this.inventory.onClose(viewer);
         verify(world).playSound(location, Sound.BLOCK_CHEST_CLOSE, 1f, 1f);
+    }
+
+    @Test
+    public void playerSoundOnClose() throws TestInitializationException {
+        Player viewer = mock(Player.class);
+        Location location = mock(Location.class);
+
+        when(viewer.getLocation()).thenReturn(location);
+
+        TestHelper.overrideConfigurationValue("globalSound", false);
+        this.inventory.onClose(viewer);
+        verify(viewer).playSound(location, Sound.BLOCK_CHEST_CLOSE, 1f, 1f);
     }
 
 }
