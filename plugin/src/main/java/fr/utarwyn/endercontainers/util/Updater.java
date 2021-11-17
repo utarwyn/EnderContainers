@@ -106,7 +106,7 @@ public class Updater extends AbstractManager implements Runnable {
         Player player = event.getPlayer();
 
         // Send update message to the player if it has the permission
-        if (MiscUtil.playerHasPerm(player, "update") && this.hasToBeUpdated()) {
+        if (player.hasPermission("endercontainers.update") && this.hasToBeUpdated()) {
             this.notifyPlayer(player);
         }
     }

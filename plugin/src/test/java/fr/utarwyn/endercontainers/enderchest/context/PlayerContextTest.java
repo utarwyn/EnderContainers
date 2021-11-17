@@ -82,7 +82,7 @@ public class PlayerContextTest {
     @Test
     public void getAccessibleChestCount() {
         assertThat(this.context.getAccessibleChestCount()).isEqualTo(1);
-        when(this.player.isOp()).thenReturn(true);
+        when(this.player.hasPermission(anyString())).thenReturn(true);
         assertThat(this.context.getAccessibleChestCount()).isEqualTo(ENDERCHEST_AMOUNT);
     }
 
@@ -118,10 +118,7 @@ public class PlayerContextTest {
 
     @Test
     public void openListInventory() {
-        // With permission, main menu has to be opened
-        when(this.player.isOp()).thenReturn(true);
         this.context.openListInventory(this.player);
-
         assertThatPlayerOpenListInventory();
     }
 
@@ -159,7 +156,7 @@ public class PlayerContextTest {
     public void openEnderchestInventory() {
         assertThat(this.context.openEnderchestInventory(this.player, 0)).isTrue();
         assertThat(this.context.openEnderchestInventory(this.player, 2)).isFalse();
-        when(this.player.isOp()).thenReturn(true);
+        when(this.player.hasPermission(anyString())).thenReturn(true);
         assertThat(this.context.openEnderchestInventory(this.player, 2)).isTrue();
         assertThat(this.context.openEnderchestInventory(this.player, ENDERCHEST_AMOUNT)).isFalse();
     }

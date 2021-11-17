@@ -23,7 +23,7 @@ public class OpenCommand extends AbstractCommand {
 
         this.manager = Managers.get(EnderChestManager.class);
 
-        this.setPermission("openchests");
+        this.setPermission("endercontainers.openchests");
         this.addParameter(Parameter.string().withPlayersCompletions());
     }
 

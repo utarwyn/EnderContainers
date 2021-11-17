@@ -13,7 +13,7 @@ public class LoadCommand extends AbstractBackupCommand {
     public LoadCommand(BackupManager manager) {
         super("load", manager, "apply");
 
-        this.setPermission("backup.load");
+        this.setPermission("endercontainers.backup.load");
         this.addParameter(Parameter.string());
     }
 

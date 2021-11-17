@@ -13,7 +13,7 @@ public class CreateCommand extends AbstractBackupCommand {
     public CreateCommand(BackupManager manager) {
         super("create", manager, "new");
 
-        this.setPermission("backup.create");
+        this.setPermission("endercontainers.backup.create");
         this.addParameter(Parameter.string());
     }
 

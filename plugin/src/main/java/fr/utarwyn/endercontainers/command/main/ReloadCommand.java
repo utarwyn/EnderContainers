@@ -19,7 +19,7 @@ public class ReloadCommand extends AbstractCommand {
         super("reload", "rl");
         this.plugin = plugin;
 
-        this.setPermission("reload");
+        this.setPermission("endercontainers.reload");
     }
 
     @Override

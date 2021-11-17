@@ -20,7 +20,7 @@ public class InfoCommand extends AbstractBackupCommand {
     public InfoCommand(BackupManager manager) {
         super("info", manager);
 
-        this.setPermission("backup.info");
+        this.setPermission("endercontainers.backup.info");
         this.addParameter(Parameter.string());
     }
 

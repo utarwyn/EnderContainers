@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers.command.main;
 
 import fr.utarwyn.endercontainers.command.AbstractCommand;
-import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -30,8 +29,8 @@ public class HelpCommand extends AbstractCommand {
      * @return formated command
      */
     static String formatCommandFor(CommandSender sender, String command, String permission) {
-        if (!MiscUtil.senderHasPerm(sender, permission)) {
-            command = ChatColor.RED.toString() + ChatColor.STRIKETHROUGH.toString() + ChatColor.stripColor(command);
+        if (!sender.hasPermission("endercontainers." + permission)) {
+            command = ChatColor.RED.toString() + ChatColor.STRIKETHROUGH + ChatColor.stripColor(command);
         }
 
         return command;

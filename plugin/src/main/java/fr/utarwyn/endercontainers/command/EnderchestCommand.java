@@ -4,12 +4,14 @@ import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
-import fr.utarwyn.endercontainers.util.MiscUtil;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class EnderchestCommand extends AbstractCommand {
+
+    private static final String PERM_CHEST = "endercontainers.cmd.enderchest.%d";
+    private static final String PERM_CHEST_LIST = "endercontainers.cmd.enderchests";
 
     private final EnderChestManager manager;
 
@@ -47,7 +49,7 @@ public class EnderchestCommand extends AbstractCommand {
     }
 
     private void openListInventory(Player player) {
-        if (MiscUtil.playerHasPerm(player, "cmd.enderchests")) {
+        if (player.hasPermission(PERM_CHEST_LIST)) {
             this.manager.loadPlayerContext(player.getUniqueId(), context -> context.openListInventory(player));
         } else {
             PluginMsg.accessDenied(player);
@@ -55,7 +57,7 @@ public class EnderchestCommand extends AbstractCommand {
     }
 
     private void openChestInventory(Player player, int num) {
-        if (MiscUtil.playerHasPerm(player, "cmd.enderchests") || MiscUtil.playerHasPerm(player, "cmd.enderchest." + num)) {
+        if (player.hasPermission(PERM_CHEST_LIST) || player.hasPermission(String.format(PERM_CHEST, num))) {
             this.manager.loadPlayerContext(player.getUniqueId(), context -> {
                 if (!context.openEnderchestInventory(player, num)) {
                     PluginMsg.errorMessage(player, LocaleKey.ERR_NOPERM_OPEN_CHEST);

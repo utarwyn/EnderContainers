@@ -23,7 +23,7 @@ public class UpdateCommand extends AbstractCommand {
         super("update");
         this.updater = Managers.get(Updater.class);
 
-        this.setPermission("update");
+        this.setPermission("endercontainers.update");
     }
 
     @Override

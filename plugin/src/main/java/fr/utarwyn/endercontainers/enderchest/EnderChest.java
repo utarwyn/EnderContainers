@@ -3,7 +3,6 @@ package fr.utarwyn.endercontainers.enderchest;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.inventory.EnderChestInventory;
-import fr.utarwyn.endercontainers.util.MiscUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -17,6 +16,10 @@ import java.util.concurrent.ConcurrentMap;
  * @since 2.0.0
  */
 public class EnderChest {
+
+    private static final String PERM_OPEN = "endercontainers.open.%d";
+    private static final String PERM_SLOT_ROW = "endercontainers.slot%d.row%d";
+    private static final String PERM_SLOTS_ROW = "endercontainers.slots.row%d";
 
     /**
      * The number of the enderchest.
@@ -139,7 +142,7 @@ public class EnderChest {
 
         // For the first chest or if the player is offline, viewer has the access.
         if (!this.isDefault() && player != null) {
-            return MiscUtil.playerHasPerm(player, "open." + this.getNum());
+            return player.hasPermission(String.format(PERM_OPEN, this.getNum()));
         } else {
             return true;
         }
@@ -210,8 +213,8 @@ public class EnderChest {
 
         // check player permissions to compute the row count for this slot
         for (int perm = 6; perm > 0; perm--) {
-            if ((MiscUtil.playerHasPerm(player, "slot" + this.num + ".row" + perm)) ||
-                    (MiscUtil.playerHasPerm(player, "slots.row" + perm))) {
+            if (player.hasPermission(String.format(PERM_SLOT_ROW, this.num, perm))
+                    || player.hasPermission(String.format(PERM_SLOTS_ROW, perm))) {
                 count = perm;
                 break;
             }

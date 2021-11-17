@@ -88,7 +88,7 @@ public class UpdaterTest {
         verify(this.player, never()).playSound(any(), any(Sound.class), eq(1f), eq(1f));
 
         // no update
-        when(this.player.isOp()).thenReturn(true);
+        when(this.player.hasPermission("endercontainers.update")).thenReturn(true);
         this.updater.onPlayerJoin(event);
         verify(this.player, never()).playSound(any(), any(Sound.class), eq(1f), eq(1f));
 

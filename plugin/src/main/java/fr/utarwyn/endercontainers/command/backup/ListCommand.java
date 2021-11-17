@@ -14,7 +14,7 @@ public class ListCommand extends AbstractBackupCommand {
     public ListCommand(BackupManager manager) {
         super("list", manager);
 
-        this.setPermission("backup.list");
+        this.setPermission("endercontainers.backup.list");
     }
 
     @Override

@@ -22,11 +22,6 @@ import java.util.stream.Collectors;
 public abstract class AbstractCommand extends Command implements TabCompleter, CommandExecutor, Listener {
 
     /**
-     * Prefix for all command permissions of the plugin
-     */
-    private static final String PERM_PREFIX = "endercontainers.";
-
-    /**
      * Permission needed to type the command (for a player)
      */
     private String permission;
@@ -250,7 +245,7 @@ public abstract class AbstractCommand extends Command implements TabCompleter, C
      * @return true if the player has the access
      */
     private boolean hasRequiredPermission(Player player) {
-        return this.permission == null || player.hasPermission(PERM_PREFIX + this.permission);
+        return this.permission == null || player.hasPermission(this.permission);
     }
 
     /**
