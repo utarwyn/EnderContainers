@@ -57,6 +57,7 @@ public class EnderChestTest {
 
     @Test
     public void initialState() {
+        assertThat(this.chest.container).isNotNull();
         assertThat(this.chest.getNum()).isEqualTo(1);
         assertThat(this.chest.getRows()).isEqualTo(3);
         assertThat(this.chest.getMaxSize()).isEqualTo(27);
