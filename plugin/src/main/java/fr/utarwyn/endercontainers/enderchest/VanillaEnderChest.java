@@ -94,6 +94,14 @@ public class VanillaEnderChest extends EnderChest {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateContainer() {
+        // No custom container attached
+    }
+
+    /**
      * Retrieves the offline player profile from server data.
      * MUST be called in a synchronous way.
      *

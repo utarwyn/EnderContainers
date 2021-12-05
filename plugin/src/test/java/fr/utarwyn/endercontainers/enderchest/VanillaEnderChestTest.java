@@ -23,15 +23,15 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class VanillaEnderChestTest {
 
-    private VanillaEnderChest chest;
-
-    private Player player;
-
     @Mock
     private PlayerContext context;
 
     @Mock
     private Inventory inventory;
+
+    private Player player;
+
+    private VanillaEnderChest chest;
 
     @BeforeClass
     public static void setUpClass() throws TestInitializationException {
@@ -49,9 +49,11 @@ public class VanillaEnderChestTest {
     }
 
     @Test
-    public void create() {
-        assertThat(this.chest.getNum()).isZero();
+    public void initialize() {
+        assertThat(this.chest.container).isNull();
+        assertThat(this.chest.getNum()).isEqualTo(0);
         assertThat(this.chest.getRows()).isEqualTo(3);
+        assertThat(this.chest.getMaxSize()).isEqualTo(27);
         assertThat(this.chest.getOwnerAsPlayer()).isEqualTo(this.player);
     }
 
@@ -76,10 +78,31 @@ public class VanillaEnderChestTest {
     }
 
     @Test
+    public void updateRowCount() {
+        this.chest.updateRowCount();
+        assertThat(this.chest.getRows()).isEqualTo(3);
+    }
+
+    @Test
+    public void doNotUpdateContainer() {
+        this.chest.updateContainer();
+        assertThat(this.chest.container).isNull();
+    }
+
+    @Test
     public void getSize() {
-        ItemStack item = mock(ItemStack.class);
+        // Inventory without owner
+        when(this.context.getOwnerAsObject()).thenReturn(null);
+        assertThat((new VanillaEnderChest(this.context)).getSize()).isZero();
+
+        // Inventory without content
+        when(this.inventory.getContents()).thenReturn(new ItemStack[0]);
+        assertThat(this.chest.getSize()).isZero();
+
+        // Inventory with few items
+        ItemStack itemStack = mock(ItemStack.class);
         when(this.inventory.getContents()).thenReturn(
-                Arrays.asList(item, null, item, item, null).toArray(new ItemStack[0])
+                Arrays.asList(itemStack, itemStack, null, itemStack).toArray(new ItemStack[0])
         );
         assertThat(this.chest.getSize()).isEqualTo(3);
     }

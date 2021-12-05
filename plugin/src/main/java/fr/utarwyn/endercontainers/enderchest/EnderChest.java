@@ -51,7 +51,7 @@ public class EnderChest {
         this.context = context;
         this.num = num;
         this.updateRowCount();
-        this.container = new EnderChestInventory(this);
+        this.updateContainer();
     }
 
     /**
@@ -224,7 +224,7 @@ public class EnderChest {
     }
 
     /**
-     * Updates container of the chest if needed.
+     * Updates or creates custom container of the chest.
      */
     public void updateContainer() {
         if (this.container != null) {
@@ -241,6 +241,8 @@ public class EnderChest {
             if (needReload) {
                 this.container.reloadInventory();
             }
+        } else {
+            this.container = new EnderChestInventory(this);
         }
     }
 
