@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.compatibility.nms;
 import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * Base class to perform reflection things on current server net classes.
@@ -78,6 +79,22 @@ public abstract class NMSUtil {
     protected static Class<?> getNMSClass(String className, String package1_17)
             throws ClassNotFoundException {
         return Class.forName((MC_PACKAGE != null ? MC_PACKAGE + package1_17 + "." : NMS_PACKAGE) + className);
+    }
+
+    /**
+     * Get an internal net Minecraft Server method with a name changes.
+     * Usefull from Minecraft 1.18 because of minifier.
+     *
+     * @param clazz          class where the method is located
+     * @param name           name used before Minecraft 1.18
+     * @param name1_18       name introduced with Minecraft 1.18
+     * @param parameterTypes parameter types
+     * @return located method
+     * @throws NoSuchMethodException thrown if method has not been found
+     */
+    protected static Method getNMSDynamicMethod(Class<?> clazz, String name, String name1_18, Class<?>... parameterTypes)
+            throws NoSuchMethodException {
+        return clazz.getMethod(ServerVersion.isNewerThan(ServerVersion.V1_17) ? name1_18 : name, parameterTypes);
     }
 
     /**
