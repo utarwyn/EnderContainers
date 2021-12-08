@@ -28,10 +28,12 @@ public class NMSUtilTest {
 
     @Test
     public void getNMSDynamicMethod() throws ReflectiveOperationException {
+        ServerVersion defVersion = ServerVersion.get();
         overrideServerVersion(ServerVersion.V1_8);
         assertThat(NMSUtil.getNMSDynamicMethod(String.class, "toLowerCase", "toUpperCase").invoke("TeSt")).isEqualTo("test");
         overrideServerVersion(ServerVersion.V1_18);
         assertThat(NMSUtil.getNMSDynamicMethod(String.class, "toLowerCase", "toUpperCase").invoke("TeSt")).isEqualTo("TEST");
+        overrideServerVersion(defVersion);
     }
 
 }
