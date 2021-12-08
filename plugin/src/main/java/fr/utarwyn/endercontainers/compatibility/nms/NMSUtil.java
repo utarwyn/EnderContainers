@@ -87,14 +87,14 @@ public abstract class NMSUtil {
      *
      * @param clazz          class where the method is located
      * @param name           name used before Minecraft 1.18
-     * @param name1_18       name introduced with Minecraft 1.18
+     * @param name18         name introduced with Minecraft 1.18
      * @param parameterTypes parameter types
      * @return located method
      * @throws NoSuchMethodException thrown if method has not been found
      */
-    protected static Method getNMSDynamicMethod(Class<?> clazz, String name, String name1_18, Class<?>... parameterTypes)
+    protected static Method getNMSDynamicMethod(Class<?> clazz, String name, String name18, Class<?>... parameterTypes)
             throws NoSuchMethodException {
-        return clazz.getMethod(ServerVersion.isNewerThan(ServerVersion.V1_17) ? name1_18 : name, parameterTypes);
+        return clazz.getMethod(ServerVersion.isNewerThan(ServerVersion.V1_17) ? name18 : name, parameterTypes);
     }
 
     /**
