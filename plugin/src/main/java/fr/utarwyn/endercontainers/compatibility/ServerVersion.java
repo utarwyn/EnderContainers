@@ -19,7 +19,8 @@ public enum ServerVersion {
     V1_14,
     V1_15,
     V1_16,
-    V1_17;
+    V1_17,
+    V1_18;
 
     private static ServerVersion currentVersion;
 

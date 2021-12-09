@@ -17,8 +17,6 @@ import java.util.UUID;
  */
 public class NMSPlayerUtil extends NMSUtil {
 
-    private static final String GET_WORLD_SERVER_METHOD = "getWorldServer";
-
     /**
      * Singleton instance of the utility class.
      */
@@ -34,6 +32,8 @@ public class NMSPlayerUtil extends NMSUtil {
 
     private final Object worldServer;
 
+    private final String methodGetWorldServer;
+
     private Object playerInteractManager;
 
     /**
@@ -46,6 +46,9 @@ public class NMSPlayerUtil extends NMSUtil {
         Class<?> minecraftServerClass = getNMSClass("MinecraftServer", "server");
         Class<?> gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
         Class<?> worldServerClass = getNMSClass("WorldServer", "server.level");
+
+        // 1.18+ :: New method names
+        methodGetWorldServer = ServerVersion.isNewerThan(ServerVersion.V1_17) ? "a" : "getWorldServer";
 
         gameProfileContructor = gameProfileClass.getDeclaredConstructor(UUID.class, String.class);
         minecraftServer = minecraftServerClass.getMethod("getServer").invoke(null);
@@ -127,7 +130,7 @@ public class NMSPlayerUtil extends NMSUtil {
         Object resourceKey = constructResourceKey.invoke(null, dimensionKey, overworldKey);
         constructResourceKey.setAccessible(false);
 
-        Method getWorldServer = minecraftServerClass.getDeclaredMethod(GET_WORLD_SERVER_METHOD, genericResourceKey);
+        Method getWorldServer = minecraftServerClass.getDeclaredMethod(methodGetWorldServer, genericResourceKey);
         return getWorldServer.invoke(minecraftServer, resourceKey);
     }
 
@@ -139,11 +142,11 @@ public class NMSPlayerUtil extends NMSUtil {
             } else {
                 Class<?> dimensionManagerClass = getNMSClass("DimensionManager", null);
                 Object dimension = dimensionManagerClass.getDeclaredField("OVERWORLD").get(null);
-                Method method = minecraftServerClass.getMethod(GET_WORLD_SERVER_METHOD, dimensionManagerClass);
+                Method method = minecraftServerClass.getMethod(methodGetWorldServer, dimensionManagerClass);
                 server = method.invoke(minecraftServer, dimension);
             }
         } else {
-            Method method = minecraftServerClass.getMethod(GET_WORLD_SERVER_METHOD, int.class);
+            Method method = minecraftServerClass.getMethod(methodGetWorldServer, int.class);
             server = method.invoke(minecraftServer, 0);
         }
 
