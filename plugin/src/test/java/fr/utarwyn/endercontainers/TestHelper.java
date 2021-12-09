@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers;
 
+import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 import fr.utarwyn.endercontainers.compatibility.nms.NMSHologramUtil;
 import fr.utarwyn.endercontainers.configuration.ConfigLoadingException;
 import fr.utarwyn.endercontainers.configuration.Configuration;
@@ -268,6 +269,22 @@ public class TestHelper {
         }
 
         filesReady = false;
+    }
+
+    /**
+     * Overrides server version.
+     *
+     * @param version version to force
+     */
+    public static void overrideServerVersion(ServerVersion version) {
+        try {
+            Field currentVersion = ServerVersion.class.getDeclaredField("currentVersion");
+            currentVersion.setAccessible(true);
+            currentVersion.set(null, version);
+            currentVersion.setAccessible(false);
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

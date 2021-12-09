@@ -172,14 +172,18 @@ public class NMSHologramUtil extends NMSUtil {
     public int spawnHologram(Location location, String text, Player observer) throws ReflectiveOperationException {
         // Then, we need to generate the fake armorstand
         Object entity = this.createHologramEntity(location.getWorld(), location.getX(), location.getY(), location.getZ(), text);
-        int entityId = (int) this.entityClass.getDeclaredMethod("getId").invoke(entity);
+
+        // 1.18+ :: New method name in Entity class
+        Method getId = getNMSDynamicMethod(this.entityClass, "getId", "ae");
+        int entityId = (int) getId.invoke(entity);
 
         // Send the spawn packet for 1.8+
         this.sendPacket(observer, spawnPacketConstructor.newInstance(entity));
 
         // Send the metadata packet for 1.15+
         if (ServerVersion.isNewerThan(ServerVersion.V1_14)) {
-            Method getDataWatcher = this.entityClass.getDeclaredMethod("getDataWatcher");
+            // 1.18+ :: New method name in Entity class
+            Method getDataWatcher = getNMSDynamicMethod(this.entityClass, "getDataWatcher", "ai");
             Object metadataPacket = this.metadataPacketConstructor.newInstance(entityId, getDataWatcher.invoke(entity), false);
             this.sendPacket(observer, metadataPacket);
         }
@@ -217,7 +221,7 @@ public class NMSHologramUtil extends NMSUtil {
         Method getHandle = player.getClass().getMethod("getHandle");
         Object entityPlayer = getHandle.invoke(player);
         Object pConnection = this.playerConnectionField.get(entityPlayer);
-        Method sendMethod = pConnection.getClass().getMethod("sendPacket", this.packetClass);
+        Method sendMethod = getNMSDynamicMethod(pConnection.getClass(), "sendPacket", "a", this.packetClass);
 
         sendMethod.invoke(pConnection, packet);
     }
@@ -233,8 +237,7 @@ public class NMSHologramUtil extends NMSUtil {
      * @return The spawn packet object
      * @throws ReflectiveOperationException error with reflection
      */
-    private Object createHologramEntity(World w, double x, double y, double z, String text)
-            throws ReflectiveOperationException {
+    private Object createHologramEntity(World w, double x, double y, double z, String text) throws ReflectiveOperationException {
         Object craftWorldObj = this.craftWorldClass.cast(w);
         Method getHandleMethod = craftWorldObj.getClass().getMethod("getHandle");
         Object entityObject;
@@ -243,8 +246,8 @@ public class NMSHologramUtil extends NMSUtil {
         if (ServerVersion.isNewerThan(ServerVersion.V1_13)) {
             Optional<Object> armorStandType = (Optional<Object>) this.entityTypesInvokationMethod.invoke(null, "armor_stand");
             entityObject = this.armorStandConstructor.newInstance(
-                    armorStandType.orElseThrow(() -> new NullPointerException("ArmorStand entity type not found")), getHandleMethod.invoke(craftWorldObj)
-            );
+                    armorStandType.orElseThrow(() -> new NullPointerException("ArmorStand entity type not found")),
+                    getHandleMethod.invoke(craftWorldObj));
         } else {
             entityObject = this.armorStandConstructor.newInstance(getHandleMethod.invoke(craftWorldObj));
         }
@@ -254,7 +257,7 @@ public class NMSHologramUtil extends NMSUtil {
             Method fromStringOrNullMethod = this.chatMessageClass.getMethod("fromStringOrNull", String.class);
             Object chatComponent = fromStringOrNullMethod.invoke(null, text);
 
-            Method setCustomName = entityObject.getClass().getMethod("setCustomName", this.chatBaseComponentClass);
+            Method setCustomName = getNMSDynamicMethod(entityObject.getClass(), "setCustomName", "a", this.chatBaseComponentClass);
             setCustomName.invoke(entityObject, chatComponent);
         } else {
             Method setCustomName = entityObject.getClass().getMethod("setCustomName", String.class);
@@ -263,20 +266,23 @@ public class NMSHologramUtil extends NMSUtil {
 
         // In 1.10+ versions, setGravity has been replaced with setNoGravity
         if (ServerVersion.isNewerThan(ServerVersion.V1_9)) {
-            Method setNoGravity = entityObject.getClass().getMethod("setNoGravity", boolean.class);
+            Method setNoGravity = getNMSDynamicMethod(entityObject.getClass(), "setNoGravity", "e", boolean.class);
             setNoGravity.invoke(entityObject, true);
         } else {
             Method setGravity = entityObject.getClass().getMethod("setGravity", boolean.class);
             setGravity.invoke(entityObject, false);
         }
 
-        Method setCustomNameVisible = entityClass.getMethod("setCustomNameVisible", boolean.class);
+        Method setCustomNameVisible = getNMSDynamicMethod(entityClass, "setCustomNameVisible", "n", boolean.class);
         setCustomNameVisible.invoke(entityObject, true);
 
-        Method setLocation = entityObject.getClass().getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
+        Method setLocation = getNMSDynamicMethod(
+                entityObject.getClass(), "setLocation", "a",
+                double.class, double.class, double.class, float.class, float.class
+        );
         setLocation.invoke(entityObject, x, y, z, 0.0F, 0.0F);
 
-        Method setInvisible = entityObject.getClass().getMethod("setInvisible", boolean.class);
+        Method setInvisible = getNMSDynamicMethod(entityObject.getClass(), "setInvisible", "j", boolean.class);
         setInvisible.invoke(entityObject, true);
 
         return entityObject;
