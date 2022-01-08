@@ -14,7 +14,7 @@ public abstract class DependencyResolverPattern {
 
     private final Class<? extends Dependency> clazz;
 
-    public DependencyResolverPattern(Class<? extends Dependency> clazz) {
+    protected DependencyResolverPattern(Class<? extends Dependency> clazz) {
         this.clazz = clazz;
     }
 
