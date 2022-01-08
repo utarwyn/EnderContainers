@@ -1,15 +1,15 @@
-package fr.utarwyn.endercontainers.dependency;
+package fr.utarwyn.endercontainers.dependency.resolve;
 
+import fr.utarwyn.endercontainers.dependency.Dependency;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 /**
- * Resolve a dependency instance with a custom version matching.
+ * Resolve a dependency instance using custom matching patterns.
  *
  * @author Utarwyn <maxime.malgorn@laposte.net>
  * @since 2.2.0
@@ -24,7 +24,7 @@ public class DependencyResolver {
     /**
      * Patterns to match dependency's versions
      */
-    private final Map<Pattern, Class<? extends Dependency>> patterns;
+    private final List<DependencyResolverPattern> patterns;
 
     /**
      * Name of the dependency instance to build
@@ -38,7 +38,7 @@ public class DependencyResolver {
      */
     public DependencyResolver(PluginManager pluginManager) {
         this.pluginManager = pluginManager;
-        this.patterns = new HashMap<>();
+        this.patterns = new ArrayList<>();
     }
 
     /**
@@ -61,7 +61,19 @@ public class DependencyResolver {
      * @return this instance
      */
     public DependencyResolver matchVersion(String expression, Class<? extends Dependency> clazz) {
-        this.patterns.put(Pattern.compile(expression), clazz);
+        this.patterns.add(new DependencyResolverPatternVersion(expression, clazz));
+        return this;
+    }
+
+    /**
+     * Match a specific dependency class from an author name.
+     *
+     * @param author dependency author to match
+     * @param clazz  class to use for for the targeted author
+     * @return this instance
+     */
+    public DependencyResolver matchAuthor(String author, Class<? extends Dependency> clazz) {
+        this.patterns.add(new DependencyResolverPatternAuthor(author, clazz));
         return this;
     }
 
@@ -103,19 +115,10 @@ public class DependencyResolver {
      * @return dependency instance if present
      */
     private Optional<Dependency> constructInstance(Plugin plugin) {
-        String pluginVersion = plugin.getDescription().getVersion();
-
-        return this.patterns.entrySet().stream()
-                .filter(entry -> entry.getKey().matcher(pluginVersion).find())
-                .map(Map.Entry::getValue)
+        return this.patterns.stream()
+                .filter(pattern -> pattern.matchWith(plugin))
                 .findFirst()
-                .map(clazz -> {
-                    try {
-                        return clazz.getDeclaredConstructor(Plugin.class).newInstance(plugin);
-                    } catch (ReflectiveOperationException e) {
-                        return null;
-                    }
-                });
+                .map(pattern -> pattern.construct(plugin));
     }
 
 }
