@@ -43,8 +43,8 @@ public class FactionsUUIDDependency extends Dependency {
         Faction playerFac = fPlayer.getFaction();
         Faction currentFac = Board.getInstance().getFactionAt(new FLocation(block));
 
-        boolean playerFacIsReal = this.isRealFaction(playerFac);
-        boolean currentFacIsReal = this.isRealFaction(currentFac);
+        boolean playerFacIsReal = playerFac != null && playerFac.isNormal();
+        boolean currentFacIsReal = currentFac != null && currentFac.isNormal();
 
         // Check permission between the two factions if there are real
         if (playerFacIsReal && currentFacIsReal) {
@@ -61,20 +61,6 @@ public class FactionsUUIDDependency extends Dependency {
                     Collections.singletonMap("faction", currentFac.getTag())
             );
         }
-    }
-
-    /**
-     * Checks if a faction is real or fictive.
-     * Handles Warzone, Safezone and Wilderness.
-     *
-     * @param faction faction to check
-     * @return true if the faction is real
-     */
-    private boolean isRealFaction(Faction faction) {
-        return faction != null
-                && !faction.isWilderness()
-                && !faction.isWarZone()
-                && !faction.isSafeZone();
     }
 
 }
