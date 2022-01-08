@@ -23,6 +23,10 @@
             <id>enginehub</id>
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
+        <repository>
+            <id>utarwyn</id>
+            <url>https://repo.utarwyn.fr</url>
+        </repository>
     </repositories>
 
     <dependencies>
