@@ -72,13 +72,13 @@ public class InventoryManagerTest {
         );
 
         // Default behavior (no interaction)
-        when(this.holder.isItemMovingRestricted()).thenReturn(true);
+        when(this.holder.canMoveItemInside(any())).thenReturn(false);
         this.manager.onInventoryClick(event);
         assertThat(event.isCancelled()).isTrue();
         verify(holder).onClick(player, event.getRawSlot());
 
         // With interaction allowed
-        when(this.holder.isItemMovingRestricted()).thenReturn(false);
+        when(this.holder.canMoveItemInside(any())).thenReturn(true);
         this.manager.onInventoryClick(event);
         assertThat(event.isCancelled()).isFalse();
         verify(holder, times(2)).onClick(player, event.getRawSlot());
@@ -94,7 +94,7 @@ public class InventoryManagerTest {
                 ClickType.LEFT, InventoryAction.NOTHING
         );
 
-        when(this.holder.isItemMovingRestricted()).thenReturn(true);
+        when(this.holder.canMoveItemInside(any())).thenReturn(false);
         this.manager.onInventoryClick(event);
         assertThat(event.isCancelled()).isFalse();
 
@@ -145,14 +145,14 @@ public class InventoryManagerTest {
         );
 
         // With the restriction enabled
-        when(this.holder.isItemMovingRestricted()).thenReturn(true);
+        when(this.holder.canMoveItemInside(any())).thenReturn(false);
         this.manager.onInventoryDrag(event);
         assertThat(event.isCancelled()).isTrue();
 
         event.setResult(Event.Result.DEFAULT); // reset the event result
 
         // With the restriction disabled
-        when(this.holder.isItemMovingRestricted()).thenReturn(false);
+        when(this.holder.canMoveItemInside(any())).thenReturn(true);
         this.manager.onInventoryDrag(event);
         assertThat(event.isCancelled()).isFalse();
     }
@@ -167,12 +167,12 @@ public class InventoryManagerTest {
         );
 
         // With the restriction enabled
-        when(this.holder.isItemMovingRestricted()).thenReturn(true);
+        when(this.holder.canMoveItemInside(any())).thenReturn(false);
         this.manager.onInventoryDrag(event);
         assertThat(event.isCancelled()).isFalse();
 
         // With the restriction disabled
-        when(this.holder.isItemMovingRestricted()).thenReturn(false);
+        when(this.holder.canMoveItemInside(any())).thenReturn(true);
         this.manager.onInventoryDrag(event);
         assertThat(event.isCancelled()).isFalse();
 

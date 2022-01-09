@@ -10,6 +10,9 @@ enderchests:
   onlyShowAccessible: false
   useVanillaEnderchest: true
   numberingEnderchests: true
+  forbiddenMaterials:
+    - andesite
+    - purpur_block
 mysql:
   enabled: false
   host: 'localhost'

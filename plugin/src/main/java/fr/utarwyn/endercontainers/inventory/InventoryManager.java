@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Optional;
 
@@ -48,7 +49,9 @@ public class InventoryManager extends AbstractManager {
         if (holder.isPresent()) {
             // A restricted move is when player clicks in the inventory or uses shift click
             boolean restrictedMove = validSlot || event.isShiftClick();
-            event.setCancelled(this.isMoveItemRestricted(event.getWhoClicked(), holder.get()) && restrictedMove);
+            event.setCancelled(restrictedMove && this.isMoveItemRestricted(
+                    event.getWhoClicked(), event.isShiftClick() ? event.getCurrentItem() : event.getCursor(), holder.get()
+            ));
 
             // Perform the action only when player clicks on a valid slot of the inventory
             if (validSlot) {
@@ -68,8 +71,12 @@ public class InventoryManager extends AbstractManager {
         Inventory inventory = event.getView().getTopInventory();
         Optional<AbstractInventoryHolder> holder = this.getInventoryHolder(inventory);
 
-        if (event.getWhoClicked() instanceof Player && holder.isPresent()
-                && this.isMoveItemRestricted(event.getWhoClicked(), holder.get())) {
+        // TODO improve readability of this code
+        if (
+                event.getWhoClicked() instanceof Player
+                        && holder.isPresent()
+                        && this.isMoveItemRestricted(event.getWhoClicked(), event.getNewItems().values().stream().findFirst().orElse(null), holder.get())
+        ) {
             boolean itemInInventory = event.getRawSlots().stream()
                     .anyMatch(slot -> slot < inventory.getSize());
 
@@ -124,11 +131,12 @@ public class InventoryManager extends AbstractManager {
      * Checks if a player can move an item in a specific inventory or not.
      *
      * @param human  human entity instance
+     * @param item   itemstack moved into the inventory
      * @param holder inventory holder where the item wants to be moved
      * @return false if the move is retricted for the player, false otherwise
      */
-    private boolean isMoveItemRestricted(HumanEntity human, AbstractInventoryHolder holder) {
-        return holder.isItemMovingRestricted() || GameMode.SPECTATOR == human.getGameMode();
+    private boolean isMoveItemRestricted(HumanEntity human, ItemStack item, AbstractInventoryHolder holder) {
+        return GameMode.SPECTATOR == human.getGameMode() || !holder.canMoveItemInside(item);
     }
 
 }

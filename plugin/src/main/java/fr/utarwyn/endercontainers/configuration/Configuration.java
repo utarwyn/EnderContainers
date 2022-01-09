@@ -22,6 +22,7 @@ public class Configuration {
     private final boolean onlyShowAccessibleEnderchests;
     private final boolean useVanillaEnderchest;
     private final boolean numberingEnderchests;
+    private final List<String> forbiddenMaterials;
 
     private final boolean mysql;
     private final String mysqlHost;
@@ -56,6 +57,7 @@ public class Configuration {
         this.onlyShowAccessibleEnderchests = loadValue("enderchests.onlyShowAccessible", config::isBoolean, config::getBoolean);
         this.useVanillaEnderchest = loadValue("enderchests.useVanillaEnderchest", config::isBoolean, config::getBoolean);
         this.numberingEnderchests = loadValue("enderchests.numberingEnderchests", config::isBoolean, config::getBoolean);
+        this.forbiddenMaterials = loadValue("enderchests.forbiddenMaterials", config::isList, config::getStringList);
 
         this.mysql = loadValue("mysql.enabled", config::isBoolean, config::getBoolean);
         this.mysqlHost = loadValue("mysql.host", config::isString, config::getString);
@@ -110,6 +112,10 @@ public class Configuration {
 
     public boolean isNumberingEnderchests() {
         return this.numberingEnderchests;
+    }
+
+    public List<String> getForbiddenMaterials() {
+        return this.forbiddenMaterials;
     }
 
     public boolean isMysql() {
