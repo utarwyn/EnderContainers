@@ -40,6 +40,12 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>endercontainers-dependency-factionsuuid</artifactId>
+            <version>2.2.3-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>endercontainers-dependency-plotsquared</artifactId>
             <version>2.2.3-SNAPSHOT</version>
         </dependency>

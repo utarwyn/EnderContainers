@@ -1,5 +1,6 @@
-package fr.utarwyn.endercontainers.dependency;
+package fr.utarwyn.endercontainers.dependency.resolve;
 
+import fr.utarwyn.endercontainers.dependency.Dependency;
 import fr.utarwyn.endercontainers.mock.DependencyMock;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -10,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -30,6 +32,7 @@ public class DependencyResolverTest {
         // Create a fake description file for the plugin
         PluginDescriptionFile descriptionFile = mock(PluginDescriptionFile.class);
         when(descriptionFile.getVersion()).thenReturn("1.12.5");
+        when(descriptionFile.getAuthors()).thenReturn(Collections.singletonList("Utarwyn"));
 
         // Plugin manager stubs
         when(this.plugin.getDescription()).thenReturn(descriptionFile);
@@ -56,7 +59,9 @@ public class DependencyResolverTest {
 
         // Wrong dependency class with enabled plugin
         resolver.name("Plugin");
-        assertThat(resolver.resolve()).isEmpty();
+        assertThatIllegalStateException().isThrownBy(resolver::resolve)
+                .withCauseInstanceOf(ReflectiveOperationException.class)
+                .withMessageContaining("cannot instanciate");
     }
 
     @Test
@@ -86,6 +91,16 @@ public class DependencyResolverTest {
 
         // Matched version
         resolver.matchVersion("^1.*", DependencyMock.class);
+        assertThat(resolver.resolve()).isNotEmpty();
+    }
+
+    @Test
+    public void resolvingOrder() {
+        DependencyResolver resolver = new DependencyResolver(this.pluginManager)
+                .name("Plugin")
+                .matchAuthor("Utarwyn", DependencyMock.class)
+                .use(null);
+
         assertThat(resolver.resolve()).isNotEmpty();
     }
 

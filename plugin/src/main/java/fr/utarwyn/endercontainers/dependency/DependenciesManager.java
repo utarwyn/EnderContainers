@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.dependency;
 
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
+import fr.utarwyn.endercontainers.dependency.resolve.DependencyResolver;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -88,6 +89,7 @@ public class DependenciesManager extends AbstractManager implements DependencyVa
         // Factions
         new DependencyResolver(this.pluginManager)
                 .name("Factions")
+                .matchAuthor("mbaxter", FactionsUUIDDependency.class)
                 .matchVersion("^1\\.6.*", Factions1Dependency.class)
                 .matchVersion("^2.*", Factions2Dependency.class)
                 .resolve().ifPresent(this::enableDependency);

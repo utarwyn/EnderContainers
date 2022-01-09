@@ -45,6 +45,7 @@
         <module>api</module>
         <module>dependencies/Factions1</module>
         <module>dependencies/Factions2</module>
+        <module>dependencies/FactionsUUID</module>
         <module>dependencies/PlotSquared</module>
         <module>dependencies/WorldGuard6</module>
         <module>dependencies/WorldGuard7</module>
