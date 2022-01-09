@@ -7,6 +7,7 @@ dependencies {
     implementation project(':api')
     implementation project(':dependencies:factions1')
     implementation project(':dependencies:factions2')
+    implementation project(':dependencies:factionsuuid')
     implementation project(':dependencies:plotsquared')
     implementation project(':dependencies:worldguard6')
     implementation project(':dependencies:worldguard7')
