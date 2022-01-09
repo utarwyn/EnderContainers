@@ -33,9 +33,11 @@ public class AbstractInventoryHolderTest {
     }
 
     @Test
-    public void canMoveItemInside() {
-        // Default behavior does not allow moving item
-        assertThat(this.holder.canMoveItemInside(any())).isFalse();
+    public void itemMovingRestricted() {
+        this.holder.itemMovingRestricted = true;
+        assertThat(this.holder.isItemMovingRestricted()).isTrue();
+        this.holder.itemMovingRestricted = false;
+        assertThat(this.holder.isItemMovingRestricted()).isFalse();
     }
 
     @Test

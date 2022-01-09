@@ -7,10 +7,12 @@ import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.enderchest.context.SaveTask;
+import fr.utarwyn.endercontainers.enderchest.listener.EnderChestListener;
 import fr.utarwyn.endercontainers.inventory.InventoryManager;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -45,8 +47,9 @@ public class EnderChestManagerTest {
     @Test
     public void initialize() throws TestInitializationException {
         DependenciesManager dependenciesManager = mock(DependenciesManager.class);
+        InventoryManager inventoryManager = mock(InventoryManager.class);
 
-        TestHelper.registerManagers(dependenciesManager);
+        TestHelper.registerManagers(dependenciesManager, inventoryManager);
         TestHelper.setupManager(this.manager);
 
         this.manager.initialize();
@@ -71,6 +74,14 @@ public class EnderChestManagerTest {
         verify(context).save();
         verify(inventoryManager).closeAll();
         assertThat(this.manager.contextMap).isEmpty();
+    }
+
+    @Test
+    public void getForbiddenMaterials() {
+        assertThat(this.manager.getForbiddenMaterials())
+                .isNotEmpty()
+                .hasSize(2)
+                .containsExactlyInAnyOrder(Material.PURPUR_BLOCK, Material.ANDESITE);
     }
 
     @Test

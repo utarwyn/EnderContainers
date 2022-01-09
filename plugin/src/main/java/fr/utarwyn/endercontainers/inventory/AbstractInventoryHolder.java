@@ -26,6 +26,11 @@ public abstract class AbstractInventoryHolder implements InventoryHolder {
     protected Inventory inventory;
 
     /**
+     * Flag which defines if item moves in the inventory are restricted
+     */
+    protected boolean itemMovingRestricted = true;
+
+    /**
      * True if the inventory has been initialized, false otherwise
      */
     private boolean initialized;
@@ -47,6 +52,15 @@ public abstract class AbstractInventoryHolder implements InventoryHolder {
     @Override
     public Inventory getInventory() {
         return this.inventory;
+    }
+
+    /**
+     * Check if item moves inside this inventory are restricted.
+     *
+     * @return value of the moveRestricted flag
+     */
+    public boolean isItemMovingRestricted() {
+        return this.itemMovingRestricted;
     }
 
     /**
@@ -75,16 +89,6 @@ public abstract class AbstractInventoryHolder implements InventoryHolder {
      */
     public void onClick(Player player, int slot) {
         // Not implemented
-    }
-
-    /**
-     * Check if a specific item can be moved inside the inventory.
-     *
-     * @param itemStack item that wants to be moved
-     * @return true if the item can be moved, false otherwise
-     */
-    public boolean canMoveItemInside(ItemStack itemStack) {
-        return false;
     }
 
     /**

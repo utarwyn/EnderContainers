@@ -9,12 +9,10 @@ import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
 
@@ -43,6 +41,8 @@ public class EnderChestInventory extends AbstractInventoryHolder {
      */
     public EnderChestInventory(EnderChest chest) {
         this.chest = chest;
+        this.itemMovingRestricted = false;
+
         this.reloadInventory();
     }
 
@@ -110,16 +110,6 @@ public class EnderChestInventory extends AbstractInventoryHolder {
         return Files.getLocale().getMessage(LocaleKey.MENU_CHEST_TITLE)
                 .replace("%player%", playername)
                 .replace("%num%", num);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean canMoveItemInside(ItemStack itemStack) {
-        List<String> forbiddenMaterialNames = Files.getConfiguration().getForbiddenMaterials();
-        return forbiddenMaterialNames.isEmpty() || itemStack == null || forbiddenMaterialNames.stream()
-                .noneMatch(name -> itemStack.getType() == Material.matchMaterial(name));
     }
 
     /**

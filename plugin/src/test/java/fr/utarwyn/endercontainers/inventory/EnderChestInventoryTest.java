@@ -117,16 +117,6 @@ public class EnderChestInventoryTest {
     }
 
     @Test
-    public void filteringItems() {
-        ItemStack allowedItem = new ItemStack(Material.OAK_BOAT);
-        ItemStack forbiddenItem = new ItemStack(Material.PURPUR_BLOCK);
-
-        assertThat(this.inventory.canMoveItemInside(null)).isTrue();
-        assertThat(this.inventory.canMoveItemInside(allowedItem)).isTrue();
-        assertThat(this.inventory.canMoveItemInside(forbiddenItem)).isFalse();
-    }
-
-    @Test
     public void saveOnClose() throws TestInitializationException {
         EnderChestManager manager = mock(EnderChestManager.class);
         Player viewer = mock(Player.class);

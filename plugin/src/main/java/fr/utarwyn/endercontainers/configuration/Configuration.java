@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.configuration;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.List;
@@ -57,7 +58,11 @@ public class Configuration {
         this.onlyShowAccessibleEnderchests = loadValue("enderchests.onlyShowAccessible", config::isBoolean, config::getBoolean);
         this.useVanillaEnderchest = loadValue("enderchests.useVanillaEnderchest", config::isBoolean, config::getBoolean);
         this.numberingEnderchests = loadValue("enderchests.numberingEnderchests", config::isBoolean, config::getBoolean);
-        this.forbiddenMaterials = loadValue("enderchests.forbiddenMaterials", config::isList, config::getStringList);
+        this.forbiddenMaterials = loadValue(
+                "enderchests.forbiddenMaterials",
+                key -> config.isList(key) && config.getStringList(key).stream().allMatch(material -> Material.matchMaterial(material) != null),
+                config::getStringList
+        );
 
         this.mysql = loadValue("mysql.enabled", config::isBoolean, config::getBoolean);
         this.mysqlHost = loadValue("mysql.host", config::isString, config::getString);

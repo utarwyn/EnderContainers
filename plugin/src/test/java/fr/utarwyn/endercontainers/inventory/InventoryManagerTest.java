@@ -7,6 +7,7 @@ import fr.utarwyn.endercontainers.TestInitializationException;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.block.Furnace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.inventory.*;
@@ -72,13 +73,13 @@ public class InventoryManagerTest {
         );
 
         // Default behavior (no interaction)
-        when(this.holder.canMoveItemInside(any())).thenReturn(false);
+        when(this.holder.isItemMovingRestricted()).thenReturn(true);
         this.manager.onInventoryClick(event);
         assertThat(event.isCancelled()).isTrue();
         verify(holder).onClick(player, event.getRawSlot());
 
         // With interaction allowed
-        when(this.holder.canMoveItemInside(any())).thenReturn(true);
+        when(this.holder.isItemMovingRestricted()).thenReturn(false);
         this.manager.onInventoryClick(event);
         assertThat(event.isCancelled()).isFalse();
         verify(holder, times(2)).onClick(player, event.getRawSlot());
@@ -94,7 +95,7 @@ public class InventoryManagerTest {
                 ClickType.LEFT, InventoryAction.NOTHING
         );
 
-        when(this.holder.canMoveItemInside(any())).thenReturn(false);
+        when(this.holder.isItemMovingRestricted()).thenReturn(true);
         this.manager.onInventoryClick(event);
         assertThat(event.isCancelled()).isFalse();
 
@@ -136,6 +137,19 @@ public class InventoryManagerTest {
     }
 
     @Test
+    public void inventoryClickOtherInventory() {
+        when(this.inventory.getHolder()).thenReturn(mock(Furnace.class));
+
+        InventoryClickEvent event = new InventoryClickEvent(
+                this.inventoryView, InventoryType.SlotType.CONTAINER, 2,
+                ClickType.LEFT, InventoryAction.NOTHING
+        );
+
+        this.manager.onInventoryClick(event);
+        verify(this.holder, never()).isItemMovingRestricted();
+    }
+
+    @Test
     public void inventoryDragInside() {
         when(this.inventory.getSize()).thenReturn(27);
 
@@ -145,14 +159,14 @@ public class InventoryManagerTest {
         );
 
         // With the restriction enabled
-        when(this.holder.canMoveItemInside(any())).thenReturn(false);
+        when(this.holder.isItemMovingRestricted()).thenReturn(true);
         this.manager.onInventoryDrag(event);
         assertThat(event.isCancelled()).isTrue();
 
         event.setResult(Event.Result.DEFAULT); // reset the event result
 
         // With the restriction disabled
-        when(this.holder.canMoveItemInside(any())).thenReturn(true);
+        when(this.holder.isItemMovingRestricted()).thenReturn(false);
         this.manager.onInventoryDrag(event);
         assertThat(event.isCancelled()).isFalse();
     }
@@ -166,21 +180,14 @@ public class InventoryManagerTest {
                 ImmutableMap.of(32, new ItemStack(Material.STONE), 33, new ItemStack(Material.STONE))
         );
 
-        // With the restriction enabled
-        when(this.holder.canMoveItemInside(any())).thenReturn(false);
-        this.manager.onInventoryDrag(event);
-        assertThat(event.isCancelled()).isFalse();
-
-        // With the restriction disabled
-        when(this.holder.canMoveItemInside(any())).thenReturn(true);
         this.manager.onInventoryDrag(event);
         assertThat(event.isCancelled()).isFalse();
 
         // Without a custom inventory
         when(this.inventory.getHolder()).thenReturn(null);
         event = new InventoryDragEvent(
-                this.inventoryView, null, new ItemStack(Material.STONE), false,
-                ImmutableMap.of()
+                this.inventoryView, null,
+                new ItemStack(Material.STONE), false, ImmutableMap.of()
         );
 
         this.manager.onInventoryDrag(event);
@@ -199,6 +206,19 @@ public class InventoryManagerTest {
         when(this.player.getGameMode()).thenReturn(GameMode.SPECTATOR);
         this.manager.onInventoryDrag(event);
         assertThat(event.isCancelled()).isTrue();
+    }
+
+    @Test
+    public void inventoryDragOtherInventory() {
+        when(this.inventory.getHolder()).thenReturn(mock(Furnace.class));
+
+        InventoryDragEvent event = new InventoryDragEvent(
+                this.inventoryView, null,
+                new ItemStack(Material.STONE), false, ImmutableMap.of()
+        );
+
+        this.manager.onInventoryDrag(event);
+        verify(this.holder, never()).isItemMovingRestricted();
     }
 
     @Test

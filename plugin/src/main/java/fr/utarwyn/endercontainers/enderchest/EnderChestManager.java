@@ -6,7 +6,10 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.enderchest.context.SaveTask;
+import fr.utarwyn.endercontainers.enderchest.listener.EnderChestInventoryListener;
+import fr.utarwyn.endercontainers.enderchest.listener.EnderChestListener;
 import fr.utarwyn.endercontainers.inventory.InventoryManager;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -15,6 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * The new enderchest manager to manage all chests
@@ -35,11 +39,17 @@ public class EnderChestManager extends AbstractManager {
     Set<UUID> loadingContexts;
 
     /**
+     * Collection of forbidden materials in chests loaded from configuration file
+     */
+    Set<Material> forbiddenMaterials;
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public void initialize() {
         this.registerListener(new EnderChestListener(this));
+        this.registerListener(new EnderChestInventoryListener(this));
     }
 
     /**
@@ -49,6 +59,9 @@ public class EnderChestManager extends AbstractManager {
     public synchronized void load() {
         this.contextMap = new ConcurrentHashMap<>();
         this.loadingContexts = ConcurrentHashMap.newKeySet();
+        this.forbiddenMaterials = Files.getConfiguration().getForbiddenMaterials()
+                .stream().map(Material::matchMaterial)
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -61,8 +74,18 @@ public class EnderChestManager extends AbstractManager {
 
         // Save and unload all data
         this.loadingContexts.clear();
+        this.forbiddenMaterials.clear();
         this.contextMap.values().forEach(PlayerContext::save);
         this.contextMap.clear();
+    }
+
+    /**
+     * Retrieves the collection of forbidden materials in chests.
+     *
+     * @return collection of forbidden materials
+     */
+    public Set<Material> getForbiddenMaterials() {
+        return this.forbiddenMaterials;
     }
 
     /**
