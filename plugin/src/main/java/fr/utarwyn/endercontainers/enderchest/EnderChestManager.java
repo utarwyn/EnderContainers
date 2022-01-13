@@ -9,7 +9,6 @@ import fr.utarwyn.endercontainers.enderchest.context.SaveTask;
 import fr.utarwyn.endercontainers.enderchest.listener.EnderChestInventoryListener;
 import fr.utarwyn.endercontainers.enderchest.listener.EnderChestListener;
 import fr.utarwyn.endercontainers.inventory.InventoryManager;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -18,7 +17,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * The new enderchest manager to manage all chests
@@ -39,11 +37,6 @@ public class EnderChestManager extends AbstractManager {
     Set<UUID> loadingContexts;
 
     /**
-     * Collection of forbidden materials in chests loaded from configuration file
-     */
-    Set<Material> forbiddenMaterials;
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -59,9 +52,6 @@ public class EnderChestManager extends AbstractManager {
     public synchronized void load() {
         this.contextMap = new ConcurrentHashMap<>();
         this.loadingContexts = ConcurrentHashMap.newKeySet();
-        this.forbiddenMaterials = Files.getConfiguration().getForbiddenMaterials()
-                .stream().map(Material::matchMaterial)
-                .collect(Collectors.toSet());
     }
 
     /**
@@ -74,18 +64,8 @@ public class EnderChestManager extends AbstractManager {
 
         // Save and unload all data
         this.loadingContexts.clear();
-        this.forbiddenMaterials.clear();
         this.contextMap.values().forEach(PlayerContext::save);
         this.contextMap.clear();
-    }
-
-    /**
-     * Retrieves the collection of forbidden materials in chests.
-     *
-     * @return collection of forbidden materials
-     */
-    public Set<Material> getForbiddenMaterials() {
-        return this.forbiddenMaterials;
     }
 
     /**
@@ -109,12 +89,7 @@ public class EnderChestManager extends AbstractManager {
             return Optional.empty();
         }
 
-        return this.contextMap.values().stream()
-                .map(context -> context.getChest(0))
-                .filter(Optional::isPresent)
-                .map(ec -> (VanillaEnderChest) ec.get())
-                .filter(ec -> ec.isUsedBy(player))
-                .findFirst();
+        return this.contextMap.values().stream().map(context -> context.getChest(0)).filter(Optional::isPresent).map(ec -> (VanillaEnderChest) ec.get()).filter(ec -> ec.isUsedBy(player)).findFirst();
     }
 
     /**
@@ -141,8 +116,7 @@ public class EnderChestManager extends AbstractManager {
                 consumer.accept(this.contextMap.get(owner));
             } else {
                 this.loadingContexts.add(owner);
-                this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin,
-                        new LoadTask(this.plugin, this, owner, consumer));
+                this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, new LoadTask(this.plugin, this, owner, consumer));
             }
         }
     }

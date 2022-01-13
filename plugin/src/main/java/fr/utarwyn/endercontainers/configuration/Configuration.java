@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Handles plugin configuration.
@@ -23,7 +24,7 @@ public class Configuration {
     private final boolean onlyShowAccessibleEnderchests;
     private final boolean useVanillaEnderchest;
     private final boolean numberingEnderchests;
-    private final List<String> forbiddenMaterials;
+    private final List<Material> forbiddenMaterials;
 
     private final boolean mysql;
     private final String mysqlHost;
@@ -61,7 +62,7 @@ public class Configuration {
         this.forbiddenMaterials = loadValue(
                 "enderchests.forbiddenMaterials",
                 key -> config.isList(key) && config.getStringList(key).stream().allMatch(material -> Material.matchMaterial(material) != null),
-                config::getStringList
+                key -> config.getStringList(key).stream().map(Material::matchMaterial).collect(Collectors.toList())
         );
 
         this.mysql = loadValue("mysql.enabled", config::isBoolean, config::getBoolean);
@@ -119,7 +120,7 @@ public class Configuration {
         return this.numberingEnderchests;
     }
 
-    public List<String> getForbiddenMaterials() {
+    public List<Material> getForbiddenMaterials() {
         return this.forbiddenMaterials;
     }
 

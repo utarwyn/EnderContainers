@@ -108,7 +108,8 @@ public class EnderChestInventoryListener implements Listener {
      * @return true if material is forbidden, false otherwise
      */
     private boolean checkIfMaterialIsRestricted(ItemStack item) {
-        return !this.manager.getForbiddenMaterials().isEmpty() && item != null && this.manager.getForbiddenMaterials().stream().anyMatch(material -> item.getType() == material);
+        return !Files.getConfiguration().getForbiddenMaterials().isEmpty() && item != null
+                && Files.getConfiguration().getForbiddenMaterials().stream().anyMatch(material -> item.getType() == material);
     }
 
     /**

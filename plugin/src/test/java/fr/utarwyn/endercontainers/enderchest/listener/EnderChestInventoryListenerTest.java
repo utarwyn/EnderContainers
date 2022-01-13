@@ -67,9 +67,6 @@ public class EnderChestInventoryListenerTest {
         doCallRealMethod().when(this.inventoryManager).cancelClickEventIfRestricted(any(), any());
         lenient().doCallRealMethod().when(this.inventoryManager).cancelDragEventIfRestricted(any(), any());
 
-        when(this.manager.getForbiddenMaterials()).thenReturn(Sets.newHashSet(
-                Material.BEDROCK, Material.OAK_BOAT
-        ));
         when(this.player.getWorld()).thenReturn(this.world);
         when(this.player.getLocation()).thenReturn(new Location(this.world, 0, 0, 0));
         when(this.player.getGameMode()).thenReturn(GameMode.SURVIVAL);

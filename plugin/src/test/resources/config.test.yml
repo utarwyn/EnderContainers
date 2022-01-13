@@ -12,6 +12,8 @@ enderchests:
   numberingEnderchests: true
   forbiddenMaterials:
     - andesite
+    - bedrock
+    - oak_boat
     - purpur_block
 mysql:
   enabled: false

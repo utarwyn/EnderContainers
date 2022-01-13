@@ -12,7 +12,6 @@ import fr.utarwyn.endercontainers.inventory.InventoryManager;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -74,14 +73,6 @@ public class EnderChestManagerTest {
         verify(context).save();
         verify(inventoryManager).closeAll();
         assertThat(this.manager.contextMap).isEmpty();
-    }
-
-    @Test
-    public void getForbiddenMaterials() {
-        assertThat(this.manager.getForbiddenMaterials())
-                .isNotEmpty()
-                .hasSize(2)
-                .containsExactlyInAnyOrder(Material.PURPUR_BLOCK, Material.ANDESITE);
     }
 
     @Test
