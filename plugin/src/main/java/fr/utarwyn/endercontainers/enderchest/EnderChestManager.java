@@ -89,7 +89,12 @@ public class EnderChestManager extends AbstractManager {
             return Optional.empty();
         }
 
-        return this.contextMap.values().stream().map(context -> context.getChest(0)).filter(Optional::isPresent).map(ec -> (VanillaEnderChest) ec.get()).filter(ec -> ec.isUsedBy(player)).findFirst();
+        return this.contextMap.values().stream()
+                .map(context -> context.getChest(0))
+                .filter(Optional::isPresent)
+                .map(ec -> (VanillaEnderChest) ec.get())
+                .filter(ec -> ec.isUsedBy(player))
+                .findFirst();
     }
 
     /**
@@ -116,7 +121,8 @@ public class EnderChestManager extends AbstractManager {
                 consumer.accept(this.contextMap.get(owner));
             } else {
                 this.loadingContexts.add(owner);
-                this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, new LoadTask(this.plugin, this, owner, consumer));
+                this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin,
+                        new LoadTask(this.plugin, this, owner, consumer));
             }
         }
     }
