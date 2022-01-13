@@ -1,27 +1,21 @@
-package fr.utarwyn.endercontainers.enderchest;
+package fr.utarwyn.endercontainers.enderchest.listener;
 
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
+import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.junit.Before;
@@ -32,7 +26,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -69,7 +62,6 @@ public class EnderChestListenerTest {
         this.listener = new EnderChestListener(this.manager);
 
         when(this.player.getWorld()).thenReturn(this.world);
-        when(this.player.getLocation()).thenReturn(new Location(this.world, 0, 0, 0));
         when(this.world.getName()).thenReturn("world");
         when(this.block.getType()).thenReturn(Material.ENDER_CHEST);
         when(this.player.getUniqueId()).thenReturn(UUID.randomUUID());
@@ -170,84 +162,8 @@ public class EnderChestListenerTest {
         verify(this.manager).savePlayerContext(this.player.getUniqueId(), true);
     }
 
-    @Test
-    public void inventoryCloseSaveOfflineVanillaChest() {
-        Player player2 = mock(Player.class);
-        UUID player2Identifier = UUID.randomUUID();
-        VanillaEnderChest chest = mock(VanillaEnderChest.class);
-        InventoryCloseEvent event = this.createInventoryCloseEvent();
-
-        when(player2.getUniqueId()).thenReturn(player2Identifier);
-        when(this.manager.getVanillaEnderchestUsedBy(this.player)).thenReturn(Optional.of(chest));
-
-        // do not save if the viewer is the owner of the chest
-        when(chest.getOwnerAsPlayer()).thenReturn(this.player);
-        this.listener.onInventoryClose(event);
-        verify(this.manager, never()).savePlayerContext(player2.getUniqueId(), true);
-
-        // do not save if the player is online
-        when(chest.getOwnerAsPlayer()).thenReturn(player2);
-        when(chest.getOwner()).thenReturn(player2Identifier);
-        when(player2.isOnline()).thenReturn(true);
-        this.listener.onInventoryClose(event);
-        verify(this.manager, never()).savePlayerContext(player2.getUniqueId(), true);
-
-        // save the chest (and the player data) if the player is not the viewer and its offline
-        when(player2.isOnline()).thenReturn(false);
-        this.listener.onInventoryClose(event);
-        verify(this.manager).savePlayerContext(player2.getUniqueId(), true);
-        verify(player2).saveData();
-    }
-
-    @Test
-    public void inventoryCloseGlobalSound() {
-        this.listener.onInventoryClose(this.createInventoryCloseEvent());
-        verify(this.world).playSound(this.player.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1f, 1f);
-    }
-
-    @Test
-    public void inventoryClosePlayerSound() throws TestInitializationException {
-        TestHelper.overrideConfigurationValue("globalSound", false);
-        this.listener.onInventoryClose(this.createInventoryCloseEvent());
-        verify(this.player).playSound(this.player.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1f, 1f);
-    }
-
-    @Test
-    public void inventoryCloseUnsupportedActions() {
-        InventoryCloseEvent event = this.createInventoryCloseEvent();
-
-        // try with an unknown entity -> no sound
-        when(event.getPlayer()).thenReturn(mock(HumanEntity.class));
-        this.listener.onInventoryClose(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), anyFloat(), anyFloat());
-
-        // try with another type of container -> no sound
-        when(event.getPlayer()).thenReturn(this.player);
-        when(event.getInventory().getType()).thenReturn(InventoryType.CHEST);
-        this.listener.onInventoryClose(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), anyFloat(), anyFloat());
-
-        // try with an enderchest managed by the plugin -> no sound (integrated in the inventory system)
-        when(event.getInventory().getType()).thenReturn(InventoryType.ENDER_CHEST);
-        when(this.manager.getVanillaEnderchestUsedBy(this.player)).thenReturn(Optional.empty());
-        this.listener.onInventoryClose(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), anyFloat(), anyFloat());
-    }
-
     private PlayerInteractEvent createInteractEvent(Action action) {
         return new PlayerInteractEvent(this.player, action, null, this.block, BlockFace.NORTH);
-    }
-
-    private InventoryCloseEvent createInventoryCloseEvent() {
-        Inventory inventory = mock(Inventory.class);
-        InventoryView inventoryView = mock(InventoryView.class);
-        InventoryCloseEvent event = new InventoryCloseEvent(inventoryView);
-
-        when(inventory.getType()).thenReturn(InventoryType.ENDER_CHEST);
-        when(inventoryView.getPlayer()).thenReturn(this.player);
-        when(inventoryView.getTopInventory()).thenReturn(inventory);
-
-        return event;
     }
 
 }

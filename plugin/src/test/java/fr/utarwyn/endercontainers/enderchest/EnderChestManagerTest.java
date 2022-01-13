@@ -7,6 +7,7 @@ import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.enderchest.context.SaveTask;
+import fr.utarwyn.endercontainers.enderchest.listener.EnderChestListener;
 import fr.utarwyn.endercontainers.inventory.InventoryManager;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
@@ -45,8 +46,9 @@ public class EnderChestManagerTest {
     @Test
     public void initialize() throws TestInitializationException {
         DependenciesManager dependenciesManager = mock(DependenciesManager.class);
+        InventoryManager inventoryManager = mock(InventoryManager.class);
 
-        TestHelper.registerManagers(dependenciesManager);
+        TestHelper.registerManagers(dependenciesManager, inventoryManager);
         TestHelper.setupManager(this.manager);
 
         this.manager.initialize();

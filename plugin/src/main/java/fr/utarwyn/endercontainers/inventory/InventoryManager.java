@@ -3,7 +3,6 @@ package fr.utarwyn.endercontainers.inventory;
 import fr.utarwyn.endercontainers.AbstractManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -11,8 +10,10 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Manages all inventories of the plugin.
@@ -37,24 +38,19 @@ public class InventoryManager extends AbstractManager {
      *
      * @param event inventory click event
      */
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
         Inventory inventory = event.getView().getTopInventory();
-        Optional<AbstractInventoryHolder> holder = this.getInventoryHolder(inventory);
-
-        int slot = event.getRawSlot();
-        boolean validSlot = slot >= 0 && slot < inventory.getSize();
-
-        if (holder.isPresent()) {
-            // A restricted move is when player clicks in the inventory or uses shift click
-            boolean restrictedMove = validSlot || event.isShiftClick();
-            event.setCancelled(this.isMoveItemRestricted(event.getWhoClicked(), holder.get()) && restrictedMove);
+        this.getInventoryHolder(inventory).ifPresent(holder -> {
+            this.cancelClickEventIfRestricted(event, item -> holder.isItemMovingRestricted());
 
             // Perform the action only when player clicks on a valid slot of the inventory
+            int slot = event.getRawSlot();
+            boolean validSlot = slot >= 0 && slot < inventory.getSize();
             if (validSlot) {
-                holder.get().onClick((Player) event.getWhoClicked(), slot);
+                holder.onClick((Player) event.getWhoClicked(), slot);
             }
-        }
+        });
     }
 
     /**
@@ -63,18 +59,11 @@ public class InventoryManager extends AbstractManager {
      *
      * @param event inventory drag event
      */
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onInventoryDrag(InventoryDragEvent event) {
-        Inventory inventory = event.getView().getTopInventory();
-        Optional<AbstractInventoryHolder> holder = this.getInventoryHolder(inventory);
-
-        if (event.getWhoClicked() instanceof Player && holder.isPresent()
-                && this.isMoveItemRestricted(event.getWhoClicked(), holder.get())) {
-            boolean itemInInventory = event.getRawSlots().stream()
-                    .anyMatch(slot -> slot < inventory.getSize());
-
-            event.setCancelled(itemInInventory);
-        }
+        this.getInventoryHolder(event.getView().getTopInventory()).ifPresent(holder ->
+                this.cancelDragEventIfRestricted(event, items -> holder.isItemMovingRestricted())
+        );
     }
 
     /**
@@ -85,8 +74,43 @@ public class InventoryManager extends AbstractManager {
      */
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        Optional<AbstractInventoryHolder> holder = this.getInventoryHolder(event.getInventory());
-        holder.ifPresent(h -> h.onClose((Player) event.getPlayer()));
+        this.getInventoryHolder(event.getInventory())
+                .ifPresent(holder -> holder.onClose((Player) event.getPlayer()));
+    }
+
+    /**
+     * Cancels an inventory click event based on its context.
+     *
+     * @param event         event to possibly cancel
+     * @param itemPredicate predicate to test if used itemstack can trigger a cancellation
+     */
+    public void cancelClickEventIfRestricted(
+            InventoryClickEvent event, Predicate<ItemStack> itemPredicate
+    ) {
+        Inventory inventory = event.getView().getTopInventory();
+        boolean validSlot = event.getRawSlot() >= 0 && event.getRawSlot() < inventory.getSize();
+        event.setCancelled((validSlot || event.isShiftClick()) && (
+                GameMode.SPECTATOR == event.getWhoClicked().getGameMode() || itemPredicate.test(
+                        event.isShiftClick() ? event.getCurrentItem() : event.getCursor()
+                )
+        ));
+    }
+
+    /**
+     * Cancels an inventory drag event based on its context.
+     *
+     * @param event          event to possibly cancel
+     * @param itemsPredicate predicate to test if used itemstacks can trigger a cancellation
+     */
+    public void cancelDragEventIfRestricted(
+            InventoryDragEvent event, Predicate<ItemStack[]> itemsPredicate
+    ) {
+        Inventory inventory = event.getView().getTopInventory();
+        event.setCancelled(
+                event.getRawSlots().stream().anyMatch(slot -> slot < inventory.getSize())
+                        && (GameMode.SPECTATOR == event.getWhoClicked().getGameMode()
+                        || itemsPredicate.test(event.getNewItems().values().toArray(new ItemStack[0])))
+        );
     }
 
     /**
@@ -118,17 +142,6 @@ public class InventoryManager extends AbstractManager {
     private Optional<AbstractInventoryHolder> getInventoryHolder(Inventory inventory) {
         boolean isCustom = inventory.getHolder() instanceof AbstractInventoryHolder;
         return isCustom ? Optional.of((AbstractInventoryHolder) inventory.getHolder()) : Optional.empty();
-    }
-
-    /**
-     * Checks if a player can move an item in a specific inventory or not.
-     *
-     * @param human  human entity instance
-     * @param holder inventory holder where the item wants to be moved
-     * @return false if the move is retricted for the player, false otherwise
-     */
-    private boolean isMoveItemRestricted(HumanEntity human, AbstractInventoryHolder holder) {
-        return holder.isItemMovingRestricted() || GameMode.SPECTATOR == human.getGameMode();
     }
 
 }

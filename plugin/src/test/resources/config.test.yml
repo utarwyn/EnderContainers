@@ -10,6 +10,11 @@ enderchests:
   onlyShowAccessible: false
   useVanillaEnderchest: true
   numberingEnderchests: true
+  forbiddenMaterials:
+    - andesite
+    - bedrock
+    - oak_boat
+    - purpur_block
 mysql:
   enabled: false
   host: 'localhost'

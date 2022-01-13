@@ -1,10 +1,12 @@
 package fr.utarwyn.endercontainers.configuration;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Handles plugin configuration.
@@ -22,6 +24,7 @@ public class Configuration {
     private final boolean onlyShowAccessibleEnderchests;
     private final boolean useVanillaEnderchest;
     private final boolean numberingEnderchests;
+    private final List<Material> forbiddenMaterials;
 
     private final boolean mysql;
     private final String mysqlHost;
@@ -56,6 +59,11 @@ public class Configuration {
         this.onlyShowAccessibleEnderchests = loadValue("enderchests.onlyShowAccessible", config::isBoolean, config::getBoolean);
         this.useVanillaEnderchest = loadValue("enderchests.useVanillaEnderchest", config::isBoolean, config::getBoolean);
         this.numberingEnderchests = loadValue("enderchests.numberingEnderchests", config::isBoolean, config::getBoolean);
+        this.forbiddenMaterials = loadValue(
+                "enderchests.forbiddenMaterials",
+                key -> config.isList(key) && config.getStringList(key).stream().allMatch(material -> Material.matchMaterial(material) != null),
+                key -> config.getStringList(key).stream().map(Material::matchMaterial).collect(Collectors.toList())
+        );
 
         this.mysql = loadValue("mysql.enabled", config::isBoolean, config::getBoolean);
         this.mysqlHost = loadValue("mysql.host", config::isString, config::getString);
@@ -110,6 +118,10 @@ public class Configuration {
 
     public boolean isNumberingEnderchests() {
         return this.numberingEnderchests;
+    }
+
+    public List<Material> getForbiddenMaterials() {
+        return this.forbiddenMaterials;
     }
 
     public boolean isMysql() {

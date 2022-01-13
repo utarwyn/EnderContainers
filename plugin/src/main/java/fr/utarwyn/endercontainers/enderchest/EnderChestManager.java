@@ -6,6 +6,8 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.enderchest.context.SaveTask;
+import fr.utarwyn.endercontainers.enderchest.listener.EnderChestInventoryListener;
+import fr.utarwyn.endercontainers.enderchest.listener.EnderChestListener;
 import fr.utarwyn.endercontainers.inventory.InventoryManager;
 import org.bukkit.entity.Player;
 
@@ -40,6 +42,7 @@ public class EnderChestManager extends AbstractManager {
     @Override
     public void initialize() {
         this.registerListener(new EnderChestListener(this));
+        this.registerListener(new EnderChestInventoryListener(this));
     }
 
     /**
@@ -86,12 +89,7 @@ public class EnderChestManager extends AbstractManager {
             return Optional.empty();
         }
 
-        return this.contextMap.values().stream()
-                .map(context -> context.getChest(0))
-                .filter(Optional::isPresent)
-                .map(ec -> (VanillaEnderChest) ec.get())
-                .filter(ec -> ec.isUsedBy(player))
-                .findFirst();
+        return this.contextMap.values().stream().map(context -> context.getChest(0)).filter(Optional::isPresent).map(ec -> (VanillaEnderChest) ec.get()).filter(ec -> ec.isUsedBy(player)).findFirst();
     }
 
     /**
@@ -118,8 +116,7 @@ public class EnderChestManager extends AbstractManager {
                 consumer.accept(this.contextMap.get(owner));
             } else {
                 this.loadingContexts.add(owner);
-                this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin,
-                        new LoadTask(this.plugin, this, owner, consumer));
+                this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, new LoadTask(this.plugin, this, owner, consumer));
             }
         }
     }

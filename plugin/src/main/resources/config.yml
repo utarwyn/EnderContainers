@@ -31,6 +31,10 @@ enderchests:
   # Number the items in the main menu so that they follow enderchests number
   numberingEnderchests: false
 
+  # A list of item materials which are forbidden to store in chests
+  # Use Minecraft item IDs displayed ingame (shortcut: F3+H)
+  forbiddenMaterials: [ ]
+
 
 # Mysql/MariaDB configuration, if needed
 mysql:

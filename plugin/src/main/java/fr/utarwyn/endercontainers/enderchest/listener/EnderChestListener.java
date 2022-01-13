@@ -1,25 +1,20 @@
-package fr.utarwyn.endercontainers.enderchest;
+package fr.utarwyn.endercontainers.enderchest.listener;
 
 import fr.utarwyn.endercontainers.Managers;
-import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
+import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
 
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -45,7 +40,7 @@ public class EnderChestListener implements Listener {
      *
      * @param manager The chest manager associated with this listener
      */
-    EnderChestListener(EnderChestManager manager) {
+    public EnderChestListener(EnderChestManager manager) {
         this.manager = manager;
         this.dependenciesManager = Managers.get(DependenciesManager.class);
     }
@@ -101,43 +96,6 @@ public class EnderChestListener implements Listener {
         // Clear all the player data from memory
         boolean unused = this.manager.isContextUnused(owner);
         this.manager.savePlayerContext(owner, unused);
-    }
-
-    /**
-     * Method called when a player closes an inventory
-     *
-     * @param event The inventory close event
-     */
-    @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
-        if (!(event.getPlayer() instanceof Player)) return;
-
-        Player player = (Player) event.getPlayer();
-        Inventory inventory = event.getInventory();
-
-        // Play the closing sound when we use the default enderchest!
-        if (inventory.getType().equals(InventoryType.ENDER_CHEST) && Files.getConfiguration().isUseVanillaEnderchest()) {
-            Optional<VanillaEnderChest> vanilla = this.manager.getVanillaEnderchestUsedBy(player);
-
-            // When closing the default enderchest ...
-            if (vanilla.isPresent()) {
-                Player ownerObj = vanilla.get().getOwnerAsPlayer();
-
-                // ... save and delete the context from memory if the player is offline.
-                if (!ownerObj.equals(player) && !ownerObj.isOnline()) {
-                    this.manager.savePlayerContext(vanilla.get().getOwner(), true);
-                    ownerObj.saveData();
-                }
-            }
-
-            // Play the closing sound
-            Sound sound = CompatibilityHelper.searchSound("CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
-            if (Files.getConfiguration().isGlobalSound()) {
-                player.getWorld().playSound(player.getLocation(), sound, 1f, 1f);
-            } else {
-                player.playSound(player.getLocation(), sound, 1f, 1f);
-            }
-        }
     }
 
 }
