@@ -11,8 +11,6 @@ dependencyResolutionManagement {
         maven { url 'https://repo.utarwyn.fr' }
         maven { url 'https://ci.ender.zone/plugin/repository/everything/' }
         maven { url 'https://maven.enginehub.org/repo/' }
-        maven { url 'https://mvn.intellectualsites.com/content/repositories/releases/' }
-        maven { url 'https://mvn.intellectualsites.com/content/repositories/snapshots/' }
     }
 
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)

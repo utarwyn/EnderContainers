@@ -8,6 +8,6 @@ dependencies {
     compileOnly('com.sk89q.worldedit:worldedit-core:7.2.6') {
         exclude group: '*', module: '*'
     }
-    testRuntimeOnly 'org.khelekore:prtree:1.7.0-SNAPSHOT'
+    testRuntimeOnly 'org.khelekore:prtree:1.7.0'
 }
 
