@@ -12,7 +12,7 @@ dependencies {
     implementation project(':dependencies:worldguard6')
     implementation project(':dependencies:worldguard7')
     implementation 'com.zaxxer:HikariCP:4.0.3'
-    implementation 'org.slf4j:slf4j-nop:1.7.32'
+    implementation 'org.slf4j:slf4j-nop:1.7.35'
     implementation 'org.bstats:bstats-bukkit:2.2.1'
 }
 
