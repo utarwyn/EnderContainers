@@ -5,6 +5,7 @@ pipeline {
         jdk 'jdk8'
     }
     options {
+        timeout(time: 15, unit: 'MINUTES')
         buildDiscarder logRotator(
                 numToKeepStr: env.BRANCH_NAME ==~ /next|master/ ? '10' : ''
         )
