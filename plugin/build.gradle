@@ -17,7 +17,8 @@ dependencies {
 }
 
 shadowJar {
-    archiveFileName = "${rootProject.name}-${rootProject.version}.jar"
+    archiveFileName.set("${rootProject.name}-${rootProject.version}.jar")
+    archiveClassifier.set('')
 
     dependencies {
         exclude 'META-INF/**'
