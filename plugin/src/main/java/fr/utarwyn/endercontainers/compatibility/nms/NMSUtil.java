@@ -83,18 +83,19 @@ public abstract class NMSUtil {
 
     /**
      * Get an internal net Minecraft Server method with a name changes.
-     * Usefull from Minecraft 1.18 because of minifier.
+     * Useful since Minecraft 1.18 because of minifiers.
      *
      * @param clazz          class where the method is located
      * @param name           name used before Minecraft 1.18
-     * @param name18         name introduced with Minecraft 1.18
+     * @param namePost17     name introduced after Minecraft 1.17
      * @param parameterTypes parameter types
      * @return located method
      * @throws NoSuchMethodException thrown if method has not been found
      */
-    protected static Method getNMSDynamicMethod(Class<?> clazz, String name, String name18, Class<?>... parameterTypes)
-            throws NoSuchMethodException {
-        return clazz.getMethod(ServerVersion.isNewerThan(ServerVersion.V1_17) ? name18 : name, parameterTypes);
+    protected static Method getNMSDynamicMethod(
+            Class<?> clazz, String name, String namePost17, Class<?>... parameterTypes
+    ) throws NoSuchMethodException {
+        return clazz.getMethod(ServerVersion.isNewerThan(ServerVersion.V1_17) ? namePost17 : name, parameterTypes);
     }
 
     /**
