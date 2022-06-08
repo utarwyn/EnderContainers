@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers.compatibility;
 
 import com.google.common.base.Preconditions;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -125,17 +124,19 @@ public class CompatibilityHelper {
     }
 
     public static Enchantment enchantmentFromString(String value) {
-        if (!StringUtils.isNumeric(value)) { // Name or NamespacedKey
+        try {
+            // Legacy method: use the name (old versions of Bukkit)
+            int numericValue = Integer.parseInt(value);
+            return Enchantment.getByName(ENCHANT_BY_IDS.get(numericValue));
+        } catch (NumberFormatException e) {
+            // Name or NamespacedKey
             if (ServerVersion.isNewerThan(V1_12) && value.contains("!")) {
                 // New method to get en enchantment!
                 String[] parts = value.split("!");
                 return Enchantment.getByKey(new NamespacedKey(parts[0], parts[1]));
             } else {
-                // Legacy method: use the name (old versions of Bukkit)
                 return Enchantment.getByName(value);
             }
-        } else { // Legacy support for enchant ids
-            return Enchantment.getByName(ENCHANT_BY_IDS.get(Integer.valueOf(value)));
         }
     }
 
