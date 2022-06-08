@@ -15,9 +15,9 @@
     <name>EnderContainers Dependency PlotSquared</name>
 
     <properties>
-        <plotsquared.version>5.13.3</plotsquared.version>
+        <plotsquared.version>5.13.11</plotsquared.version>
         <worldedit.version>7.2.3</worldedit.version>
-        <prtree.version>1.7.0-SNAPSHOT</prtree.version>
+        <prtree.version>1.7.0</prtree.version>
     </properties>
 
     <repositories>
@@ -26,12 +26,8 @@
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
         <repository>
-            <id>plotsquared-releases</id>
-            <url>https://mvn.intellectualsites.com/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <id>plotsquared-snapshots</id>
-            <url>https://mvn.intellectualsites.com/content/repositories/snapshots/</url>
+            <id>utarwyn</id>
+            <url>https://repo.utarwyn.fr</url>
         </repository>
     </repositories>
 
