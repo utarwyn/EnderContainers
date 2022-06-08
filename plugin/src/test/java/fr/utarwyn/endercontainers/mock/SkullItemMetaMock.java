@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.mock;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.profile.PlayerProfile;
 
 public class SkullItemMetaMock extends ItemMetaMock implements SkullMeta {
 
@@ -37,6 +38,16 @@ public class SkullItemMetaMock extends ItemMetaMock implements SkullMeta {
     @Override
     public boolean setOwningPlayer(OfflinePlayer owner) {
         return false;
+    }
+
+    @Override
+    public PlayerProfile getOwnerProfile() {
+        return null;
+    }
+
+    @Override
+    public void setOwnerProfile(PlayerProfile profile) {
+
     }
 
     @Override
