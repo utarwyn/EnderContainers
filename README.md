@@ -33,7 +33,7 @@ Works with Bukkit/Spigot 1.8 to 1.18!
 </p>
 
 > :wave: Need help about the plugin? Go to the [official wiki](https://github.com/utarwyn/EnderContainers/wiki). \
-> :fire: **NEW!** Download development builds of the plugin from my [personal integration service](https://ci.utarwyn.fr/job/EnderContainers).
+> :fire: **NEW!** Download development builds of the plugin directly [from GitHub](https://github.com/utarwyn/EnderContainers#downloads).
 
 
 ## Key Features
@@ -44,6 +44,15 @@ Works with Bukkit/Spigot 1.8 to 1.18!
  - Support for all items, **even custom items**!
  - Complete backup management
  - Integrations with **[a bunch of plugins](https://github.com/utarwyn/EnderContainers/wiki/Integrations)**!
+
+
+## Downloads
+
+| Version   | Supported Minecraft versions | Status      | Download                                                                                     |
+|-----------|------------------------------|-------------|----------------------------------------------------------------------------------------------|
+| 2.2.2     | 1.8 to 1.17                  | Stable      | [Click here](https://www.spigotmc.org/resources/endercontainers.4750/)                       |
+| 2.2.3     | 1.8 to 1.18                  | Beta        | [Click here](https://utarwyn.fr/projects/EnderContainers/EnderContainers-2.2.3-SNAPSHOT.jar) |
+| 2.3.0-dev | 1.8 to 1.18                  | Development | [Click here](https://utarwyn.fr/projects/EnderContainers/EnderContainers-2.3.0-SNAPSHOT.jar) |
 
 
 ## Technical Features
