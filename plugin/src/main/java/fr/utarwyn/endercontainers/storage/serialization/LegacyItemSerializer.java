@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers.storage.serialization;
 
 import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -140,9 +139,9 @@ public class LegacyItemSerializer implements ItemSerializer {
                     Material material;
 
                     // Material ids is an old way to store items, now we use material names (more reliable).
-                    if (StringUtils.isNumeric(value)) {
+                    try {
                         material = CompatibilityHelper.materialFromId(Integer.parseInt(value));
-                    } else {
+                    } catch (NumberFormatException e) {
                         material = CompatibilityHelper.matchMaterial(value);
                     }
 

@@ -1,9 +1,9 @@
 package fr.utarwyn.endercontainers.database.request;
 
+import com.google.common.base.Joiner;
 import fr.utarwyn.endercontainers.database.Database;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
-import org.apache.commons.lang.StringUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -119,9 +119,9 @@ public class SelectRequest implements Request {
     public String getRequest() {
         StringBuilder request = new StringBuilder("SELECT ");
 
-        request.append(StringUtils.join(this.fields, ","));
+        request.append(Joiner.on(',').join(this.fields));
         request.append(" FROM ");
-        request.append(StringUtils.join(this.froms, ","));
+        request.append(Joiner.on(',').join(this.froms));
 
         for (String[] join : this.joins) {
             request.append(" JOIN ").append(join[0]).append(" ON ").append(join[1]).append(" = ").append(join[2]);
@@ -132,13 +132,13 @@ public class SelectRequest implements Request {
         }
 
         if (this.conditions.length > 0) {
-            request.append(" WHERE ").append(StringUtils.join(this.conditions, " AND "));
+            request.append(" WHERE ").append(Joiner.on(" AND ").join(this.conditions));
         }
         if (this.groupsBy.length > 0) {
-            request.append(" GROUP BY ").append(StringUtils.join(this.groupsBy, ","));
+            request.append(" GROUP BY ").append(Joiner.on(',').join(this.groupsBy));
         }
         if (this.orders.length > 0) {
-            request.append(" ORDER BY ").append(StringUtils.join(this.orders, ","));
+            request.append(" ORDER BY ").append(Joiner.on(',').join(this.orders));
         }
         if (this.limits.length > 0) {
             if (this.limits[1] > 0) { // limites

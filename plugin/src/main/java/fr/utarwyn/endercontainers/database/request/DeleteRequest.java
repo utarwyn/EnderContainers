@@ -1,7 +1,7 @@
 package fr.utarwyn.endercontainers.database.request;
 
+import com.google.common.base.Joiner;
 import fr.utarwyn.endercontainers.database.Database;
-import org.apache.commons.lang.StringUtils;
 
 import java.sql.SQLException;
 
@@ -83,7 +83,7 @@ public class DeleteRequest implements Request {
         // Construct conditions if exists
         if (this.conditions.length > 0) {
             sb.append(" WHERE ");
-            sb.append(StringUtils.join(this.conditions, " AND "));
+            sb.append(Joiner.on(" AND ").join(this.conditions));
         }
 
         return sb.toString();

@@ -1,8 +1,8 @@
 package fr.utarwyn.endercontainers.database.request;
 
+import com.google.common.base.Joiner;
 import fr.utarwyn.endercontainers.database.Database;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
-import org.apache.commons.lang.StringUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -130,12 +130,12 @@ public class SavingRequest implements Request {
             }
             request.deleteCharAt(request.length() - 1);
 
-            request.append(" WHERE ").append(StringUtils.join(this.conditions, " AND "));
+            request.append(" WHERE ").append(Joiner.on(" AND ").join(this.conditions));
         } else {
             String action = this.replaceIfExists ? "REPLACE" : "INSERT";
 
             request.append(action).append(" INTO `").append(this.table).append('`');
-            request.append("(").append(StringUtils.join(this.fields, ",")).append(")");
+            request.append("(").append(Joiner.on(',').join(this.fields)).append(")");
 
             request.append(" VALUES ");
             request.append("(").append(this.generateFakeParameters(this.values)).append(")");
@@ -145,7 +145,7 @@ public class SavingRequest implements Request {
     }
 
     private String generateFakeParameters(Object[] values) {
-        return StringUtils.join(Arrays.stream(values).map(v -> '?').toArray(), ",");
+        return Joiner.on(',').join(Arrays.stream(values).map(v -> '?').toArray());
     }
 
 }

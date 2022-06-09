@@ -169,20 +169,22 @@ public class EnderChestListenerTest {
         Updater updater = mock(Updater.class);
         TestHelper.registerManagers(updater);
 
+        when(this.player.getLocation()).thenReturn(mock(Location.class));
+
         // no permission
         this.listener.onPlayerJoin(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), eq(1f), eq(1f));
+        verify(this.player, never()).playSound(any(Location.class), any(Sound.class), eq(1f), eq(1f));
 
         // no update
         when(this.player.isOp()).thenReturn(true);
         when(updater.notifyPlayer(this.player)).thenReturn(false);
         this.listener.onPlayerJoin(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), eq(1f), eq(1f));
+        verify(this.player, never()).playSound(any(Location.class), any(Sound.class), eq(1f), eq(1f));
 
         // update and permission
         when(updater.notifyPlayer(this.player)).thenReturn(true);
         this.listener.onPlayerJoin(event);
-        verify(this.player).playSound(any(), eq(Sound.BLOCK_NOTE_BLOCK_PLING), eq(1f), eq(1f));
+        verify(this.player).playSound(any(Location.class), eq(Sound.BLOCK_NOTE_BLOCK_PLING), eq(1f), eq(1f));
     }
 
     @Test
@@ -241,19 +243,19 @@ public class EnderChestListenerTest {
         // try with an unknown entity -> no sound
         when(event.getPlayer()).thenReturn(mock(HumanEntity.class));
         this.listener.onInventoryClose(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), anyFloat(), anyFloat());
+        verify(this.player, never()).playSound(any(Location.class), any(Sound.class), anyFloat(), anyFloat());
 
         // try with another type of container -> no sound
         when(event.getPlayer()).thenReturn(this.player);
         when(event.getInventory().getType()).thenReturn(InventoryType.CHEST);
         this.listener.onInventoryClose(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), anyFloat(), anyFloat());
+        verify(this.player, never()).playSound(any(Location.class), any(Sound.class), anyFloat(), anyFloat());
 
         // try with an enderchest managed by the plugin -> no sound (integrated in the inventory system)
         when(event.getInventory().getType()).thenReturn(InventoryType.ENDER_CHEST);
         when(this.manager.getVanillaEnderchestUsedBy(this.player)).thenReturn(Optional.empty());
         this.listener.onInventoryClose(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), anyFloat(), anyFloat());
+        verify(this.player, never()).playSound(any(Location.class), any(Sound.class), anyFloat(), anyFloat());
     }
 
     private PlayerInteractEvent createInteractEvent(Action action) {
