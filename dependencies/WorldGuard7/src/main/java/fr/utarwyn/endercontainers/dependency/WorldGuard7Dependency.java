@@ -14,7 +14,7 @@ import org.bukkit.plugin.Plugin;
 
 /**
  * Interacts with the WorldGuard V7+ plugin.
- * Prevent to open chests in zones protected with the flag USE.
+ * Prevent to open chests in zones protected with the flag "chest-access".
  *
  * @author Utarwyn
  * @since 2.2.0
@@ -46,7 +46,7 @@ public class WorldGuard7Dependency extends Dependency {
         Location location = BukkitAdapter.adapt(block.getLocation());
 
         // Check for denied flags at the chest's location!
-        if (!query.testBuild(location, localPlayer, Flags.INTERACT, Flags.USE)) {
+        if (!query.testBuild(location, localPlayer, Flags.CHEST_ACCESS)) {
             throw new BlockChestOpeningException();
         }
     }
