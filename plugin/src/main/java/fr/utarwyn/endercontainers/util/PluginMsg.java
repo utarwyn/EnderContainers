@@ -1,8 +1,8 @@
 package fr.utarwyn.endercontainers.util;
 
+import com.google.common.base.Strings;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -120,8 +120,8 @@ public class PluginMsg {
      * @param receiver receiver of the message
      */
     public static void pluginBar(CommandSender receiver) {
-        String pBar = "§5§m" + StringUtils.repeat("-", 5);
-        String sBar = "§d§m" + StringUtils.repeat("-", 11);
+        String pBar = "§5§m" + Strings.repeat("-", 5);
+        String sBar = "§d§m" + Strings.repeat("-", 11);
 
         receiver.sendMessage("§8++" + pBar + sBar + "§r§d( §6EnderContainers §d)" + sBar + pBar + "§8++");
     }
@@ -132,8 +132,8 @@ public class PluginMsg {
      * @param receiver receiver of the message
      */
     public static void endBar(CommandSender receiver) {
-        String pBar = "§5§m" + StringUtils.repeat("-", 5);
-        receiver.sendMessage("§8++" + pBar + "§d§m" + StringUtils.repeat("-", 39) + pBar + "§8++");
+        String pBar = "§5§m" + Strings.repeat("-", 5);
+        receiver.sendMessage("§8++" + pBar + "§d§m" + Strings.repeat("-", 39) + pBar + "§8++");
     }
 
     /**

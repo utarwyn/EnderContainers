@@ -231,19 +231,19 @@ public class EnderChestInventoryListenerTest {
         // try with an unknown entity -> no sound
         when(event.getPlayer()).thenReturn(mock(HumanEntity.class));
         this.listener.onInventoryClose(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), anyFloat(), anyFloat());
+        verify(this.player, never()).playSound(any(Location.class), any(Sound.class), anyFloat(), anyFloat());
 
         // try with another type of container -> no sound
         when(event.getPlayer()).thenReturn(this.player);
         when(event.getInventory().getType()).thenReturn(InventoryType.CHEST);
         this.listener.onInventoryClose(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), anyFloat(), anyFloat());
+        verify(this.player, never()).playSound(any(Location.class), any(Sound.class), anyFloat(), anyFloat());
 
         // try with an enderchest managed by the plugin -> no sound (integrated in the inventory system)
         when(event.getInventory().getType()).thenReturn(InventoryType.ENDER_CHEST);
         when(this.manager.getVanillaEnderchestUsedBy(this.player)).thenReturn(Optional.empty());
         this.listener.onInventoryClose(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), anyFloat(), anyFloat());
+        verify(this.player, never()).playSound(any(Location.class), any(Sound.class), anyFloat(), anyFloat());
     }
 
     private InventoryClickEvent createInventoryClickEvent(boolean shift) {

@@ -57,6 +57,11 @@ public class ItemFactoryMock implements ItemFactory {
     }
 
     @Override
+    public ItemStack createItemStack(String input) throws IllegalArgumentException {
+        return null;
+    }
+
+    @Override
     public Material updateMaterial(ItemMeta meta, Material material)
             throws IllegalArgumentException {
         return material;

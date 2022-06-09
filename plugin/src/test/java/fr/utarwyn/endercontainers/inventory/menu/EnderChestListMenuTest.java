@@ -4,6 +4,7 @@ import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -88,12 +89,12 @@ public class EnderChestListMenuTest {
 
         // cannot opened the chest by default
         this.menu.onClick(player, 0);
-        verify(player).playSound(isNull(), eq(Sound.ENTITY_VILLAGER_NO), anyFloat(), anyFloat());
+        verify(player).playSound((Location) isNull(), eq(Sound.ENTITY_VILLAGER_NO), anyFloat(), anyFloat());
 
         // now test if player has perm
         when(this.context.openEnderchestInventory(player, 0)).thenReturn(true);
         this.menu.onClick(player, 0);
-        verify(player).playSound(isNull(), eq(Sound.UI_BUTTON_CLICK), anyFloat(), anyFloat());
+        verify(player).playSound((Location) isNull(), eq(Sound.UI_BUTTON_CLICK), anyFloat(), anyFloat());
     }
 
     @Test

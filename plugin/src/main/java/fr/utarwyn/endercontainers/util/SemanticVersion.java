@@ -1,7 +1,7 @@
 package fr.utarwyn.endercontainers.util;
 
 import com.google.common.base.Objects;
-import org.apache.commons.lang.Validate;
+import com.google.common.base.Preconditions;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,7 +46,7 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
      * @param version semantic version in a string format
      */
     public SemanticVersion(String version) {
-        Validate.notNull(version, "semantic version cannot be null");
+        Preconditions.checkArgument(version != null, "semantic version cannot be null");
         Matcher matcher = Pattern.compile(REGEX).matcher(version);
 
         if (!matcher.matches()) {

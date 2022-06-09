@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.util;
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -83,21 +84,23 @@ public class UpdaterTest {
         Updater updater = mock(Updater.class);
         TestHelper.registerManagers(updater);
 
+        when(this.player.getLocation()).thenReturn(mock(Location.class));
+
         // no permission
         this.updater.onPlayerJoin(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), eq(1f), eq(1f));
+        verify(this.player, never()).playSound(any(Location.class), any(Sound.class), eq(1f), eq(1f));
 
         // no update
         when(this.player.hasPermission("endercontainers.update")).thenReturn(true);
         this.updater.onPlayerJoin(event);
-        verify(this.player, never()).playSound(any(), any(Sound.class), eq(1f), eq(1f));
+        verify(this.player, never()).playSound(any(Location.class), any(Sound.class), eq(1f), eq(1f));
 
         // update and permission
         when(this.plugin.getDescription().getVersion()).thenReturn("1.0.0");
         this.updater.load();
 
         this.updater.onPlayerJoin(event);
-        verify(this.player).playSound(any(), eq(Sound.BLOCK_NOTE_BLOCK_PLING), eq(1f), eq(1f));
+        verify(this.player).playSound(any(Location.class), eq(Sound.BLOCK_NOTE_BLOCK_PLING), eq(1f), eq(1f));
     }
 
     @Test

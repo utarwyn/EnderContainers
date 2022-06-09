@@ -92,7 +92,11 @@ public class NMSHologramUtil extends NMSUtil {
         Class<?> armorStandClass = getNMSClass("EntityArmorStand", "world.entity.decoration");
         Class<?> entityPlayerClass = getNMSClass("EntityPlayer", "server.level");
         Class<?> destroyPacketClass = getNMSClass("PacketPlayOutEntityDestroy", "network.protocol.game");
-        Class<?> spawnPacketClass = getNMSClass("PacketPlayOutSpawnEntityLiving", "network.protocol.game");
+
+        // 1.19+ :: PacketPlayOutSpawnEntityLiving has been renamed PacketPlayOutSpawnEntity
+        String spawnPacketClassName = ServerVersion.isNewerThan(ServerVersion.V1_18)
+                ? "PacketPlayOutSpawnEntity" : "PacketPlayOutSpawnEntityLiving";
+        Class<?> spawnPacketClass = getNMSClass(spawnPacketClassName, "network.protocol.game");
 
         this.packetClass = getNMSClass("Packet", "network.protocol");
         this.entityClass = getNMSClass("Entity", "world.entity");
@@ -257,8 +261,10 @@ public class NMSHologramUtil extends NMSUtil {
             Method fromStringOrNullMethod = this.chatMessageClass.getMethod("fromStringOrNull", String.class);
             Object chatComponent = fromStringOrNullMethod.invoke(null, text);
 
-            Method setCustomName = getNMSDynamicMethod(entityObject.getClass(), "setCustomName", "a", this.chatBaseComponentClass);
-            setCustomName.invoke(entityObject, chatComponent);
+            // 1.19+ :: method is now "b" (instead of "a")
+            String methodNamePost17 = ServerVersion.isNewerThan(ServerVersion.V1_18) ? "b" : "a";
+            getNMSDynamicMethod(entityObject.getClass(), "setCustomName", methodNamePost17, this.chatBaseComponentClass)
+                    .invoke(entityObject, chatComponent);
         } else {
             Method setCustomName = entityObject.getClass().getMethod("setCustomName", String.class);
             setCustomName.invoke(entityObject, text);

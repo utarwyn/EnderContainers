@@ -55,8 +55,14 @@ public class NMSPlayerUtil extends NMSUtil {
         getBukkitEntityMethod = entityPlayerClass.getDeclaredMethod("getBukkitEntity");
         worldServer = this.prepareWorldServer(minecraftServerClass);
 
-        // 1.17+ :: we do not have to pass PlayerInteractManager to entity player constructor
-        if (ServerVersion.isNewerThan(ServerVersion.V1_16)) {
+        if (ServerVersion.isNewerThan(ServerVersion.V1_18)) {
+            // 1.19+ :: constructor also need a public key
+            Class<?> publicKeyClass = getNMSClass("ProfilePublicKey", "world.entity.player");
+            entityPlayerConstructor = entityPlayerClass.getDeclaredConstructor(
+                    minecraftServerClass, worldServerClass, gameProfileClass, publicKeyClass
+            );
+        } else if (ServerVersion.isNewerThan(ServerVersion.V1_16)) {
+            // 1.17+ :: we do not have to pass PlayerInteractManager to entity player constructor
             entityPlayerConstructor = entityPlayerClass.getDeclaredConstructor(
                     minecraftServerClass, worldServerClass, gameProfileClass
             );
@@ -102,7 +108,12 @@ public class NMSPlayerUtil extends NMSUtil {
 
         // 1.17+ :: we do not have to pass PlayerInteractManager to entity player constructor
         if (playerInteractManager == null) {
-            entityPlayer = entityPlayerConstructor.newInstance(minecraftServer, worldServer, gameProfile);
+            // 1.19+ :: constructor also need a public key
+            if (ServerVersion.isNewerThan(ServerVersion.V1_18)) {
+                entityPlayer = entityPlayerConstructor.newInstance(minecraftServer, worldServer, gameProfile, null);
+            } else {
+                entityPlayer = entityPlayerConstructor.newInstance(minecraftServer, worldServer, gameProfile);
+            }
         } else {
             entityPlayer = entityPlayerConstructor.newInstance(minecraftServer, worldServer, gameProfile, playerInteractManager);
         }

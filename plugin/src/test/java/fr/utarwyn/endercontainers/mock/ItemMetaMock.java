@@ -280,6 +280,11 @@ public class ItemMetaMock implements ItemMeta, Damageable {
     }
 
     @Override
+    public String getAsString() {
+        return "";
+    }
+
+    @Override
     public CustomItemTagContainer getCustomTagContainer() {
         throw new UnsupportedOperationException();
     }
