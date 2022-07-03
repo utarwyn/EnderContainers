@@ -15,6 +15,7 @@
 .gradle
 **/out/
 **/build/
+**/target/
 !src/**/build/
 gradle-app.setting
 !gradle-wrapper.jar
