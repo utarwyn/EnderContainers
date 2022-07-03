@@ -9,6 +9,7 @@ import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -50,9 +51,12 @@ public class EnderChestListener implements Listener {
      *
      * @param event The interact event
      */
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
+        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.useInteractedBlock() == Event.Result.DENY) {
+            return;
+        }
+
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
 
