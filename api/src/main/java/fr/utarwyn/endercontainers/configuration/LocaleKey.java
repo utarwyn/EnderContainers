@@ -28,10 +28,6 @@ public enum LocaleKey {
 
     MENU_MAIN_TITLE("menus.main_title"),
     MENU_CHEST_TITLE("menus.chest_title"),
-    MENU_PANE_TITLE("menus.pane_title"),
-    MENU_CHEST_EMPTY("menus.chest_empty"),
-    MENU_CHEST_FULL("menus.chest_full"),
-    MENU_CHEST_LOCKED("menus.chest_locked"),
     MENU_PREV_PAGE("menus.previous_page"),
     MENU_NEXT_PAGE("menus.next_page"),
 

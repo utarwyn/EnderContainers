@@ -40,6 +40,9 @@ menus:
   chest_title: '玩家 %player% 的第 %num% 个末影箱'
   pane_title: '末影箱 %num% %counter%'
 
+  chest_item_accessible_title: '&a末影箱 %num% %counter%'
+  chest_item_inaccessible_title: '&c末影箱 %num%'
+
   chest_empty: '&2这个末影箱是空的!'
   chest_full: '&c这个末影箱满了!'
   chest_locked: '&8&o>> 末影箱被锁上了!'

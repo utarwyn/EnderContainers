@@ -7,14 +7,33 @@ disabledWorlds:
 enderchests:
   max: 27
   default: 1
-  onlyShowAccessible: false
   useVanillaEnderchest: true
-  numberingEnderchests: true
   forbiddenMaterials:
     - andesite
     - bedrock
     - oak_boat
     - purpur_block
+ui:
+  enderchestItem:
+    name: '{{menus.chest_item_accessible_title}}'
+    type: 'LIME_STAINED_GLASS_PANE'
+    lore: [ ]
+    variants:
+      - condition: 'inaccessible'
+        name: '{{menus.chest_item_inaccessible_title}}'
+        type: 'BLACK_STAINED_GLASS_PANE'
+        lore: [ '{{menus.chest_locked}}' ]
+      - condition: 'number = 3'
+        name: 'Third chest'
+      - condition: 'filling = 100%'
+        type: 'RED_STAINED_GLASS_PANE'
+        lore: [ '{{menus.chest_full}}' ]
+      - condition: 'filling = 0%'
+        lore: [ '{{menus.chest_empty}}' ]
+      - condition: 'filling >= 90%'
+        type: 'RED_STAINED_GLASS_PANE'
+    numbering: true
+  onlyShowAccessible: false
 mysql:
   enabled: false
   host: 'localhost'

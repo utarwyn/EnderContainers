@@ -40,6 +40,9 @@ menus:
   chest_title: '玩家 %player% 的第 %num% 個終界箱'
   pane_title: '終界箱 %num% %counter%'
 
+  chest_item_accessible_title: '&a終界箱 %num% %counter%'
+  chest_item_inaccessible_title: '&c終界箱 %num%'
+
   chest_empty: '&2這個終界箱是空的!'
   chest_full: '&c這個終界箱滿了!'
   chest_locked: '&8&o>> 終界箱被鎖上了!'
@@ -79,4 +82,4 @@ dependencies:
 ##                    ##
 miscellaneous:
 
-  chest_nametag: '&e終界箱數量: &6&l%enderchests%/%maxenderchests%&r&e' 
+  chest_nametag: '&e終界箱數量: &6&l%enderchests%/%maxenderchests%&r&e'

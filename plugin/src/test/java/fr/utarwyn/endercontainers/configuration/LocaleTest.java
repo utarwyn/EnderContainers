@@ -57,4 +57,15 @@ public class LocaleTest {
         assertThat(Files.getLocale().getMessage(localeKey)).isNull();
     }
 
+    @Test
+    public void replaceWithMessages() {
+        // No locale key in input test
+        assertThat(Files.getLocale().replaceWithMessages("simple text without locale key"))
+                .isEqualTo("simple text without locale key");
+
+        // With multiple locale keys
+        assertThat(Files.getLocale().replaceWithMessages("({{menus.previous_page}},{{menus.next_page}})"))
+                .isEqualTo("(§c≪ Previous page,§cNext page ≫)");
+    }
+
 }
