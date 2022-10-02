@@ -12,7 +12,7 @@ import java.util.Collections;
 
 /**
  * FactionsUUID dependency. Protect enderchests in enemy factions.
- * Works with FactionsUUID: https://www.spigotmc.org/resources/factionsuuid.1035/
+ * Works with <a href="https://www.spigotmc.org/resources/factionsuuid.1035/">FactionsUUID</a>
  *
  * @author Utarwyn
  * @since 2.2.3

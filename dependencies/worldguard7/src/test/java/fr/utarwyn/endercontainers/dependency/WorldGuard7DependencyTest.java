@@ -109,7 +109,7 @@ public class WorldGuard7DependencyTest {
     @Test
     public void validateIfCanBuildSucceed() {
         try {
-            when(this.regionQuery.testBuild(any(com.sk89q.worldedit.util.Location.class), eq(this.localPlayer), eq(Flags.INTERACT), eq(Flags.USE)))
+            when(this.regionQuery.testBuild(any(com.sk89q.worldedit.util.Location.class), eq(this.localPlayer), eq(Flags.CHEST_ACCESS)))
                     .thenReturn(true);
             this.dependency.validateBlockChestOpening(this.block, this.player);
         } catch (BlockChestOpeningException e) {
@@ -120,7 +120,7 @@ public class WorldGuard7DependencyTest {
     @Test
     public void invalidateIfCanBuildErrored() {
         try {
-            when(this.regionQuery.testBuild(any(com.sk89q.worldedit.util.Location.class), eq(this.localPlayer), eq(Flags.INTERACT), eq(Flags.USE)))
+            when(this.regionQuery.testBuild(any(com.sk89q.worldedit.util.Location.class), eq(this.localPlayer), eq(Flags.CHEST_ACCESS)))
                     .thenReturn(false);
             this.dependency.validateBlockChestOpening(this.block, this.player);
             fail("should throw block chest opening exception because build is forbidden by WorldGuard");

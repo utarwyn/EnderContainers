@@ -61,7 +61,7 @@ public class WorldGuard6DependencyTest {
     @Test
     public void validateIfCanBuildSucceed() {
         try {
-            when(this.regionQuery.testBuild(any(Location.class), any(LocalPlayer.class), eq(DefaultFlag.INTERACT), eq(DefaultFlag.USE)))
+            when(this.regionQuery.testBuild(eq(this.block.getLocation()), any(LocalPlayer.class), eq(DefaultFlag.CHEST_ACCESS)))
                     .thenReturn(true);
             this.dependency.validateBlockChestOpening(this.block, this.player);
         } catch (BlockChestOpeningException e) {
@@ -72,7 +72,7 @@ public class WorldGuard6DependencyTest {
     @Test
     public void invalidateIfCanBuildErrored() {
         try {
-            when(this.regionQuery.testBuild(any(Location.class), any(LocalPlayer.class), eq(DefaultFlag.INTERACT), eq(DefaultFlag.USE)))
+            when(this.regionQuery.testBuild(eq(this.block.getLocation()), any(LocalPlayer.class), eq(DefaultFlag.CHEST_ACCESS)))
                     .thenReturn(false);
             this.dependency.validateBlockChestOpening(this.block, this.player);
             fail("should throw block chest opening exception because build is forbidden by WorldGuard");
