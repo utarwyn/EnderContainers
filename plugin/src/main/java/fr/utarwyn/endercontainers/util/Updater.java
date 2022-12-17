@@ -156,7 +156,7 @@ public class Updater extends AbstractManager implements Runnable {
         } else {
             PluginMsg.infoMessage(
                     player, LocaleKey.CMD_NO_UPDATE,
-                    Collections.singletonMap("version", this.latestVersion.toString())
+                    Collections.singletonMap("version", this.currentVersion.toString())
             );
         }
     }

@@ -68,12 +68,14 @@ public class UpdaterTest {
 
     @Test
     public void withoutUpdate() {
-        when(this.plugin.getDescription().getVersion()).thenReturn("99.99.99-dev");
+        String currentVersion = "99.99.99-dev";
+        when(this.plugin.getDescription().getVersion()).thenReturn(currentVersion);
         this.updater.load();
 
         verify(this.plugin.getServer().getScheduler()).runTaskAsynchronously(this.plugin, this.updater);
         this.updater.notifyPlayer(this.player);
         verify(this.player).sendMessage(contains("is up-to-date"));
+        verify(this.player).sendMessage(contains("version is §e" + currentVersion));
     }
 
     @Test
