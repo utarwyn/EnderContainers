@@ -5,10 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -87,13 +84,21 @@ public class InventoryManager extends AbstractManager {
     public void cancelClickEventIfRestricted(
             InventoryClickEvent event, Predicate<ItemStack> itemPredicate
     ) {
-        Inventory inventory = event.getView().getTopInventory();
-        boolean validSlot = event.getRawSlot() >= 0 && event.getRawSlot() < inventory.getSize();
-        event.setCancelled((validSlot || event.isShiftClick()) && (
-                GameMode.SPECTATOR == event.getWhoClicked().getGameMode() || itemPredicate.test(
-                        event.isShiftClick() ? event.getCurrentItem() : event.getCursor()
-                )
-        ));
+        Inventory topInventory = event.getView().getTopInventory();
+        Inventory bottomInventory = event.getView().getBottomInventory();
+        boolean validSlot = event.getRawSlot() >= 0 && event.getRawSlot() < topInventory.getSize();
+        boolean isSpectator = GameMode.SPECTATOR == event.getWhoClicked().getGameMode();
+
+        ItemStack item;
+        if (event.isShiftClick()) {
+            item = event.getCurrentItem();
+        } else if (event.getAction() == InventoryAction.HOTBAR_SWAP) {
+            item = bottomInventory.getItem(event.getHotbarButton());
+        } else {
+            item = event.getCursor();
+        }
+
+        event.setCancelled((validSlot || event.isShiftClick()) && (isSpectator || itemPredicate.test(item)));
     }
 
     /**
