@@ -5,8 +5,10 @@ import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
+import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -15,7 +17,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.WorldSaveEvent;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -83,6 +88,37 @@ public class EnderChestListener implements Listener {
             } catch (BlockChestOpeningException e) {
                 if (e.getKey() != null) {
                     PluginMsg.errorMessage(player, e.getKey(), e.getParameters());
+                }
+            }
+        }
+    }
+
+    /**
+     * Method called when a world is saved
+     *
+     * @param event The save event
+     */
+    @EventHandler
+    public void onWorldSave(WorldSaveEvent event) {
+        World world = event.getWorld();
+
+        // Iterate over all the player contexts to save them
+        Map<UUID, PlayerContext> contextMap = this.manager.getContextMap();
+        for (Iterator<Map.Entry<UUID, PlayerContext>> it = contextMap.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<UUID, PlayerContext> entry = it.next();
+
+            // Only the player in the world of the event will be saved
+            Player player = entry.getValue().getOwnerAsObject();
+            if (player != null && world.equals(player.getWorld())) {
+                UUID owner = entry.getKey();
+
+                // Clear all the player data from memory
+                boolean unused = this.manager.isContextUnused(owner);
+
+                // Because iterator is used, we need to clear the player data manually with it.remove()
+                this.manager.savePlayerContext(owner, false);
+                if (unused) {
+                    it.remove();
                 }
             }
         }
