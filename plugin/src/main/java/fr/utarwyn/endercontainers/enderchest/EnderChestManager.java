@@ -98,6 +98,15 @@ public class EnderChestManager extends AbstractManager {
     }
 
     /**
+     * Get the all context of loaded players.
+     *
+     * @return context map of all players
+     */
+    public Map<UUID, PlayerContext> getContextMap() {
+        return contextMap;
+    }
+
+    /**
      * Check if the context of a specific player is unused at a given time.
      * All chests of this context must not have viewer in their container.
      *

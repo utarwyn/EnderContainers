@@ -16,6 +16,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.junit.Before;
@@ -25,7 +26,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -33,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bukkit.event.block.Action.LEFT_CLICK_AIR;
 import static org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EnderChestListenerTest {
@@ -146,6 +150,26 @@ public class EnderChestListenerTest {
         PlayerInteractEvent event = this.createInteractEvent(RIGHT_CLICK_BLOCK);
         this.listener.onPlayerInteract(event);
         assertThat(event.useInteractedBlock()).isEqualTo(Event.Result.ALLOW);
+    }
+
+    @Test
+    public void worldSaveSaveContext() {
+        WorldSaveEvent event = new WorldSaveEvent(this.player.getWorld());
+
+        // With a loaded player, we have to save the context
+        PlayerContext context = mock(PlayerContext.class);
+        Map<UUID, PlayerContext> contextMap = new HashMap<>(Collections.singletonMap(
+                this.player.getUniqueId(), context
+        ));
+        when(context.getOwnerAsObject()).thenReturn(this.player);
+        when(this.manager.getContextMap()).thenReturn(contextMap);
+        when(this.manager.isContextUnused(this.player.getUniqueId())).thenReturn(true);
+
+        this.listener.onWorldSave(event);
+        verify(this.manager).getContextMap();
+        verify(this.manager).isContextUnused(this.player.getUniqueId());
+        verify(this.manager).savePlayerContext(this.player.getUniqueId(), false);
+        assertThat(contextMap).isEmpty();
     }
 
     @Test
