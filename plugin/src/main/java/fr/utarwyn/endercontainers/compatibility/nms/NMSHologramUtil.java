@@ -192,7 +192,7 @@ public class NMSHologramUtil extends NMSUtil {
         // 1.19.3+ — 1.18+ :: New method name in Entity class
         Method getId;
         if (ServerVersion.isNewerThan(ServerVersion.V1_19)) {
-            getId = this.entityClass.getMethod("ah");
+            getId = this.entityClass.getMethod(ServerVersion.isNewerThan(ServerVersion.V1_19_R2) ? "af" : "ah");
         } else {
             getId = getNMSDynamicMethod(this.entityClass, "getId", "ae");
         }
@@ -320,7 +320,7 @@ public class NMSHologramUtil extends NMSUtil {
     private Object createEntityMetadataPacket(int entityId, Object entity) throws ReflectiveOperationException {
         Method getDataWatcher;
         if (ServerVersion.isNewerThan(ServerVersion.V1_19)) {
-            getDataWatcher = this.entityClass.getMethod("al");
+            getDataWatcher = this.entityClass.getMethod(ServerVersion.isNewerThan(ServerVersion.V1_19_R2) ? "aj" : "al");
         } else {
             getDataWatcher = getNMSDynamicMethod(this.entityClass, "getDataWatcher", "ai");
         }
