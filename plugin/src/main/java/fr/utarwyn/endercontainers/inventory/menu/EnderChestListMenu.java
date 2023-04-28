@@ -188,7 +188,7 @@ public class EnderChestListMenu extends AbstractInventoryHolder {
     }
 
     /**
-     * Generate an itemstack with informations of an enderchest
+     * Generate an itemstack with information of an enderchest
      * (capacity, accessibility, number, etc.)
      *
      * @param ec The enderchest processed
