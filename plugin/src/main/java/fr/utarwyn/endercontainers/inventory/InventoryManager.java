@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.inventory;
 import fr.utarwyn.endercontainers.AbstractManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.*;
@@ -84,16 +85,19 @@ public class InventoryManager extends AbstractManager {
     public void cancelClickEventIfRestricted(
             InventoryClickEvent event, Predicate<ItemStack> itemPredicate
     ) {
+        HumanEntity whoClicked = event.getWhoClicked();
         Inventory topInventory = event.getView().getTopInventory();
         Inventory bottomInventory = event.getView().getBottomInventory();
         boolean validSlot = event.getRawSlot() >= 0 && event.getRawSlot() < topInventory.getSize();
-        boolean isSpectator = GameMode.SPECTATOR == event.getWhoClicked().getGameMode();
+        boolean isSpectator = GameMode.SPECTATOR == whoClicked.getGameMode();
 
         ItemStack item;
         if (event.isShiftClick()) {
             item = event.getCurrentItem();
         } else if (event.getAction() == InventoryAction.HOTBAR_SWAP) {
-            item = bottomInventory.getItem(event.getHotbarButton());
+            // Since `-1` is not a number slot, then we should look an item in off-hand.
+            item = event.getHotbarButton() == -1 ?
+                    whoClicked.getInventory().getItemInOffHand() : bottomInventory.getItem(event.getHotbarButton());
         } else {
             item = event.getCursor();
         }
