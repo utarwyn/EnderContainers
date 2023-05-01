@@ -11,10 +11,7 @@ import fr.utarwyn.endercontainers.enderchest.listener.EnderChestListener;
 import fr.utarwyn.endercontainers.inventory.InventoryManager;
 import org.bukkit.entity.Player;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -64,7 +61,7 @@ public class EnderChestManager extends AbstractManager {
 
         // Save and unload all data
         this.loadingContexts.clear();
-        this.contextMap.values().forEach(PlayerContext::save);
+        this.contextMap.values().forEach(pc -> pc.save(Collections.emptySet()));
         this.contextMap.clear();
     }
 

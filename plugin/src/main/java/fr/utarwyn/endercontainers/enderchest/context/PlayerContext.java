@@ -14,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A context in which all enderchests of a player are loaded.
@@ -189,10 +190,24 @@ public class PlayerContext {
     }
 
     /**
-     * Save all datas stored in the context.
+     * Update used inventories in the context.
+     * This method is called synchronously before the async SaveTask.
+     *
+     * @return set of used enderchests
      */
-    public void save() {
-        this.chests.forEach(EnderChest::updateContainer);
+    public Set<EnderChest> preSave() {
+        Set<EnderChest> usedChests = this.chests.stream().filter(EnderChest::isContainerUsed).collect(Collectors.toSet());
+        usedChests.forEach(EnderChest::updateContainer);
+        return usedChests;
+    }
+
+    /**
+     * Save all datas stored in the context.
+     *
+     * @param usedChests set of used enderchests (previously returned by preSave)
+     */
+    public void save(Set<EnderChest> usedChests) {
+        this.chests.stream().filter(chest -> !usedChests.contains(chest)).forEach(EnderChest::updateContainer);
         this.data.saveContext(this.chests);
     }
 

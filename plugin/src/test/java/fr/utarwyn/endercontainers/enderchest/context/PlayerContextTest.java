@@ -163,7 +163,7 @@ public class PlayerContextTest {
 
     @Test
     public void save() {
-        this.context.save();
+        this.context.save(Collections.emptySet());
         verify(this.playerData).saveContext(any());
     }
 
