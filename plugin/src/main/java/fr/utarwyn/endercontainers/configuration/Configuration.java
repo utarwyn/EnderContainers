@@ -49,7 +49,6 @@ public class Configuration {
     private final boolean blockNametag;
     private final boolean updateChecker;
     private final boolean globalSound;
-    private final boolean saveOnChestClose;
 
     /**
      * Create a configuration object from plugin configuration.
@@ -109,7 +108,6 @@ public class Configuration {
         this.blockNametag = loadValue("others.blockNametag", config::isBoolean, config::getBoolean);
         this.updateChecker = loadValue("others.updateChecker", config::isBoolean, config::getBoolean);
         this.globalSound = loadValue("others.globalSound", config::isBoolean, config::getBoolean);
-        this.saveOnChestClose = loadValue("others.saveOnChestClose", config::isBoolean, config::getBoolean);
     }
 
     public String getLocale() {
@@ -210,10 +208,6 @@ public class Configuration {
 
     public boolean isGlobalSound() {
         return this.globalSound;
-    }
-
-    public boolean isSaveOnChestClose() {
-        return this.saveOnChestClose;
     }
 
     private <T> T loadValue(String key, Predicate<String> checker, Function<String, T> getter) throws ConfigLoadingException {

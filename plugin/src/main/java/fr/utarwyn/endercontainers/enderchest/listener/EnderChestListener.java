@@ -16,7 +16,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 
 import java.util.Iterator;
@@ -122,20 +121,6 @@ public class EnderChestListener implements Listener {
                 }
             }
         }
-    }
-
-    /**
-     * Method called when a player quits the server
-     *
-     * @param event The quit event
-     */
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        UUID owner = event.getPlayer().getUniqueId();
-
-        // Clear all the player data from memory
-        boolean unused = this.manager.isContextUnused(owner);
-        this.manager.savePlayerContext(owner, unused);
     }
 
 }

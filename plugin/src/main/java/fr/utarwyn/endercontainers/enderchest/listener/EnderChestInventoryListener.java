@@ -4,7 +4,6 @@ import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
-import fr.utarwyn.endercontainers.enderchest.VanillaEnderChest;
 import fr.utarwyn.endercontainers.inventory.EnderChestInventory;
 import fr.utarwyn.endercontainers.inventory.InventoryManager;
 import org.bukkit.Sound;
@@ -18,8 +17,6 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Optional;
 
 /**
  * Intercepts events about chest inventories.
@@ -78,19 +75,6 @@ public class EnderChestInventoryListener implements Listener {
 
         // Play the closing sound when we use the default enderchest!
         if (this.isEnderChestInventory(event.getInventory())) {
-            Optional<VanillaEnderChest> vanilla = this.manager.getVanillaEnderchestUsedBy(player);
-
-            // When closing the default enderchest ...
-            if (vanilla.isPresent()) {
-                Player ownerObj = vanilla.get().getOwnerAsPlayer();
-
-                // ... save and delete the context from memory if the player is offline.
-                if (!ownerObj.equals(player) && !ownerObj.isOnline()) {
-                    this.manager.savePlayerContext(vanilla.get().getOwner(), true);
-                    ownerObj.saveData();
-                }
-            }
-
             // Play the closing sound
             Sound sound = CompatibilityHelper.searchSound("CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
             if (Files.getConfiguration().isGlobalSound()) {

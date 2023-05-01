@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
-import fr.utarwyn.endercontainers.enderchest.VanillaEnderChest;
 import fr.utarwyn.endercontainers.inventory.EnderChestInventory;
 import fr.utarwyn.endercontainers.inventory.InventoryManager;
 import org.bukkit.*;
@@ -22,8 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -176,37 +173,6 @@ public class EnderChestInventoryListenerTest {
     }
 
     @Test
-    public void inventoryCloseSaveOfflineVanillaChest() {
-        when(this.inventory.getType()).thenReturn(InventoryType.ENDER_CHEST);
-
-        Player player2 = mock(Player.class);
-        UUID player2Identifier = UUID.randomUUID();
-        VanillaEnderChest chest = mock(VanillaEnderChest.class);
-        InventoryCloseEvent event = new InventoryCloseEvent(this.inventoryView);
-
-        when(player2.getUniqueId()).thenReturn(player2Identifier);
-        when(this.manager.getVanillaEnderchestUsedBy(this.player)).thenReturn(Optional.of(chest));
-
-        // do not save if the viewer is the owner of the chest
-        when(chest.getOwnerAsPlayer()).thenReturn(this.player);
-        this.listener.onInventoryClose(event);
-        verify(this.manager, never()).savePlayerContext(player2.getUniqueId(), true);
-
-        // do not save if the player is online
-        when(chest.getOwnerAsPlayer()).thenReturn(player2);
-        when(chest.getOwner()).thenReturn(player2Identifier);
-        when(player2.isOnline()).thenReturn(true);
-        this.listener.onInventoryClose(event);
-        verify(this.manager, never()).savePlayerContext(player2.getUniqueId(), true);
-
-        // save the chest (and the player data) if the player is not the viewer and its offline
-        when(player2.isOnline()).thenReturn(false);
-        this.listener.onInventoryClose(event);
-        verify(this.manager).savePlayerContext(player2.getUniqueId(), true);
-        verify(player2).saveData();
-    }
-
-    @Test
     public void inventoryCloseGlobalSound() {
         when(this.inventory.getType()).thenReturn(InventoryType.ENDER_CHEST);
         this.listener.onInventoryClose(new InventoryCloseEvent(this.inventoryView));
@@ -240,7 +206,6 @@ public class EnderChestInventoryListenerTest {
 
         // try with an enderchest managed by the plugin -> no sound (integrated in the inventory system)
         when(event.getInventory().getType()).thenReturn(InventoryType.ENDER_CHEST);
-        when(this.manager.getVanillaEnderchestUsedBy(this.player)).thenReturn(Optional.empty());
         this.listener.onInventoryClose(event);
         verify(this.player, never()).playSound(any(Location.class), any(Sound.class), anyFloat(), anyFloat());
     }
