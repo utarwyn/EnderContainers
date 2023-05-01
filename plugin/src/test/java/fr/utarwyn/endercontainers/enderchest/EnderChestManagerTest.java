@@ -70,7 +70,7 @@ public class EnderChestManagerTest {
 
         this.manager.unload();
 
-        verify(context).save();
+        verify(context).save(any());
         verify(inventoryManager).closeAll();
         assertThat(this.manager.contextMap).isEmpty();
     }
