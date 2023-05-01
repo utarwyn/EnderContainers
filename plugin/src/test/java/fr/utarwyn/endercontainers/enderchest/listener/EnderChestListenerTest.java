@@ -172,20 +172,6 @@ public class EnderChestListenerTest {
         assertThat(contextMap).isEmpty();
     }
 
-    @Test
-    public void playerLeaveSaveContext() {
-        PlayerQuitEvent event = new PlayerQuitEvent(this.player, "");
-
-        // By default, we have to save the context but not delete it
-        this.listener.onPlayerQuit(event);
-        verify(this.manager).savePlayerContext(this.player.getUniqueId(), false);
-
-        // With an unused context, we also have to delete the context
-        when(this.manager.isContextUnused(this.player.getUniqueId())).thenReturn(true);
-        this.listener.onPlayerQuit(event);
-        verify(this.manager).savePlayerContext(this.player.getUniqueId(), true);
-    }
-
     private PlayerInteractEvent createInteractEvent(Action action) {
         return new PlayerInteractEvent(this.player, action, null, this.block, BlockFace.NORTH);
     }

@@ -129,18 +129,6 @@ public class EnderChestInventoryTest {
         // do not save if the owner is connected
         this.inventory.onClose(viewer);
         verify(manager, never()).savePlayerContext(any(), eq(true));
-
-        // save if forced by the configuration
-        TestHelper.overrideConfigurationValue("saveOnChestClose", true);
-        this.inventory.onClose(viewer);
-        verify(manager).savePlayerContext(this.chest.getOwner(), false);
-        TestHelper.overrideConfigurationValue("saveOnChestClose", false);
-
-        // save if owner not connected
-        UUID offline = UUID.fromString("62dcb385-f2ac-472f-9d88-a0cc0d957082");
-        when(this.chest.getOwner()).thenReturn(offline);
-        this.inventory.onClose(viewer);
-        verify(manager).savePlayerContext(this.chest.getOwner(), true);
     }
 
     @Test

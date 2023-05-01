@@ -33,7 +33,6 @@ public class ConfigurationTest {
         assertThat(config.getMysqlSslKeystorePassword()).isNull();
         assertThat(config.getMysqlSslTrustKeystoreFile()).isNull();
         assertThat(config.getMysqlSslTrustKeystorePassword()).isNull();
-        assertThat(config.isSaveOnChestClose()).isFalse();
     }
 
     @Test

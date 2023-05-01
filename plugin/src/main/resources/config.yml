@@ -69,7 +69,3 @@ others:
 
   # Use a global sound when a player opens/closes an enderchest
   globalSound: true
-
-  # Save enderchests on close. Beware! This could be very resource intensive.
-  # Enable this ONLY if you have issues with the normal saving system.
-  saveOnChestClose: false

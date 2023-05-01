@@ -1,14 +1,11 @@
 package fr.utarwyn.endercontainers.inventory;
 
 import com.google.common.base.Preconditions;
-import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
-import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
-import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -117,15 +114,6 @@ public class EnderChestInventory extends AbstractInventoryHolder {
      */
     @Override
     public void onClose(Player player) {
-        // Save and delete the player context if the owner of the chest is offline
-        Player owner = Bukkit.getPlayer(this.chest.getOwner());
-        boolean offlineOwner = owner == null || !owner.isOnline();
-
-        // Save chest inventory if owner is offline or forced by the configuration (experimental)
-        if (offlineOwner || Files.getConfiguration().isSaveOnChestClose()) {
-            Managers.get(EnderChestManager.class).savePlayerContext(this.chest.getOwner(), offlineOwner);
-        }
-
         // Play the closing sound
         Sound sound = CompatibilityHelper.searchSound("CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
         if (Files.getConfiguration().isGlobalSound()) {
