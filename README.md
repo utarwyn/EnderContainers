@@ -3,7 +3,7 @@
 <h4 align="center">
 A modern Bukkit plugin to divide enderchest into multiple inventories.
 <br>
-Works with Bukkit/Spigot 1.8 to 1.19!
+Works with Bukkit/Spigot 1.8 to 1.20!
 </h4>
 
 <p align="center">
