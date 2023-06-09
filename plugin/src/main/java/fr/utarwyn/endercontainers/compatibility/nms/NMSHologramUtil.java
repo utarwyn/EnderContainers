@@ -120,7 +120,9 @@ public class NMSHologramUtil extends NMSUtil {
         }
 
         // 1.17+ :: New way of retrieving player connection instance
-        if (ServerVersion.isNewerThan(ServerVersion.V1_16)) {
+        if (ServerVersion.isNewerThan(ServerVersion.V1_19_R3)) {
+            this.playerConnectionField = entityPlayerClass.getField("c");
+        } else if (ServerVersion.isNewerThan(ServerVersion.V1_16)) {
             this.playerConnectionField = entityPlayerClass.getField("b");
         } else {
             this.playerConnectionField = entityPlayerClass.getField("playerConnection");
