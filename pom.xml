@@ -35,10 +35,12 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <bukkit-api.version>1.19-R0.1-SNAPSHOT</bukkit-api.version>
-        <junit.version>4.13.1</junit.version>
-        <mockito.version>3.8.0</mockito.version>
-        <assertj.version>3.19.0</assertj.version>
+        <bukkit-api.version>1.20-R0.1-SNAPSHOT</bukkit-api.version>
+
+        <junit.version>4.13.2</junit.version>
+        <mockito.version>5.3.1</mockito.version>
+        <assertj.version>3.24.2</assertj.version>
+        <jacoco.version>0.8.8</jacoco.version>
     </properties>
 
     <modules>
@@ -133,7 +135,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.6</version>
+                        <version>${jacoco.version}</version>
                         <executions>
                             <execution>
                                 <id>prepare-agent</id>
