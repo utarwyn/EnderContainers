@@ -51,9 +51,9 @@ public class DatabaseManagerTest {
         TestHelper.setupManager(this.databaseManager);
 
         // Call real methods
-        lenient().when(this.database.select(any())).thenCallRealMethod();
+        lenient().when(this.database.select(any(String[].class))).thenCallRealMethod();
         lenient().when(this.database.update(anyString())).thenCallRealMethod();
-        lenient().when(this.database.delete(any())).thenCallRealMethod();
+        lenient().when(this.database.delete(any(String[].class))).thenCallRealMethod();
 
         // Force custom database
         Field field = this.databaseManager.getClass().getDeclaredField("database");

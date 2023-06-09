@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.mock;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -48,6 +49,16 @@ public class SkullItemMetaMock extends ItemMetaMock implements SkullMeta {
     @Override
     public void setOwnerProfile(PlayerProfile profile) {
 
+    }
+
+    @Override
+    public void setNoteBlockSound(NamespacedKey namespacedKey) {
+
+    }
+
+    @Override
+    public NamespacedKey getNoteBlockSound() {
+        return null;
     }
 
     @Override
