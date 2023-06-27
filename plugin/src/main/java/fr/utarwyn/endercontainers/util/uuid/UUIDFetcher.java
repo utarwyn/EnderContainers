@@ -29,21 +29,14 @@ import java.util.logging.Level;
 public class UUIDFetcher {
 
     /**
-     * Date when name changes were introduced
-     *
-     * @see UUIDFetcher#getUUIDAt(String, long)
-     */
-    public static final long NAME_CHANGES_INTRODUCED = 1422748800000L;
-
-    /**
-     * URL used to convert an UUID to a playername at a specific time
-     */
-    private static final String UUID_URL = "https://api.mojang.com/users/profiles/minecraft/%s?at=%d";
-
-    /**
      * URL used to convert a playername to an UUID
      */
-    private static final String NAME_URL = "https://api.mojang.com/user/profiles/%s/names";
+    private static final String UUID_URL = "https://api.mojang.com/users/profiles/minecraft/%s";
+
+    /**
+     * URL used to convert an UUID to a playername
+     */
+    private static final String NAME_URL = "https://sessionserver.mojang.com/session/minecraft/profile/%s";
 
     /**
      * Gson library object used to parse the retrieved JSON data and convert it to object
@@ -95,17 +88,6 @@ public class UUIDFetcher {
      * @return The uuid
      */
     public static UUID getUUID(String name) {
-        return getUUIDAt(name, System.currentTimeMillis());
-    }
-
-    /**
-     * Fetches the uuid synchronously for a specified name and time
-     *
-     * @param name      The name
-     * @param timestamp Time when the player had this name in milliseconds
-     * @see UUIDFetcher#NAME_CHANGES_INTRODUCED
-     */
-    private static UUID getUUIDAt(String name, long timestamp) {
         // UUID in cache!
         if (nameCache.contains(name))
             return nameCache.get(name);
@@ -129,7 +111,7 @@ public class UUIDFetcher {
         }
 
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(String.format(UUID_URL, name, timestamp / 1000)).openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL(String.format(UUID_URL, name)).openConnection();
             connection.setReadTimeout(5000);
             UUIDFetcher data = GSON.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher.class);
 
@@ -184,13 +166,12 @@ public class UUIDFetcher {
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(String.format(NAME_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
             connection.setReadTimeout(5000);
-            UUIDFetcher[] nameHistory = GSON.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher[].class);
-            UUIDFetcher currentNameData = nameHistory[nameHistory.length - 1];
+            UUIDFetcher data = GSON.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher.class);
 
-            nameCache.put(currentNameData.name.toLowerCase(), uuid);
-            idCache.put(uuid, currentNameData.name);
+            nameCache.put(data.name.toLowerCase(), uuid);
+            idCache.put(uuid, data.name);
 
-            return currentNameData.name;
+            return data.name;
         } catch (IOException e) {
             EnderContainers.getInstance().getLogger().log(Level.SEVERE, "Cannot retrieve the player name from the Mojang Api", e);
         }
