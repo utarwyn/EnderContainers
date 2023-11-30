@@ -21,7 +21,7 @@ class EnderChestItemVariantTest {
 
     @Test
     void creationWithAllDefaultItemFields() {
-        Map<String, Object> map = new HashMap<>() {{
+        Map<String, Object> map = new HashMap<String, Object>() {{
             put("condition", "inaccessible");
         }};
         EnderChestItemVariant variant = new EnderChestItemVariant(defaultItem, map);
@@ -34,7 +34,7 @@ class EnderChestItemVariantTest {
 
     @Test
     void creationWithVariantItemFields() {
-        Map<String, Object> map = new HashMap<>() {{
+        Map<String, Object> map = new HashMap<String, Object>() {{
             put("name", "variant name");
             put("type", "RED_STAINED_GLASS_PANE");
             put("lore", Arrays.asList("variant line 1", "variant line 2"));
@@ -50,8 +50,9 @@ class EnderChestItemVariantTest {
 
     @Test
     void creationErrorWithoutCondition() {
-        assertThat(assertThrows(NullPointerException.class, () -> new EnderChestItemVariant(defaultItem, new HashMap<>())).getMessage())
-                .isEqualTo("variant must have a condition");
+        HashMap<String, Object> section = new HashMap<>();
+        Throwable exception = assertThrows(NullPointerException.class, () -> new EnderChestItemVariant(defaultItem, section));
+        assertThat(exception.getMessage()).isEqualTo("variant must have a condition");
     }
 
 }

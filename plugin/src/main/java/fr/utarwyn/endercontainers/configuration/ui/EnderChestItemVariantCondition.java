@@ -3,7 +3,7 @@ package fr.utarwyn.endercontainers.configuration.ui;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 public class EnderChestItemVariantCondition {
 
@@ -60,7 +60,7 @@ public class EnderChestItemVariantCondition {
 
     public boolean isValidUsingOperator(double value) {
         if (this.operator != null && this.value != null) {
-            return this.operator.checker.apply(value, this.value);
+            return this.operator.checker.test(value, this.value);
         } else {
             return false;
         }
@@ -77,7 +77,7 @@ public class EnderChestItemVariantCondition {
     }
 
     public enum Operator {
-        EQUAL("=", (v1, v2) -> Objects.equals(v1, v2)),
+        EQUAL("=", Objects::equals),
         GREATER_OR_EQUAL(">=", (v1, v2) -> v1 >= v2),
         GREATER(">", (v1, v2) -> v1 > v2),
         LOWER_OR_EQUAL("<=", (v1, v2) -> v1 <= v2),
@@ -86,9 +86,9 @@ public class EnderChestItemVariantCondition {
 
         private final String representation;
 
-        private final BiFunction<Double, Double, Boolean> checker;
+        private final BiPredicate<Double, Double> checker;
 
-        Operator(String representation, BiFunction<Double, Double, Boolean> checker) {
+        Operator(String representation, BiPredicate<Double, Double> checker) {
             this.representation = representation;
             this.checker = checker;
         }

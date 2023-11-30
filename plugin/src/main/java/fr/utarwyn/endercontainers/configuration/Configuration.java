@@ -65,7 +65,7 @@ public class Configuration {
 
         this.maxEnderchests = loadValue("enderchests.max", config::isInt, config::getInt);
         this.defaultEnderchests = loadValue("enderchests.default", config::isInt, config::getInt);
-        legacyOnlyShowAccessible = loadValue("enderchests.onlyShowAccessible", (v) -> true, config::getBoolean);
+        legacyOnlyShowAccessible = loadValue("enderchests.onlyShowAccessible", v -> true, config::getBoolean);
         this.useVanillaEnderchest = loadValue("enderchests.useVanillaEnderchest", config::isBoolean, config::getBoolean);
         this.forbiddenMaterials = loadValue(
                 "enderchests.forbiddenMaterials",
@@ -78,7 +78,6 @@ public class Configuration {
         );
         this.enderchestItemVariants = loadValue("ui.enderchestItem.variants", config::isList,
                 key -> Objects.requireNonNull(config.getList(key)).stream()
-                        .map(Map.class::cast)
                         .map(map -> new EnderChestItemVariant(this.enderchestItem, (Map<String, Object>) map))
                         .collect(Collectors.toList())
         );

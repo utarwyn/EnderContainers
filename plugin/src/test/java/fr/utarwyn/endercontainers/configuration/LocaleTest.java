@@ -16,15 +16,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class LocaleTest {
+class LocaleTest {
 
     @BeforeAll
-    public static void setupClass() throws TestInitializationException {
+    static void setupClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 
     @Test
-    public void unknownLocaleFile() throws TestInitializationException {
+    void unknownLocaleFile() throws TestInitializationException {
         try {
             new Locale(TestHelper.getPlugin(), "unknown");
             fail("should not load an unknown resource locale file");
@@ -34,7 +34,7 @@ public class LocaleTest {
     }
 
     @Test
-    public void saveCustomLocaleFile() throws TestInitializationException, ConfigLoadingException {
+    void saveCustomLocaleFile() throws TestInitializationException, ConfigLoadingException {
         EnderContainers plugin = TestHelper.getPlugin();
         File destination = new File(plugin.getDataFolder(), "locale.yml");
 
@@ -44,7 +44,7 @@ public class LocaleTest {
     }
 
     @Test
-    public void getMessage() {
+    void getMessage() {
         // Existing key in the file
         assertThat(Files.getLocale().getMessage(LocaleKey.MENU_MAIN_TITLE))
                 .isNotNull()
@@ -58,7 +58,7 @@ public class LocaleTest {
     }
 
     @Test
-    public void replaceWithMessages() {
+    void replaceWithMessages() {
         // No locale key in input test
         assertThat(Files.getLocale().replaceWithMessages("simple text without locale key"))
                 .isEqualTo("simple text without locale key");

@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -50,14 +51,15 @@ class EnderChestItemTest {
 
     @Test
     void creationErrorWithNullConfigSection() {
-        assertThat(assertThrows(NullPointerException.class, () -> new EnderChestItem(null)).getMessage())
-                .isEqualTo("configuration section cannot be null");
+        Throwable exception = assertThrows(NullPointerException.class, () -> new EnderChestItem(null));
+        assertThat(exception.getMessage()).isEqualTo("configuration section cannot be null");
     }
 
     @Test
     void creationErrorWithUnknownMaterial() {
-        assertThat(assertThrows(NullPointerException.class, () -> new EnderChestItem(null, "FAKE_MATERIAL", Collections.emptyList())).getMessage())
-                .isEqualTo("item material FAKE_MATERIAL is not valid");
+        List<String> lore = Collections.emptyList();
+        Throwable exception = assertThrows(NullPointerException.class, () -> new EnderChestItem(null, "FAKE_MATERIAL", lore));
+        assertThat(exception.getMessage()).isEqualTo("item material FAKE_MATERIAL is not valid");
     }
 
 }
