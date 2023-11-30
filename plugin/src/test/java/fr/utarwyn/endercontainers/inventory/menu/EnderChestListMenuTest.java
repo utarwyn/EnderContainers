@@ -71,7 +71,7 @@ class EnderChestListMenuTest {
         assertThat(chestItem.getType()).isEqualTo(Material.LIME_STAINED_GLASS_PANE);
         assertThat(chestItem.getItemMeta()).isNotNull();
         assertThat(chestItem.getItemMeta().getLore())
-                .containsExactly("§2This enderchest is empty!", "§6Second line");
+                .containsExactly("§2This enderchest is empty!", "§6Second line", "(0%) (0/0)");
 
         // check out of bounds item
         assertThat(this.menu.getInventory().getItem(64)).isNull();

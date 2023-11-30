@@ -29,7 +29,7 @@ ui:
         type: 'RED_STAINED_GLASS_PANE'
         lore: [ '{{menus.chest_full}}' ]
       - condition: 'filling = 0%'
-        lore: [ '{{menus.chest_empty}}', '&6Second line' ]
+        lore: [ '{{menus.chest_empty}}', '&6Second line', '%percent% %counter%' ]
       - condition: 'filling >= 90%'
         type: 'RED_STAINED_GLASS_PANE'
     numbering: true

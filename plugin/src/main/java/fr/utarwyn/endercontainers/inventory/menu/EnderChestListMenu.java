@@ -213,10 +213,10 @@ public class EnderChestListMenu extends AbstractInventoryHolder {
                 ((Damageable) meta).setDamage(item.getDurability());
             }
 
-            meta.setDisplayName(this.formatPaneTitle(ec, item.getName()));
+            meta.setDisplayName(this.formatTextWithChestInfo(item.getName(), ec));
             meta.setLore(
                     item.getLore().stream()
-                            .map(line -> Files.getLocale().replaceWithMessages(line))
+                            .map(line -> this.formatTextWithChestInfo(line, ec))
                             .map(line -> ChatColor.translateAlternateColorCodes('&', line))
                             .collect(Collectors.toList())
             );
@@ -227,30 +227,29 @@ public class EnderChestListMenu extends AbstractInventoryHolder {
     }
 
     /**
-     * Formats the pane title from the configuration to have info about an enderchest.
+     * Formats a text and replace placeholders with info about an enderchest.
      *
-     * @param chest enderchest represented by the pane
-     * @param title original title got from the configuration
-     * @return formatted title ready to be displayed in the container
+     * @param text  text to format
+     * @param chest enderchest to use for the placeholders values
+     * @return formatted text ready to be displayed on the item
      */
-    private String formatPaneTitle(EnderChest chest, String title) {
-        // Get message from locale first
-        title = Files.getLocale().replaceWithMessages(title);
+    private String formatTextWithChestInfo(String text, EnderChest chest) {
+        text = Files.getLocale().replaceWithMessages(text);
 
         // Separate all placeholders to improve performance
-        if (title.contains("%num%")) {
-            title = title.replace("%num%", String.valueOf(chest.getNum() + 1));
+        if (text.contains("%num%")) {
+            text = text.replace("%num%", String.valueOf(chest.getNum() + 1));
         }
 
-        if (title.contains("%counter%")) {
-            title = title.replace("%counter%", "(" + chest.getSize() + "/" + chest.getMaxSize() + ")");
+        if (text.contains("%counter%")) {
+            text = text.replace("%counter%", "(" + chest.getSize() + "/" + chest.getMaxSize() + ")");
         }
 
-        if (title.contains("%percent%")) {
-            title = title.replace("%percent%", "(" + String.format("%.0f", chest.getFillPercentage() * 100) + "%)");
+        if (text.contains("%percent%")) {
+            text = text.replace("%percent%", "(" + String.format("%.0f", chest.getFillPercentage() * 100) + "%)");
         }
 
-        return title;
+        return text;
     }
 
     /**
