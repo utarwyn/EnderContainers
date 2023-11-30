@@ -38,7 +38,9 @@ menus:
 
   main_title: 'Enderchests de %player%'
   chest_title: 'Enderchest %num% de %player%'
-  pane_title: 'Enderchest %num% %counter%'
+
+  chest_item_accessible_title: '&aEnderchest %num% %counter%'
+  chest_item_inaccessible_title: '&cEnderchest %num%'
 
   chest_empty: '&2Cet enderchest est vide !'
   chest_full: '&cInventaire plein !'

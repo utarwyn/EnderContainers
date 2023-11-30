@@ -4,23 +4,23 @@ import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.compatibility.ServerVersion;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
+import fr.utarwyn.endercontainers.configuration.ui.EnderChestItem;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.inventory.AbstractInventoryHolder;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
 import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Represents the menu with the list of all enderchests.
@@ -29,6 +29,11 @@ import java.util.Optional;
  * @since 2.0.0
  */
 public class EnderChestListMenu extends AbstractInventoryHolder {
+
+    /**
+     * Internal item selector
+     */
+    protected static final EnderChestItemSelector ITEM_SELECTOR;
 
     /**
      * Static fields which represents the maximum number of items per page
@@ -51,6 +56,8 @@ public class EnderChestListMenu extends AbstractInventoryHolder {
     private static final ItemStack NEXT_PAGE_ITEM;
 
     static {
+        ITEM_SELECTOR = new EnderChestItemSelector();
+
         if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
             SKULL_MATERIAL = Material.PLAYER_HEAD;
         } else {
@@ -195,36 +202,24 @@ public class EnderChestListMenu extends AbstractInventoryHolder {
      * @return The itemstack generated
      */
     private ItemStack getItemStackOf(EnderChest ec) {
-        DyeColor dyeColor = ec.isAccessible() ? this.getDyePercentageColor(ec.getFillPercentage()) : DyeColor.BLACK;
         int amount = Files.getConfiguration().isNumberingEnderchests() ? ec.getNum() + 1 : 1;
 
-        ItemStack itemStack;
-
-        if (ServerVersion.isNewerThan(ServerVersion.V1_12)) {
-            itemStack = new ItemStack(CompatibilityHelper.searchMaterial(dyeColor.name() + "_STAINED_GLASS_PANE"), amount);
-        } else {
-            itemStack = new ItemStack(CompatibilityHelper.searchMaterial("STAINED_GLASS_PANE"), amount, dyeColor.getWoolData());
-        }
-
+        EnderChestItem item = ITEM_SELECTOR.fromEnderchest(ec);
+        ItemStack itemStack = new ItemStack(item.getMaterial(), amount);
         ItemMeta meta = itemStack.getItemMeta();
 
-        List<String> lore = new ArrayList<>();
-
-        // Update lore with the chest's status
-        if (!ec.isAccessible()) {
-            lore.add(Files.getLocale().getMessage(LocaleKey.MENU_CHEST_LOCKED));
-        }
-        if (ec.isFull()) {
-            lore.add(Files.getLocale().getMessage(LocaleKey.MENU_CHEST_FULL));
-        } else if (ec.isEmpty()) {
-            lore.add(Files.getLocale().getMessage(LocaleKey.MENU_CHEST_EMPTY));
-        }
-
-        // Update itemstack metadata
         if (meta != null) {
-            meta.setDisplayName(this.formatPaneTitle(ec,
-                    Files.getLocale().getMessage(LocaleKey.MENU_PANE_TITLE)));
-            meta.setLore(lore);
+            if (item.getDurability() != null && meta instanceof Damageable) {
+                ((Damageable) meta).setDamage(item.getDurability());
+            }
+
+            meta.setDisplayName(this.formatTextWithChestInfo(item.getName(), ec));
+            meta.setLore(
+                    item.getLore().stream()
+                            .map(line -> this.formatTextWithChestInfo(line, ec))
+                            .map(line -> ChatColor.translateAlternateColorCodes('&', line))
+                            .collect(Collectors.toList())
+            );
         }
 
         itemStack.setItemMeta(meta);
@@ -232,63 +227,29 @@ public class EnderChestListMenu extends AbstractInventoryHolder {
     }
 
     /**
-     * Formats the pane title from the configuration to have info about an enderchest.
+     * Formats a text and replace placeholders with info about an enderchest.
      *
-     * @param chest enderchest represented by the pane
-     * @param title original title got from the configuration
-     * @return formatted title ready to be displayed in the container
+     * @param text  text to format
+     * @param chest enderchest to use for the placeholders values
+     * @return formatted text ready to be displayed on the item
      */
-    private String formatPaneTitle(EnderChest chest, String title) {
-        ChatColor fillingColor = this.getPercentageColor(chest.getFillPercentage());
-        ChatColor accessibilityColor = chest.isAccessible() ? ChatColor.GREEN : ChatColor.RED;
-
-        // Adding the color before all text
-        title = accessibilityColor + title;
+    private String formatTextWithChestInfo(String text, EnderChest chest) {
+        text = Files.getLocale().replaceWithMessages(text);
 
         // Separate all placeholders to improve performance
-        if (title.contains("%num%")) {
-            title = title.replace("%num%", String.valueOf(chest.getNum() + 1));
+        if (text.contains("%num%")) {
+            text = text.replace("%num%", String.valueOf(chest.getNum() + 1));
         }
 
-        if (title.contains("%counter%")) {
-            title = title.replace("%counter%", fillingColor + "(" + chest.getSize() + "/" + chest.getMaxSize() + ")" + accessibilityColor);
+        if (text.contains("%counter%")) {
+            text = text.replace("%counter%", "(" + chest.getSize() + "/" + chest.getMaxSize() + ")");
         }
 
-        if (title.contains("%percent%")) {
-            title = title.replace("%percent%", fillingColor + "(" + String.format("%.0f", chest.getFillPercentage() * 100) + "%)" + accessibilityColor);
+        if (text.contains("%percent%")) {
+            text = text.replace("%percent%", "(" + String.format("%.0f", chest.getFillPercentage() * 100) + "%)");
         }
 
-        return title;
-    }
-
-    /**
-     * Get the color in terms of a percentage between 0 and 1
-     *
-     * @param perc The percentage
-     * @return The chat color generated
-     */
-    private ChatColor getPercentageColor(double perc) {
-        if (perc >= 1)
-            return ChatColor.DARK_RED;
-        if (perc >= .5)
-            return ChatColor.GOLD;
-
-        return ChatColor.GREEN;
-    }
-
-    /**
-     * Get the dye color in terms of a percentage between 0 and 1
-     *
-     * @param perc The percentage
-     * @return The dye color used for the itemstack
-     */
-    private DyeColor getDyePercentageColor(double perc) {
-        if (perc >= 1)
-            return DyeColor.RED;
-        if (perc >= .5)
-            return DyeColor.ORANGE;
-
-        return DyeColor.LIME;
+        return text;
     }
 
     /**

@@ -22,18 +22,51 @@ enderchests:
   # Range: 1 to max
   default: 1
 
-  # Show/Hide all inaccessible enderchests in the main menu.
-  onlyShowAccessible: false
-
   # Use the vanilla enderchest as the first one. Otherwise, it will be managed by EnderContainers.
   useVanillaEnderchest: true
-
-  # Number the items in the main menu so that they follow enderchests number
-  numberingEnderchests: false
 
   # A list of item materials which are forbidden to store in chests
   # Use Minecraft item IDs displayed ingame (shortcut: F3+H)
   forbiddenMaterials: [ ]
+
+
+# UI configuration
+ui:
+
+  # What an enderchest item will look like in the main menu
+  enderchestItem:
+
+    # Default look of the item if no variant was found for chest state
+    name: '{{menus.chest_item_accessible_title}}'
+    type: 'LIME_STAINED_GLASS_PANE'
+    lore: [ ]
+
+    # A list of variants to condition the display of item according to chest state
+    # Check our wiki on GitHub to have a list of available conditions and variables
+    variants:
+      - condition: 'inaccessible'
+        name: '{{menus.chest_item_inaccessible_title}}'
+        type: 'BLACK_STAINED_GLASS_PANE'
+        lore: [ '{{menus.chest_locked}}' ]
+
+      - condition: 'filling = 100%'
+        type: 'RED_STAINED_GLASS_PANE'
+        lore: [ '{{menus.chest_full}}' ]
+
+      - condition: 'filling = 0%'
+        lore: [ '{{menus.chest_empty}}' ]
+
+      - condition: 'filling >= 90%'
+        type: 'RED_STAINED_GLASS_PANE'
+
+      - condition: 'filling >= 50%'
+        type: 'ORANGE_STAINED_GLASS_PANE'
+
+    # Number the item so that they follow enderchests number
+    numbering: false
+
+  # Show/Hide all inaccessible enderchests
+  onlyShowAccessible: false
 
 
 # Mysql/MariaDB configuration, if needed

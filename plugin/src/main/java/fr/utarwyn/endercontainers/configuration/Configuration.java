@@ -1,9 +1,13 @@
 package fr.utarwyn.endercontainers.configuration;
 
+import fr.utarwyn.endercontainers.configuration.ui.EnderChestItem;
+import fr.utarwyn.endercontainers.configuration.ui.EnderChestItemVariant;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -21,10 +25,13 @@ public class Configuration {
 
     private final int maxEnderchests;
     private final int defaultEnderchests;
-    private final boolean onlyShowAccessibleEnderchests;
     private final boolean useVanillaEnderchest;
-    private final boolean numberingEnderchests;
     private final List<Material> forbiddenMaterials;
+
+    private final EnderChestItem enderchestItem;
+    private final List<EnderChestItemVariant> enderchestItemVariants;
+    private final boolean numberingEnderchests;
+    private final boolean onlyShowAccessibleEnderchests;
 
     private final boolean mysql;
     private final String mysqlHost;
@@ -51,19 +58,32 @@ public class Configuration {
      * @throws ConfigLoadingException thrown if configuration cannot be loaded
      */
     Configuration(FileConfiguration config) throws ConfigLoadingException {
+        boolean legacyOnlyShowAccessible;
+
         this.locale = loadValue("locale", config::isString, config::getString);
         this.disabledWorlds = loadValue("disabledWorlds", config::isList, config::getStringList);
 
         this.maxEnderchests = loadValue("enderchests.max", config::isInt, config::getInt);
         this.defaultEnderchests = loadValue("enderchests.default", config::isInt, config::getInt);
-        this.onlyShowAccessibleEnderchests = loadValue("enderchests.onlyShowAccessible", config::isBoolean, config::getBoolean);
+        legacyOnlyShowAccessible = loadValue("enderchests.onlyShowAccessible", v -> true, config::getBoolean);
         this.useVanillaEnderchest = loadValue("enderchests.useVanillaEnderchest", config::isBoolean, config::getBoolean);
-        this.numberingEnderchests = loadValue("enderchests.numberingEnderchests", config::isBoolean, config::getBoolean);
         this.forbiddenMaterials = loadValue(
                 "enderchests.forbiddenMaterials",
                 key -> config.isList(key) && config.getStringList(key).stream().allMatch(material -> Material.matchMaterial(material) != null),
                 key -> config.getStringList(key).stream().map(Material::matchMaterial).collect(Collectors.toList())
         );
+
+        this.enderchestItem = loadValue("ui.enderchestItem", config::isConfigurationSection,
+                key -> new EnderChestItem(config.getConfigurationSection(key))
+        );
+        this.enderchestItemVariants = loadValue("ui.enderchestItem.variants", config::isList,
+                key -> Objects.requireNonNull(config.getList(key)).stream()
+                        .map(map -> new EnderChestItemVariant(this.enderchestItem, (Map<String, Object>) map))
+                        .collect(Collectors.toList())
+        );
+        this.numberingEnderchests = loadValue("ui.enderchestItem.numbering", config::isBoolean, config::getBoolean);
+        this.onlyShowAccessibleEnderchests = loadValue("ui.onlyShowAccessible", config::isBoolean, config::getBoolean)
+                || legacyOnlyShowAccessible;
 
         this.mysql = loadValue("mysql.enabled", config::isBoolean, config::getBoolean);
         this.mysqlHost = loadValue("mysql.host", config::isString, config::getString);
@@ -122,6 +142,14 @@ public class Configuration {
 
     public List<Material> getForbiddenMaterials() {
         return this.forbiddenMaterials;
+    }
+
+    public EnderChestItem getEnderchestItem() {
+        return this.enderchestItem;
+    }
+
+    public List<EnderChestItemVariant> getEnderchestItemVariants() {
+        return this.enderchestItemVariants;
     }
 
     public boolean isMysql() {
@@ -189,14 +217,19 @@ public class Configuration {
     }
 
     private <T> T loadValue(String key, Predicate<String> checker, Function<String, T> getter) throws ConfigLoadingException {
+        Throwable cause = null;
         if (checker.test(key)) {
-            return getter.apply(key);
-        } else {
-            throw new ConfigLoadingException(String.format(
-                    "Cannot set value of config key %s for %s",
-                    key, getClass().getSimpleName().toLowerCase()
-            ));
+            try {
+                return getter.apply(key);
+            } catch (Exception e) {
+                cause = e;
+            }
         }
+
+        throw new ConfigLoadingException(String.format(
+                "Cannot set value of config key %s for %s",
+                key, getClass().getSimpleName().toLowerCase()
+        ), cause);
     }
 
 }

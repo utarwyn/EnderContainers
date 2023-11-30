@@ -11,7 +11,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ConfigurationTest {
@@ -28,6 +30,8 @@ public class ConfigurationTest {
         assertThat(config.getDisabledWorlds()).containsExactly("disabled");
         assertThat(config.isOnlyShowAccessibleEnderchests()).isFalse();
         assertThat(config.isUseVanillaEnderchest()).isTrue();
+        assertThat(config.getEnderchestItem()).isNotNull();
+        assertThat(config.getEnderchestItemVariants()).hasSize(5);
         assertThat(config.isNumberingEnderchests()).isTrue();
         assertThat(config.getMysqlSslKeystoreFile()).isNull();
         assertThat(config.getMysqlSslKeystorePassword()).isNull();
@@ -53,6 +57,10 @@ public class ConfigurationTest {
     @Test
     public void loadValueError() {
         FileConfiguration fileConfiguration = mock(FileConfiguration.class);
+        // Throw an exception on every string retrieved
+        when(fileConfiguration.isString(any())).thenReturn(true);
+        when(fileConfiguration.getString(any())).thenThrow(new IllegalStateException());
+
         try {
             new Configuration(fileConfiguration);
             fail("configuration with a value error must fail");

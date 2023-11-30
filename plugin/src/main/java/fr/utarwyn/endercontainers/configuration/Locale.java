@@ -15,6 +15,8 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Locale class. Reflects a locale .yml file.
@@ -28,6 +30,11 @@ public class Locale {
      * Locale will be loaded from file with that name
      */
     private static final String CUSTOM = "custom";
+
+    /**
+     * Pattern used to replace variables in an input text.
+     */
+    private static final Pattern REPLACING_PATTERN = Pattern.compile("\\{\\{(\\w.+?)}}");
 
     /**
      * Java plugin instance
@@ -80,14 +87,28 @@ public class Locale {
     }
 
     /**
-     * Retreive a message from the locale file by its key.
+     * Retreives a message from the locale file by its key.
      *
      * @param key localization key
      * @return retreived message from the loaded file
      */
     public String getMessage(LocaleKey key) {
-        return this.cache.computeIfAbsent(key.getKey(), k ->
-                this.formatMessage(this.configuration.getString(k)));
+        return this.getMessage(key.getKey());
+    }
+
+    /**
+     * Replaces all variables in a text with locale messages.
+     *
+     * @param text input text
+     * @return formatted text with locale messages
+     */
+    public String replaceWithMessages(String text) {
+        StringBuffer sb = new StringBuffer();
+        Matcher matcher = REPLACING_PATTERN.matcher(text);
+        while (matcher.find()) {
+            matcher.appendReplacement(sb, this.getMessage(matcher.group(1)));
+        }
+        return matcher.appendTail(sb).toString();
     }
 
     /**
@@ -106,6 +127,10 @@ public class Locale {
             this.configuration.options().copyDefaults(true);
             this.saveToFileIfNotExist(resource, file);
         }
+    }
+
+    private String getMessage(String key) {
+        return this.cache.computeIfAbsent(key, k -> this.formatMessage(this.configuration.getString(k)));
     }
 
     /**
