@@ -21,6 +21,7 @@ buildscript {
         maven { url 'https://plugins.gradle.org/m2/' }
     }
     dependencies {
+        // cannot upgrade to 4.1+ because of Java 8 compatibility
         classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:4.0.0.2929'
     }
 }
