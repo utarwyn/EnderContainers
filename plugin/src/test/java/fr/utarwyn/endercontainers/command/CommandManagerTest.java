@@ -7,18 +7,18 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CommandManagerTest {
 
     private static final String NAME = "name";
@@ -26,7 +26,7 @@ public class CommandManagerTest {
 
     private CommandManager manager;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         TestHelper.setUpServer();
     }
@@ -35,7 +35,7 @@ public class CommandManagerTest {
         when(((ServerMock) Bukkit.getServer()).getCommandMap()).thenReturn(commandMap);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException {
         this.manager = new CommandManager();
         TestHelper.setupManager(this.manager);

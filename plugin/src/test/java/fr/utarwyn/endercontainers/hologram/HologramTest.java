@@ -5,17 +5,17 @@ import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.compatibility.nms.NMSHologramUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class HologramTest {
 
     private static final String TITLE = "title";
@@ -28,7 +28,7 @@ public class HologramTest {
     @Mock
     private Location location;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpServer();
         TestHelper.getPlugin();

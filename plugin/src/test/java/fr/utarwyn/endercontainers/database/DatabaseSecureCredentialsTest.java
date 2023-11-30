@@ -2,10 +2,10 @@ package fr.utarwyn.endercontainers.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import fr.utarwyn.endercontainers.configuration.Configuration;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Properties;
 
@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DatabaseSecureCredentialsTest {
 
     private static final String DEFAULT_FILE = "test.p12";
@@ -25,7 +25,7 @@ public class DatabaseSecureCredentialsTest {
 
     private DatabaseSecureCredentials credentials;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.credentials = new DatabaseSecureCredentials();
         this.poolConfig = new HikariConfig();

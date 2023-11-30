@@ -2,24 +2,23 @@ package fr.utarwyn.endercontainers.command.main;
 
 import fr.utarwyn.endercontainers.command.CommandTestHelper;
 import org.bukkit.entity.Player;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class HelpCommandTest extends CommandTestHelper<HelpCommand> {
 
     @Mock
     private Player player;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.command = new HelpCommand();
     }
@@ -32,6 +31,7 @@ public class HelpCommandTest extends CommandTestHelper<HelpCommand> {
 
     @Test
     public void withPermission() {
+        when(this.player.hasPermission(anyString())).thenReturn(false);
         when(this.player.hasPermission("endercontainers.reload")).thenReturn(true);
         when(this.player.hasPermission("endercontainers.update")).thenReturn(true);
 

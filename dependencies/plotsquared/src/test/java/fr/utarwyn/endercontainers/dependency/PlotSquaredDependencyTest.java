@@ -13,12 +13,12 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -26,12 +26,11 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class PlotSquaredDependencyTest {
 
     private PlotSquaredDependency dependency;
@@ -48,12 +47,12 @@ public class PlotSquaredDependencyTest {
     @Mock
     private Block block;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         BlockType.REGISTRY.register("minecraft:ender_chest", new BlockType("ender_chest"));
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws ReflectiveOperationException {
         this.dependency = new PlotSquaredDependency(null);
 
@@ -63,11 +62,11 @@ public class PlotSquaredDependencyTest {
         plotInstance.set(null, plotSquared);
         plotInstance.setAccessible(false);
 
-        when(this.player.getUniqueId()).thenReturn(UUID.randomUUID());
-        when(this.block.getLocation()).thenReturn(new Location(mock(World.class), 0, 0, 0));
-        when(plotSquared.getPlotAreaAbs(any())).thenReturn(this.plotArea);
-        when(this.plotArea.getPlot(any(com.plotsquared.core.location.Location.class))).thenReturn(this.plot);
-        when(this.plot.getFlag(UseFlag.class)).thenReturn(Collections.singletonList(BlockTypeWrapper.get(BlockTypes.ENDER_CHEST)));
+        lenient().when(this.player.getUniqueId()).thenReturn(UUID.randomUUID());
+        lenient().when(this.block.getLocation()).thenReturn(new Location(mock(World.class), 0, 0, 0));
+        lenient().when(plotSquared.getPlotAreaAbs(any())).thenReturn(this.plotArea);
+        lenient().when(this.plotArea.getPlot(any(com.plotsquared.core.location.Location.class))).thenReturn(this.plot);
+        lenient().when(this.plot.getFlag(UseFlag.class)).thenReturn(Collections.singletonList(BlockTypeWrapper.get(BlockTypes.ENDER_CHEST)));
     }
 
     @Test

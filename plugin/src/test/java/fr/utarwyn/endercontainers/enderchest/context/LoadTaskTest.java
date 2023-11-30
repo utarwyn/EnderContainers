@@ -5,12 +5,12 @@ import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.player.PlayerData;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class LoadTaskTest {
 
     private UUID uuid;
@@ -37,12 +37,12 @@ public class LoadTaskTest {
     @Mock
     private EnderChestManager chestManager;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException {
         TestHelper.registerManagers(this.storageManager);
         TestHelper.setupManager(this.chestManager);

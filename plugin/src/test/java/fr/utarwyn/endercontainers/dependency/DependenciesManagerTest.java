@@ -10,11 +10,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,17 +23,17 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DependenciesManagerTest {
 
     private DependenciesManager manager;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         TestHelper.setUpServer();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException {
         this.manager = new DependenciesManager();
         TestHelper.setupManager(this.manager);
@@ -115,6 +115,7 @@ public class DependenciesManagerTest {
         when(plugin.getName()).thenReturn(name);
         when(plugin.getDescription()).thenReturn(descriptionFile);
         when(descriptionFile.getVersion()).thenReturn(version);
+        when(manager.isPluginEnabled(anyString())).thenReturn(false);
         when(manager.isPluginEnabled(name)).thenReturn(true);
         when(manager.getPlugin(name)).thenReturn(plugin);
     }

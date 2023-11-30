@@ -5,20 +5,19 @@ import fr.utarwyn.endercontainers.mock.DependencyMock;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DependencyResolverTest {
 
     @Mock
@@ -27,15 +26,16 @@ public class DependencyResolverTest {
     @Mock
     private Plugin plugin;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // Create a fake description file for the plugin
         PluginDescriptionFile descriptionFile = mock(PluginDescriptionFile.class);
-        when(descriptionFile.getVersion()).thenReturn("1.12.5");
-        when(descriptionFile.getAuthors()).thenReturn(Collections.singletonList("Utarwyn"));
+        lenient().when(descriptionFile.getVersion()).thenReturn("1.12.5");
+        lenient().when(descriptionFile.getAuthors()).thenReturn(Collections.singletonList("Utarwyn"));
 
         // Plugin manager stubs
         when(this.plugin.getDescription()).thenReturn(descriptionFile);
+        when(this.pluginManager.isPluginEnabled(anyString())).thenReturn(false);
         when(this.pluginManager.isPluginEnabled("Plugin")).thenReturn(true);
         when(this.pluginManager.getPlugin("Plugin")).thenReturn(this.plugin);
     }

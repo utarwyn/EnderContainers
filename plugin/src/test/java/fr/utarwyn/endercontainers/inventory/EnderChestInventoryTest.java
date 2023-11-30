@@ -11,11 +11,11 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Map;
 import java.util.Objects;
@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EnderChestInventoryTest {
 
     private EnderChestInventory inventory;
@@ -35,7 +35,7 @@ public class EnderChestInventoryTest {
     @Mock
     private EnderChest chest;
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException {
         TestHelper.setUpFiles();
 

@@ -7,13 +7,13 @@ import fr.utarwyn.endercontainers.database.adapter.MySQLAdapter;
 import fr.utarwyn.endercontainers.database.request.DeleteRequest;
 import fr.utarwyn.endercontainers.database.request.SavingRequest;
 import fr.utarwyn.endercontainers.database.request.SelectRequest;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.*;
 
@@ -21,18 +21,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DatabaseTest {
 
     @Mock(answer = Answers.CALLS_REAL_METHODS)
     private Database database;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.database.source = mock(HikariDataSource.class);
     }
@@ -173,11 +173,11 @@ public class DatabaseTest {
         ResultSet resultSet = mock(ResultSet.class);
         ResultSetMetaData resultSetMetaData = mock(ResultSetMetaData.class);
 
-        when(resultSetMetaData.getColumnCount()).thenReturn(0);
-        when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
-        when(statement.executeQuery()).thenReturn(resultSet);
-        when(connection.prepareStatement(anyString())).thenReturn(statement);
-        when(this.database.source.getConnection()).thenReturn(connection);
+        lenient().when(resultSetMetaData.getColumnCount()).thenReturn(0);
+        lenient().when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
+        lenient().when(statement.executeQuery()).thenReturn(resultSet);
+        lenient().when(connection.prepareStatement(anyString())).thenReturn(statement);
+        lenient().when(this.database.source.getConnection()).thenReturn(connection);
 
         return statement;
     }

@@ -11,18 +11,18 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class WorldGuard6DependencyTest {
 
     private WorldGuard6Dependency dependency;
@@ -36,16 +36,16 @@ public class WorldGuard6DependencyTest {
     @Mock
     private Block block;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         WorldGuardPlugin plugin = mock(WorldGuardPlugin.class, CALLS_REAL_METHODS);
         RegionContainer regionContainer = mock(RegionContainer.class);
 
         this.dependency = new WorldGuard6Dependency(plugin);
 
-        when(regionContainer.createQuery()).thenReturn(this.regionQuery);
-        when(plugin.getRegionContainer()).thenReturn(regionContainer);
-        when(this.block.getLocation()).thenReturn(new Location(mock(World.class), 0, 0, 0));
+        lenient().when(regionContainer.createQuery()).thenReturn(this.regionQuery);
+        lenient().when(plugin.getRegionContainer()).thenReturn(regionContainer);
+        lenient().when(this.block.getLocation()).thenReturn(new Location(mock(World.class), 0, 0, 0));
     }
 
     @Test

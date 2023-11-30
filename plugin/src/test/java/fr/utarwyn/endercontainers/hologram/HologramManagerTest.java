@@ -12,13 +12,13 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.function.Consumer;
 
@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class HologramManagerTest {
 
     private HologramManager manager;
@@ -45,13 +45,13 @@ public class HologramManagerTest {
     @Mock
     private EnderChestManager enderChestManager;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpServer();
         TestHelper.setUpFiles();
     }
 
-    @Before
+    @BeforeEach
     @SuppressWarnings("unchecked")
     public void setUp() throws TestInitializationException {
         this.observer = TestHelper.getPlayer();
@@ -60,16 +60,16 @@ public class HologramManagerTest {
         TestHelper.registerManagers(this.dependenciesManager, this.enderChestManager);
         TestHelper.setupManager(this.manager);
 
-        when(this.targetedBlock.getType()).thenReturn(Material.ENDER_CHEST);
-        when(this.targetedBlock.getLocation()).thenReturn(new Location(mock(World.class), 0, 0, 0));
-        when(this.observer.getTargetBlock(isNull(), anyInt())).thenReturn(this.targetedBlock);
-        doAnswer(answer -> {
+        lenient().when(this.targetedBlock.getType()).thenReturn(Material.ENDER_CHEST);
+        lenient().when(this.targetedBlock.getLocation()).thenReturn(new Location(mock(World.class), 0, 0, 0));
+        lenient().when(this.observer.getTargetBlock(isNull(), anyInt())).thenReturn(this.targetedBlock);
+        lenient().doAnswer(answer -> {
             ((Consumer<PlayerContext>) answer.getArgument(1)).accept(this.context);
             return null;
         }).when(this.enderChestManager).loadPlayerContext(any(), any());
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         lenient().when(this.observer.getWorld().getName()).thenReturn("world");
         lenient().when(this.observer.getTargetBlock(isNull(), anyInt())).thenReturn(mock(Block.class));

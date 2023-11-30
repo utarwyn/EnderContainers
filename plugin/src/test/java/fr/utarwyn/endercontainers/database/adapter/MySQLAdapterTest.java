@@ -2,16 +2,16 @@ package fr.utarwyn.endercontainers.database.adapter;
 
 import com.zaxxer.hikari.HikariConfig;
 import fr.utarwyn.endercontainers.configuration.Configuration;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MySQLAdapterTest {
 
     private MySQLAdapter adapter;
@@ -19,7 +19,7 @@ public class MySQLAdapterTest {
     @Mock
     private Configuration pluginConfig;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.adapter = new MySQLAdapter();
     }

@@ -3,11 +3,11 @@ package fr.utarwyn.endercontainers.storage.backups;
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.backup.Backup;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import java.util.Scanner;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BackupsFlatDataTest {
 
     private BackupsFlatData data;
@@ -37,7 +37,7 @@ public class BackupsFlatDataTest {
 
     private File file;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
@@ -61,7 +61,7 @@ public class BackupsFlatDataTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException, IOException {
         this.data = new BackupsFlatData(TestHelper.getPlugin());
         this.backup = new Backup("test", new Timestamp(System.currentTimeMillis()), "Utarwyn");

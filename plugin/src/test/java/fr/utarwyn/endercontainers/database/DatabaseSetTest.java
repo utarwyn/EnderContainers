@@ -1,7 +1,7 @@
 package fr.utarwyn.endercontainers.database;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -22,7 +22,7 @@ public class DatabaseSetTest {
 
     private DatabaseSet set;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.set = new DatabaseSet();
     }

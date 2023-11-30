@@ -6,17 +6,17 @@ import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.Updater;
 import org.bukkit.entity.Player;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.contains;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MainCommandTest {
 
     private MainCommand command;
@@ -24,7 +24,7 @@ public class MainCommandTest {
     @Mock
     private Player player;
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException {
         TestHelper.registerManagers(new EnderChestManager(), new BackupManager(), new Updater());
         this.command = new MainCommand(TestHelper.getPlugin());

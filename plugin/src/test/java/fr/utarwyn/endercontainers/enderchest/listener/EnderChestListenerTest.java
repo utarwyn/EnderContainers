@@ -18,12 +18,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -34,7 +34,7 @@ import static org.bukkit.event.block.Action.LEFT_CLICK_AIR;
 import static org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EnderChestListenerTest {
 
     private EnderChestListener listener;
@@ -54,17 +54,17 @@ public class EnderChestListenerTest {
     @Mock
     private World world;
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException {
         TestHelper.registerManagers(this.manager, this.dependenciesManager);
         TestHelper.setUpFiles();
 
         this.listener = new EnderChestListener(this.manager);
 
-        when(this.player.getWorld()).thenReturn(this.world);
-        when(this.world.getName()).thenReturn("world");
-        when(this.block.getType()).thenReturn(Material.ENDER_CHEST);
-        when(this.player.getUniqueId()).thenReturn(UUID.randomUUID());
+        lenient().when(this.player.getWorld()).thenReturn(this.world);
+        lenient().when(this.world.getName()).thenReturn("world");
+        lenient().when(this.block.getType()).thenReturn(Material.ENDER_CHEST);
+        lenient().when(this.player.getUniqueId()).thenReturn(UUID.randomUUID());
     }
 
     @Test

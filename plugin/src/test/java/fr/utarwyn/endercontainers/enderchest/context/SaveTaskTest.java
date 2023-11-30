@@ -1,14 +1,14 @@
 package fr.utarwyn.endercontainers.enderchest.context;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SaveTaskTest {
 
     private SaveTask task;
@@ -16,7 +16,7 @@ public class SaveTaskTest {
     @Mock
     private PlayerContext context;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.task = new SaveTask(this.context);
     }

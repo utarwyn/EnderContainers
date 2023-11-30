@@ -2,8 +2,8 @@ package fr.utarwyn.endercontainers.compatibility.nms;
 
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.compatibility.ServerVersion;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import static fr.utarwyn.endercontainers.TestHelper.overrideServerVersion;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.fail;
 
 public class NMSUtilTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         TestHelper.setUpServer();
     }

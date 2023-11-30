@@ -1,7 +1,6 @@
 package fr.utarwyn.endercontainers.enderchest.listener;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
@@ -15,11 +14,11 @@ import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyFloat;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EnderChestInventoryListenerTest {
 
     private EnderChestInventoryListener listener;
@@ -57,24 +56,24 @@ public class EnderChestInventoryListenerTest {
     @Mock
     private World world;
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException {
         TestHelper.registerManagers(this.manager, this.inventoryManager);
         TestHelper.setUpFiles();
 
         this.listener = new EnderChestInventoryListener(this.manager);
 
-        doCallRealMethod().when(this.inventoryManager).cancelClickEventIfRestricted(any(), any());
+        lenient().doCallRealMethod().when(this.inventoryManager).cancelClickEventIfRestricted(any(), any());
         lenient().doCallRealMethod().when(this.inventoryManager).cancelDragEventIfRestricted(any(), any());
 
-        when(this.player.getWorld()).thenReturn(this.world);
-        when(this.player.getLocation()).thenReturn(new Location(this.world, 0, 0, 0));
-        when(this.player.getGameMode()).thenReturn(GameMode.SURVIVAL);
-        when(this.inventory.getHolder()).thenReturn(this.enderChestInventory);
-        when(this.inventory.getSize()).thenReturn(27);
-        when(this.inventory.getType()).thenReturn(InventoryType.CHEST);
-        when(this.inventoryView.getTopInventory()).thenReturn(this.inventory);
-        when(this.inventoryView.getPlayer()).thenReturn(this.player);
+        lenient().when(this.player.getWorld()).thenReturn(this.world);
+        lenient().when(this.player.getLocation()).thenReturn(new Location(this.world, 0, 0, 0));
+        lenient().when(this.player.getGameMode()).thenReturn(GameMode.SURVIVAL);
+        lenient().when(this.inventory.getHolder()).thenReturn(this.enderChestInventory);
+        lenient().when(this.inventory.getSize()).thenReturn(27);
+        lenient().when(this.inventory.getType()).thenReturn(InventoryType.CHEST);
+        lenient().when(this.inventoryView.getTopInventory()).thenReturn(this.inventory);
+        lenient().when(this.inventoryView.getPlayer()).thenReturn(this.player);
     }
 
     @Test

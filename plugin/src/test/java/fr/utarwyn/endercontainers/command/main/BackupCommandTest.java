@@ -5,19 +5,20 @@ import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.backup.BackupManager;
 import fr.utarwyn.endercontainers.command.CommandTestHelper;
 import org.bukkit.entity.Player;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BackupCommandTest extends CommandTestHelper<BackupCommand> {
 
     @Mock
@@ -26,12 +27,12 @@ public class BackupCommandTest extends CommandTestHelper<BackupCommand> {
     @Mock
     private Player player;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException {
         TestHelper.registerManagers(this.manager);
         this.command = new BackupCommand();
@@ -44,6 +45,7 @@ public class BackupCommandTest extends CommandTestHelper<BackupCommand> {
 
     @Test
     public void withPermission() {
+        when(this.player.hasPermission(anyString())).thenReturn(false);
         when(this.player.hasPermission("endercontainers.backup.list")).thenReturn(true);
         when(this.player.hasPermission("endercontainers.backup.remove")).thenReturn(true);
 

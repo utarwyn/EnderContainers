@@ -1,13 +1,13 @@
 package fr.utarwyn.endercontainers.configuration;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class LocaleKeyTest {
+class LocaleKeyTest {
 
     @Test
-    public void create() {
+    void create() {
         assertThat(LocaleKey.CMD_BACKUP_CREATED.getKey()).isEqualTo("commands.backups.created");
     }
 

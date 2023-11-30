@@ -7,19 +7,19 @@ import fr.utarwyn.endercontainers.storage.backups.BackupsFlatData;
 import fr.utarwyn.endercontainers.storage.backups.BackupsSQLData;
 import fr.utarwyn.endercontainers.storage.player.PlayerFlatData;
 import fr.utarwyn.endercontainers.storage.player.PlayerSQLData;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class StorageManagerTest {
 
     private StorageManager manager;
@@ -27,12 +27,12 @@ public class StorageManagerTest {
     @Mock
     private DatabaseManager databaseManager;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException {
         this.manager = new StorageManager();
         TestHelper.setupManager(this.manager);

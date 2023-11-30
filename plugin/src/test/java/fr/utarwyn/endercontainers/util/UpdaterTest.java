@@ -7,13 +7,13 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
  * @author Utarwyn
  * @since 2.2.1
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UpdaterTest {
 
     private Updater updater;
@@ -37,12 +37,12 @@ public class UpdaterTest {
     @Mock
     private Player player;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException {
         this.updater = new Updater();
         this.plugin = TestHelper.getPlugin();
@@ -51,7 +51,7 @@ public class UpdaterTest {
         this.initialVersion = this.plugin.getDescription().getVersion();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         lenient().when(this.plugin.getDescription().getVersion()).thenReturn(this.initialVersion);
     }

@@ -1,7 +1,7 @@
 package fr.utarwyn.endercontainers.database.request;
 
 import fr.utarwyn.endercontainers.database.Database;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 

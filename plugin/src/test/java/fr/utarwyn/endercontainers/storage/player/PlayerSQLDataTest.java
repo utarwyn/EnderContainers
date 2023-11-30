@@ -9,11 +9,11 @@ import fr.utarwyn.endercontainers.storage.serialization.ItemSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class PlayerSQLDataTest {
 
     private static final String FAKE_DATA = "FAKE_DATA";
@@ -47,7 +47,7 @@ public class PlayerSQLDataTest {
     @Mock
     private ItemSerializer itemSerializer;
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException, IOException, SQLException {
         TestHelper.registerManagers(this.databaseManager);
 
@@ -56,10 +56,10 @@ public class PlayerSQLDataTest {
 
         this.data = new PlayerSQLData(uuid, TestHelper.getPlugin(), this.itemSerializer);
 
-        when(this.chest.getOwner()).thenReturn(uuid);
-        when(this.itemSerializer.deserialize(FAKE_DATA)).thenReturn(CONTENTS);
-        when(this.itemSerializer.serialize(CONTENTS)).thenReturn(FAKE_DATA);
-        when(this.databaseManager.getEnderchestsOf(uuid)).thenReturn(Arrays.asList(
+        lenient().when(this.chest.getOwner()).thenReturn(uuid);
+        lenient().when(this.itemSerializer.deserialize(FAKE_DATA)).thenReturn(CONTENTS);
+        lenient().when(this.itemSerializer.serialize(CONTENTS)).thenReturn(FAKE_DATA);
+        lenient().when(this.databaseManager.getEnderchestsOf(uuid)).thenReturn(Arrays.asList(
                 createChestSet(1, 3, uuid, FAKE_DATA),
                 createChestSet(10, 5, uuid, FAKE_DATA),
                 createChestSet(5, 3, uuid, null)

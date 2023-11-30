@@ -6,12 +6,12 @@ import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.storage.serialization.ItemSerializer;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,10 +22,9 @@ import java.util.concurrent.ConcurrentMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class PlayerFlatDataTest {
 
     private static final UUID TEST_UUID = UUID.fromString("06242f9a-6fcf-4504-b69a-9420da52ee9d");
@@ -44,16 +43,16 @@ public class PlayerFlatDataTest {
     @Mock
     private ItemSerializer itemSerializer;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException, IOException {
         this.data = new PlayerFlatData(TEST_UUID, TestHelper.getPlugin(), this.itemSerializer);
-        when(this.itemSerializer.serialize(ITEMS)).thenReturn(VALID);
-        when(this.itemSerializer.deserialize(VALID)).thenReturn(ITEMS);
+        lenient().when(this.itemSerializer.serialize(ITEMS)).thenReturn(VALID);
+        lenient().when(this.itemSerializer.deserialize(VALID)).thenReturn(ITEMS);
     }
 
     @Test

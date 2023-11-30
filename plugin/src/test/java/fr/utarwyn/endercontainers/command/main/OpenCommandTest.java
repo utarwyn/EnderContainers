@@ -7,12 +7,12 @@ import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.function.Consumer;
 
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class OpenCommandTest extends CommandTestHelper<OpenCommand> {
 
     @Mock
@@ -31,19 +31,19 @@ public class OpenCommandTest extends CommandTestHelper<OpenCommand> {
 
     private Player player;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException {
         TestHelper.registerManagers(this.manager);
         this.player = TestHelper.getPlayer();
         this.command = new OpenCommand();
         this.permission = "endercontainers.openchests";
 
-        doAnswer(answer -> {
+        lenient().doAnswer(answer -> {
             ((Consumer<PlayerContext>) answer.getArgument(1)).accept(this.context);
             return null;
         }).when(this.manager).loadPlayerContext(any(), any());

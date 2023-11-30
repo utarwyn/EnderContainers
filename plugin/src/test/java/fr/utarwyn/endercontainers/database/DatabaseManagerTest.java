@@ -5,14 +5,14 @@ import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.database.request.DeleteRequest;
 import fr.utarwyn.endercontainers.database.request.SavingRequest;
 import fr.utarwyn.endercontainers.database.request.SelectRequest;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
 import java.sql.SQLException;
@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DatabaseManagerTest {
 
     private DatabaseManager databaseManager;
@@ -35,17 +35,17 @@ public class DatabaseManagerTest {
     @Mock
     private Database database;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws TestInitializationException {
         TestHelper.overrideConfigurationValue("mysql", true);
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() throws TestInitializationException {
         TestHelper.overrideConfigurationValue("mysql", false);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException, ReflectiveOperationException {
         this.databaseManager = new DatabaseManager();
         TestHelper.setupManager(this.databaseManager);

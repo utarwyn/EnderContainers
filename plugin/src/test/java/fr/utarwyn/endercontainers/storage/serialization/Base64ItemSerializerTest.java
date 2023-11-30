@@ -3,9 +3,9 @@ package fr.utarwyn.endercontainers.storage.serialization;
 import fr.utarwyn.endercontainers.TestHelper;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,12 +17,12 @@ public class Base64ItemSerializerTest {
 
     private ItemSerializer serializer;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         TestHelper.setUpServer();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.serializer = new Base64ItemSerializer();
     }

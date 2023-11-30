@@ -5,11 +5,11 @@ import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.backup.Backup;
 import fr.utarwyn.endercontainers.database.DatabaseManager;
 import fr.utarwyn.endercontainers.database.DatabaseSet;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -20,7 +20,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BackupsSQLDataTest {
 
     private static final Timestamp CURRENT = new Timestamp(new Date().getTime());
@@ -58,11 +58,11 @@ public class BackupsSQLDataTest {
         return set;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws TestInitializationException {
-        when(this.backup.getName()).thenReturn(NAME);
-        when(this.backup.getDate()).thenReturn(CURRENT);
-        when(this.backup.getCreatedBy()).thenReturn(AUTHOR);
+        lenient().when(this.backup.getName()).thenReturn(NAME);
+        lenient().when(this.backup.getDate()).thenReturn(CURRENT);
+        lenient().when(this.backup.getCreatedBy()).thenReturn(AUTHOR);
 
         TestHelper.registerManagers(this.databaseManager);
         this.data = new BackupsSQLData(TestHelper.getPlugin());

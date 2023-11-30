@@ -15,23 +15,19 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class WorldGuard7DependencyTest {
 
     private static boolean serverReplaced = false;
@@ -50,7 +46,7 @@ public class WorldGuard7DependencyTest {
     @Mock
     private Block block;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws ReflectiveOperationException {
         if (Bukkit.getServer() == null) {
             Server server = mock(Server.class);
@@ -70,7 +66,7 @@ public class WorldGuard7DependencyTest {
         instanceField.setAccessible(false);
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws ReflectiveOperationException {
         if (serverReplaced) {
             Field instance = Bukkit.class.getDeclaredField("server");
@@ -80,7 +76,7 @@ public class WorldGuard7DependencyTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         WorldGuardPlugin plugin = mock(WorldGuardPlugin.class);
         WorldGuardPlatform platform = mock(WorldGuardPlatform.class);
@@ -88,10 +84,10 @@ public class WorldGuard7DependencyTest {
 
         this.dependency = new WorldGuard7Dependency(plugin);
 
-        when(regionContainer.createQuery()).thenReturn(this.regionQuery);
-        when(platform.getRegionContainer()).thenReturn(regionContainer);
-        when(plugin.wrapPlayer(this.player)).thenReturn(this.localPlayer);
-        when(this.block.getLocation()).thenReturn(new Location(mock(World.class), 0, 0, 0));
+        lenient().when(regionContainer.createQuery()).thenReturn(this.regionQuery);
+        lenient().when(platform.getRegionContainer()).thenReturn(regionContainer);
+        lenient().when(plugin.wrapPlayer(this.player)).thenReturn(this.localPlayer);
+        lenient().when(this.block.getLocation()).thenReturn(new Location(mock(World.class), 0, 0, 0));
 
         WorldGuard.getInstance().setPlatform(platform);
     }
