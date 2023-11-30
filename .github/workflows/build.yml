@@ -1,14 +1,15 @@
-name: Java Integration
+name: Build
 
 on:
   push:
     branches: [ master, next ]
-    paths:
-      - 'api/**'
-      - 'dependencies/**'
-      - 'plugin/**'
-      - '.github/workflows/**'
-      - '*gradle*'
+    paths-ignore:
+      - '*.md'
+      - '.github/**/*.yml'
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+  pull_request:
+    types: [ opened, synchronize, reopened ]
 
 jobs:
   build:
@@ -45,61 +46,17 @@ jobs:
           chmod +x gradlew
           ./gradlew build --stacktrace
 
-  publish:
-    runs-on: ubuntu-latest
-    name: Publish to Maven repository
-    steps:
-      - name: Checkout Git repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Restore Gradle cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Setup JDK 17
-        uses: actions/setup-java@v2
-        with:
-          distribution: adopt
-          java-version: 17
-
-      - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
-
-      - name: Build with Gradle
-        run: |
-          chmod +x gradlew
-          ./gradlew build --stacktrace
-
-      - name: Publish to Maven repository
-        run: ./gradlew publishApiPublicationToPersonalRepository publishPluginPublicationToPersonalRepository --stacktrace
-        env:
-          PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
-
-      - name: Archive plugin jars on GitHub
-        uses: actions/upload-artifact@master
-        with:
-          name: EnderContainers plugin jars
-          path: |
-            api/build/libs/*.jar
-            plugin/build/libs/EnderContainers-*.jar
-
   quality:
     runs-on: ubuntu-latest
     name: Check code quality
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Restore Gradle cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
@@ -107,14 +64,14 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Restore SonarCloud packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Setup JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: adopt
           java-version: 17
@@ -122,7 +79,7 @@ jobs:
       - name: Build with Gradle
         run: |
           chmod +x gradlew
-          ./gradlew build jacocoTestReport sonarqube --stacktrace
+          ./gradlew build jacocoTestReport sonar --stacktrace
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
