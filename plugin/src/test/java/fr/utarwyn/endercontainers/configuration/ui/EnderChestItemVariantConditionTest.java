@@ -1,14 +1,14 @@
 package fr.utarwyn.endercontainers.configuration.ui;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class EnderChestItemVariantConditionTest {
+class EnderChestItemVariantConditionTest {
 
     @Test
-    public void createConditionWithoutOperator() {
+    void createConditionWithoutOperator() {
         EnderChestItemVariantCondition condition = new EnderChestItemVariantCondition("inaccessible");
         assertThat(condition).isNotNull();
         assertThat(condition.getKey()).isEqualTo(EnderChestItemVariantCondition.Key.INACCESSIBLE);
@@ -17,7 +17,7 @@ public class EnderChestItemVariantConditionTest {
     }
 
     @Test
-    public void createConditionWithOperator() {
+    void createConditionWithOperator() {
         EnderChestItemVariantCondition condition = new EnderChestItemVariantCondition("number = 3");
         assertThat(condition).isNotNull();
         assertThat(condition.getKey()).isEqualTo(EnderChestItemVariantCondition.Key.NUMBER);
@@ -26,7 +26,7 @@ public class EnderChestItemVariantConditionTest {
     }
 
     @Test
-    public void createConditionWithOperatorAndPercentValue() {
+    void createConditionWithOperatorAndPercentValue() {
         EnderChestItemVariantCondition condition = new EnderChestItemVariantCondition("filling >= 90%");
         assertThat(condition).isNotNull();
         assertThat(condition.getKey()).isEqualTo(EnderChestItemVariantCondition.Key.FILLING);
@@ -35,7 +35,7 @@ public class EnderChestItemVariantConditionTest {
     }
 
     @Test
-    public void invalidCondition() {
+    void invalidCondition() {
         assertThat(assertThrows(IllegalArgumentException.class, () -> new EnderChestItemVariantCondition("fake")).getMessage())
                 .isEqualTo("invalid condition key fake in condition `fake`");
         assertThat(assertThrows(IllegalArgumentException.class, () -> new EnderChestItemVariantCondition("filling >> 5%")).getMessage())
@@ -45,7 +45,7 @@ public class EnderChestItemVariantConditionTest {
     }
 
     @Test
-    public void isValidUsingOperator() {
+    void isValidUsingOperator() {
         // Without operator or value
         EnderChestItemVariantCondition condition = new EnderChestItemVariantCondition("inaccessible");
         assertThat(condition).isNotNull();

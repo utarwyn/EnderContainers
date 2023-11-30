@@ -217,6 +217,7 @@ public class EnderChestListMenu extends AbstractInventoryHolder {
             meta.setLore(
                     item.getLore().stream()
                             .map(line -> Files.getLocale().replaceWithMessages(line))
+                            .map(line -> ChatColor.translateAlternateColorCodes('&', line))
                             .collect(Collectors.toList())
             );
         }

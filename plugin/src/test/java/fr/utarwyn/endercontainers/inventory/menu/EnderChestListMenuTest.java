@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class EnderChestListMenuTest {
+class EnderChestListMenuTest {
 
     private EnderChestListMenu menu;
 
@@ -38,12 +38,12 @@ public class EnderChestListMenuTest {
     private PlayerContext context;
 
     @BeforeAll
-    public static void setUpClass() throws TestInitializationException {
+    static void setUpClass() throws TestInitializationException {
         TestHelper.setUpFiles();
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         UUID playerId = TestHelper.getPlayer().getUniqueId();
 
         this.chests = IntStream.range(0, 27).mapToObj((number) -> {
@@ -61,7 +61,7 @@ public class EnderChestListMenuTest {
     }
 
     @Test
-    public void prepare() {
+    void prepare() {
         // check that chest has been prepared
         verify(this.chests.get(0)).updateRowCount();
 
@@ -69,13 +69,16 @@ public class EnderChestListMenuTest {
         ItemStack chestItem = this.menu.getInventory().getItem(0);
         assertThat(chestItem).isNotNull();
         assertThat(chestItem.getType()).isEqualTo(Material.LIME_STAINED_GLASS_PANE);
+        assertThat(chestItem.getItemMeta()).isNotNull();
+        assertThat(chestItem.getItemMeta().getLore())
+                .containsExactly("§2This enderchest is empty!", "§6Second line");
 
         // check out of bounds item
         assertThat(this.menu.getInventory().getItem(64)).isNull();
     }
 
     @Test
-    public void itemNumbering() {
+    void itemNumbering() {
         Inventory inventory = this.menu.getInventory();
         assertThat(inventory.getItem(1)).isNotNull();
         assertThat(inventory.getItem(1).getAmount()).isEqualTo(2);
@@ -84,7 +87,7 @@ public class EnderChestListMenuTest {
     }
 
     @Test
-    public void click() {
+    void click() {
         Player player = TestHelper.getPlayer();
 
         // cannot opened the chest by default
@@ -98,12 +101,12 @@ public class EnderChestListMenuTest {
     }
 
     @Test
-    public void rows() {
+    void rows() {
         assertThat(this.menu.getRows()).isEqualTo(3);
     }
 
     @Test
-    public void title() {
+    void title() {
         String playerName = TestHelper.getPlayer().getName();
         assertThat(this.menu.getTitle()).isEqualTo("Enderchests of " + playerName);
     }

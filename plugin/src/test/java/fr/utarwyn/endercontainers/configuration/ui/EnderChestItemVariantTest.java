@@ -1,27 +1,27 @@
 package fr.utarwyn.endercontainers.configuration.ui;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class EnderChestItemVariantTest {
+class EnderChestItemVariantTest {
 
     private EnderChestItem defaultItem;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.defaultItem = new EnderChestItem("default name", "LIME_STAINED_GLASS_PANE", Arrays.asList("line1", "line2"));
     }
 
     @Test
-    public void creationWithAllDefaultItemFields() {
-        Map<String, Object> map = new HashMap<String, Object>() {{
+    void creationWithAllDefaultItemFields() {
+        Map<String, Object> map = new HashMap<>() {{
             put("condition", "inaccessible");
         }};
         EnderChestItemVariant variant = new EnderChestItemVariant(defaultItem, map);
@@ -33,8 +33,8 @@ public class EnderChestItemVariantTest {
     }
 
     @Test
-    public void creationWithVariantItemFields() {
-        Map<String, Object> map = new HashMap<String, Object>() {{
+    void creationWithVariantItemFields() {
+        Map<String, Object> map = new HashMap<>() {{
             put("name", "variant name");
             put("type", "RED_STAINED_GLASS_PANE");
             put("lore", Arrays.asList("variant line 1", "variant line 2"));
@@ -49,7 +49,7 @@ public class EnderChestItemVariantTest {
     }
 
     @Test
-    public void creationErrorWithoutCondition() {
+    void creationErrorWithoutCondition() {
         assertThat(assertThrows(NullPointerException.class, () -> new EnderChestItemVariant(defaultItem, new HashMap<>())).getMessage())
                 .isEqualTo("variant must have a condition");
     }
