@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     implementation project(':api')
-    compileOnly('com.massivecraft:Factions:1.6.9.5-U0.6.6') {
+    compileOnly('com.massivecraft:Factions:2.14.0') {
         exclude group: '*', module: '*'
     }
 }
