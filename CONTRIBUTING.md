@@ -39,3 +39,9 @@ Ready to submit? Perform the checklist below:
 
 Avoid creating too many commits when creating a PR.
 Maybe the usage of [`git rebase`](http://learn.github.com/p/rebasing.html) could be a nice idea.
+
+Requirements
+------------
+
+- Java 11+
+- Gradle 8+
