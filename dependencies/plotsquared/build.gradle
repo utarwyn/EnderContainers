@@ -5,7 +5,7 @@ plugins {
 dependencies {
     implementation project(':api')
     compileOnly 'com.plotsquared:PlotSquared-Core:5.13.11'
-    compileOnly('com.sk89q.worldedit:worldedit-core:7.2.6') {
+    compileOnly('com.sk89q.worldedit:worldedit-core:7.2.20') {
         exclude group: '*', module: '*'
     }
     testRuntimeOnly 'org.khelekore:prtree:1.7.0'
