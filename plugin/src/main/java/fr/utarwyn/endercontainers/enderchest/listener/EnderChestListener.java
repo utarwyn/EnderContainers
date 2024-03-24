@@ -2,13 +2,13 @@ package fr.utarwyn.endercontainers.enderchest.listener;
 
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
+import fr.utarwyn.endercontainers.configuration.enderchests.SaveMode;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
 import fr.utarwyn.endercontainers.util.PluginMsg;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 
 import java.util.Iterator;
@@ -93,29 +94,41 @@ public class EnderChestListener implements Listener {
     }
 
     /**
+     * Method called when a player quits the server
+     *
+     * @param event The quit event
+     */
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        if (Files.getConfiguration().getSaveMode() == SaveMode.LOGOUT) {
+            UUID owner = event.getPlayer().getUniqueId();
+            this.manager.savePlayerContext(owner);
+            this.manager.deletePlayerContextIfUnused(owner);
+        }
+    }
+
+    /**
      * Method called when a world is saved
      *
      * @param event The save event
      */
     @EventHandler
     public void onWorldSave(WorldSaveEvent event) {
-        World world = event.getWorld();
+        if (Files.getConfiguration().getSaveMode() != SaveMode.WORLD_SAVE) {
+            return;
+        }
 
-        // Iterate over all the player contexts to save them
         Map<UUID, PlayerContext> contextMap = this.manager.getContextMap();
         for (Iterator<Map.Entry<UUID, PlayerContext>> it = contextMap.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<UUID, PlayerContext> entry = it.next();
 
-            // Only the player in the world of the event will be saved
             Player player = entry.getValue().getOwnerAsObject();
-            if (player != null && world.equals(player.getWorld())) {
-                UUID owner = entry.getKey();
-
+            // Avoids saving players data several times in a row if multiple worlds are on the server
+            if (player == null || player.getWorld().equals(event.getWorld())) {
                 // Clear all the player data from memory
-                boolean unused = this.manager.isContextUnused(owner);
+                boolean unused = this.manager.isContextUnused(entry.getKey());
 
-                // Because iterator is used, we need to clear the player data manually with it.remove()
-                this.manager.savePlayerContext(owner, false);
+                this.manager.savePlayerContext(entry.getKey());
                 if (unused) {
                     it.remove();
                 }

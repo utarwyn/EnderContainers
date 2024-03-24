@@ -25,6 +25,10 @@ enderchests:
   # Use the vanilla enderchest as the first one. Otherwise, it will be managed by EnderContainers.
   useVanillaEnderchest: true
 
+  # The mode in which the plugin will save enderchests
+  # Can be: logout, on-close or world-save
+  saveMode: 'logout'
+
   # A list of item materials which are forbidden to store in chests
   # Use Minecraft item IDs displayed ingame (shortcut: F3+H)
   forbiddenMaterials: [ ]

@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.enderchest.listener;
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
+import fr.utarwyn.endercontainers.configuration.enderchests.SaveMode;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
@@ -36,7 +37,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bukkit.event.block.Action.LEFT_CLICK_AIR;
 import static org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 public class EnderChestListenerTest {
@@ -153,10 +153,25 @@ public class EnderChestListenerTest {
     }
 
     @Test
-    public void worldSaveSaveContext() {
+    public void playerLeaveSaveContext() {
+        PlayerQuitEvent event = new PlayerQuitEvent(this.player, "");
+
+        this.listener.onPlayerQuit(event);
+        verify(this.manager).savePlayerContext(this.player.getUniqueId());
+        verify(this.manager).deletePlayerContextIfUnused(this.player.getUniqueId());
+    }
+
+    @Test
+    public void worldSaveSaveContext() throws TestInitializationException {
         WorldSaveEvent event = new WorldSaveEvent(this.player.getWorld());
 
-        // With a loaded player, we have to save the context
+        // Do nothing by default
+        this.listener.onWorldSave(event);
+        verify(this.manager, never()).getContextMap();
+
+        // Save player context if enabled in configuration
+        TestHelper.overrideConfigurationValue("saveMode", SaveMode.WORLD_SAVE);
+
         PlayerContext context = mock(PlayerContext.class);
         Map<UUID, PlayerContext> contextMap = new HashMap<>(Collections.singletonMap(
                 this.player.getUniqueId(), context
@@ -168,7 +183,7 @@ public class EnderChestListenerTest {
         this.listener.onWorldSave(event);
         verify(this.manager).getContextMap();
         verify(this.manager).isContextUnused(this.player.getUniqueId());
-        verify(this.manager).savePlayerContext(this.player.getUniqueId(), false);
+        verify(this.manager).savePlayerContext(this.player.getUniqueId());
         assertThat(contextMap).isEmpty();
     }
 

@@ -11,7 +11,10 @@ import fr.utarwyn.endercontainers.enderchest.listener.EnderChestListener;
 import fr.utarwyn.endercontainers.inventory.InventoryManager;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -61,7 +64,8 @@ public class EnderChestManager extends AbstractManager {
 
         // Save and unload all data
         this.loadingContexts.clear();
-        this.contextMap.values().forEach(pc -> pc.save(Collections.emptySet()));
+        this.contextMap.values().forEach(PlayerContext::update);
+        this.contextMap.values().forEach(PlayerContext::save);
         this.contextMap.clear();
     }
 
@@ -146,19 +150,27 @@ public class EnderChestManager extends AbstractManager {
 
     /**
      * Save all data of a player.
-     * Also purge its context from memory if needed.
      *
-     * @param owner  owner of the player context to save
-     * @param delete should the context must be deleted from the memory
+     * @param owner owner of the player context to save
      */
-    public void savePlayerContext(UUID owner, boolean delete) {
+    public void savePlayerContext(UUID owner) {
         if (this.contextMap.containsKey(owner)) {
-            SaveTask saveTask = new SaveTask(this.contextMap.get(owner));
-            this.plugin.executeTaskOnOtherThread(saveTask);
+            PlayerContext playerContext = this.contextMap.get(owner);
+            SaveTask saveTask = new SaveTask(playerContext);
 
-            if (delete) {
-                this.contextMap.remove(owner);
-            }
+            playerContext.update();
+            this.plugin.executeTaskOnOtherThread(saveTask);
+        }
+    }
+
+    /**
+     * Delete a player context from memory if it is unused.
+     *
+     * @param owner owner of the player context
+     */
+    public void deletePlayerContextIfUnused(UUID owner) {
+        if (this.isContextUnused(owner)) {
+            this.contextMap.remove(owner);
         }
     }
 

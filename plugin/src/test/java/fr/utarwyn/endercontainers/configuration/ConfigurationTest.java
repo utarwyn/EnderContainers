@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.configuration;
 
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
+import fr.utarwyn.endercontainers.configuration.enderchests.SaveMode;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.junit.jupiter.api.BeforeAll;
@@ -30,6 +31,7 @@ public class ConfigurationTest {
         assertThat(config.getDisabledWorlds()).containsExactly("disabled");
         assertThat(config.isOnlyShowAccessibleEnderchests()).isFalse();
         assertThat(config.isUseVanillaEnderchest()).isTrue();
+        assertThat(config.getSaveMode()).isEqualTo(SaveMode.LOGOUT);
         assertThat(config.getEnderchestItem()).isNotNull();
         assertThat(config.getEnderchestItemVariants()).hasSize(5);
         assertThat(config.isNumberingEnderchests()).isTrue();

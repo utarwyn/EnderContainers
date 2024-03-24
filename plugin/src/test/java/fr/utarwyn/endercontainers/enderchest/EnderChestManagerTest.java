@@ -70,7 +70,8 @@ public class EnderChestManagerTest {
 
         this.manager.unload();
 
-        verify(context).save(any());
+        verify(context).update();
+        verify(context).save();
         verify(inventoryManager).closeAll();
         assertThat(this.manager.contextMap).isEmpty();
     }
@@ -167,16 +168,32 @@ public class EnderChestManagerTest {
         TestHelper.setupManager(this.manager);
 
         // Unregistered context?
-        this.manager.savePlayerContext(uuid, false);
-        this.registerPlayerContext(uuid);
+        this.manager.savePlayerContext(uuid);
+        verify(TestHelper.getPlugin(), never()).executeTaskOnOtherThread(any(SaveTask.class));
 
-        // Check saving without deletion
-        this.manager.savePlayerContext(uuid, false);
+        // Check saving a registered context
+        PlayerContext context = this.registerPlayerContext(uuid);
+        this.manager.savePlayerContext(uuid);
         assertThat(this.manager.contextMap).containsKey(uuid);
+        verify(context).update();
         verify(TestHelper.getPlugin()).executeTaskOnOtherThread(any(SaveTask.class));
+    }
 
-        // Check deletion of a context
-        this.manager.savePlayerContext(uuid, true);
+    @Test
+    public void deletePlayerContextIfUnused() throws TestInitializationException {
+        UUID uuid = UUID.randomUUID();
+
+        // Setup the manager correctly
+        TestHelper.setupManager(this.manager);
+        PlayerContext context = this.registerPlayerContext(uuid);
+
+        // Delete nothing because the context is used
+        this.manager.deletePlayerContextIfUnused(uuid);
+        assertThat(this.manager.contextMap).containsKey(uuid);
+
+        // Delete the context
+        when(context.isChestsUnused()).thenReturn(true);
+        this.manager.deletePlayerContextIfUnused(uuid);
         assertThat(this.manager.contextMap).isEmpty();
     }
 

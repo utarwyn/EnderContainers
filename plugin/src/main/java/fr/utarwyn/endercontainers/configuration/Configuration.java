@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.configuration;
 
+import fr.utarwyn.endercontainers.configuration.enderchests.SaveMode;
 import fr.utarwyn.endercontainers.configuration.ui.EnderChestItem;
 import fr.utarwyn.endercontainers.configuration.ui.EnderChestItemVariant;
 import org.bukkit.Material;
@@ -26,6 +27,7 @@ public class Configuration {
     private final int maxEnderchests;
     private final int defaultEnderchests;
     private final boolean useVanillaEnderchest;
+    private final SaveMode saveMode;
     private final List<Material> forbiddenMaterials;
 
     private final EnderChestItem enderchestItem;
@@ -58,6 +60,7 @@ public class Configuration {
      */
     Configuration(FileConfiguration config) throws ConfigLoadingException {
         boolean legacyOnlyShowAccessible;
+        boolean legacySaveOnChestClose;
 
         this.locale = loadValue("locale", config::isString, config::getString);
         this.disabledWorlds = loadValue("disabledWorlds", config::isList, config::getStringList);
@@ -108,6 +111,17 @@ public class Configuration {
         this.blockNametag = loadValue("others.blockNametag", config::isBoolean, config::getBoolean);
         this.updateChecker = loadValue("others.updateChecker", config::isBoolean, config::getBoolean);
         this.globalSound = loadValue("others.globalSound", config::isBoolean, config::getBoolean);
+
+        legacySaveOnChestClose = loadValue("others.saveOnChestClose", v -> true, config::getBoolean);
+        if (legacySaveOnChestClose) {
+            this.saveMode = SaveMode.ON_CLOSE;
+        } else {
+            this.saveMode = loadValue(
+                    "enderchests.saveMode",
+                    key -> config.isString(key) && SaveMode.fromName(config.getString(key)) != null,
+                    key -> SaveMode.fromName(config.getString(key))
+            );
+        }
     }
 
     public String getLocale() {
@@ -136,6 +150,10 @@ public class Configuration {
 
     public boolean isNumberingEnderchests() {
         return this.numberingEnderchests;
+    }
+
+    public SaveMode getSaveMode() {
+        return this.saveMode;
     }
 
     public List<Material> getForbiddenMaterials() {

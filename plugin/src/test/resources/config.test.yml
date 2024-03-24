@@ -8,6 +8,7 @@ enderchests:
   max: 27
   default: 1
   useVanillaEnderchest: true
+  saveMode: logout
   forbiddenMaterials:
     - andesite
     - bedrock
