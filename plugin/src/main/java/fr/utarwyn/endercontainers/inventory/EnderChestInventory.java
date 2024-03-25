@@ -5,6 +5,7 @@ import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
+import fr.utarwyn.endercontainers.configuration.enderchests.SaveMode;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import fr.utarwyn.endercontainers.util.uuid.UUIDFetcher;
@@ -121,9 +122,13 @@ public class EnderChestInventory extends AbstractInventoryHolder {
         Player owner = Bukkit.getPlayer(this.chest.getOwner());
         boolean offlineOwner = owner == null || !owner.isOnline();
 
-        // Save chest inventory if owner is offline or forced by the configuration (experimental)
-        if (offlineOwner || Files.getConfiguration().isSaveOnChestClose()) {
-            Managers.get(EnderChestManager.class).savePlayerContext(this.chest.getOwner(), offlineOwner);
+        // Save chest inventory if owner is offline or forced by the configuration
+        if (offlineOwner || Files.getConfiguration().getSaveMode() == SaveMode.ON_CLOSE) {
+            EnderChestManager enderChestManager = Managers.get(EnderChestManager.class);
+            enderChestManager.savePlayerContext(this.chest.getOwner());
+            if (offlineOwner) {
+                enderChestManager.deletePlayerContextIfUnused(this.chest.getOwner());
+            }
         }
 
         // Play the closing sound

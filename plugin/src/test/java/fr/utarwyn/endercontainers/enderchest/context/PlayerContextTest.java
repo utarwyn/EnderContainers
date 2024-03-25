@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.enderchest.context;
 import com.google.common.collect.Maps;
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
+import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.VanillaEnderChest;
 import fr.utarwyn.endercontainers.inventory.menu.EnderChestListMenu;
 import fr.utarwyn.endercontainers.storage.StorageManager;
@@ -22,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -159,6 +161,14 @@ public class PlayerContextTest {
         when(this.player.hasPermission(anyString())).thenReturn(true);
         assertThat(this.context.openEnderchestInventory(this.player, 2)).isTrue();
         assertThat(this.context.openEnderchestInventory(this.player, ENDERCHEST_AMOUNT)).isFalse();
+    }
+
+    @Test
+    public void update() {
+        this.context.update();
+        Optional<EnderChest> chest = this.context.getChest(1);
+        assertThat(chest).isPresent();
+        assertThat(chest.get().getFillPercentage()).isZero();
     }
 
     @Test

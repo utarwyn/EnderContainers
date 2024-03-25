@@ -189,10 +189,16 @@ public class PlayerContext {
     }
 
     /**
+     * Update container of all chests.
+     */
+    public void update() {
+        this.chests.forEach(EnderChest::updateContainer);
+    }
+
+    /**
      * Save all datas stored in the context.
      */
     public void save() {
-        this.chests.forEach(EnderChest::updateContainer);
         this.data.saveContext(this.chests);
     }
 

@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.enderchest.listener;
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
+import fr.utarwyn.endercontainers.configuration.enderchests.SaveMode;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
@@ -16,6 +17,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +27,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -152,14 +156,35 @@ public class EnderChestListenerTest {
     public void playerLeaveSaveContext() {
         PlayerQuitEvent event = new PlayerQuitEvent(this.player, "");
 
-        // By default, we have to save the context but not delete it
         this.listener.onPlayerQuit(event);
-        verify(this.manager).savePlayerContext(this.player.getUniqueId(), false);
+        verify(this.manager).savePlayerContext(this.player.getUniqueId());
+        verify(this.manager).deletePlayerContextIfUnused(this.player.getUniqueId());
+    }
 
-        // With an unused context, we also have to delete the context
+    @Test
+    public void worldSaveSaveContext() throws TestInitializationException {
+        WorldSaveEvent event = new WorldSaveEvent(this.player.getWorld());
+
+        // Do nothing by default
+        this.listener.onWorldSave(event);
+        verify(this.manager, never()).getContextMap();
+
+        // Save player context if enabled in configuration
+        TestHelper.overrideConfigurationValue("saveMode", SaveMode.WORLD_SAVE);
+
+        PlayerContext context = mock(PlayerContext.class);
+        Map<UUID, PlayerContext> contextMap = new HashMap<>(Collections.singletonMap(
+                this.player.getUniqueId(), context
+        ));
+        when(context.getOwnerAsObject()).thenReturn(this.player);
+        when(this.manager.getContextMap()).thenReturn(contextMap);
         when(this.manager.isContextUnused(this.player.getUniqueId())).thenReturn(true);
-        this.listener.onPlayerQuit(event);
-        verify(this.manager).savePlayerContext(this.player.getUniqueId(), true);
+
+        this.listener.onWorldSave(event);
+        verify(this.manager).getContextMap();
+        verify(this.manager).isContextUnused(this.player.getUniqueId());
+        verify(this.manager).savePlayerContext(this.player.getUniqueId());
+        assertThat(contextMap).isEmpty();
     }
 
     private PlayerInteractEvent createInteractEvent(Action action) {

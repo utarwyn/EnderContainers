@@ -73,31 +73,31 @@ public class EnderChestInventoryListener implements Listener {
      */
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (!(event.getPlayer() instanceof Player)) return;
+        if (!(event.getPlayer() instanceof Player) || !this.isEnderChestInventory(event.getInventory())) {
+            return;
+        }
+
         Player player = (Player) event.getPlayer();
+        Optional<VanillaEnderChest> vanilla = this.manager.getVanillaEnderchestUsedBy(player);
 
-        // Play the closing sound when we use the default enderchest!
-        if (this.isEnderChestInventory(event.getInventory())) {
-            Optional<VanillaEnderChest> vanilla = this.manager.getVanillaEnderchestUsedBy(player);
+        // When closing the default enderchest ...
+        if (vanilla.isPresent()) {
+            Player ownerObj = vanilla.get().getOwnerAsPlayer();
 
-            // When closing the default enderchest ...
-            if (vanilla.isPresent()) {
-                Player ownerObj = vanilla.get().getOwnerAsPlayer();
-
-                // ... save and delete the context from memory if the player is offline.
-                if (!ownerObj.equals(player) && !ownerObj.isOnline()) {
-                    this.manager.savePlayerContext(vanilla.get().getOwner(), true);
-                    ownerObj.saveData();
-                }
+            // ... save and delete the context from memory if the player is offline.
+            if (!ownerObj.equals(player) && !ownerObj.isOnline()) {
+                this.manager.savePlayerContext(vanilla.get().getOwner());
+                this.manager.deletePlayerContextIfUnused(ownerObj.getUniqueId());
+                ownerObj.saveData();
             }
+        }
 
-            // Play the closing sound
-            Sound sound = CompatibilityHelper.searchSound("CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
-            if (Files.getConfiguration().isGlobalSound()) {
-                player.getWorld().playSound(player.getLocation(), sound, 1f, 1f);
-            } else {
-                player.playSound(player.getLocation(), sound, 1f, 1f);
-            }
+        // Play the closing sound
+        Sound sound = CompatibilityHelper.searchSound("CHEST_CLOSE", "BLOCK_CHEST_CLOSE");
+        if (Files.getConfiguration().isGlobalSound()) {
+            player.getWorld().playSound(player.getLocation(), sound, 1f, 1f);
+        } else {
+            player.playSound(player.getLocation(), sound, 1f, 1f);
         }
     }
 

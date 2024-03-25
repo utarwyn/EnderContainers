@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.inventory;
 
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
+import fr.utarwyn.endercontainers.configuration.enderchests.SaveMode;
 import fr.utarwyn.endercontainers.enderchest.EnderChest;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 import org.assertj.core.api.Condition;
@@ -128,19 +129,22 @@ public class EnderChestInventoryTest {
 
         // do not save if the owner is connected
         this.inventory.onClose(viewer);
-        verify(manager, never()).savePlayerContext(any(), eq(true));
+        verify(manager, never()).savePlayerContext(any());
+        verify(manager, never()).deletePlayerContextIfUnused(this.chest.getOwner());
 
         // save if forced by the configuration
-        TestHelper.overrideConfigurationValue("saveOnChestClose", true);
+        TestHelper.overrideConfigurationValue("saveMode", SaveMode.ON_CLOSE);
         this.inventory.onClose(viewer);
-        verify(manager).savePlayerContext(this.chest.getOwner(), false);
-        TestHelper.overrideConfigurationValue("saveOnChestClose", false);
+        verify(manager).savePlayerContext(this.chest.getOwner());
+        verify(manager, never()).deletePlayerContextIfUnused(this.chest.getOwner());
+        TestHelper.overrideConfigurationValue("saveMode", SaveMode.LOGOUT);
 
         // save if owner not connected
         UUID offline = UUID.fromString("62dcb385-f2ac-472f-9d88-a0cc0d957082");
         when(this.chest.getOwner()).thenReturn(offline);
         this.inventory.onClose(viewer);
-        verify(manager).savePlayerContext(this.chest.getOwner(), true);
+        verify(manager).savePlayerContext(this.chest.getOwner());
+        verify(manager).deletePlayerContextIfUnused(this.chest.getOwner());
     }
 
     @Test
