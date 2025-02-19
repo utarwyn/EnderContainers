@@ -43,5 +43,5 @@ Maybe the usage of [`git rebase`](http://learn.github.com/p/rebasing.html) could
 Requirements
 ------------
 
-- Java 11+
+- Java 21+
 - Gradle 8+
