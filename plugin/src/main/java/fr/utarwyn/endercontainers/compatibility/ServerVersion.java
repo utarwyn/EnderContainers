@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
  */
 public enum ServerVersion {
 
+    NEWER,
     V1_20,
     V1_19_R3,
     V1_19_R2,
@@ -35,10 +36,15 @@ public enum ServerVersion {
         String path = Bukkit.getServer().getClass().getPackage().getName();
         BUKKIT_VERSION = path.substring(path.lastIndexOf('.') + 1);
 
-        for (ServerVersion version : values()) {
-            if (BUKKIT_VERSION.toUpperCase().startsWith(version.name())) {
-                currentVersion = version;
-                break;
+        // starting from 1.20.5, version is no more in package name
+        if ("craftbukkit".equals(BUKKIT_VERSION)) {
+            currentVersion = NEWER;
+        } else {
+            for (ServerVersion version : values()) {
+                if (BUKKIT_VERSION.toUpperCase().startsWith(version.name())) {
+                    currentVersion = version;
+                    break;
+                }
             }
         }
     }
