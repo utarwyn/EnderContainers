@@ -8,12 +8,11 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Optional;
 
 /**
  * This class is used to perform reflection things
- * on server net classes to spawn holograms for all versions.
+ * on server net classes to spawn holograms for versions prior to 1.19.
  *
  * @author Utarwyn
  * @since 2.2.0
@@ -94,21 +93,12 @@ public class NMSHologramUtil extends NMSUtil {
         Class<?> entityPlayerClass = getNMSClass("EntityPlayer", "server.level");
         Class<?> destroyPacketClass = getNMSClass("PacketPlayOutEntityDestroy", "network.protocol.game");
 
-        // 1.19+ :: PacketPlayOutSpawnEntityLiving has been renamed PacketPlayOutSpawnEntity
-        String spawnPacketClassName = ServerVersion.isNewerThan(ServerVersion.V1_18)
-                ? "PacketPlayOutSpawnEntity" : "PacketPlayOutSpawnEntityLiving";
-        Class<?> spawnPacketClass = getNMSClass(spawnPacketClassName, "network.protocol.game");
+        Class<?> spawnPacketClass = getNMSClass("PacketPlayOutSpawnEntityLiving", "network.protocol.game");
 
         this.packetClass = getNMSClass("Packet", "network.protocol");
         this.entityClass = getNMSClass("Entity", "world.entity");
         this.craftWorldClass = getCraftbukkitClass("CraftWorld");
-
-        // 1.19.3+ :: spawn packet constructor use Entity instead of LivingEntity
-        if (ServerVersion.isNewerThan(ServerVersion.V1_19)) {
-            this.spawnPacketConstructor = spawnPacketClass.getConstructor(this.entityClass);
-        } else {
-            this.spawnPacketConstructor = spawnPacketClass.getConstructor(getNMSClass("EntityLiving", "world.entity"));
-        }
+        this.spawnPacketConstructor = spawnPacketClass.getConstructor(getNMSClass("EntityLiving", "world.entity"));
 
         // 1.17+ :: try to use only one int in packet constructor parameters
         try {
@@ -120,9 +110,7 @@ public class NMSHologramUtil extends NMSUtil {
         }
 
         // 1.17+ :: New way of retrieving player connection instance
-        if (ServerVersion.isNewerThan(ServerVersion.V1_19_R3)) {
-            this.playerConnectionField = entityPlayerClass.getField("c");
-        } else if (ServerVersion.isNewerThan(ServerVersion.V1_16)) {
+        if (ServerVersion.isNewerThan(ServerVersion.V1_16)) {
             this.playerConnectionField = entityPlayerClass.getField("b");
         } else {
             this.playerConnectionField = entityPlayerClass.getField("playerConnection");
@@ -151,13 +139,7 @@ public class NMSHologramUtil extends NMSUtil {
         if (ServerVersion.isNewerThan(ServerVersion.V1_14)) {
             Class<?> packetMetadataClass = getNMSClass("PacketPlayOutEntityMetadata", "network.protocol.game");
             Class<?> dataWatcherClass = getNMSClass("DataWatcher", "network.syncher");
-
-            // 1.19.3+ :: metadata packet use a list of datawatcher items
-            if (ServerVersion.isNewerThan(ServerVersion.V1_19)) {
-                this.metadataPacketConstructor = packetMetadataClass.getConstructor(int.class, List.class);
-            } else {
-                this.metadataPacketConstructor = packetMetadataClass.getConstructor(int.class, dataWatcherClass, boolean.class);
-            }
+            this.metadataPacketConstructor = packetMetadataClass.getConstructor(int.class, dataWatcherClass, boolean.class);
         } else {
             this.metadataPacketConstructor = null;
         }
@@ -192,12 +174,7 @@ public class NMSHologramUtil extends NMSUtil {
         Object entity = this.createHologramEntity(location.getWorld(), location.getX(), location.getY(), location.getZ(), text);
 
         // 1.19.3+ — 1.18+ :: New method name in Entity class
-        Method getId;
-        if (ServerVersion.isNewerThan(ServerVersion.V1_19)) {
-            getId = this.entityClass.getMethod(ServerVersion.isNewerThan(ServerVersion.V1_19_R2) ? "af" : "ah");
-        } else {
-            getId = getNMSDynamicMethod(this.entityClass, "getId", "ae");
-        }
+        Method getId = getNMSDynamicMethod(this.entityClass, "getId", "ae");
         int entityId = (int) getId.invoke(entity);
 
         // Send the spawn packet for 1.8+
@@ -278,9 +255,7 @@ public class NMSHologramUtil extends NMSUtil {
             Method fromStringOrNullMethod = this.chatMessageClass.getMethod("fromStringOrNull", String.class);
             Object chatComponent = fromStringOrNullMethod.invoke(null, text);
 
-            // 1.19+ :: method is now "b" (instead of "a")
-            String methodNamePost17 = ServerVersion.isNewerThan(ServerVersion.V1_18) ? "b" : "a";
-            getNMSDynamicMethod(entityObject.getClass(), "setCustomName", methodNamePost17, this.chatBaseComponentClass)
+            getNMSDynamicMethod(entityObject.getClass(), "setCustomName", "a", this.chatBaseComponentClass)
                     .invoke(entityObject, chatComponent);
         } else {
             Method setCustomName = entityObject.getClass().getMethod("setCustomName", String.class);
@@ -320,25 +295,9 @@ public class NMSHologramUtil extends NMSUtil {
      * @throws ReflectiveOperationException if the packet cannot be instanciated
      */
     private Object createEntityMetadataPacket(int entityId, Object entity) throws ReflectiveOperationException {
-        Method getDataWatcher;
-        if (ServerVersion.isNewerThan(ServerVersion.V1_19)) {
-            getDataWatcher = this.entityClass.getMethod(ServerVersion.isNewerThan(ServerVersion.V1_19_R2) ? "aj" : "al");
-        } else {
-            getDataWatcher = getNMSDynamicMethod(this.entityClass, "getDataWatcher", "ai");
-        }
+        Method getDataWatcher = getNMSDynamicMethod(this.entityClass, "getDataWatcher", "ai");
         Object entityDataWatcher = getDataWatcher.invoke(entity);
-        Object metadataPacket;
-
-        // 1.19.3+ :: metadata packet use a list of datawatcher items
-        if (ServerVersion.isNewerThan(ServerVersion.V1_19)) {
-            Method getItemListMethod = entityDataWatcher.getClass().getMethod("b");
-            metadataPacket = this.metadataPacketConstructor.newInstance(entityId, getItemListMethod.invoke(entityDataWatcher));
-        } else {
-            // 1.18+ :: New method name in Entity class
-            metadataPacket = this.metadataPacketConstructor.newInstance(entityId, entityDataWatcher, false);
-        }
-
-        return metadataPacket;
+        return this.metadataPacketConstructor.newInstance(entityId, entityDataWatcher, false);
     }
 
 }

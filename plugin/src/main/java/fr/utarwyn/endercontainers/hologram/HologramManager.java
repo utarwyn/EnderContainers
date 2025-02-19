@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.hologram;
 
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.Managers;
+import fr.utarwyn.endercontainers.compatibility.ArmorStandAdapter;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
@@ -16,9 +17,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 
 /**
@@ -46,6 +49,10 @@ public class HologramManager extends AbstractManager implements Runnable {
      * The dependencies manager
      */
     private DependenciesManager dependenciesManager;
+    /**
+     * The armor stand adapter
+     */
+    private ArmorStandAdapter armorStandAdapter;
 
     /**
      * Generate a title with custom data for a block nametag.
@@ -69,6 +76,7 @@ public class HologramManager extends AbstractManager implements Runnable {
     public synchronized void load() {
         this.chestManager = Managers.get(EnderChestManager.class);
         this.dependenciesManager = Managers.get(DependenciesManager.class);
+        this.armorStandAdapter = ArmorStandAdapter.create();
         this.holograms = new ConcurrentHashMap<>();
 
         // Start the task only if the block nametag is enabled
@@ -103,8 +111,15 @@ public class HologramManager extends AbstractManager implements Runnable {
                 .filter(player -> !disabledWorlds.contains(player.getWorld().getName()))
                 .forEach(this::checkHologramStatus);
 
-        // Unused holograms can be cleared
-        this.holograms.entrySet().removeIf(entry -> !entry.getValue().isObserverOnline());
+        // Unused holograms can be destroyed
+        Predicate<Map.Entry<UUID, Hologram>> removePredicate = entry -> !entry.getValue().isObserverOnline();
+
+        this.holograms.entrySet()
+                .stream()
+                .filter(removePredicate)
+                .forEach(entry -> this.destroyHologram(entry.getValue()));
+
+        this.holograms.entrySet().removeIf(removePredicate);
     }
 
     /**
@@ -145,7 +160,8 @@ public class HologramManager extends AbstractManager implements Runnable {
         Location location = block.getLocation().clone().add(.5, -0.79D - Hologram.LINE_HEIGHT, .5);
 
         try {
-            this.holograms.put(observer.getUniqueId(), new Hologram(observer, title, location));
+            int entityId = this.armorStandAdapter.spawnArmorStandFor(this.plugin, observer, location, title);
+            this.holograms.put(observer.getUniqueId(), new Hologram(observer, entityId));
         } catch (HologramException e) {
             this.plugin.getLogger().log(Level.WARNING, "cannot create hologram instance", e);
         }
@@ -158,7 +174,7 @@ public class HologramManager extends AbstractManager implements Runnable {
      */
     private void destroyHologram(Hologram hologram) {
         try {
-            hologram.destroy();
+            this.armorStandAdapter.destroyArmorStandFor(hologram.getObserver(), hologram.getEntityId());
         } catch (HologramException e) {
             this.plugin.getLogger().log(Level.WARNING, "cannot remove hologram instance", e);
         }
