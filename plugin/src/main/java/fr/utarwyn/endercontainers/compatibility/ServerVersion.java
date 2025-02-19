@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
  */
 public enum ServerVersion {
 
+    V1_21,
     V1_20,
     V1_19_R3,
     V1_19_R2,
@@ -44,7 +45,8 @@ public enum ServerVersion {
     }
 
     public static ServerVersion get() {
-        return currentVersion;
+        return currentVersion != null ? currentVersion : V1_21; //
+
     }
 
     public static String getBukkitVersion() {
