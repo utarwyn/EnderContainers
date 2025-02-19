@@ -90,7 +90,7 @@ public class EnderChestInventoryTest {
         ItemStack[] itemList = new ItemStack[27];
         itemList[2] = new ItemStack(Material.ENDER_CHEST);
         itemList[8] = new ItemStack(Material.IRON_BLOCK, 2);
-        itemList[9] = new ItemStack(Material.GRASS, 20);
+        itemList[9] = new ItemStack(Material.DIRT, 20);
 
         // Reload items of the chest
         when(this.chest.getContents()).thenReturn(new ConcurrentHashMap<Integer, ItemStack>() {{
@@ -112,7 +112,7 @@ public class EnderChestInventoryTest {
         assertThat(map.get(2)).isNotNull(); // still present in the container
         assertThat(map.get(8)).isNotNull(); // still present in the container
         assertThat(map.get(9)).isNotNull(); // still present in the container
-        assertThat(map.get(9).getType()).isEqualTo(Material.GRASS);
+        assertThat(map.get(9).getType()).isEqualTo(Material.DIRT);
         assertThat(map.get(9).getAmount()).isEqualTo(20);
         assertThat(map.get(35)).isNotNull(); // not in the container but out of bounds, so OK
     }

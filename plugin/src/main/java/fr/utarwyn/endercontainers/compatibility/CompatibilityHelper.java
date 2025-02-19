@@ -1,6 +1,8 @@
 package fr.utarwyn.endercontainers.compatibility;
 
 import com.google.common.base.Preconditions;
+import fr.utarwyn.endercontainers.compatibility.bukkit.BukkitArmorStandAdapter;
+import fr.utarwyn.endercontainers.compatibility.nms.NMSArmorStandAdapter;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 
@@ -61,6 +63,17 @@ public class CompatibilityHelper {
             }
             throw new IllegalArgumentException(String.format("no sound found using key %s", names[0]));
         });
+    }
+
+    /**
+     * Creates a new armor stand adapter instance based on the server version.
+     *
+     * @return a new armor stand adapter instance
+     */
+    public static ArmorStandAdapter createArmorStandAdapter() {
+        return ServerVersion.isNewerThan(ServerVersion.V1_18)
+                ? new BukkitArmorStandAdapter()
+                : new NMSArmorStandAdapter();
     }
 
 }

@@ -62,7 +62,7 @@ public class ItemFactoryMock implements ItemFactory {
     }
 
     @Override
-    public Material updateMaterial(ItemMeta meta, Material material)
+    public Material updateMaterial(ItemMeta itemMeta, Material material)
             throws IllegalArgumentException {
         return material;
     }

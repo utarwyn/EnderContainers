@@ -2,7 +2,6 @@ package fr.utarwyn.endercontainers.hologram;
 
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
-import fr.utarwyn.endercontainers.compatibility.nms.NMSHologramUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.BeforeAll;
@@ -12,8 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class HologramTest {
@@ -35,53 +33,13 @@ public class HologramTest {
     }
 
     @Test
-    public void spawn() throws HologramException, ReflectiveOperationException {
-        new Hologram(this.observer, TITLE, this.location);
-        verify(NMSHologramUtil.get()).spawnHologram(this.location, TITLE, this.observer);
-    }
-
-    @Test
-    public void destroy() throws HologramException, ReflectiveOperationException {
-        when(NMSHologramUtil.get().spawnHologram(this.location, TITLE, this.observer)).thenReturn(ENTITY_ID);
-        Hologram h = new Hologram(this.observer, TITLE, this.location);
-        h.destroy();
-        verify(NMSHologramUtil.get()).destroyEntity(ENTITY_ID, this.observer);
-    }
-
-    @Test
     public void observerOnline() throws HologramException {
-        Hologram hologram = new Hologram(this.observer, TITLE, this.location);
+        Hologram hologram = new Hologram(this.observer, ENTITY_ID);
 
         when(this.observer.isOnline()).thenReturn(true);
         assertThat(hologram.isObserverOnline()).isTrue();
         when(this.observer.isOnline()).thenReturn(false);
         assertThat(hologram.isObserverOnline()).isFalse();
-    }
-
-    @Test
-    public void spawnError() throws ReflectiveOperationException {
-        when(NMSHologramUtil.get().spawnHologram(this.location, TITLE, this.observer))
-                .thenThrow(ReflectiveOperationException.class);
-
-        try {
-            new Hologram(this.observer, TITLE, this.location);
-            fail("spawn method must fail");
-        } catch (HologramException ignored) {
-        }
-    }
-
-    @Test
-    public void destroyError() throws HologramException, ReflectiveOperationException {
-        when(NMSHologramUtil.get().spawnHologram(this.location, TITLE, this.observer)).thenReturn(ENTITY_ID);
-        doThrow(ReflectiveOperationException.class).when(NMSHologramUtil.get()).destroyEntity(ENTITY_ID, this.observer);
-
-        Hologram h = new Hologram(this.observer, TITLE, this.location);
-
-        try {
-            h.destroy();
-            fail("destroy method must fail");
-        } catch (HologramException ignored) {
-        }
     }
 
 }

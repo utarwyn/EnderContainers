@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.hologram;
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.compatibility.ArmorStandAdapter;
+import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
@@ -42,6 +43,10 @@ public class HologramManager extends AbstractManager implements Runnable {
      */
     BukkitTask task;
     /**
+     * The armor stand adapter
+     */
+    ArmorStandAdapter armorStandAdapter;
+    /**
      * The enderchest manager
      */
     private EnderChestManager chestManager;
@@ -49,10 +54,6 @@ public class HologramManager extends AbstractManager implements Runnable {
      * The dependencies manager
      */
     private DependenciesManager dependenciesManager;
-    /**
-     * The armor stand adapter
-     */
-    private ArmorStandAdapter armorStandAdapter;
 
     /**
      * Generate a title with custom data for a block nametag.
@@ -76,7 +77,7 @@ public class HologramManager extends AbstractManager implements Runnable {
     public synchronized void load() {
         this.chestManager = Managers.get(EnderChestManager.class);
         this.dependenciesManager = Managers.get(DependenciesManager.class);
-        this.armorStandAdapter = ArmorStandAdapter.create();
+        this.armorStandAdapter = CompatibilityHelper.createArmorStandAdapter();
         this.holograms = new ConcurrentHashMap<>();
 
         // Start the task only if the block nametag is enabled

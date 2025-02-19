@@ -53,5 +53,4 @@ public class EnchantmentMock extends Enchantment {
     public boolean conflictsWith(Enchantment other) {
         return other == this;
     }
-
 }

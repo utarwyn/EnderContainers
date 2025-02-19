@@ -1,7 +1,5 @@
 package fr.utarwyn.endercontainers.compatibility;
 
-import fr.utarwyn.endercontainers.compatibility.bukkit.BukkitArmorStandAdapter;
-import fr.utarwyn.endercontainers.compatibility.nms.NMSArmorStandAdapter;
 import fr.utarwyn.endercontainers.hologram.HologramException;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -35,16 +33,5 @@ public interface ArmorStandAdapter {
      * @param entityId the entity ID of the armor stand to destroy
      */
     void destroyArmorStandFor(Player observer, int entityId) throws HologramException;
-
-    /**
-     * Creates a new armor stand adapter instance based on the server version.
-     *
-     * @return a new armor stand adapter instance
-     */
-    static ArmorStandAdapter create() {
-        return ServerVersion.isNewerThan(ServerVersion.V1_18)
-                ? new BukkitArmorStandAdapter()
-                : new NMSArmorStandAdapter();
-    }
 
 }

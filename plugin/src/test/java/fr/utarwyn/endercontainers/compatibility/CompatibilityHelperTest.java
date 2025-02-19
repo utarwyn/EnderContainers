@@ -1,6 +1,8 @@
 package fr.utarwyn.endercontainers.compatibility;
 
 import fr.utarwyn.endercontainers.TestHelper;
+import fr.utarwyn.endercontainers.compatibility.bukkit.BukkitArmorStandAdapter;
+import fr.utarwyn.endercontainers.compatibility.nms.NMSArmorStandAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -51,6 +53,22 @@ public class CompatibilityHelperTest {
         assertThat(CompatibilityHelper.searchSound("BLOCK_CHEST_OPEN")).isEqualTo(Sound.BLOCK_CHEST_OPEN);
         assertThat(CompatibilityHelper.searchSound("BLOCK_CHEST_OPEN", "BLOCK_CHEST_CLOSE")).isEqualTo(Sound.BLOCK_CHEST_OPEN);
         assertThat(CompatibilityHelper.searchSound("CHEST_OPEN", "BLOCK_CHEST_OPEN", "BLOCK_CHEST_CLOSE")).isEqualTo(Sound.BLOCK_CHEST_OPEN);
+    }
+
+    @Test
+    public void createBukkitArmorStandAdapter() {
+        ServerVersion def = ServerVersion.get();
+        TestHelper.overrideServerVersion(ServerVersion.V1_20);
+        assertThat(CompatibilityHelper.createArmorStandAdapter()).isInstanceOf(BukkitArmorStandAdapter.class);
+        TestHelper.overrideServerVersion(def);
+    }
+
+    @Test
+    public void createNMSArmorStandAdapter() {
+        ServerVersion def = ServerVersion.get();
+        TestHelper.overrideServerVersion(ServerVersion.V1_8);
+        assertThat(CompatibilityHelper.createArmorStandAdapter()).isInstanceOf(NMSArmorStandAdapter.class);
+        TestHelper.overrideServerVersion(def);
     }
 
 }

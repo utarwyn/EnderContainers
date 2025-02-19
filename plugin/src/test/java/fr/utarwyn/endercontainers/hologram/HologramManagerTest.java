@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.hologram;
 
 import fr.utarwyn.endercontainers.TestHelper;
 import fr.utarwyn.endercontainers.TestInitializationException;
+import fr.utarwyn.endercontainers.compatibility.ArmorStandAdapter;
 import fr.utarwyn.endercontainers.dependency.DependenciesManager;
 import fr.utarwyn.endercontainers.dependency.exceptions.BlockChestOpeningException;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
@@ -38,6 +39,9 @@ public class HologramManagerTest {
 
     @Mock
     private PlayerContext context;
+
+    @Mock
+    private ArmorStandAdapter armorStandAdapter;
 
     @Mock
     private DependenciesManager dependenciesManager;
@@ -92,15 +96,28 @@ public class HologramManagerTest {
     }
 
     @Test
-    public void spawnHologram() throws BlockChestOpeningException {
+    public void spawnHologram() throws BlockChestOpeningException, TestInitializationException, HologramException {
         assertThat(this.manager.holograms).isNull();
 
+        doReturn(5).when(this.armorStandAdapter).spawnArmorStandFor(
+                eq(TestHelper.getPlugin()), eq(this.observer), any(), anyString()
+        );
+
         // Spawn hologram when targeting enderchest
+        when(this.targetedBlock.getType()).thenReturn(Material.AIR);
         this.manager.load();
+
+        // Spawn hologram when targeting enderchest
+        when(this.targetedBlock.getType()).thenReturn(Material.ENDER_CHEST);
+        this.manager.armorStandAdapter = this.armorStandAdapter;
+        this.manager.run();
 
         verify(this.dependenciesManager).validateBlockChestOpening(this.targetedBlock, this.observer);
         verify(this.enderChestManager).loadPlayerContext(eq(this.observer.getUniqueId()), any(Consumer.class));
         assertThat(this.manager.holograms).isNotEmpty().hasSize(1);
+        assertThat(
+                this.manager.holograms.get(this.observer.getUniqueId()).getEntityId()
+        ).isEqualTo(5);
     }
 
     @Test
@@ -120,15 +137,18 @@ public class HologramManagerTest {
     }
 
     @Test
-    public void dispawnHologram() {
+    public void dispawnHologram() throws HologramException {
         // Spawn hologram after first load
         this.manager.load();
+        this.manager.armorStandAdapter = this.armorStandAdapter;
+
         assertThat(this.manager.holograms).isNotEmpty().hasSize(1);
 
         // Dispawn hologram when targeting AIR right after
         when(this.targetedBlock.getType()).thenReturn(Material.AIR);
         this.manager.run();
         assertThat(this.manager.holograms).isEmpty();
+        verify(this.armorStandAdapter).destroyArmorStandFor(this.observer, 0);
     }
 
 }
