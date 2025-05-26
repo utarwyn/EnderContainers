@@ -10,25 +10,25 @@
 commands:
 
   backups:
-    created: '&aBackup &b%backup%&a has been created.'
-    creation_starting: 'Starting backup creation in the background...'
-    exists: 'Backup &6%backup% &calready exists. Please choose another name.'
-    info: '&6%command% &7to have more info about a backup.'
-    loaded: '&aHooray! Backup &b%backup%&a has been loaded!'
-    loading_starting: 'Starting backup loading in the background...'
-    removed: '&aBackup &b%backup%&a has been removed with all its data.'
-    unknown: 'Backup &6%backup%&c not found.'
-    zero: '&cNo backup found. Create your first backup now!'
+    created: '&aKopia zapasowa &b%backup%&a została stworzona.'
+    creation_starting: 'Rozpoczynanie tworzenia kopii zapasowej w tle...'
+    exists: 'Kopia zapasowa &6%backup% &cjuż istnieje. Proszę wybierz inną nazwę.'
+    info: '&6%command% &7aby otrzymać więcej informacji o kopii zapasowej.'
+    loaded: '&aHurra! Kopia zapasowa &b%backup%&a została załadowana!'
+    loading_starting: 'Rozpoczynanie ładowania kopii zapasowej w tle...'
+    removed: '&aKopia zapasowa &b%backup%&a została usunięta razem z całymi jej danymi.'
+    unknown: 'Kopia zapasowa &6%backup%&c nie została znaleziona.'
+    zero: '&cNie znaleziono kopii zapasowych. Stwórz swoją pierwszą kopię zapasową teraz!'
 
-    label_name: 'Name'
-    label_date: 'Creation date'
-    label_by: 'Created by'
-    label_loadcmd: '&8To apply this backup'
-    label_rmcmd: '&8To remove this backup'
+    label_name: 'Nazwa'
+    label_date: 'Data utworzenia'
+    label_by: 'Stworzona przez'
+    label_loadcmd: '&8Aby zaplikować tę kopię zapasową'
+    label_rmcmd: '&8Aby usunąć tę kopię zapasową'
 
-  config_reloaded: 'Configuration reloaded!'
-  update: '&6EnderContainers &cis not up-to-date! Latest version is &e%version%&c. Type &3ecp update &cin the console and follow instructions.'
-  no_update: 'Plugin is up-to-date! Your version is &e%version%&7.'
+  config_reloaded: 'Konfiguracja przeładowana!'
+  update: '&cNie masz najnowszej wersji &6EnderContainers! Najnowsza wersja to &e%version%&c. Wpisz &3ecp update &cw konsoli i postępuj zgodnie z instrukcjami.'
+  no_update: 'Plugin ma najnowszą wersję! Twoja wersja to &e%version%&7.'
 
 
 ##              ##
@@ -36,18 +36,18 @@ commands:
 ##              ##
 menus:
 
-  main_title: 'Enderchests of %player%'
-  chest_title: 'Enderchest %num% of %player%'
+  main_title: 'Enderchesty gracza %player%'
+  chest_title: 'Enderchest %num% gracza %player%'
 
   chest_item_accessible_title: '&aEnderchest %num% %counter%'
   chest_item_inaccessible_title: '&cEnderchest %num%'
 
-  chest_empty: '&2This enderchest is empty!'
-  chest_full: '&cInventory full!'
-  chest_locked: '&8&o>> Enderchest locked!'
+  chest_empty: '&2Ten enderchest jest pusty!'
+  chest_full: '&cEkwipunek jest pełen!'
+  chest_locked: '&8&o>> Enderchest zablokowany!'
 
-  previous_page: '&c≪ Previous page'
-  next_page: '&cNext page ≫'
+  previous_page: '&c≪ Poprzednia strona'
+  next_page: '&cNastępna strona ≫'
 
 
 ##               ##
@@ -55,14 +55,14 @@ menus:
 ##               ##
 errors:
 
-  noperm_open_chest: 'You can''t open this EnderChest!'
-  noperm_console: 'You must be a player to do this!'
-  noperm_player: 'You don''t have the permission to do this!'
-  player_not_found: 'Player &6%playername% &cnot found.'
-  plugin_reload_error: 'Error when reloading configuration! Check server log for more info.'
-  plugin_world_disabled: 'Plugin is disabled in this world.'
-  cmd_invalid_parameter: 'Parameter &6%param% &cis not valid.'
-  cmd_wrong_argument_count: 'Wrong argument count. &6/ecp help &cto show the plugin''s help!'
+  noperm_open_chest: 'Nie możesz otworzyć tego enderchesta!'
+  noperm_console: 'Musisz być graczem aby to zrobić!'
+  noperm_player: 'Nie masz uprawnień do tego!'
+  player_not_found: 'Gracz &6%playername% &cnie został odnaleziony.'
+  plugin_reload_error: 'Błąd przy przeładowywaniu konfiguracji! Sprawdź dziennik serwera po więcej informacji.'
+  plugin_world_disabled: 'Plugin jest wyłączony w tym świecie.'
+  cmd_invalid_parameter: 'Parametr &6%param% &cnie jest prawidłowy.'
+  cmd_wrong_argument_count: 'Zła ilość argumentów. Wpisz &6/ecp help &caby pokazać pomoc z pluginem!'
 
 
 ##                     ##
@@ -71,9 +71,9 @@ errors:
 dependencies:
 
   # Factions plugin
-  access_denied_factions: 'You can''t use the enderchest in %faction%''s territory!'
+  access_denied_factions: 'Nie możesz użyć enderchesta na terenie %faction%!'
   # PlotSquared Plugin
-  access_denied_plotsq: 'You can''t use the enderchest in this plot!'
+  access_denied_plotsq: 'Nie możesz użyć enderchesta na tej działce!'
 
 
 ##                      ##
@@ -81,4 +81,4 @@ dependencies:
 ##                      ##
 miscellaneous:
 
-  chest_nametag: '&6&l%enderchests%/%maxenderchests%&r&e enderchest%plural% available'
+  chest_nametag: '&6&l%enderchests%/%maxenderchests%&r&e enderchest%plural% dostępnych'
