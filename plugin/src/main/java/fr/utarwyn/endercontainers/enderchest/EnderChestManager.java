@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.AbstractManager;
+import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
@@ -9,6 +10,7 @@ import fr.utarwyn.endercontainers.enderchest.context.SaveTask;
 import fr.utarwyn.endercontainers.enderchest.listener.EnderChestInventoryListener;
 import fr.utarwyn.endercontainers.enderchest.listener.EnderChestListener;
 import fr.utarwyn.endercontainers.inventory.InventoryManager;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -174,4 +176,10 @@ public class EnderChestManager extends AbstractManager {
         }
     }
 
+    public void openListInventory(PlayerContext playerContext) {
+        Bukkit.getScheduler().runTask(
+                this.plugin,
+                () -> playerContext.openListInventory(playerContext.getOwnerAsObject())
+        );
+    }
 }

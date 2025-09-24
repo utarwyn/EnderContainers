@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.inventory;
 
 import com.google.common.base.Preconditions;
+import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
 import fr.utarwyn.endercontainers.configuration.Files;
@@ -15,6 +16,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -34,6 +38,8 @@ public class EnderChestInventory extends AbstractInventoryHolder {
      * Internal map to cache all contents of the chest (even those not displayed in the container).
      */
     private ConcurrentMap<Integer, ItemStack> contents;
+
+    private final Set<UUID> openedFromMenu = ConcurrentHashMap.newKeySet();
 
     /**
      * Constructs an inventory which contains contents of an enderchest.
@@ -113,6 +119,10 @@ public class EnderChestInventory extends AbstractInventoryHolder {
                 .replace("%num%", num);
     }
 
+    public void markOpenedFromMenu(Player player) {
+        this.openedFromMenu.add(player.getUniqueId());
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -122,9 +132,9 @@ public class EnderChestInventory extends AbstractInventoryHolder {
         Player owner = Bukkit.getPlayer(this.chest.getOwner());
         boolean offlineOwner = owner == null || !owner.isOnline();
 
+        EnderChestManager enderChestManager = Managers.get(EnderChestManager.class);
         // Save chest inventory if owner is offline or forced by the configuration
         if (offlineOwner || Files.getConfiguration().getSaveMode() == SaveMode.ON_CLOSE) {
-            EnderChestManager enderChestManager = Managers.get(EnderChestManager.class);
             enderChestManager.savePlayerContext(this.chest.getOwner());
             if (offlineOwner) {
                 enderChestManager.deletePlayerContextIfUnused(this.chest.getOwner());
@@ -137,6 +147,11 @@ public class EnderChestInventory extends AbstractInventoryHolder {
             player.getWorld().playSound(player.getLocation(), sound, 1f, 1f);
         } else {
             player.playSound(player.getLocation(), sound, 1f, 1f);
+        }
+
+        UUID uuid = player.getUniqueId();
+        if (Files.getConfiguration().isReturnToMenuOnClose() && this.openedFromMenu.remove(uuid)) {
+            enderChestManager.openListInventory(this.chest.getContext());
         }
     }
 

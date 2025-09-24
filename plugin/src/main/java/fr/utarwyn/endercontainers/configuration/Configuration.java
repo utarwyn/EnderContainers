@@ -34,6 +34,7 @@ public class Configuration {
     private final List<EnderChestItemVariant> enderchestItemVariants;
     private final boolean numberingEnderchests;
     private final boolean onlyShowAccessibleEnderchests;
+    private final boolean returnToMenuOnClose;
 
     private final boolean mysql;
     private final String mysqlHost;
@@ -86,6 +87,8 @@ public class Configuration {
         this.numberingEnderchests = loadValue("ui.enderchestItem.numbering", config::isBoolean, config::getBoolean);
         this.onlyShowAccessibleEnderchests = loadValue("ui.onlyShowAccessible", config::isBoolean, config::getBoolean)
                 || legacyOnlyShowAccessible;
+
+        this.returnToMenuOnClose = loadValue("ui.returnToMenuOnClose", config::isBoolean, config::getBoolean);
 
         this.mysql = loadValue("mysql.enabled", config::isBoolean, config::getBoolean);
         this.mysqlHost = loadValue("mysql.host", config::isString, config::getString);
@@ -142,6 +145,10 @@ public class Configuration {
 
     public boolean isOnlyShowAccessibleEnderchests() {
         return this.onlyShowAccessibleEnderchests;
+    }
+
+    public boolean isReturnToMenuOnClose() {
+        return this.returnToMenuOnClose;
     }
 
     public boolean isUseVanillaEnderchest() {

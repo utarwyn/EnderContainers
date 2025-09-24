@@ -72,6 +72,9 @@ ui:
   # Show/Hide all inaccessible enderchests
   onlyShowAccessible: false
 
+  # Automatically return to the main menu when closing a chest opened from the menu
+  returnToMenuOnClose: true
+
 
 # Mysql/MariaDB configuration, if needed
 mysql:
