@@ -176,13 +176,17 @@ public class EnderChestListMenu extends AbstractInventoryHolder {
             return;
         }
 
-        // Open the selected chest
-        Sound sound;
-        if (this.context.openEnderchestInventory(player, this.getFirstChestIndex() + slot)) {
-            sound = CompatibilityHelper.searchSound("CLICK", "UI_BUTTON_CLICK");
-        } else {
-            sound = CompatibilityHelper.searchSound("VILLAGER_NO", "ENTITY_VILLAGER_NO");
+        int chestIndex = this.getFirstChestIndex() + slot;
+        boolean opened = this.context.openEnderchestInventory(player, chestIndex);
+
+        if (opened) {
+            Optional<EnderChest> chestOpt = this.context.getChest(chestIndex);
+            chestOpt.ifPresent(ch -> ch.markOpenedFromMenu(player));
         }
+
+        Sound sound = opened
+                ? CompatibilityHelper.searchSound("CLICK", "UI_BUTTON_CLICK")
+                : CompatibilityHelper.searchSound("VILLAGER_NO", "ENTITY_VILLAGER_NO");
         player.playSound(player.getLocation(), sound, 1f, 1f);
     }
 

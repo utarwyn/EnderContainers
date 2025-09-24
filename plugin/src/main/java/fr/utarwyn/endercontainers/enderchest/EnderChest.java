@@ -246,4 +246,16 @@ public class EnderChest {
         }
     }
 
+    public PlayerContext getContext() {
+        return this.context;
+    }
+
+    public void markOpenedFromMenu(Player player) {
+        if (this.container != null) {
+            this.container.markOpenedFromMenu(player);
+        }
+    }
+
+
+
 }
