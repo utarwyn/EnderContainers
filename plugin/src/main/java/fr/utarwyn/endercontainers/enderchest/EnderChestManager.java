@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.enderchest;
 
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.Managers;
+import fr.utarwyn.endercontainers.compatibility.FoliaSupport;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.enderchest.context.LoadTask;
 import fr.utarwyn.endercontainers.enderchest.context.PlayerContext;
@@ -131,7 +132,7 @@ public class EnderChestManager extends AbstractManager {
                 consumer.accept(this.contextMap.get(owner));
             } else {
                 this.loadingContexts.add(owner);
-                this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin,
+                FoliaSupport.runTaskAsynchronously(this.plugin,
                         new LoadTask(this.plugin, this, owner, consumer));
             }
         }

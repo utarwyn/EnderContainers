@@ -3,4 +3,5 @@ author: Utarwyn
 version: 2.3.0-dev
 main: fr.utarwyn.endercontainers.EnderContainers
 api-version: "1.13"
+folia-supported: true
 softdepend: [Factions, PlotSquared, Essentials, WorldGuard]

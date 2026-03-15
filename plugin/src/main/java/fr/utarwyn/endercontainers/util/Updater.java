@@ -3,6 +3,7 @@ package fr.utarwyn.endercontainers.util;
 import com.google.gson.Gson;
 import fr.utarwyn.endercontainers.AbstractManager;
 import fr.utarwyn.endercontainers.compatibility.CompatibilityHelper;
+import fr.utarwyn.endercontainers.compatibility.FoliaSupport;
 import fr.utarwyn.endercontainers.configuration.Files;
 import fr.utarwyn.endercontainers.configuration.LocaleKey;
 import org.bukkit.Sound;
@@ -66,7 +67,7 @@ public class Updater extends AbstractManager implements Runnable {
     public synchronized void load() {
         // Check for updates if enabled by the server administrator
         if (Files.getConfiguration().isUpdateChecker()) {
-            this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, this);
+            FoliaSupport.runTaskAsynchronously(this.plugin, this);
         } else {
             this.plugin.getLogger().warning("You have disabled update checking. Please be sure that the plugin is up to date.");
         }

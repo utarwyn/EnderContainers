@@ -2,6 +2,7 @@ package fr.utarwyn.endercontainers.backup.action;
 
 import fr.utarwyn.endercontainers.EnderContainers;
 import fr.utarwyn.endercontainers.backup.BackupManager;
+import fr.utarwyn.endercontainers.compatibility.FoliaSupport;
 
 import java.util.function.Consumer;
 
@@ -48,7 +49,7 @@ public abstract class BackupAbstractTask implements Runnable {
      * @param result action result
      */
     protected void supplyResult(boolean result) {
-        this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin,
+        FoliaSupport.runTaskOnMainThread(this.plugin,
                 () -> this.callback.accept(result));
     }
 
