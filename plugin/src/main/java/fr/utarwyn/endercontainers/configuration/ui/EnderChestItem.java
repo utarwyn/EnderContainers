@@ -1,5 +1,6 @@
 package fr.utarwyn.endercontainers.configuration.ui;
 
+import fr.utarwyn.endercontainers.compatibility.VersionAwareMaterialSelector;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -40,16 +41,15 @@ public class EnderChestItem {
     }
 
     private static Material formatMaterial(String type) {
-        String[] parts = type.split(":");
+        Material material = VersionAwareMaterialSelector.selectMaterial(type.split(":")[0]);
         return Objects.requireNonNull(
-                Material.matchMaterial(parts[0]),
-                String.format("item material %s is not valid", parts[0])
+                material,
+                String.format("item material %s is not valid", type)
         );
     }
 
     private static Integer formatDurability(String type) {
-        String[] parts = type.split(":");
-        return parts.length == 2 ? Integer.parseInt(parts[1]) : null;
+        return VersionAwareMaterialSelector.extractDurability(type);
     }
 
     public String getName() {
