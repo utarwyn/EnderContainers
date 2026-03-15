@@ -1,0 +1,108 @@
+# # # # # # # # # # # # # # # # # # # # #
+#   EnderContainers configuration       #
+#   Version: 2.3.0-dev                  #
+#   An enderchests plugin by Utarwyn    #
+# # # # # # # # # # # # # # # # # # # # #
+
+# The locale of the plugin
+locale: en
+
+# A list of worlds in which the plugin will be automatically disabled
+disabledWorlds: [ ]
+
+
+# Enderchests configuration
+enderchests:
+
+  # Max number of enderchests available
+  # Range: 1 to infinite
+  max: 27
+
+  # Number of enderchests available for all users without any permission
+  # Range: 1 to max
+  default: 1
+
+  # Use the vanilla enderchest as the first one. Otherwise, it will be managed by EnderContainers.
+  useVanillaEnderchest: true
+
+  # The mode in which the plugin will save enderchests
+  # Can be: logout, on-close or world-save
+  saveMode: 'logout'
+
+  # A list of item materials which are forbidden to store in chests
+  # Use Minecraft item IDs displayed ingame (shortcut: F3+H)
+  forbiddenMaterials: [ ]
+
+
+# UI configuration
+ui:
+
+  # What an enderchest item will look like in the main menu
+  enderchestItem:
+
+    # Default look of the item if no variant was found for chest state
+    name: '{{menus.chest_item_accessible_title}}'
+    type: 'LIME_STAINED_GLASS_PANE'
+    lore: [ ]
+
+    # A list of variants to condition the display of item according to chest state
+    # Check our wiki on GitHub to have a list of available conditions and variables
+    variants:
+      - condition: 'inaccessible'
+        name: '{{menus.chest_item_inaccessible_title}}'
+        type: 'BLACK_STAINED_GLASS_PANE'
+        lore: [ '{{menus.chest_locked}}' ]
+
+      - condition: 'filling = 100%'
+        type: 'RED_STAINED_GLASS_PANE'
+        lore: [ '{{menus.chest_full}}' ]
+
+      - condition: 'filling = 0%'
+        lore: [ '{{menus.chest_empty}}' ]
+
+      - condition: 'filling >= 90%'
+        type: 'RED_STAINED_GLASS_PANE'
+
+      - condition: 'filling >= 50%'
+        type: 'ORANGE_STAINED_GLASS_PANE'
+
+    # Number the item so that they follow enderchests number
+    numbering: false
+
+  # Show/Hide all inaccessible enderchests
+  onlyShowAccessible: false
+
+
+# Mysql/MariaDB configuration, if needed
+mysql:
+
+  # You can enable the MySQL module here
+  enabled: false
+
+  # Configuration of your MySQL database
+  host: 'localhost'
+  port: 3306
+  user: 'root'
+  password: ''
+  database: 'endercontainers'
+
+  # Change this section if you want to connect over SSL, by default its disabled.
+  # Check our wiki on GitHub to know how to configure it!
+  ssl:
+    enabled: false
+
+  # You can choose a prefix for all EnderContainers tables
+  tablePrefix: 'ec_'
+
+
+# Miscellaneous configuration
+others:
+
+  # Make the text above enderchests visible?
+  blockNametag: false
+
+  # Check automatically for update?
+  updateChecker: true
+
+  # Use a global sound when a player opens/closes an enderchest
+  globalSound: true

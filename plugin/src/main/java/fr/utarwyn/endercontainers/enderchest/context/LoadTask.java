@@ -1,6 +1,7 @@
 package fr.utarwyn.endercontainers.enderchest.context;
 
 import fr.utarwyn.endercontainers.EnderContainers;
+import fr.utarwyn.endercontainers.compatibility.FoliaSupport;
 import fr.utarwyn.endercontainers.enderchest.EnderChestManager;
 
 import java.util.UUID;
@@ -63,7 +64,7 @@ public class LoadTask implements Runnable {
         // This task can take a certain amount of time to be executed
         context.loadEnderchests(count);
 
-        this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, () -> {
+        FoliaSupport.runTaskOnMainThread(this.plugin, () -> {
             // Load offline player profile in a synchronous way if needed
             try {
                 context.loadOfflinePlayerProfile();

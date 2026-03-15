@@ -57,9 +57,13 @@ class EnderChestItemTest {
 
     @Test
     void creationErrorWithUnknownMaterial() {
+        // With VersionAwareMaterialSelector, unknown materials now safely fall back to GLASS
+        // instead of throwing an exception. This is a more robust behavior.
         List<String> lore = Collections.emptyList();
-        Throwable exception = assertThrows(NullPointerException.class, () -> new EnderChestItem(null, "FAKE_MATERIAL", lore));
-        assertThat(exception.getMessage()).isEqualTo("item material FAKE_MATERIAL is not valid");
+        EnderChestItem item = new EnderChestItem(null, "FAKE_MATERIAL", lore);
+        assertThat(item.getType()).isEqualTo("FAKE_MATERIAL");
+        assertThat(item.getMaterial()).isEqualTo(Material.GLASS);
+        assertThat(item.getDurability()).isNull();
     }
 
 }

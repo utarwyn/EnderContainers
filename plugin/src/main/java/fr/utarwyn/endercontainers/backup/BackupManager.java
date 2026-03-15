@@ -5,6 +5,7 @@ import fr.utarwyn.endercontainers.Managers;
 import fr.utarwyn.endercontainers.backup.action.BackupApplyTask;
 import fr.utarwyn.endercontainers.backup.action.BackupCreateTask;
 import fr.utarwyn.endercontainers.backup.action.BackupRemoveTask;
+import fr.utarwyn.endercontainers.compatibility.FoliaSupport;
 import fr.utarwyn.endercontainers.storage.StorageManager;
 import fr.utarwyn.endercontainers.storage.backups.BackupsData;
 
@@ -88,7 +89,7 @@ public class BackupManager extends AbstractManager {
         Optional<Backup> backup = this.getBackupByName(name);
 
         if (!backup.isPresent()) {
-            this.plugin.getServer().getScheduler().runTaskAsynchronously(
+            FoliaSupport.runTaskAsynchronously(
                     this.plugin,
                     new BackupCreateTask(this.plugin, this, operator, name, consumer)
             );
@@ -107,7 +108,7 @@ public class BackupManager extends AbstractManager {
         Optional<Backup> backup = this.getBackupByName(name);
 
         if (backup.isPresent()) {
-            this.plugin.getServer().getScheduler().runTaskAsynchronously(
+            FoliaSupport.runTaskAsynchronously(
                     this.plugin,
                     new BackupApplyTask(this.plugin, this, backup.get(), consumer)
             );
@@ -126,7 +127,7 @@ public class BackupManager extends AbstractManager {
         Optional<Backup> backup = this.getBackupByName(name);
 
         if (backup.isPresent()) {
-            this.plugin.getServer().getScheduler().runTaskAsynchronously(
+            FoliaSupport.runTaskAsynchronously(
                     this.plugin,
                     new BackupRemoveTask(this.plugin, this, backup.get(), consumer)
             );

@@ -15,6 +15,7 @@ import fr.utarwyn.endercontainers.util.MetricsHandler;
 import fr.utarwyn.endercontainers.util.Updater;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Objects;
 import java.util.logging.Level;
 
@@ -32,6 +33,9 @@ public class EnderContainers extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        // Extract locales folder from JAR
+        this.extractLocalesFolder();
+
         // Load config files
         try {
             Files.reload(this);
@@ -57,6 +61,30 @@ public class EnderContainers extends JavaPlugin {
 
         // Initialize the metrics handler
         new MetricsHandler(this);
+    }
+
+    /**
+     * Extracts the locales folder from the plugin JAR to the data folder
+     */
+    private void extractLocalesFolder() {
+        File localesFolder = new File(this.getDataFolder(), "locales");
+        if (!localesFolder.exists()) {
+            localesFolder.mkdirs();
+        }
+
+        String[] localeFiles = {"en.yml", "fr.yml", "zhCN.yml", "zhTW.yml"};
+        for (String fileName : localeFiles) {
+            File localeFile = new File(localesFolder, fileName);
+            if (!localeFile.exists()) {
+                try (java.io.InputStream input = this.getResource("locales/" + fileName)) {
+                    if (input != null) {
+                        java.nio.file.Files.copy(input, localeFile.toPath());
+                    }
+                } catch (Exception e) {
+                    this.getLogger().log(Level.WARNING, "Could not extract locale file: " + fileName, e);
+                }
+            }
+        }
     }
 
     /**

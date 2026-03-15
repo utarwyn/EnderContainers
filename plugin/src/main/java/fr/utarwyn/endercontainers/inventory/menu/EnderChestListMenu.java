@@ -206,13 +206,15 @@ public class EnderChestListMenu extends AbstractInventoryHolder {
 
         EnderChestItem item = ITEM_SELECTOR.fromEnderchest(ec);
         ItemStack itemStack = new ItemStack(item.getMaterial(), amount);
+        
+        // Set durability directly on ItemStack (for colored materials in 1.8.8+)
+        if (item.getDurability() != null) {
+            itemStack.setDurability(item.getDurability().shortValue());
+        }
+        
         ItemMeta meta = itemStack.getItemMeta();
 
         if (meta != null) {
-            if (item.getDurability() != null && meta instanceof Damageable) {
-                ((Damageable) meta).setDamage(item.getDurability());
-            }
-
             meta.setDisplayName(this.formatTextWithChestInfo(item.getName(), ec));
             meta.setLore(
                     item.getLore().stream()
